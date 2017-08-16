@@ -3,59 +3,50 @@
  */
 package de.evoila.config.web;
 
-import java.io.IOException;
-import java.util.Arrays;
-
-import org.springframework.boot.context.embedded.FilterRegistrationBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 
 import de.evoila.cf.broker.model.Catalog;
-import de.evoila.cf.broker.model.ServiceDefinition;
 import de.evoila.cf.config.web.cors.CORSFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 /**
- * @author johanneshiemer
+ * @author Johannes Hiemer.
  *
  */
 @Configuration
+@EnableConfigurationProperties(Catalog.class)
 public class BaseConfiguration {
-	
-	@Bean
-	public Catalog catalog() {
-		Catalog catalog = new Catalog(Arrays.asList(serviceDefinition()));
-
-		return catalog;
-	}
-
-	@Bean
-	public ServiceDefinition serviceDefinition() {
-		ClassPathResource classPathResource = new ClassPathResource("/plans/service-definition.yml");
-		CustomClassLoaderConstructor constructor = new CustomClassLoaderConstructor(ServiceDefinition.class, ServiceDefinition.class.getClassLoader());
-
-		Yaml yaml = new Yaml(constructor);
-
-		ServiceDefinition serviceDefinition = null;
-		try {
-			serviceDefinition = yaml.loadAs(classPathResource.getInputStream(), ServiceDefinition.class);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		serviceDefinition.setRequires(Arrays.asList("syslog_drain"));
-
-		return serviceDefinition;
-	}
 
     @Bean
-    public FilterRegistrationBean someFilterRegistration() {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
-        registration.setFilter(new CORSFilter());
-        registration.addUrlPatterns("/*");
-        registration.setName("corsFilter");
-        return registration;
+    public FilterRegistrationBean corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+
+        config.addExposedHeader("WWW-Authenticate");
+        config.addExposedHeader("Access-Control-Allow-Origin");
+        config.addExposedHeader("Access-Control-Allow-Headers");
+
+        config.addAllowedMethod("OPTIONS");
+        config.addAllowedMethod("HEAD");
+        config.addAllowedMethod("GET");
+        config.addAllowedMethod("PUT");
+        config.addAllowedMethod("POST");
+        config.addAllowedMethod("DELETE");
+        config.addAllowedMethod("PATCH");
+        source.registerCorsConfiguration("/**", config);
+
+        final FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+        bean.setOrder(0);
+        return bean;
     }
 
 }
