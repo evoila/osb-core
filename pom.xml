@@ -20,7 +20,7 @@
 			scm:git:git@github.com:evoila/cf-service-broker-core.git
 		</connection>
 		<url>https://github.com/evoila/cf-service-broker-core</url>
-      <tag>osb-core-1.2.0</tag>
+      <tag>parent-1.2.0</tag>
   </scm>
 
 	<modules>
@@ -124,18 +124,6 @@
 						<argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
 					</configuration>
 				</plugin>
-				<!--				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<executions>
-						<execution>
-							<id>attach-javadocs</id>
-							<goals>
-								<goal>jar</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>-->
 			</plugins>
 		</pluginManagement>
 	</build>
