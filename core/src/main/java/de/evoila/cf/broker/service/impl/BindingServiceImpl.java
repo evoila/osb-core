@@ -1,6 +1,4 @@
-/**
- * 
- */
+
 package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.exception.*;
@@ -19,8 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Johannes Hiemer.
- *
+ * @author Johannes Hiemer
  */
 public abstract class BindingServiceImpl implements BindingService {
 
@@ -82,11 +79,6 @@ public abstract class BindingServiceImpl implements BindingService {
 		return response;
 	}
 
-	/**
-	 * @param serviceInstance
-	 * @param route
-	 * @return
-	 */
 	protected abstract RouteBinding bindRoute(ServiceInstance serviceInstance, String route);
 
 	protected ServiceInstanceBinding createServiceInstanceBinding(String bindingId, String serviceInstanceId,
@@ -134,14 +126,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		return serviceInstanceRepository.getServiceInstance(serviceInstanceId);
 	}
 
-	/**
-	 * @param bindingId
-	 * @param serviceInstance
-	 * @param plan
-	 * @param externalAddresses
-	 * @return
-	 * @throws ServiceBrokerException
-	 */
+
 	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstance serviceInstance, Plan plan,
 			List<ServerAddress> externalAddresses) throws ServiceBrokerException {
 
@@ -155,13 +140,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		return serviceInstanceBinding;
 	}
 
-	/**
-	 * @param bindingId
-	 * @param serviceInstance
-	 * @param plan
-	 * @return
-	 * @throws ServiceBrokerException
-	 */
+
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstance serviceInstance, Plan plan)
 			throws ServiceBrokerException {
 
@@ -173,13 +152,6 @@ public abstract class BindingServiceImpl implements BindingService {
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, null);
 	}
 
-	/**
-	 * @param bindingId
-	 * @param serviceInstance
-	 * @param host
-	 * @return
-	 * @throws ServiceBrokerException
-	 */
 	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstance serviceInstance,
 			ServerAddress host) throws ServiceBrokerException;
 
