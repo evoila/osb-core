@@ -95,8 +95,8 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 			uaaRelyingPartyFilter.setSuccessHandler(new UaaRelyingPartyAuthenticationSuccessHandler());
 			uaaRelyingPartyFilter.setFailureHandler(new UaaRelyingPartyAuthenticationFailureHandler());
 
-
-				http.addFilterBefore(uaaRelyingPartyFilter, LogoutFilter.class)
+				http.authorizeRequests().anyRequest().permitAll().and().csrf().disable(); //Termporär
+				/*http.addFilterBefore(uaaRelyingPartyFilter, LogoutFilter.class)
 
 
 				.csrf().disable()
@@ -114,7 +114,7 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 				.authorizeRequests()
 					.antMatchers(HttpMethod.GET,"/v2/authentication/{serviceInstanceId}").permitAll()
 					.antMatchers(HttpMethod.GET,"/v2/authentication/{serviceInstanceId}/confirm").permitAll()
-					.antMatchers(HttpMethod.GET, "/v2/manage/**").authenticated();
+					.antMatchers(HttpMethod.GET, "/v2/manage/**").authenticated();*/
 
 		}
 	}
