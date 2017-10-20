@@ -1,0 +1,96 @@
+spring:
+  ### Profile ###
+  profiles: default
+
+### Persistence ###
+#### MongoDB ####
+  data:
+    mongodb:
+      host: 127.0.0.1
+      port: 27017
+      database: servicebroker
+      username: marco
+      password: computer-93
+
+### Deployment ###
+#### Existing CouchDB Server/Cluster ####
+existing:
+  endpoint:
+    hosts:
+      - 127.0.0.1
+    port: 5984
+    database: _users
+    username: admin
+    password: admin
+
+### Service Key Generation ###
+#### HAProxy ####
+haproxy:
+  uri: https://haproxy.cf.eu-de-netde.msh.host/agents/58beec3ffd66699000390a5e/schemas?type=listen
+  auth:
+    token: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b944
+
+### Login Information ###
+login:
+  username: admin
+  password: cloudfoundry
+  role: USER
+
+## OpenStack Settings ## (OPTIONAL)
+#openstack:
+#  endpoint:
+#  user:
+#    username:
+#    password:
+#    domainName:
+#  project:
+#    domainName:
+#    projectName:
+#  networkId:
+#  subnetId:
+#  imageId:
+#  keypair:
+#  cinder:
+#    az: zone00
+catalog:
+  services:
+    - id: sample-local
+      name: Sample-local
+      description: Sample Instances
+      bindable: true
+      dashboard:
+        url: $endpoint_uri
+        auth_endpoint: $uaa_uri
+      dashboard_client:
+        id: sample
+        secret: sample
+        redirect_uri: $endpoint_uri/dashboard/manage
+      plans:
+        - id: sample_s_local
+          name: S
+          description: A simple sample Local plan.
+          free: false
+          volumeSize: 25
+          volumeUnit: M
+          platform: EXISTING_SERVICE
+          connections: 4
+    - id: sample-2
+      name: Second service
+      description: Second Instance
+      bindable: true
+      dashboard:
+        url: $endpoint_uri
+        auth_endpoint: $uaa_uri
+      dashboard_client:
+        id: second
+        secret: secret
+        redirect_uri: $endpoint_uri/dashboard/manage
+      plans:
+        - id: sample_m_local
+          name: S
+          description: A second simple local plan.
+          free: false
+          volumeSize: 25
+          volumeUnit: M
+          platform: EXISTING_SERVICE
+          connections: 4

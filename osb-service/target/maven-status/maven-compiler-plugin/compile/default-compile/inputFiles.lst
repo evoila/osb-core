@@ -1,0 +1,7 @@
+/root/IdeaProjects/cf-service-broker-example/osb-service/src/main/java/de/evoila/cf/broker/service/custom/ExampleBindingService.java
+/root/IdeaProjects/cf-service-broker-example/osb-service/src/main/java/de/evoila/cf/broker/service/sample/HAProxyServiceImpl.java
+/root/IdeaProjects/cf-service-broker-example/osb-service/src/main/java/de/evoila/cf/broker/service/sample/raw/CouchDbService.java
+/root/IdeaProjects/cf-service-broker-example/osb-service/src/main/java/de/evoila/Application.java
+/root/IdeaProjects/cf-service-broker-example/osb-service/src/main/java/de/evoila/cf/cpi/custom/props/CouchDBCustomPropertyHandler.java
+/root/IdeaProjects/cf-service-broker-example/osb-service/src/main/java/de/evoila/cf/broker/service/custom/CouchDbExistingServiceFactory.java
+/root/IdeaProjects/cf-service-broker-example/osb-service/src/main/java/de/evoila/cf/broker/service/sample/CouchDbCustomImplementation.java

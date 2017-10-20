@@ -1,0 +1,12 @@
+/root/IdeaProjects/cf-service-broker-example/osb-backup-core/src/main/java/de/evoila/cf/model/DatabaseCredential.java
+/root/IdeaProjects/cf-service-broker-example/osb-backup-core/src/main/java/de/evoila/cf/model/enums/RetentionStyle.java
+/root/IdeaProjects/cf-service-broker-example/osb-backup-core/src/main/java/de/evoila/cf/model/RestoreRequest.java
+/root/IdeaProjects/cf-service-broker-example/osb-backup-core/src/main/java/de/evoila/cf/model/FileDestination.java
+/root/IdeaProjects/cf-service-broker-example/osb-backup-core/src/main/java/de/evoila/cf/model/enums/JobStatus.java
+/root/IdeaProjects/cf-service-broker-example/osb-backup-core/src/main/java/de/evoila/cf/model/enums/DestinationType.java
+/root/IdeaProjects/cf-service-broker-example/osb-backup-core/src/main/java/de/evoila/cf/model/BackupJob.java
+/root/IdeaProjects/cf-service-broker-example/osb-backup-core/src/main/java/de/evoila/cf/model/ErrorMessage.java
+/root/IdeaProjects/cf-service-broker-example/osb-backup-core/src/main/java/de/evoila/cf/model/BackupPlan.java
+/root/IdeaProjects/cf-service-broker-example/osb-backup-core/src/main/java/de/evoila/cf/model/interfaces/SwiftConfig.java
+/root/IdeaProjects/cf-service-broker-example/osb-backup-core/src/main/java/de/evoila/cf/model/enums/DatabaseType.java
+/root/IdeaProjects/cf-service-broker-example/osb-backup-core/src/main/java/de/evoila/cf/model/BackupRequest.java

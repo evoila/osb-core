@@ -1,0 +1,8 @@
+de/evoila/cf/broker/service/sample/raw/CouchDbService.class
+de/evoila/Application.class
+de/evoila/cf/broker/service/sample/CouchDbCustomImplementation.class
+de/evoila/cf/broker/service/custom/CouchDbExistingServiceFactory.class
+de/evoila/cf/cpi/custom/props/CouchDBCustomPropertyHandler.class
+de/evoila/cf/broker/service/sample/HAProxyServiceImpl.class
+de/evoila/cf/broker/service/custom/ExampleBindingService.class
+META-INF/spring-configuration-metadata.json
