@@ -130,6 +130,7 @@ public abstract class ExistingServiceFactory implements PlatformService {
 	 * de.evoila.cf.cpi.existing.ExistingServiceFactory#getExistingServiceHosts(
 	 * )
 	 */
+
 	protected List<ServerAddress> getExistingServiceHosts() {
 		List<String> hosts = getHosts();
 		List<ServerAddress> serverAddresses = new ArrayList<ServerAddress>();

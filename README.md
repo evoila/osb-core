@@ -1,4 +1,4 @@
-# osb-service-broker-example
+# osb-service-broker-couchdb
 ## Description
 
 An empty Cloud Foundry Service Broker missing concrete implementation of a distinct service.   
@@ -19,7 +19,7 @@ Concrete Service logic and binding logic has to be added.
 
     spring:
       ### Profile ###
-      profiles: defaut
+      profiles: default
     
     ### Persistence ###
     #### MongoDB ####
