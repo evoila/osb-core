@@ -4,7 +4,10 @@
 package de.evoila.cf.broker.service.custom;
 
 import com.google.gson.JsonObject;
+import de.evoila.cf.broker.bean.impl.ExistingEndpointBeanImpl;
 import de.evoila.cf.broker.service.sample.raw.CouchDbService;
+import org.lightcouch.Replicator;
+import org.lightcouch.ReplicatorDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 //import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,11 +26,14 @@ import org.lightcouch.CouchDbClient;
 //import org.lightcouch.CouchDbInfo;
 import org.lightcouch.CouchDbException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Johannes Hiemer
  *
  */
-@Service
+
 /*	--> @see ExistingEndpointBeanImpl
 @ConfigurationProperties(prefix="existing.endpoint")
 @ConditionalOnProperty(prefix="existing.endpoint",
@@ -36,10 +42,16 @@ import org.lightcouch.CouchDbException;
 		"username", "password"
 	}, havingValue="")
 */
+@Service
 public class CouchDbExistingServiceFactory extends ExistingServiceFactory {
-	
+
+    private static final String HTTP = "http://";
+
 	@Autowired
 	private CouchDbCustomImplementation couchService;
+
+    @Autowired
+    private ExistingEndpointBeanImpl endpointBean;
 
 	@Override
 	protected void createInstance(CustomExistingServiceConnection connection, String database) throws PlatformException {
@@ -51,9 +63,21 @@ public class CouchDbExistingServiceFactory extends ExistingServiceFactory {
 			CouchDbClient client = couchdb.getCouchDbClient();
 			client.context().createDB(database);
 		}catch (CouchDbException e){
-			throw new PlatformException("Could not create to the database", e);
-		}
-		//log.info("Creating the Example Service...");
+        throw new PlatformException("Could not create to the database", e);
+        }
+
+		int size = endpointBean.getHosts().size();
+        for (String host : endpointBean.getHosts().subList(1, size)) {
+
+        couchdb.getCouchDbClient().replicator()
+                .source(HTTP + couchdb.getHost() + ":" + couchdb.getPort() + "/" + database)
+                .target(HTTP + host+":" + endpointBean.getPort() + "/" + database)
+                .continuous(true)
+                .replicatorDocId("repli:"+host)
+              //  .replicatorDocRev("repli_rev:"+host)
+                .save();
+        }
+        //log.info("Creating the Example Service...");
 	}
 
 	@Override
@@ -70,7 +94,17 @@ public class CouchDbExistingServiceFactory extends ExistingServiceFactory {
 		}catch(CouchDbException e) {
 			throw new PlatformException("could not delete from the database", e);
 		}
-		//log.info("Deleting the Example Service...");
+
+        int size = endpointBean.getHosts().size();
+        for (String host : endpointBean.getHosts().subList(1, size)) {
+            ReplicatorDocument doc = couchdb.getCouchDbClient().replicator().replicatorDocId("repli:"+host).find();
+            String revision = doc.getRevision();
+            couchdb.getCouchDbClient().replicator()
+                    .replicatorDocId("repli:" + host)
+                    .replicatorDocRev(revision)
+                    .remove();
+        }
+        //log.info("Deleting the Example Service...");
 	}
 
 	@Override

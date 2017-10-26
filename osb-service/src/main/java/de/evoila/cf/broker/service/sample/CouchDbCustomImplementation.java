@@ -31,6 +31,10 @@ import de.evoila.cf.cpi.existing.CustomExistingServiceConnection;
 @Service
 public class CouchDbCustomImplementation implements CustomExistingService {
 
+    private static final String APPLICATION_JSON = "application/json";
+
+    private static final String CONTENT_TYPE = "Content-Type";
+
 	private CouchDbService service;
 
 	@Autowired
@@ -72,9 +76,9 @@ public class CouchDbCustomImplementation implements CustomExistingService {
         js.addProperty("type", "user");
         connection.getCouchDbClient().save(js);
 
-        List<String> hosts = new ArrayList<String>();
+        /*List<String> hosts = new ArrayList<String>();
         hosts.add(connection.getConfig().getHost());
-
+        */
 		/* limit access to the database only for the created user
 		* Need to connect to database "database" as server admin to make changes
 		* to the _security document
@@ -117,7 +121,7 @@ public class CouchDbCustomImplementation implements CustomExistingService {
 
 		String baseUri = connection.getCouchDbClient().getBaseUri().toString();
 		String credentials = username+":"+password;
-		String http = baseUri.substring(0,7);
+        String http = baseUri.substring(0,7);
 		baseUri = baseUri.substring(7);
 
 		String uri = http+credentials+"@"+baseUri+database+"/_security";
@@ -128,9 +132,9 @@ public class CouchDbCustomImplementation implements CustomExistingService {
 
         HttpPut request = new HttpPut(uri);
 
-        params.setContentType("application/json");
-        request.addHeader("content-type", "application/json");
-        request.addHeader("Accept", "application/json");
+        params.setContentType(APPLICATION_JSON);
+        request.addHeader(CONTENT_TYPE, APPLICATION_JSON);
+        request.addHeader("Accept", APPLICATION_JSON);
         request.setEntity(params);
 
         HttpResponse response = c.execute(request);

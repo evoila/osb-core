@@ -25,6 +25,7 @@ import java.util.List;
  */
 public class CouchDbService implements CustomExistingServiceConnection {
 
+	//private static final String HTTP = "http://";
 	private boolean initialized;
 	private String host;
 	private CouchDbProperties config;
@@ -47,28 +48,16 @@ public class CouchDbService implements CustomExistingServiceConnection {
         //couchDbClient  = new CouchDbClient(database, true, "http", hosts.get(0), port, username, password);
 		couchDbClient = new CouchDbClient(config);
 
+		setHost(hosts.get(0));
+		setPort(port);
+
 		setInitialized(true);
 	}
 
 	public boolean isConnected() {
 		return couchDbClient != null && this.initialized;
 	}
-/*
-	public void bind(CouchDbService connection, String database,
-					 String username, String password) {
 
-		JsonObject js = new JsonObject();
-
-		js.addProperty("_id", "org.couchdb.user:"+username);
-		//js.addProperty("_rev", null);
-		js.addProperty("name", username);
-		js.addProperty("password", password);
-		js.add("roles", new JsonArray());
-		js.addProperty("type", "user");
-		connection.getCouchDbClient().save(js);
-
-	}
-*/
 	public boolean isInitialized() {
 		return initialized;
 	}
@@ -98,4 +87,11 @@ public class CouchDbService implements CustomExistingServiceConnection {
 		return port;
 	}
 
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
 }
