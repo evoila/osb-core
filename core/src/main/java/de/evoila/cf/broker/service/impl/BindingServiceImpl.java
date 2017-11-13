@@ -170,6 +170,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		ServerAddress host = serviceInstance.getHosts().get(0);
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, host, plan);
 
+
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, null);
 	}
 
@@ -177,10 +178,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	 * @param bindingId
 	 * @param serviceInstance
 	 * @param host
-	 * @param plan
-	 * @return
-	 * @throws ServiceBrokerException
-	 */
+	 */	
 	protected abstract Map<String, Object> createCredentials (String bindingId, ServiceInstance serviceInstance,
 															  ServerAddress host, Plan plan) throws ServiceBrokerException;
 
