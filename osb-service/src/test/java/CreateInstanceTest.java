@@ -25,6 +25,7 @@ import org.lightcouch.CouchDbClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -38,6 +39,7 @@ import static junit.framework.TestCase.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 @ContextConfiguration(classes = Application.class, loader = AnnotationConfigContextLoader.class, initializers = ConfigFileApplicationContextInitializer.class)
+@ActiveProfiles(profiles={"default", "singlenode"})
 public class CreateInstanceTest {
 
     @Autowired
@@ -73,7 +75,6 @@ public class CreateInstanceTest {
     @Test
     public void testCreateInstanceFromServiceInstance () throws Exception {
 
-      //serviceInstance = new ServiceInstance("instance_binding", "service_def", "s", "d", "d", new HashMap<>(), "d");
         Plan p = new Plan();
         service.createInstance(serviceInstance, p, new HashMap<String, String>());
 
@@ -85,7 +86,7 @@ public class CreateInstanceTest {
 
         HttpResponse response = performGet(uri);
 
-        assertEquals(200, response.getStatusLine().getStatusCode()); // instanz wurde erzeugt
+        assertEquals(200, response.getStatusLine().getStatusCode());
 
         String uri_sec = uri+"/_security";
         HttpResponse resp = performGet(uri_sec);
@@ -109,6 +110,8 @@ public class CreateInstanceTest {
 
         assertNotNull(repository.getServiceInstance(serviceInstance.getId()));
 
+
+
         ServiceInstanceBindingResponse serviceInstanceBinding = bindingService.createServiceInstanceBinding("binding_id", serviceInstance.getId(),
                 "sample-local", "sample_s_local", false, null);
 
@@ -131,7 +134,7 @@ public class CreateInstanceTest {
 
     @After
     public void delete () throws Exception {
-        bindingService.deleteServiceInstanceBinding("binding_id"); //it's the username
+        bindingService.deleteServiceInstanceBinding("binding_id"); // it's the username
         deploymentService.syncDeleteInstance(getServiceInstance(), service);
     }
 

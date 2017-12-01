@@ -11,6 +11,7 @@ import org.lightcouch.CouchDbClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -24,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 @ContextConfiguration(classes = Application.class, loader = AnnotationConfigContextLoader.class, initializers = ConfigFileApplicationContextInitializer.class)
+@ActiveProfiles(profiles={"default", "singlenode"})
 public class ConnectionTest {
 
     @Autowired
@@ -32,10 +34,6 @@ public class ConnectionTest {
     @Autowired
     private CouchDbExistingServiceFactory couchService;
 
-
-    /* it is not necessary to have a copy of the application.yml
-     in the test path (./test/resource/application.yml)
-     */
 
     @Test
     public void testConnection () throws Exception {
@@ -49,7 +47,7 @@ public class ConnectionTest {
         conn.connection(hosts, port, database, username, password);
         assertNotNull(conn.getService());
         assertTrue(conn.getService().isConnected());
-        assertEquals(conn.getService().getCouchDbClient().getDBUri().toString(), "http://127.0.0.1:5984/"+couchService.getDatabase()+"/");
+        assertEquals(conn.getService().getCouchDbClient().getDBUri().toString(), "http://"+hosts.get(0)+":"+port+"/"+couchService.getDatabase()+"/");
     }
 
 }

@@ -1,0 +1,10 @@
+spring:
+  ### Profile ###
+  profiles:
+
+### Deployment ###
+#### Existing CouchDB Server/Cluster ####
+existing:
+  endpoint:
+    hosts:
+      - 10.244.0.3

@@ -88,6 +88,7 @@ public class CouchDbBindingService extends BindingServiceImpl {
     return conn;
 }
 
+
 	private CouchDbService openConnection(ExistingEndpointBeanImpl endpointBean) throws ServiceBrokerException {
 
 	    String ip = endpointBean.getHosts().get(0);

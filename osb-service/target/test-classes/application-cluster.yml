@@ -1,0 +1,16 @@
+spring:
+  ### Profile ###
+  profiles: cluster
+
+### Deployment ###
+#### Existing CouchDB Server/Cluster ####
+existing:
+  endpoint:
+    hosts:
+      - 10.244.0.3
+      - 10.244.0.4
+      - 10.244.0.5
+    port: 5984
+    database: _users
+    username: admin
+    password: admin

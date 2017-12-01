@@ -79,7 +79,8 @@ public class CouchDbCustomImplementation implements CustomExistingService {
         /*List<String> hosts = new ArrayList<String>();
         hosts.add(connection.getConfig().getHost());
         */
-		/* limit access to the database only for the created user
+		/* **Security document **
+		* limit access to the database only for the created user
 		* Need to connect to database "database" as server admin to make changes
 		* to the _security document
 		* Cannot retrieve admin password from the configuration client (connection.getConfig().getPassword()==null)
@@ -87,6 +88,7 @@ public class CouchDbCustomImplementation implements CustomExistingService {
 		* Need to have variables from parameters */
 
         JsonObject main = ((CouchDbClient) adminClient.get(0)).find(JsonObject.class, "_security");
+        /* change: create a class with object and jacson properties */
         if (main.size() == 0) {
             //create document
             JsonObject inside1 = new JsonObject();
@@ -177,7 +179,7 @@ public class CouchDbCustomImplementation implements CustomExistingService {
 			add(endpointBean.getPassword());
 		}};
 	}
-	/* for testing */
+
 	public CouchDbService getService() {
 		return service;
 	}

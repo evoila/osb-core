@@ -171,7 +171,6 @@ public abstract class BindingServiceImpl implements BindingService {
 
 		ServerAddress host = serviceInstance.getHosts().get(0);
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, host);
-
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, null);
 	}
 
