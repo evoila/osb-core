@@ -5,11 +5,11 @@ package de.evoila.cf.broker.service.sample;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.google.gson.JsonArray;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import de.evoila.cf.broker.bean.impl.ExistingEndpointBeanImpl;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
+import de.evoila.cf.broker.model.NamesAndRoles;
 import de.evoila.cf.broker.service.sample.raw.CouchDbService;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -20,20 +20,25 @@ import org.lightcouch.CouchDbClient;
 import org.lightcouch.CouchDbException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import de.evoila.cf.broker.model.UserDocument;
+import de.evoila.cf.broker.model.SecurityDocument;
 //import de.evoila.cf.broker.service.sample.raw.CouchDbService;
 import de.evoila.cf.cpi.existing.CustomExistingService;
 import de.evoila.cf.cpi.existing.CustomExistingServiceConnection;
 
 /**
  * @author Johannes Hiemer
+ * @author Marco Di Martino
  */
+
 @Service
 public class CouchDbCustomImplementation implements CustomExistingService {
 
     private static final String APPLICATION_JSON = "application/json";
 
     private static final String CONTENT_TYPE = "Content-Type";
+
+    private static final String PREFIX_ID = "org.couchdb.user:";
 
 	private CouchDbService service;
 
@@ -57,29 +62,24 @@ public class CouchDbCustomImplementation implements CustomExistingService {
 
 	public static void bind(CouchDbService connection, String database,
 			String username, String password) throws Exception {
-            //ArrayList adminClient = createAdminClient(database);
-        bindRoleToDatabaseWithPassword(connection, database, username, password, new ArrayList<>()/*this obj is to modify (see call from CouchDbBindingService)*/);
+            bindRoleToDatabaseWithPassword(connection, database, username, password, new ArrayList<>());
 	}
 	public static void bindRoleToDatabaseWithPassword(CouchDbService connection, String database,
 					 String username, String password, ArrayList<Object> adminClient) throws Exception {
 
         String match_role = database + "_admin";
-		/* creation of the user in the _user database
+		String id = PREFIX_ID+username;
+        /*creation of the user in the _user database
 		* only server admin can access this database */
-        JsonObject js = new JsonObject();
-        JsonArray arr = new JsonArray();
-        arr.add(match_role);
-        js.addProperty("_id", "org.couchdb.user:" + username);
-        js.addProperty("name", username);
-        js.addProperty("password", password);
-        js.add("roles", arr);
-        js.addProperty("type", "user");
+
+        ArrayList<String> user_roles = new ArrayList<String>(){{ add(match_role);}};
+
+        UserDocument userDoc = new UserDocument(id, username, password, user_roles, "user");
+        Gson gson = new Gson();
+        JsonObject js = (JsonObject)gson.toJsonTree(userDoc);
         connection.getCouchDbClient().save(js);
 
-        /*List<String> hosts = new ArrayList<String>();
-        hosts.add(connection.getConfig().getHost());
-        */
-		/* **Security document **
+		/* ** Security document **
 		* limit access to the database only for the created user
 		* Need to connect to database "database" as server admin to make changes
 		* to the _security document
@@ -88,34 +88,28 @@ public class CouchDbCustomImplementation implements CustomExistingService {
 		* Need to have variables from parameters */
 
         JsonObject main = ((CouchDbClient) adminClient.get(0)).find(JsonObject.class, "_security");
-        /* change: create a class with object and jacson properties */
+        SecurityDocument sec_doc = null;
+
         if (main.size() == 0) {
-            //create document
-            JsonObject inside1 = new JsonObject();
-            JsonObject inside2 = new JsonObject();
-            JsonArray arr1 = new JsonArray();
-            JsonArray arr2 = new JsonArray();
+			// create document
+            ArrayList<String> admin_names = new ArrayList<>();
+            admin_names.add(username);
+            ArrayList<String> admin_roles = new ArrayList<>();
+            admin_roles.add(database+"_admin");
+			NamesAndRoles adm = new NamesAndRoles(admin_names, admin_roles);
+			NamesAndRoles mem = new NamesAndRoles(admin_names, new ArrayList<>());
+         	sec_doc = new SecurityDocument(adm, mem);
 
-            arr1.add(username);
-            arr2.add(database + "_admin");
-            inside1.add("names", arr1);
-            inside1.add("roles", arr2);
-
-            inside2.add("names", arr1);
-            inside2.add("roles", new JsonArray());
-
-            main.add("admins", inside1);
-            main.add("members", inside2);
         } else {
             //update document
-            JsonArray names = main.get("admins").getAsJsonObject().get("names").getAsJsonArray();
-            names.add(username);
-            JsonArray members_names = main.get("members").getAsJsonObject().get("names").getAsJsonArray();
-            members_names.add(username);
+            sec_doc = gson.fromJson(main, SecurityDocument.class);
+            sec_doc.getAdmins().addName(username);
+            sec_doc.getMembers().addName(username);
         }
+        JsonObject security = (JsonObject)gson.toJsonTree(sec_doc);
 
         send_put(connection, database, connection.getConfig().getUsername(),
-                adminClient.get(1).toString(), main.toString());
+                adminClient.get(1).toString(), security.toString());
     }
 
 	public static void send_put(CouchDbService connection, String database, String username,
@@ -145,17 +139,9 @@ public class CouchDbCustomImplementation implements CustomExistingService {
         }
 	}
 
-	/*@Override
-	public void bindRoleToInstanceWithPassword(CustomExistingServiceConnection connection, String database,
-			String username, String password) throws Exception {
-		if(connection instanceof CouchDbService){
-			CouchDbClient client = createNewConnection(database);
-			this.bindRoleToDatabaseWithPassword((CouchDbService) connection, database, username, password, client);
-		}
-	}*/
 	@Override
 	public void bindRoleToInstanceWithPassword(CustomExistingServiceConnection connection, String database,
-											   String username, String password) throws Exception {
+			String username, String password) throws Exception {
 		if(connection instanceof CouchDbService){
 			ArrayList adminClient = createAdminClient(database);
 			this.bindRoleToDatabaseWithPassword((CouchDbService) connection, database, username, password, adminClient);
@@ -180,7 +166,7 @@ public class CouchDbCustomImplementation implements CustomExistingService {
 		}};
 	}
 
-	public CouchDbService getService() {
+    public CouchDbService getService() {
 		return service;
 	}
 }

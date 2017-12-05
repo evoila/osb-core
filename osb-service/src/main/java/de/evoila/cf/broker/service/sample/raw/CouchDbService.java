@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * @author Johannes Hiemer
+ * @author Marco Di Martino
  * This class contains a specific implementation for the access to the
  * underlying service. For a database for example it contains the access
  * to the connection, the update and create commands etc.

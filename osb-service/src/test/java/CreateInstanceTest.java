@@ -36,6 +36,10 @@ import java.util.List;
 
 import static junit.framework.TestCase.*;
 
+/**
+ * @author Marco Di Martino
+ */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 @ContextConfiguration(classes = Application.class, loader = AnnotationConfigContextLoader.class, initializers = ConfigFileApplicationContextInitializer.class)

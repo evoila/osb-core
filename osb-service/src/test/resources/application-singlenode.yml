@@ -1,6 +1,6 @@
 spring:
   ### Profile ###
-  profiles:
+  profiles: singlenode
 
 ### Deployment ###
 #### Existing CouchDB Server/Cluster ####

@@ -1,10 +1,9 @@
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mongodb.util.JSON;
 import de.evoila.Application;
-import de.evoila.cf.broker.model.Plan;
-import de.evoila.cf.broker.model.ServerAddress;
-import de.evoila.cf.broker.model.ServiceInstance;
-import de.evoila.cf.broker.model.ServiceInstanceBindingResponse;
+import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.DeploymentServiceImpl;
 import de.evoila.cf.broker.service.custom.CouchDbExistingServiceFactory;
@@ -37,12 +36,17 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
+import java.lang.reflect.Executable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import static junit.framework.TestCase.*;
+import static org.junit.Assert.assertEquals;
 
+/**
+* @author Marco Di Martino
+*/
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 @ContextConfiguration(classes = Application.class, loader = AnnotationConfigContextLoader.class, initializers = ConfigFileApplicationContextInitializer.class)
@@ -140,6 +144,10 @@ public class ClusterTest {
             client.shutdown();
             existingServices.remove(host);
         }
+    }
+
+    @Test
+    public void testC_check_access_on_db() throws Exception {
         String userTest="userTest";
         String passwordTest="passwordTest";
 
@@ -150,14 +158,10 @@ public class ClusterTest {
                                                         couchService.getUsername(),
                                                         couchService.getPassword()))
                                             .getCouchDbClient();
-        JsonObject js = new JsonObject();
-        JsonArray arr = new JsonArray();
-        arr.add("no_role");
-        js.addProperty("_id", "org.couchdb.user:"+userTest);
-        js.addProperty("name", userTest);
-        js.addProperty("password", passwordTest);
-        js.add("roles", arr);
-        js.addProperty("type", "user");
+        ArrayList<String> roles = new ArrayList<>();
+        roles.add(serviceInstance.getId()+"_admin");
+        UserDocument ud = new UserDocument("org.couchdb.user:"+userTest, userTest, passwordTest, new ArrayList<>(), "user");
+        JsonObject js = (JsonObject)new Gson().toJsonTree(ud);
         dbc.save(js);
 
         /* check userTest cannot access db 'instance_binding' */
@@ -166,25 +170,95 @@ public class ClusterTest {
         HttpResponse resp = performGet(uri);
         assertEquals(403, resp.getStatusLine().getStatusCode()); // "forbidden": Not allowed to access this db
 
-
-        /* deleting ... */
-
         JsonObject j = dbc.find(JsonObject.class,"org.couchdb.user:userTest");
-
-        couchService.deleteServiceInstance(serviceInstance);
-        assertFalse(dbc.context().getAllDbs().contains("instance_binding"));
         dbc.remove(j);
         assertFalse(dbc.contains("org.couchdb.user:"+userTest));
-        assertFalse(dbc.contains("org.couchdb.user:instance_binding"));
+    }
+
+    @Test
+    public void testD_check_update_security_document () throws Exception {
+        String userTest="userTest";
+        String passwordTest="passwordTest";
+
+        CouchDbService to_users = ((CouchDbService)conn.connection(couchService.getHosts(),
+                couchService.getPort(),
+                couchService.getDatabase(),
+                couchService.getUsername(),
+                couchService.getPassword())
+                            );
+        /* giving access to db instance_binding */
+        conn.bindRoleToInstanceWithPassword(to_users, serviceInstance.getId(), userTest, passwordTest);
+
+        /* getting data ... */
+        CouchDbClient dbc = to_users.getCouchDbClient();
+
+        JsonObject j = dbc.find(JsonObject.class,"org.couchdb.user:userTest");
+        assertTrue(dbc.contains("org.couchdb.user:"+userTest));
+
+
+        CouchDbClient to_instance = ((CouchDbService)conn.connection(couchService.getHosts(),
+                couchService.getPort(),
+                serviceInstance.getId(),
+                couchService.getUsername(),
+                couchService.getPassword())
+                                    ).getCouchDbClient();
+
+        JsonObject jo = to_instance.find(JsonObject.class, "_security");
+        String sec_doc = "{\"admins\":{\"names\":[\"instance_binding\",\"userTest\"],\"roles\":[\"instance_binding_admin\"]},\"members\":{\"names\":[\"instance_binding\",\"userTest\"],\"roles\":[]}}";
+        assertEquals(sec_doc, jo.toString());
 
     }
 
     @Test
-    public void testC_bindingInstanceOnCluster() throws Exception {
+    public void testE_check_user_has_binding() throws Exception {
 
+        String userTest="userTest";
+        String passwordTest="passwordTest";
+
+        CouchDbClient usr_db = ((CouchDbService)conn.connection(couchService.getHosts(),
+                couchService.getPort(),
+                couchService.getDatabase(),
+                couchService.getUsername(),
+                couchService.getPassword())
+                                ).getCouchDbClient();
+
+        String uri = "http://"+userTest+":"+passwordTest+"@"+couchService.getHosts().get(0)+":"+couchService.getPort()+"/"+serviceInstance.getId();
+
+        HttpResponse resp = performGet(uri);
+        assertEquals(200, resp.getStatusLine().getStatusCode()); // Now user can access db
+
+    }
+
+    @Test
+    public void testF_check_unbinding_service() throws Exception {
+        /*deleting bindings in the security document and deleting user */
+        CouchDbService dbs = ((CouchDbService)conn.connection(couchService.getHosts(),
+                couchService.getPort(),
+                serviceInstance.getId(),
+                couchService.getUsername(),
+                couchService.getPassword())
+        );
+
+        bindingService.deleteBinding("userTest", serviceInstance);
+        JsonObject security = dbs.getCouchDbClient().find(JsonObject.class, "_security");
+        String sec_doc = "{\"admins\":{\"names\":[\"instance_binding\"],\"roles\":[\"instance_binding_admin\"]},\"members\":{\"names\":[\"instance_binding\"],\"roles\":[]}}";
+        assertEquals(sec_doc, security.toString());
+
+        CouchDbClient dbc = ((CouchDbService)conn.connection(couchService.getHosts(),
+                couchService.getPort(),
+                couchService.getDatabase(),
+                couchService.getUsername(),
+                couchService.getPassword()
+        )).getCouchDbClient();
+
+        assertFalse(dbc.contains("org.couchdb.user:userTest"));
+    }
+    @Test
+    public void testG_bindingInstanceOnCluster() throws Exception {
+        /*
         Plan plan = new Plan();
         service.createInstance(serviceInstance, plan, new HashMap<String, String>());
-
+        */
         List<ServerAddress> list = new ArrayList<>();
 
         for (String host : couchService.getHosts()) {
@@ -212,20 +286,21 @@ public class ClusterTest {
         HttpResponse r = performGet(uri);
         HttpEntity ee = r.getEntity();
         String entity = EntityUtils.toString(ee);
-        log.info(entity);
         assertTrue(entity.contains("binding_id"));
+    }
 
-         /* deleting ... */
-
+    @Test
+    public void testH_deleting_instances () throws Exception {
+        String binding_id ="binding_id";
         bindingService.deleteServiceInstanceBinding(binding_id);
         deploymentService.syncDeleteInstance(serviceInstance, service);
+
         CouchDbClient dbc = ((CouchDbService)conn.connection(couchService.getHosts(), couchService.getPort(), couchService.getDatabase(), couchService.getUsername(), couchService.getPassword())).getCouchDbClient();
         assertFalse(dbc.context().getAllDbs().contains("instance_binding"));
         assertFalse(dbc.contains("org.couchdb.user:"+binding_id));
         assertFalse(dbc.contains("org.couchdb.user:instance_binding"));
 
     }
-
     public HttpResponse performGet (String uri) throws Exception {
 
         HttpClient c = new DefaultHttpClient();

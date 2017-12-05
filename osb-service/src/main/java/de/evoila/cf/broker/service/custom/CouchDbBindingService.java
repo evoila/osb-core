@@ -11,11 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.rabbitmq.client.AMQP;
 import de.evoila.cf.broker.bean.ExistingEndpointBean;
 import de.evoila.cf.broker.bean.impl.ExistingEndpointBeanImpl;
+import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.service.sample.CouchDbCustomImplementation;
 import de.evoila.cf.broker.service.sample.raw.CouchDbService;
 import de.evoila.cf.cpi.existing.ExistingServiceFactory;
@@ -32,14 +34,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.evoila.cf.broker.exception.ServiceBrokerException;
-import de.evoila.cf.broker.model.RouteBinding;
-import de.evoila.cf.broker.model.ServerAddress;
-import de.evoila.cf.broker.model.ServiceInstance;
-import de.evoila.cf.broker.model.ServiceInstanceBinding;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
 
 /**
  * @author Johannes Hiemer.
+ * @author Marco Di Martino
  *
  */
 @Service
@@ -61,9 +60,6 @@ public class CouchDbBindingService extends BindingServiceImpl {
 	 * de.evoila.cf.broker.model.ServerAddress)
 	 */
 
-/*	private CouchDbService openConnection(ServiceInstance instance) throws ServiceBrokerException {
-			conn.createConnection(hosts, port, instance.getId(), instance.getId(), instance.getId());
-*/
     private CouchDbService openConnection(ExistingEndpointBeanImpl endpointBean, String database) throws ServiceBrokerException {
 
     String ip = endpointBean.getHosts().get(0);
@@ -157,7 +153,7 @@ public class CouchDbBindingService extends BindingServiceImpl {
 	@Override
 	public void deleteBinding(String bindingId, ServiceInstance serviceInstance) throws ServiceBrokerException {
 
-		log.info("Unbinding the Couchdb Service...");
+		log.info("Unbinding the CouchDB Service...");
 
 		CouchDbService service = openConnection(endpointBean);
 
@@ -166,35 +162,14 @@ public class CouchDbBindingService extends BindingServiceImpl {
 
 		service = openConnection(endpointBean, serviceInstance.getId());
         JsonObject security_doc = service.getCouchDbClient().find(JsonObject.class, "_security");
+        SecurityDocument sd = new Gson().fromJson(security_doc, SecurityDocument.class);
+        sd.getAdmins().deleteName(bindingId);
+        sd.getMembers().deleteName(bindingId);
 
-        JsonArray admin_names = security_doc.get("admins").getAsJsonObject().get("names").getAsJsonArray();
-
-        boolean found = false;
-        int i=0;
-
-        while (i < admin_names.size() && !found){
-          if (admin_names.get(i).toString().equals("\""+bindingId+"\"")){
-            admin_names.remove(i);
-            found = true;
-            }
-            i++;
-        }
-
-        JsonArray members_names = security_doc.get("members").getAsJsonObject().get("names").getAsJsonArray();
-
-        i=0;
-        found=false;
-
-        while (i < members_names.size() && !found){
-            if (members_names.get(i).toString().equals("\""+bindingId+"\"")){
-                members_names.remove(i);
-                found = true;
-            }
-            i++;
-        }
+        JsonObject security = (JsonObject)new Gson().toJsonTree(sd);
         try {
             CouchDbCustomImplementation.send_put(service, serviceInstance.getId(), service.getConfig().getUsername(),
-                    endpointBean.getPassword(), security_doc.toString());
+                    endpointBean.getPassword(), security.toString());
         }catch(Exception e){
             throw new ServiceBrokerException("An error has occurred while deleting binding", e);
         }

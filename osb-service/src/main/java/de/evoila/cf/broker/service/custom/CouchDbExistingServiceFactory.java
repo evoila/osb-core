@@ -31,6 +31,7 @@ import java.util.List;
 
 /**
  * @author Johannes Hiemer
+ * @author Marco Di Martino
  *
  */
 
@@ -59,26 +60,13 @@ public class CouchDbExistingServiceFactory extends ExistingServiceFactory {
 			createDatabase((CouchDbService) connection, database);
 	}
 	public void createDatabase(CouchDbService couchdb, String database) throws PlatformException {
-		/*int size = endpointBean.getHosts().size();
-		for (String host : endpointBean.getHosts().subList(1, size)) {
-
-			couchdb.getCouchDbClient().replicator()
-					.source(HTTP + couchdb.getHost() + ":" + couchdb.getPort()+ "/" + database)
-					.target(HTTP + host+":" + endpointBean.getPort()+ "/" + database)
-					.continuous(true)
-					.replicatorDocId("repli:"+host)
-					//.replicatorDocRev("repli_rev:"+host)
-					.save();
-		}*/
-
 		try {
 			CouchDbClient client = couchdb.getCouchDbClient();
 			client.context().createDB(database);
 		}catch (CouchDbException e){
         throw new PlatformException("Could not create to the database", e);
         }
-
-        //log.info("Creating the Example Service...");
+		log.info("Creating the CouchDB Service...");
 	}
 
 	@Override
@@ -95,18 +83,7 @@ public class CouchDbExistingServiceFactory extends ExistingServiceFactory {
 		}catch(CouchDbException e) {
 			throw new PlatformException("could not delete from the database", e);
 		}
-
-        /*int size = endpointBean.getHosts().size();
-        for (String host : endpointBean.getHosts().subList(1, size)) {
-            ReplicatorDocument doc = couchdb.getCouchDbClient().replicator().replicatorDocId("repli:"+host).find();
-            String revision = doc.getRevision();
-            couchdb.getCouchDbClient().replicator()
-                    .replicatorDocId("repli:" + host)
-                    .replicatorDocRev(revision)
-                    .remove();
-        }*/
-
-        //log.info("Deleting the Example Service...");
+        log.info("Deleting the CouchDB Service...");
 	}
 
 	@Override
