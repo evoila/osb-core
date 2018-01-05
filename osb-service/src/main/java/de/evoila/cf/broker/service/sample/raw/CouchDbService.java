@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class CouchDbService implements CustomExistingServiceConnection {
 
-	//private static final String HTTP = "http://";
+	//private String db="_users";
 	private boolean initialized;
 	private String host;
 	private CouchDbProperties config;
@@ -35,7 +35,11 @@ public class CouchDbService implements CustomExistingServiceConnection {
 	private CouchDbClient couchDbClient;
 
 	public void createConnection(List<String> hosts, int port, String database, String  username, String  password) throws UnknownHostException {
-
+		/*
+		if (!(database.equals(db))){
+			database+="db-";
+		}
+		*/
        	config = new CouchDbProperties();
 
         config.setDbName(database);
@@ -46,12 +50,10 @@ public class CouchDbService implements CustomExistingServiceConnection {
         config.setUsername(username);
         config.setPassword(password);
 
-        //couchDbClient  = new CouchDbClient(database, true, "http", hosts.get(0), port, username, password);
 		couchDbClient = new CouchDbClient(config);
 
 		setHost(hosts.get(0));
 		setPort(port);
-
 		setInitialized(true);
 	}
 

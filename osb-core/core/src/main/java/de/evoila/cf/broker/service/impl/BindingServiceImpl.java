@@ -50,7 +50,6 @@ public abstract class BindingServiceImpl implements BindingService {
 			String serviceId, String planId, boolean generateServiceKey, String route)
 					throws ServiceInstanceBindingExistsException, ServiceBrokerException,
 					ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
-
 		validateBindingNotExists(bindingId, instanceId);
 
 		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
@@ -146,7 +145,6 @@ public abstract class BindingServiceImpl implements BindingService {
 	 */
 	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstance serviceInstance, Plan plan,
 			List<ServerAddress> externalAddresses) throws ServiceBrokerException {
-
 		log.debug("bind service key");
 
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, externalAddresses.get(0));
@@ -168,7 +166,6 @@ public abstract class BindingServiceImpl implements BindingService {
 			throws ServiceBrokerException {
 
 		log.debug("bind service");
-
 		ServerAddress host = serviceInstance.getHosts().get(0);
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, host);
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, null);

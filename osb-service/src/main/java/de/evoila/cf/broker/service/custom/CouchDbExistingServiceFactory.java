@@ -35,18 +35,13 @@ import java.util.List;
  *
  */
 
-/*	--> @see ExistingEndpointBeanImpl
-@ConfigurationProperties(prefix="existing.endpoint")
-@ConditionalOnProperty(prefix="existing.endpoint",
-	name = {"hosts", "port",
-		"database",
-		"username", "password"
-	}, havingValue="")
-*/
+
 @Service
 public class CouchDbExistingServiceFactory extends ExistingServiceFactory {
 
     private static final String HTTP = "http://";
+	private static final String PREFIX_ID = "org.couchdb.user:";
+	private static final String DB = "db-";
 
 	@Autowired
 	private CouchDbCustomImplementation couchService;
@@ -60,13 +55,15 @@ public class CouchDbExistingServiceFactory extends ExistingServiceFactory {
 			createDatabase((CouchDbService) connection, database);
 	}
 	public void createDatabase(CouchDbService couchdb, String database) throws PlatformException {
+		log.info("Creating the CouchDB Service...");
+		database=DB+database;
 		try {
+
 			CouchDbClient client = couchdb.getCouchDbClient();
 			client.context().createDB(database);
 		}catch (CouchDbException e){
         throw new PlatformException("Could not create to the database", e);
         }
-		log.info("Creating the CouchDB Service...");
 	}
 
 	@Override
@@ -76,14 +73,15 @@ public class CouchDbExistingServiceFactory extends ExistingServiceFactory {
 	}
 
 	public void deleteDatabase(CouchDbService couchdb, String database) throws PlatformException {
+		log.info("Deleting the CouchDB Service...");
+		database=DB+database;
 		try{
 			couchdb.getCouchDbClient().context().deleteDB(database, "delete database");
-			JsonObject user = couchdb.getCouchDbClient().find(JsonObject.class, "org.couchdb.user:"+database);
+			JsonObject user = couchdb.getCouchDbClient().find(JsonObject.class, PREFIX_ID+database);
 			couchdb.getCouchDbClient().remove(user);
 		}catch(CouchDbException e) {
 			throw new PlatformException("could not delete from the database", e);
 		}
-        log.info("Deleting the CouchDB Service...");
 	}
 
 	@Override

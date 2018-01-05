@@ -17,7 +17,7 @@ spring:
 existing:
   endpoint:
     hosts:
-      - 10.244.0.6
+      - 10.244.0.8
     port: 5984
     database: _users
     username: admin
@@ -69,26 +69,6 @@ catalog:
         - id: sample_s_local
           name: S
           description: A simple sample Local plan.
-          free: false
-          volumeSize: 25
-          volumeUnit: M
-          platform: EXISTING_SERVICE
-          connections: 4
-    - id: sample-2
-      name: Second service
-      description: Second Instance
-      bindable: true
-      dashboard:
-        url: $endpoint_uri
-        auth_endpoint: $uaa_uri
-      dashboard_client:
-        id: second
-        secret: secret
-        redirect_uri: $endpoint_uri/dashboard/manage
-      plans:
-        - id: sample_m_local
-          name: S
-          description: A second simple local plan.
           free: false
           volumeSize: 25
           volumeUnit: M

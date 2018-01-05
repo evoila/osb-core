@@ -123,7 +123,7 @@ public class SecurityTest {
                 couchService.getPassword()
         )
         ).getCouchDbClient();
-        JsonObject j1=cl1.find(JsonObject.class, "org.couchdb.user:instance_binding");
+        JsonObject j1=cl1.find(JsonObject.class, "org.couchdb.user:db-instance_binding");
         cl1.remove(j1);
     }
 }

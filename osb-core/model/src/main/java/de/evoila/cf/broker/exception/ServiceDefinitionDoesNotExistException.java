@@ -1,7 +1,7 @@
 package de.evoila.cf.broker.exception;
 
 /**
- * Exception denoting an unknown ServiceDefintion
+ * Exception denoting an unknown ServiceDefinition
  * 
  * @author sgreenberg@gopivotal.com
  *

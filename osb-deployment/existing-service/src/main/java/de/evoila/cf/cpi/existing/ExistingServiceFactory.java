@@ -114,7 +114,6 @@ public abstract class ExistingServiceFactory implements PlatformService {
 	public ServiceInstance createInstance(ServiceInstance serviceInstance, Plan plan,
 			Map<String, String> customProperties) throws PlatformException {
 		String instanceId = serviceInstance.getId();
-
 		serviceInstance = new ServiceInstance(serviceInstance, "http://currently.not/available", instanceId,
 				getExistingServiceHosts());
 
@@ -166,6 +165,7 @@ public abstract class ExistingServiceFactory implements PlatformService {
 
 			String instanceId = serviceInstance.getId();
 			createInstance(connection, instanceId);
+			instanceId="db-"+instanceId;
 			getCustomExistingService().bindRoleToInstanceWithPassword(connection, instanceId, instanceId, instanceId);
 		} catch (Exception e) {
 			log.error(e.toString());
@@ -173,7 +173,7 @@ public abstract class ExistingServiceFactory implements PlatformService {
 		}
 	}
 
-	protected abstract void createInstance(CustomExistingServiceConnection connection, String instanceId)  throws PlatformException;;
+	protected abstract void createInstance(CustomExistingServiceConnection connection, String instanceId)  throws PlatformException;
 
 	public List<String> getHosts() {
 		return hosts;

@@ -48,6 +48,8 @@ public class CouchDbBindingService extends BindingServiceImpl {
 
 	private SecureRandom random = new SecureRandom();
 
+    private static final String DB = "db-";
+
 	@Autowired
 	private ExistingEndpointBeanImpl endpointBean;
 
@@ -121,7 +123,7 @@ public class CouchDbBindingService extends BindingServiceImpl {
 		/* setting credentials */
         String username = bindingId;
         String password = new BigInteger(130, pw).toString(32);
-        String database = serviceInstance.getId();
+        String database = DB+serviceInstance.getId();
 
         CouchDbService admin_to_db = openConnection(endpointBean, database);
 
@@ -145,7 +147,7 @@ public class CouchDbBindingService extends BindingServiceImpl {
 
         String dbURL = String.format("couchdb://%s:%s@%s:%d/%s", username,
                 password, host.getIp(), host.getPort(),
-                serviceInstance.getId());
+                database);//serviceInstance.getId());
 
         return credentials;
     }
@@ -159,8 +161,8 @@ public class CouchDbBindingService extends BindingServiceImpl {
 
 		JsonObject toRemove = service.getCouchDbClient().find(JsonObject.class, "org.couchdb.user:"+bindingId);
 		service.getCouchDbClient().remove(toRemove);
-
-		service = openConnection(endpointBean, serviceInstance.getId());
+        String db=DB+serviceInstance.getId();
+		service = openConnection(endpointBean, db);
         JsonObject security_doc = service.getCouchDbClient().find(JsonObject.class, "_security");
         SecurityDocument sd = new Gson().fromJson(security_doc, SecurityDocument.class);
         sd.getAdmins().deleteName(bindingId);
@@ -168,7 +170,7 @@ public class CouchDbBindingService extends BindingServiceImpl {
 
         JsonObject security = (JsonObject)new Gson().toJsonTree(sd);
         try {
-            CouchDbCustomImplementation.send_put(service, serviceInstance.getId(), service.getConfig().getUsername(),
+            CouchDbCustomImplementation.send_put(service, db, service.getConfig().getUsername(),
                     endpointBean.getPassword(), security.toString());
         }catch(Exception e){
             throw new ServiceBrokerException("An error has occurred while deleting binding", e);

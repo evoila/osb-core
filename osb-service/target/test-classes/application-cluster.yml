@@ -9,7 +9,7 @@ existing:
     hosts:
       - 10.244.0.3
       - 10.244.0.4
-      - 10.244.0.5
+      - 10.244.0.6
     port: 5984
     database: _users
     username: admin

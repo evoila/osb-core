@@ -84,7 +84,7 @@ public class CreateInstanceTest {
 
         CouchDbClient cl = conn.getService().getCouchDbClient();
 
-        assertNotNull(cl.find(JsonObject.class, "org.couchdb.user:instance_binding"));
+        assertNotNull(cl.find(JsonObject.class, "org.couchdb.user:db-instance_binding"));
 
         String uri = "http://"+couchService.getUsername()+":"+couchService.getPassword()+"@"+couchService.getHosts().get(0)+":"+couchService.getPort()+"/"+serviceInstance.getId();
 
@@ -97,7 +97,7 @@ public class CreateInstanceTest {
         HttpEntity e = resp.getEntity();
         String ent = EntityUtils.toString(e);
 
-        assertTrue(ent.contains("instance_binding"));
+        assertTrue(ent.contains("db-instance_binding"));
 
         /* binding instance to database */
         List<ServerAddress> list = new ArrayList<>();
@@ -110,7 +110,7 @@ public class CreateInstanceTest {
         list.add(sa);
 
         serviceInstance.setHosts(list);
-        repository.addServiceInstance("instance_binding", serviceInstance);
+        repository.addServiceInstance("db-instance_binding", serviceInstance);
 
         assertNotNull(repository.getServiceInstance(serviceInstance.getId()));
 
