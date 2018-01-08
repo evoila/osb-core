@@ -140,7 +140,7 @@ public abstract class BindingServiceImpl implements BindingService {
 
 		log.debug("bind service key");
 
-		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, externalAddresses.get(0));
+		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, externalAddresses.get(0), plan);
 
 		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
 				credentials, null);
@@ -155,7 +155,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		log.debug("bind service");
 
 		ServerAddress host = serviceInstance.getHosts().get(0);
-		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, host);
+		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, host, plan);
 
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, null);
 	}
@@ -164,10 +164,11 @@ public abstract class BindingServiceImpl implements BindingService {
 	 * @param bindingId
 	 * @param serviceInstance
 	 * @param host
+	 * @param plan
 	 * @return
 	 * @throws ServiceBrokerException
 	 */
 	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstance serviceInstance,
-															 ServerAddress host) throws ServiceBrokerException;
+															 ServerAddress host, Plan plan) throws ServiceBrokerException;
 
 }
