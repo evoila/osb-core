@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.evoila.cf.broker.service.impl;
 
@@ -46,9 +46,9 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	@Override
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
-			String serviceId, String planId, boolean generateServiceKey, String route)
-					throws ServiceInstanceBindingExistsException, ServiceBrokerException,
-					ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
+																	   String serviceId, String planId, boolean generateServiceKey, String route)
+			throws ServiceInstanceBindingExistsException, ServiceBrokerException,
+			ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
 
 		validateBindingNotExists(bindingId, instanceId);
 
@@ -90,7 +90,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	protected abstract RouteBinding bindRoute(ServiceInstance serviceInstance, String route);
 
 	protected ServiceInstanceBinding createServiceInstanceBinding(String bindingId, String serviceInstanceId,
-			Map<String, Object> credentials, String syslogDrainUrl, String appGuid) {
+																  Map<String, Object> credentials, String syslogDrainUrl, String appGuid) {
 		ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId, serviceInstanceId, credentials,
 				syslogDrainUrl);
 		return binding;
@@ -134,20 +134,13 @@ public abstract class BindingServiceImpl implements BindingService {
 		return serviceInstanceRepository.getServiceInstance(serviceInstanceId);
 	}
 
-	/**
-	 * @param bindingId
-	 * @param serviceInstance
-	 * @param plan
-	 * @param externalAddresses
-	 * @return
-	 * @throws ServiceBrokerException
-	 */
+
 	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstance serviceInstance, Plan plan,
-			List<ServerAddress> externalAddresses) throws ServiceBrokerException {
+													List<ServerAddress> externalAddresses) throws ServiceBrokerException {
 
 		log.debug("bind service key");
 
-		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, externalAddresses.get(0), plan);
+		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, externalAddresses.get(0));
 
 		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
 				credentials, null);
@@ -155,20 +148,14 @@ public abstract class BindingServiceImpl implements BindingService {
 		return serviceInstanceBinding;
 	}
 
-	/**
-	 * @param bindingId
-	 * @param serviceInstance
-	 * @param plan
-	 * @return
-	 * @throws ServiceBrokerException
-	 */
+
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstance serviceInstance, Plan plan)
 			throws ServiceBrokerException {
 
 		log.debug("bind service");
 
 		ServerAddress host = serviceInstance.getHosts().get(0);
-		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, host, plan);
+		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, host);
 
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, null);
 	}
@@ -177,11 +164,10 @@ public abstract class BindingServiceImpl implements BindingService {
 	 * @param bindingId
 	 * @param serviceInstance
 	 * @param host
-	 * @param plan
 	 * @return
 	 * @throws ServiceBrokerException
 	 */
-	protected abstract Map<String, Object> createCredentials (String bindingId, ServiceInstance serviceInstance,
-															  ServerAddress host, Plan plan) throws ServiceBrokerException;
+	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstance serviceInstance,
+															 ServerAddress host) throws ServiceBrokerException;
 
 }
