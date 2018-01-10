@@ -89,12 +89,16 @@ public class UaaRelyingPartyFilter extends GenericFilterBean {
             return;
         }
 
-        // We need to handle the tokens here, check the implementation how to resovle it
+        // We need to handle the tokens here, check the implementation how to resolve it
         String token = UaaFilterUtils.tryResolveToken(request, HttpHeaders.AUTHORIZATION);
         try {
 
             if (token == null) {
+                /*response.setContentType("application/json");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No authorization header present");
+                */
                 throw new AuthenticationCredentialsNotFoundException("No authorization header present.");
+
             }
 
             Authentication authResult =

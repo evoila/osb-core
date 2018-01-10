@@ -3,6 +3,7 @@
  */
 package de.evoila.config.web;
 
+import de.evoila.cf.config.security.uaa.utils.HeaderCheckFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -49,4 +50,13 @@ public class BaseConfiguration {
         return bean;
     }
 
+    @Bean
+    public FilterRegistrationBean headerCheck() {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(new HeaderCheckFilter());
+        registration.addUrlPatterns("/", "/*", "/v2/*");
+        // In case you want the filter to apply to specific URL patterns only
+        //registration.addUrlPatterns("/v2/*");
+        return registration;
+    }
 }

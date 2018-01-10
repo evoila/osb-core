@@ -8,6 +8,7 @@ import de.evoila.cf.broker.service.DeploymentServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.rmi.activation.ActivationSystem;
 
 /**
  * @author Johannes Hiemer.
@@ -39,12 +41,15 @@ public class ServiceInstanceController extends BaseController {
 
 	@RequestMapping(value = "/service_instances/{instanceId}", method = RequestMethod.PUT)
 	public ResponseEntity<ServiceInstanceResponse> createServiceInstance(
+
+
 			@PathVariable("instanceId") String serviceInstanceId,
 			@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 			@Valid @RequestBody ServiceInstanceRequest request) throws ServiceDefinitionDoesNotExistException,
-					ServiceInstanceExistsException, ServiceBrokerException, AsyncRequiredException {
+			ServiceInstanceExistsException, ServiceBrokerException, AsyncRequiredException {
 
-		if (acceptsIncomplete == null) {
+
+		if (acceptsIncomplete == null || !acceptsIncomplete.booleanValue()) {
 			throw new AsyncRequiredException();
 		}
 
@@ -84,8 +89,8 @@ public class ServiceInstanceController extends BaseController {
 
 	@RequestMapping(value = "/service_instances/{instanceId}", method = RequestMethod.DELETE)
 	public ResponseEntity<String> deleteServiceInstance(@PathVariable("instanceId") String instanceId,
-			@RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId)
-					throws ServiceBrokerException, AsyncRequiredException, ServiceInstanceDoesNotExistException {
+														@RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId)
+			throws ServiceBrokerException, AsyncRequiredException, ServiceInstanceDoesNotExistException {
 
 		log.debug("DELETE: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
 				+ ", deleteServiceInstanceBinding(), serviceInstanceId = " + instanceId + ", serviceId = " + serviceId
@@ -99,23 +104,26 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@Override
-	@ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, AsyncRequiredException.class })
+	@ExceptionHandler({ServiceDefinitionDoesNotExistException.class, AsyncRequiredException.class})
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(Exception ex, HttpServletResponse response) {
+		log.warn("Handle exception for [accepts_incomplete|serviceDefinitionNotExist]"+ex.getMessage());
 		return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
 	@ExceptionHandler(ServiceInstanceExistsException.class)
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceExistsException ex,
-			HttpServletResponse response) {
+														HttpServletResponse response) {
+		log.warn("Handle exception for [serviceInstanceExists]"+ex.getMessage());
 		return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
 	}
 
 	@ExceptionHandler(ServiceInstanceDoesNotExistException.class)
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceDoesNotExistException ex,
-			HttpServletResponse response) {
+														HttpServletResponse response) {
+		log.warn("Handle exception for [serviceInstanceDoesNotExist]"+ex.getMessage());
 		return processErrorResponse("{}", HttpStatus.GONE);
 	}
 }

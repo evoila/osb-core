@@ -91,7 +91,7 @@ public class CouchDbExistingServiceFactory extends ExistingServiceFactory {
 
 	@Override
 	public ServiceInstance postProvisioning(ServiceInstance serviceInstance, Plan plan) throws PlatformException {
-		log.info("Executing Post Provisioning the Example Service...");
+		log.info("Executing Post Provisioning the CouchDB Service...");
 		
 		return serviceInstance;
 	}

@@ -17,7 +17,7 @@ spring:
 existing:
   endpoint:
     hosts:
-      - 10.244.0.8
+      - 127.0.0.1
     port: 5984
     database: _users
     username: admin
@@ -55,19 +55,21 @@ login:
 catalog:
   services:
     - id: sample-local
-      name: Sample-local
+      name: sample-local
       description: Sample Instances
       bindable: true
       dashboard:
-        url: $endpoint_uri
-        auth_endpoint: $uaa_uri
+        url: http://localhost:8080
+        #url:$endpoint_uri
+        auth_endpoint: http://localhost:8080
+        #auth_endpoint: $uaa_uri
       dashboard_client:
         id: sample
         secret: sample
-        redirect_uri: $endpoint_uri/dashboard/manage
+        redirect_uri: http://localhost:8080/dashboard/manage
       plans:
         - id: sample_s_local
-          name: S
+          name: s
           description: A simple sample Local plan.
           free: false
           volumeSize: 25
