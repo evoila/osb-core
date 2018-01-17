@@ -116,14 +116,14 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 	}
 
-	private void validateBindingNotExists(String bindingId, String instanceId)
+	protected void validateBindingNotExists(String bindingId, String instanceId)
 			throws ServiceInstanceBindingExistsException {
 		if (bindingRepository.containsInternalBindingId(bindingId)) {
 			throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
 		}
 	}
 
-	private ServiceInstance getBinding(String bindingId) throws ServerviceInstanceBindingDoesNotExistsException {
+	protected ServiceInstance getBinding(String bindingId) throws ServerviceInstanceBindingDoesNotExistsException {
 		if (!bindingRepository.containsInternalBindingId(bindingId)) {
 			throw new ServerviceInstanceBindingDoesNotExistsException(bindingId);
 		}
