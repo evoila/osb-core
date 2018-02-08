@@ -46,7 +46,8 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	@Override
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
-																	   String serviceId, String planId, boolean generateServiceKey, String route)
+																	   String serviceId, String planId, boolean generateServiceKey,
+																	   String appGuid, String route)
 			throws ServiceInstanceBindingExistsException, ServiceBrokerException,
 			ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
 
