@@ -96,13 +96,7 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 			uaaRelyingPartyFilter.setSuccessHandler(new UaaRelyingPartyAuthenticationSuccessHandler());
 			uaaRelyingPartyFilter.setFailureHandler(new UaaRelyingPartyAuthenticationFailureHandler());
 
-
-
 				http.addFilterBefore(uaaRelyingPartyFilter, LogoutFilter.class)
-				//http.authorizeRequests().anyRequest().permitAll().and().csrf().disable(); //Termporär
-				http.addFilterBefore(uaaRelyingPartyFilter, LogoutFilter.class)
-
-
 
 				.csrf().disable()
 
