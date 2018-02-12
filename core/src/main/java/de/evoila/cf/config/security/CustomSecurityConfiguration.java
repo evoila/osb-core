@@ -25,6 +25,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
  * 
  */
 @Configuration
+@Order(1)
 @EnableWebSecurity
 public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 
@@ -61,7 +62,7 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
         		.antMatchers(HttpMethod.GET, "/info").authenticated()
         		.antMatchers(HttpMethod.GET, "/health").authenticated()
 				.antMatchers(HttpMethod.GET, "/error").authenticated()
-			.antMatchers(HttpMethod.GET, "/env").authenticated()
+				.antMatchers(HttpMethod.GET, "/env").authenticated()
 				.antMatchers(HttpMethod.GET,"/v2/dashboard/{serviceInstanceId}").permitAll()
 				.antMatchers(HttpMethod.GET,"/v2/dashboard/{serviceInstanceId}/confirm").permitAll()
 				.antMatchers("/v2/backup/**").permitAll()
@@ -74,7 +75,7 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 
 
 	@Configuration
-	@Order(1)
+	@Order(5)
 	public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
 		@Bean

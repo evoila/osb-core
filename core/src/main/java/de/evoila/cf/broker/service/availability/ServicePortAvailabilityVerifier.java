@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.evoila.cf.broker.service.availability;
 
@@ -23,7 +23,6 @@ import de.evoila.cf.broker.model.ServerAddress;
  *
  */
 @Service
-
 public class ServicePortAvailabilityVerifier implements ServiceInstanceAvailabilityVerifier {
 
 
@@ -75,10 +74,10 @@ public class ServicePortAvailabilityVerifier implements ServiceInstanceAvailabil
 
 	private boolean verifyServiceAvailability(String ip, int port, boolean useInitialTimeout) throws PlatformException {
 		boolean available = false;
-		
-		if (useInitialTimeout) 
+
+		if (useInitialTimeout)
 			this.timeout(INITIAL_TIMEOUT);
-		
+
 		for (int i = 0; i < connectionTimeouts; i++) {
 			available = this.execute(ip, port);
 
