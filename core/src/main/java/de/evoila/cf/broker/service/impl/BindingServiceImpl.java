@@ -1,4 +1,6 @@
-
+/**
+ *
+ */
 package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.exception.*;
@@ -17,7 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Johannes Hiemer
+ * @author Johannes Hiemer.
+ *
  */
 public abstract class BindingServiceImpl implements BindingService {
 
@@ -35,7 +38,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	@Autowired
 	protected RouteBindingRepository routeBindingRepository;
 
-	@Autowired
+	@Autowired(required = false)
 	protected HAProxyService haProxyService;
 
 	protected abstract void deleteBinding(String bindingId, ServiceInstance serviceInstance)
@@ -43,9 +46,9 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	@Override
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
-			String serviceId, String planId, boolean generateServiceKey, String route)
-					throws ServiceInstanceBindingExistsException, ServiceBrokerException,
-					ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
+																	   String serviceId, String planId, boolean generateServiceKey, String route, ServiceInstanceBindingRequest request)
+			throws ServiceInstanceBindingExistsException, ServiceBrokerException,
+			ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
 
 		validateBindingNotExists(bindingId, instanceId);
 
@@ -65,12 +68,12 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		ServiceInstanceBinding binding;
-		if (generateServiceKey) {
+		if (generateServiceKey && haProxyService != null) {
 			List<ServerAddress> externalServerAddresses = haProxyService.appendAgent(serviceInstance.getHosts(), bindingId, instanceId);
 
-			binding = bindServiceKey(bindingId, serviceInstance, plan, externalServerAddresses);
+			binding = bindServiceKey(bindingId, serviceInstance, plan, externalServerAddresses, request);
 		} else {
-			binding = bindService(bindingId, serviceInstance, plan);
+			binding = bindService(bindingId, serviceInstance, plan, request);
 		}
 
 		ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(binding);
@@ -79,10 +82,15 @@ public abstract class BindingServiceImpl implements BindingService {
 		return response;
 	}
 
+	/**
+	 * @param serviceInstance
+	 * @param route
+	 * @return
+	 */
 	protected abstract RouteBinding bindRoute(ServiceInstance serviceInstance, String route);
 
 	protected ServiceInstanceBinding createServiceInstanceBinding(String bindingId, String serviceInstanceId,
-			Map<String, Object> credentials, String syslogDrainUrl, String appGuid) {
+																  Map<String, Object> credentials, String syslogDrainUrl, String appGuid) {
 		ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId, serviceInstanceId, credentials,
 				syslogDrainUrl);
 		return binding;
@@ -96,7 +104,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		try {
 			ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
 			List<ServerAddress> externalServerAddresses = binding.getExternalServerAddresses();
-			if (externalServerAddresses != null) {
+			if (externalServerAddresses != null && haProxyService != null) {
 				haProxyService.removeAgent(serviceInstance.getHosts(), bindingId);
 			}
 
@@ -128,31 +136,46 @@ public abstract class BindingServiceImpl implements BindingService {
 
 
 	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstance serviceInstance, Plan plan,
-			List<ServerAddress> externalAddresses) throws ServiceBrokerException {
+													List<ServerAddress> externalAddresses, ServiceInstanceBindingRequest request) throws ServiceBrokerException {
 
 		log.debug("bind service key");
 
-		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, externalAddresses.get(0));
-
+		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, externalAddresses.get(0), plan, request);
+		List<VolumeMounts> volumeMounts = createMountPoint(bindingId, serviceInstance, externalAddresses.get(0), plan, request, credentials);
 		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
-				credentials, null);
+				credentials, null, volumeMounts);
 		serviceInstanceBinding.setExternalServerAddresses(externalAddresses);
 		return serviceInstanceBinding;
 	}
 
 
-	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstance serviceInstance, Plan plan)
+	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstance serviceInstance, Plan plan, ServiceInstanceBindingRequest request)
 			throws ServiceBrokerException {
 
 		log.debug("bind service");
 
 		ServerAddress host = serviceInstance.getHosts().get(0);
-		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, host);
-
-		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, null);
+		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, host, plan, request);
+		List<VolumeMounts> volumeMounts = createMountPoint(bindingId, serviceInstance, host, plan, request, credentials);
+		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
+				credentials, null, volumeMounts);
 	}
 
+	/**
+	 * @param bindingId
+	 * @param serviceInstance
+	 * @param host
+	 * @param plan
+	 * @return
+	 * @throws ServiceBrokerException
+	 */
 	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstance serviceInstance,
-			ServerAddress host) throws ServiceBrokerException;
+															 ServerAddress host, Plan plan, ServiceInstanceBindingRequest request) throws ServiceBrokerException;
+
+	//Concrete Class created to be overwritten by Servicebrokers that shuould provide Volume Mounts
+	protected List<VolumeMounts> createMountPoint(String bindingId, ServiceInstance serviceInstance,
+												  ServerAddress host, Plan plan, ServiceInstanceBindingRequest request, Map<String, Object> credentials) throws ServiceBrokerException{
+		return null;
+	}
 
 }
