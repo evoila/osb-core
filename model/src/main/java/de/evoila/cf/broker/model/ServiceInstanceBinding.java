@@ -26,16 +26,25 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 
 	private List<ServerAddress> externalServerAddresses;
 
+	private List<VolumeMounts> volumeMounts;
+
+
 	public ServiceInstanceBinding() {
 		super();
 	}
 
 	public ServiceInstanceBinding(String id, String serviceInstanceId, Map<String, Object> credentials,
 			String syslogDrainUrl) {
+		this(id, serviceInstanceId, credentials, syslogDrainUrl, null);
+
+	}
+	public ServiceInstanceBinding(String id, String serviceInstanceId, Map<String, Object> credentials,
+								  String syslogDrainUrl, List<VolumeMounts> volumeMounts) {
 		this.id = id;
 		this.serviceInstanceId = serviceInstanceId;
 		setCredentials(credentials);
 		this.syslogDrainUrl = syslogDrainUrl;
+		this.volumeMounts = volumeMounts;
 	}
 
 	@Override
@@ -83,4 +92,11 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 		this.externalServerAddresses = externalServerAddresses;
 	}
 
+	public List<VolumeMounts> getVolumeMounts() {
+		return volumeMounts;
+	}
+
+	public void setVolumeMounts(List<VolumeMounts>	 volumeMounts) {
+		this.volumeMounts = volumeMounts;
+	}
 }

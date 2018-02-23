@@ -22,7 +22,7 @@ import org.springframework.cloud.config.java.AbstractCloudConfig;
 class RabbitOnConditionalConfiguration{
 
       @Configuration
-      @Profile({"default", "local"})
+      @Profile({ "local"})
       @ConditionalOnBean(RabbitMQCredentials.class)
       static class Default {
 
@@ -48,25 +48,5 @@ class RabbitOnConditionalConfiguration{
                   return new RabbitTemplate(connectionFactory());
             }
 
-      }
-
-      @Configuration
-      @Profile("cloud")
-      static class Cloud extends AbstractCloudConfig {
-
-            @Bean
-            public ConnectionFactory rabbitConnectionFactory() {
-                  return connectionFactory().rabbitConnectionFactory();
-            }
-
-            @Bean
-            public AmqpAdmin amqpAdmin() {
-                  return new RabbitAdmin(rabbitConnectionFactory());
-            }
-
-            @Bean
-            public RabbitTemplate rabbitTemplate() {
-                  return new RabbitTemplate(rabbitConnectionFactory());
-            }
       }
 }

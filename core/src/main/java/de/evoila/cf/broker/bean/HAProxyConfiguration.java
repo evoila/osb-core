@@ -3,12 +3,15 @@
  */
 package de.evoila.cf.broker.bean;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 /** @author Rene Schollmeyer */
 @Service
 @ConfigurationProperties(prefix="haproxy")
+@ConditionalOnProperty(prefix = "haroxy", name = {"uri"}, havingValue = "")
+
 public class HAProxyConfiguration {
 
 	private String uri;

@@ -28,9 +28,6 @@ import de.evoila.cf.broker.repository.JobRepository;
 import de.evoila.cf.broker.repository.PlatformRepository;
 import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
-import de.evoila.cf.broker.service.AsyncDeploymentService;
-import de.evoila.cf.broker.service.DeploymentService;
-import de.evoila.cf.broker.service.PlatformService;
 import de.evoila.cf.cpi.custom.props.DomainBasedCustomPropertyHandler;
 
 /**
@@ -133,7 +130,13 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 			createdServiceInstance = platformService.createInstance(serviceInstance, plan, mergedProperties);
 		} catch (PlatformException e) {
+			try {
+				platformService.deleteServiceInstance(serviceInstance);
+			} catch (PlatformException e1) {
+				throw new ServiceBrokerException("Could not delete failed instance " +serviceInstance.getId() + " due to: ", e);
+			}
 			serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
+
 
 			throw new ServiceBrokerException("Could not create instance due to: ", e);
 		}
@@ -143,14 +146,20 @@ public class DeploymentServiceImpl implements DeploymentService {
 		else {
 			serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
 
-			throw new ServiceBrokerException(
-					"Internal error. Service instance was not created. ID was: " + serviceInstance.getId());
+			throw new ServiceBrokerException("Internal error. Service instance was not created. ID was: " + serviceInstance.getId());
 		}
 
 		try {
 			createdServiceInstance = platformService.postProvisioning(createdServiceInstance, plan);
 		} catch (PlatformException e) {
+			try {
+				platformService.deleteServiceInstance(serviceInstance);
+				serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
+			} catch (PlatformException e1) {
+				throw new ServiceBrokerException("Could not delete failed instance " +serviceInstance.getId() + " due to: ", e);
+			}
 			throw new ServiceBrokerException("Error during service availability verification", e);
+
 		}
 
 		return new ServiceInstanceResponse(createdServiceInstance, false);
@@ -175,6 +184,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 	@Override
 	public void deleteServiceInstance(String instanceId)
 			throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
+		log.info("Log at DeploymentServiceImpl L190. InstanceId=" + instanceId);
 		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
 
 		if (serviceInstance == null) {

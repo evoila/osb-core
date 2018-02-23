@@ -6,6 +6,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -38,12 +39,17 @@ public class Plan {
 	@JsonProperty(value="free", required=false)
 	private boolean free = true;
 
-	private int volumeSize;
+	@JsonProperty(value = "plan_updateable",required = false, defaultValue = "false")
+	private boolean planUpdateable;
+
+	private Integer volumeSize;
 
 	private VolumeUnit volumeUnit;
 
 	private Platform platform;
 
+	@JsonSerialize
+	@JsonProperty(required=false)
 	private String flavorId;
 
 	private int connections;
@@ -52,7 +58,7 @@ public class Plan {
 		super();
 	}
 
-	public int getVolumeSize() {
+	public Integer getVolumeSize() {
 		return volumeSize;
 	}
 
@@ -163,4 +169,11 @@ public class Plan {
 		this.free = free;
 	}
 
+	public boolean isPlanUpdateable () {
+		return planUpdateable;
+	}
+
+	public void setPlanUpdateable (boolean planUpdateable) {
+		this.planUpdateable = planUpdateable;
+	}
 }

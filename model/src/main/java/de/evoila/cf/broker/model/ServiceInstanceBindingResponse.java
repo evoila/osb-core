@@ -1,9 +1,11 @@
 package de.evoila.cf.broker.model;
 
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -22,9 +24,20 @@ public class ServiceInstanceBindingResponse {
 
 	private String routeServiceUrl;
 
-	public ServiceInstanceBindingResponse(Map<String, Object> credentials, String syslogDrainUrl) {
+	private List<VolumeMounts> volumeMounts;
+
+	public ServiceInstanceBindingResponse(Map<String, Object> credentials, String syslogDrainUrl,  List<VolumeMounts>  volumeMounts) {
 		this.credentials = credentials;
 		this.syslogDrainUrl = syslogDrainUrl;
+		this.volumeMounts = volumeMounts;
+	}
+
+	public ServiceInstanceBindingResponse(Map<String, Object> credentials, String syslogDrainUrl) {
+		this(credentials,syslogDrainUrl,  null);
+	}
+
+	public void setVolumeMounts(List<VolumeMounts>  volumeMounts) {
+		this.volumeMounts = volumeMounts;
 	}
 
 	public ServiceInstanceBindingResponse(String routeServiceUrl) {
@@ -34,6 +47,7 @@ public class ServiceInstanceBindingResponse {
 	public ServiceInstanceBindingResponse(ServiceInstanceBinding binding) {
 		this.credentials = binding.getCredentials();
 		this.syslogDrainUrl = binding.getSyslogDrainUrl();
+		this.volumeMounts = binding.getVolumeMounts();
 	}
 
 	@JsonSerialize
@@ -60,6 +74,13 @@ public class ServiceInstanceBindingResponse {
 	@JsonProperty("route_service_url")
 	public String getRouteServiceUrl() {
 		return routeServiceUrl;
+	}
+
+	@JsonSerialize
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@JsonProperty("volume_mounts")
+	public List<VolumeMounts>  getVolumeMounts() {
+		return volumeMounts ;
 	}
 
 	public void setRouteServiceUrl(String routeServiceUrl) {

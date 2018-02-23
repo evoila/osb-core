@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import org.springframework.data.annotation.Id;
 /**
  * An instance of a ServiceDefinition.
  * 
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class ServiceInstance implements BaseEntity<String> {
 
+	@Id
 	@JsonSerialize
 	@JsonProperty("service_instance_id")
 	private String id;
@@ -59,37 +61,50 @@ public class ServiceInstance implements BaseEntity<String> {
 	@JsonProperty("context")
 	private Map<String, String> context;
 
+	@JsonIgnore
+	private String username;
+
+	@JsonIgnore
+	private String password;
+
 	@SuppressWarnings("unused")
 	private ServiceInstance() {
 	}
 
+
 	public ServiceInstance(String id, String serviceDefinitionId, String planId, String organizationGuid,
 			String spaceGuid, Map<String, String> parameters, String dashboardUrl) {
-		initialize(id, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
+		initialize(id, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters, null, null);
 		setDashboardUrl(dashboardUrl);
 	}
 
 	private void initialize(String id, String serviceDefinitionId, String planId, String organizationGuid,
-			String spaceGuid, Map<String, String> parameters) {
+			String spaceGuid, Map<String, String> parameters, String username, String password) {
 		setId(id);
 		setServiceDefinitionId(serviceDefinitionId);
 		setPlanId(planId);
 		setOrganizationGuid(organizationGuid);
 		setSpaceGuid(spaceGuid);
+		setPassword(password);
+		setUsername(username);
 		if (parameters != null)
 			setParameters(parameters);
 	}
 
 	public ServiceInstance(String serviceInstanceId, String serviceDefintionId, String planId, String organizationGuid,
 			String spaceGuid, Map<String, String> parameters, String dashboardUrl, String internalId) {
-		initialize(id, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
+
+		initialize(id, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters, null, null);
 		setInternalId(internalId);
 		setDashboardUrl(dashboardUrl);
 	}
 
 	public ServiceInstance(ServiceInstance serviceInstance, String dashboardUrl, String internalId) {
+
 		initialize(serviceInstance.id, serviceInstance.serviceDefinitionId, serviceInstance.planId,
-				serviceInstance.organizationGuid, serviceInstance.spaceGuid, serviceInstance.parameters);
+				serviceInstance.organizationGuid, serviceInstance.spaceGuid, serviceInstance.parameters, serviceInstance.username, serviceInstance.password);
+
+		this.setHosts(serviceInstance.getHosts());
 		setInternalId(internalId);
 		setDashboardUrl(dashboardUrl);
 	}
@@ -97,15 +112,22 @@ public class ServiceInstance implements BaseEntity<String> {
 	public ServiceInstance(ServiceInstance serviceInstance, String dashboardUrl, String internalId,
 			List<ServerAddress> hosts) {
 		initialize(serviceInstance.id, serviceInstance.serviceDefinitionId, serviceInstance.planId,
-				serviceInstance.organizationGuid, serviceInstance.spaceGuid, serviceInstance.parameters);
+				serviceInstance.organizationGuid, serviceInstance.spaceGuid, serviceInstance.parameters, serviceInstance.username, serviceInstance.password);
 		setInternalId(internalId);
 		setDashboardUrl(dashboardUrl);
 		setHosts(hosts);
 	}
 
+	//added
+	public ServiceInstance(ServiceInstance serviceInstance, String internalId){
+		initialize(serviceInstance.id, serviceInstance.serviceDefinitionId, serviceInstance.planId,
+				serviceInstance.organizationGuid, serviceInstance.spaceGuid, serviceInstance.parameters, serviceInstance.username, serviceInstance.password);
+		setInternalId(internalId);
+	}
+
 	public ServiceInstance(String serviceInstanceId, String serviceDefinitionId, String planId, String organizationGuid,
 			String spaceGuid, Map<String, String> parameters, Map<String, String> context) {
-		initialize(serviceInstanceId, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
+		initialize(serviceInstanceId, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters, null, null);
 		if(context != null)
 			setContext(context);
 	}
@@ -160,6 +182,8 @@ public class ServiceInstance implements BaseEntity<String> {
 	}
 
 	public Map<String, String> getParameters() {
+		if(parameters == null)
+			parameters = new HashMap<>();
 		return parameters;
 	}
 
@@ -189,5 +213,21 @@ public class ServiceInstance implements BaseEntity<String> {
 
 	public void setContext(Map<String, String> context) {
 		this.context = new HashMap<String, String>(context);
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 }
