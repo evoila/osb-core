@@ -46,6 +46,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
 		log.debug("ServiceInstanceBinding Created: " + bindingId);
 
+
 		return new ResponseEntity<ServiceInstanceBindingResponse>(response, HttpStatus.CREATED);
 	}
 
@@ -60,7 +61,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
 		try {
 			bindingService.deleteServiceInstanceBinding(bindingId);
-		} catch (ServerviceInstanceBindingDoesNotExistsException e) {
+		} catch (ServiceInstanceBindingDoesNotExistsException e) {
 			return new ResponseEntity<String>("{}", HttpStatus.GONE);
 		}
 

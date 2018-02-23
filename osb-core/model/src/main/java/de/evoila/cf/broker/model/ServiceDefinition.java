@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * 
  * @author sgreenberg@gopivotal.com
  * @author Johannes Hiemer.
+ * @author Marco Di Martino.
  *
  */
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
@@ -60,34 +61,51 @@ public class ServiceDefinition {
 	@JsonProperty("dashboard_client")
 	private DashboardClient dashboardClient;
 
+	@JsonSerialize
+	@JsonProperty("plan_updateable") // misspelling of attribute kept, do not change it
+	private boolean updateable;
+
+
 	public ServiceDefinition() {
 		super();
-	};
+	}
 
-	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans) {
+	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans, boolean updatable) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.bindable = bindable;
 		this.setPlans(plans);
+		this.updateable = updatable;
 	}
 
-	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans,
+	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans, boolean updatable,
 			List<String> requires) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.bindable = bindable;
+		this.updateable = updatable;
 		this.setPlans(plans);
 		this.setRequires(requires);
 	}
 
-	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans,
+	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans, boolean updatable,
 			List<String> tags, Map<String, Object> metadata, List<String> requires) {
-		this(id, name, description, bindable, plans);
+		this(id, name, description, bindable, plans, updatable);
 		setTags(tags);
 		setMetadata(metadata);
 		setRequires(requires);
+	}
+
+	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans) {
+		/*this.id = id;
+		this.name = name;
+		this.description = description;
+		this.bindable = bindable;
+		this.setPlans(plans);
+		this.updatable=updatable;*/
+		this(id, name, description, bindable, plans, false);
 	}
 
 	public String getId() {
@@ -120,6 +138,14 @@ public class ServiceDefinition {
 
 	public void setBindable(boolean bindable) {
 		this.bindable = bindable;
+	}
+
+	public boolean isUpdateable() {
+		return updateable;
+	}
+
+	public void setPlan_updateable(boolean updatable) {
+		this.updateable = updatable;
 	}
 
 	public List<Plan> getPlans() {

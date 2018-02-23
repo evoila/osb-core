@@ -3,7 +3,7 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
 	
-  	<root level="INFO">
+  	<root level="DEBUG">
 		<appender-ref ref="FILE" />
 		<appender-ref ref="CONSOLE" />
 	</root>

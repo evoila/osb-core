@@ -1,6 +1,6 @@
 package de.evoila.cf.broker.controller;
 
-import de.evoila.cf.broker.exception.BadHeaderException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +26,7 @@ public class CatalogController extends BaseController {
 	@RequestMapping(value = { "/", "" }, method = RequestMethod.GET)
 	public @ResponseBody Catalog getCatalog(){
 		logger.debug("GET: getCatalog()");
-		/*if (headers.containsKey(getHeader())) {
-			if (!(headers.get(getHeader()).get(0).equals(getVersion()))) {
-				throw new BadHeaderException(headers.get(getHeader()).get(0));
-			}
-		}else{
-				throw new BadHeaderException(null);
-			}
-		*/
+
 		return service.getCatalog();
 	}
 }

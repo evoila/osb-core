@@ -26,9 +26,9 @@ existing:
 ### Service Key Generation ###
 #### HAProxy ####
 haproxy:
-  uri: https://haproxy.cf.eu-de-netde.msh.host/agents/58beec3ffd66699000390a5e/schemas?type=listen
+  uri: https://haproxy.cf.dev.eu-de-central.msh.host/agents/596c5b4d57920aaa9fdffae4/schemas?type=listen
   auth:
-    token: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b944
+    token: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 
 ### Login Information ###
 login:
@@ -61,18 +61,27 @@ catalog:
       dashboard:
         url: http://localhost:8080
         #url:$endpoint_uri
-        auth_endpoint: http://localhost:8080
+        auth_endpoint: $uaa_uri
         #auth_endpoint: $uaa_uri
       dashboard_client:
         id: sample
         secret: sample
-        redirect_uri: http://localhost:8080/dashboard/manage
+        redirect_uri: http://localhost:8080
+      plan_updateable: true
       plans:
-        - id: sample_s_local
-          name: s
-          description: A simple sample Local plan.
-          free: false
-          volumeSize: 25
-          volumeUnit: M
-          platform: EXISTING_SERVICE
-          connections: 4
+      - id: 5678-1234
+        name: m
+        description: Aa simple sample Local plan.
+        free: false
+        volumeSize: 25
+        volumeUnit: M
+        platform: EXISTING_SERVICE
+        connections: 4
+      - id: 1234-5678
+        name: s
+        description: Another simple sample Local plan.
+        free: false
+        volumeSize: 25
+        volumeUnit: G
+        platform: EXISTING_SERVICE
+        connections: 4

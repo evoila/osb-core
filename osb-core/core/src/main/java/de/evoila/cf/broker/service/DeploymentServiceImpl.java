@@ -35,6 +35,7 @@ import de.evoila.cf.cpi.custom.props.DomainBasedCustomPropertyHandler;
 
 /**
  * @author Christian Brinker.
+ * @author Marco Di Martino.
  *
  */
 @Service
@@ -75,7 +76,18 @@ public class DeploymentServiceImpl implements DeploymentService {
 		return new JobProgressResponse(progress);
 	}
 
+	@Override
+	public void updateServiceInstance(String instanceId, String planId) throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
 
+
+		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+		if (serviceInstance == null){
+			throw new ServiceInstanceDoesNotExistException(instanceId);
+		}
+
+		serviceInstance.updatePlanId(planId);
+		serviceInstanceRepository.updateServiceInstancePlan(serviceInstance);
+	}
 	@Override
 	public ServiceInstanceResponse createServiceInstance(String serviceInstanceId, String serviceDefinitionId,
 			String planId, String organizationGuid, String spaceGuid, Map<String, String> parameters,

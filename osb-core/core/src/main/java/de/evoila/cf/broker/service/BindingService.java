@@ -42,9 +42,9 @@ public interface BindingService {
      *
      * @param id
      * @throws ServiceBrokerException
-     * @throws ServerviceInstanceBindingDoesNotExistsException
+     * @throws ServiceInstanceBindingDoesNotExistsException
      */
     void deleteServiceInstanceBinding (String id)
-          throws ServiceBrokerException, ServerviceInstanceBindingDoesNotExistsException;
+          throws ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException;
 
 }

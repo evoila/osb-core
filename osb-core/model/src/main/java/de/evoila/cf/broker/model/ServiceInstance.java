@@ -110,6 +110,10 @@ public class ServiceInstance implements BaseEntity<String> {
 			setContext(context);
 	}
 
+	public void updatePlanId(String planId){
+		this.setPlanId(planId);
+	}
+
 	@Override
 	public String getId() {
 		return id;

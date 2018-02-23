@@ -12,11 +12,15 @@ import org.springframework.context.annotation.Configuration;
 import de.evoila.cf.broker.model.Catalog;
 import de.evoila.cf.config.web.cors.CORSFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author Johannes Hiemer.
+ * @author Marco Di Martino
  *
  */
 @Configuration
@@ -24,7 +28,7 @@ import org.springframework.web.filter.CorsFilter;
 public class BaseConfiguration {
 
     @Bean
-    public FilterRegistrationBean corsFilter() {
+    public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
@@ -45,8 +49,7 @@ public class BaseConfiguration {
         config.addAllowedMethod("PATCH");
         source.registerCorsConfiguration("/**", config);
 
-        final FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-        bean.setOrder(0);
+        final CorsFilter bean = new CorsFilter((source));
         return bean;
     }
 
@@ -59,4 +62,5 @@ public class BaseConfiguration {
         //registration.addUrlPatterns("/v2/*");
         return registration;
     }
+
 }

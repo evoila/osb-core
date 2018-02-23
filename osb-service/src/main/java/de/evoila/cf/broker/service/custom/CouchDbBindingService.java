@@ -161,7 +161,7 @@ public class CouchDbBindingService extends BindingServiceImpl {
 
 		JsonObject toRemove = service.getCouchDbClient().find(JsonObject.class, "org.couchdb.user:"+bindingId);
 		service.getCouchDbClient().remove(toRemove);
-        String db=DB+serviceInstance.getId();
+        String db = DB+serviceInstance.getId();
 		service = openConnection(endpointBean, db);
         JsonObject security_doc = service.getCouchDbClient().find(JsonObject.class, "_security");
         SecurityDocument sd = new Gson().fromJson(security_doc, SecurityDocument.class);

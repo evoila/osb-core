@@ -94,9 +94,6 @@ public class UaaRelyingPartyFilter extends GenericFilterBean {
         try {
 
             if (token == null) {
-                /*response.setContentType("application/json");
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No authorization header present");
-                */
                 throw new AuthenticationCredentialsNotFoundException("No authorization header present.");
 
             }
@@ -129,7 +126,6 @@ public class UaaRelyingPartyFilter extends GenericFilterBean {
             logger.debug("Updated SecurityContextHolder to contain null Authentication");
             logger.debug("Delegating to authentication failure handler " + failureHandler);
         }
-
         failureHandler.onAuthenticationFailure(request, response, failed);
     }
 

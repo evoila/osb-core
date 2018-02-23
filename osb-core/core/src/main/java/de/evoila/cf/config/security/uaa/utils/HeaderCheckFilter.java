@@ -1,6 +1,5 @@
 package de.evoila.cf.config.security.uaa.utils;
 
-import de.evoila.cf.broker.exception.BadHeaderException;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -18,7 +17,6 @@ public class HeaderCheckFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         if (req.getHeader("x-broker-api-version") == null) {
-            //throw new BadHeaderException(null);
             HttpServletResponse httpResponse = (HttpServletResponse) response;
             httpResponse.setContentType("application/json");
             httpResponse.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Requests to Service Broker must contain header that declares API-version");

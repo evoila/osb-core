@@ -57,4 +57,11 @@ public abstract interface DeploymentService {
 	 */
 	public void deleteServiceInstance(String instanceId) throws ServiceBrokerException, ServiceInstanceDoesNotExistException;
 
+	/**
+	 * @param instance
+	 * @param plan
+	 * @throws ServiceInstanceDoesNotExistException
+	 * @throws ServiceBrokerException
+	 */
+	public void updateServiceInstance(String instanceId, String planId) throws ServiceBrokerException, ServiceInstanceDoesNotExistException;
 }

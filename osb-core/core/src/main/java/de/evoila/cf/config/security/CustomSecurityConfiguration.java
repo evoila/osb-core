@@ -17,15 +17,18 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 /**
  * @author Johannes Hiemer.
+ * @author Marco Di Martino.
  * 
  */
 @Configuration
 @EnableWebSecurity
+@Order(1)
 public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 
 	@Autowired
@@ -57,24 +60,29 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
         	.authorizeRequests()
         		.antMatchers(HttpMethod.GET,"/v2/endpoint").authenticated()
 				.antMatchers(HttpMethod.GET,"/v2/catalog").authenticated()
-				.antMatchers("/v2/service_instance/**").authenticated()
+				.antMatchers("/v2/service_instances/**").authenticated()
         		.antMatchers(HttpMethod.GET, "/info").authenticated()
         		.antMatchers(HttpMethod.GET, "/health").authenticated()
 				.antMatchers(HttpMethod.GET, "/error").authenticated()
+
 			.antMatchers(HttpMethod.GET, "/env").authenticated()
 				.antMatchers(HttpMethod.GET,"/v2/dashboard/{serviceInstanceId}").permitAll()
 				.antMatchers(HttpMethod.GET,"/v2/dashboard/{serviceInstanceId}/confirm").permitAll()
 				.antMatchers("/v2/backup/**").permitAll()
 				.antMatchers("/v2/dashboard/manage/**").authenticated()
-        .and()
+				.and()
         	.httpBasic()
+				.and()
+				.anonymous().disable()
+				.exceptionHandling()
+				.authenticationEntryPoint(new org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint("Authorization"))
         .and()
         	.csrf().disable();
     }
 
 
 	@Configuration
-	@Order(1)
+	@Order(10)
 	public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
 		@Bean
@@ -114,8 +122,11 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 				.authorizeRequests()
 					.antMatchers(HttpMethod.GET,"/v2/authentication/{serviceInstanceId}").permitAll()
 					.antMatchers(HttpMethod.GET,"/v2/authentication/{serviceInstanceId}/confirm").permitAll()
-					.antMatchers(HttpMethod.GET, "/v2/manage/**").authenticated();
-
+					.antMatchers(HttpMethod.GET, "/v2/manage/**").authenticated()
+				.and()
+					.anonymous().disable()
+					.exceptionHandling()
+					.authenticationEntryPoint(new org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint("headerValue"));
 		}
 	}
 }

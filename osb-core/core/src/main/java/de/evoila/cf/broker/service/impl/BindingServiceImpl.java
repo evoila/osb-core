@@ -99,7 +99,7 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	@Override
 	public void deleteServiceInstanceBinding(String bindingId)
-			throws ServiceBrokerException, ServerviceInstanceBindingDoesNotExistsException {
+			throws ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException {
 		ServiceInstance serviceInstance = getBinding(bindingId);
 
 		try {
@@ -124,13 +124,13 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 	}
 
-	private ServiceInstance getBinding(String bindingId) throws ServerviceInstanceBindingDoesNotExistsException {
+	private ServiceInstance getBinding(String bindingId) throws ServiceInstanceBindingDoesNotExistsException {
 		if (!bindingRepository.containsInternalBindingId(bindingId)) {
-			throw new ServerviceInstanceBindingDoesNotExistsException(bindingId);
+			throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
 		}
 		String serviceInstanceId = bindingRepository.getInternalBindingId(bindingId);
 		if (serviceInstanceId == null) {
-			throw new ServerviceInstanceBindingDoesNotExistsException(bindingId);
+			throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
 		}
 		return serviceInstanceRepository.getServiceInstance(serviceInstanceId);
 	}
@@ -150,7 +150,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, externalAddresses.get(0));
 
 		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
-				credentials, null);
+				credentials, "");
 		serviceInstanceBinding.setExternalServerAddresses(externalAddresses);
 		return serviceInstanceBinding;
 	}
@@ -168,7 +168,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		log.debug("bind service");
 		ServerAddress host = serviceInstance.getHosts().get(0);
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, host);
-		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, null);
+		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, "");
 	}
 
 	/**

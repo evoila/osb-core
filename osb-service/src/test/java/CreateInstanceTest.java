@@ -43,7 +43,8 @@ import static junit.framework.TestCase.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 @ContextConfiguration(classes = Application.class, loader = AnnotationConfigContextLoader.class, initializers = ConfigFileApplicationContextInitializer.class)
-@ActiveProfiles(profiles={"default", "singlenode"})
+//@ActiveProfiles(profiles={"default", "singlenode"})
+@ActiveProfiles("default")
 public class CreateInstanceTest {
 
     @Autowired
@@ -86,7 +87,7 @@ public class CreateInstanceTest {
 
         assertNotNull(cl.find(JsonObject.class, "org.couchdb.user:db-instance_binding"));
 
-        String uri = "http://"+couchService.getUsername()+":"+couchService.getPassword()+"@"+couchService.getHosts().get(0)+":"+couchService.getPort()+"/"+serviceInstance.getId();
+        String uri = "http://"+couchService.getUsername()+":"+couchService.getPassword()+"@"+couchService.getHosts().get(0)+":"+couchService.getPort()+"/"+"db-"+serviceInstance.getId();
 
         HttpResponse response = performGet(uri);
 
@@ -110,14 +111,14 @@ public class CreateInstanceTest {
         list.add(sa);
 
         serviceInstance.setHosts(list);
-        repository.addServiceInstance("db-instance_binding", serviceInstance);
+        repository.addServiceInstance("instance_binding", serviceInstance);
 
         assertNotNull(repository.getServiceInstance(serviceInstance.getId()));
 
 
 
         ServiceInstanceBindingResponse serviceInstanceBinding = bindingService.createServiceInstanceBinding("binding_id", serviceInstance.getId(),
-                "sample-local", "sample_s_local", false, null);
+                "sample-local", "5678-1234", false, null);
 
         assertEquals("binding_id", serviceInstanceBinding.getCredentials().get("username"));
 

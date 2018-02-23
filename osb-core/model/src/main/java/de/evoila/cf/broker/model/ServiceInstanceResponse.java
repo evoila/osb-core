@@ -2,6 +2,7 @@ package de.evoila.cf.broker.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -19,7 +20,8 @@ public class ServiceInstanceResponse {
 	@JsonSerialize
 	@JsonProperty("dashboard_url")
 	private String dashboardUrl;
-	
+
+	@JsonIgnore
 	private boolean isAsync;
 
 	public ServiceInstanceResponse() {
@@ -42,6 +44,7 @@ public class ServiceInstanceResponse {
 		this.dashboardUrl = dashboardUrl;
 	}
 
+	@JsonIgnore
 	public boolean isAsync() {
 		return isAsync;
 	}

@@ -31,7 +31,7 @@ public class Catalog {
 
 	private void setServices(List<ServiceDefinition> services) {
 		if ( services == null ) {
-			this.services = new ArrayList<ServiceDefinition>();
+			this.services = new ArrayList<>();
 		} else {
 			this.services= services;
 		} 

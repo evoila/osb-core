@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 
+
 /**
  * @author Patrick Weber, evoila.
+ * @author Marco Di Martino
  *
  */
 @Service
@@ -45,5 +47,13 @@ public class ServiceInstanceRepositoryImpl
 	public void deleteServiceInstance(String serviceInstanceId) {
 		serviceInstanceRepository.delete(serviceInstanceId);
 	}
+
+
+	@Override
+	public void updateServiceInstancePlan(ServiceInstance serviceInstance){
+		serviceInstanceRepository.save(serviceInstance);
+
+	}
+
 
 }

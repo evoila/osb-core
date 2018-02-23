@@ -8,6 +8,7 @@ import java.util.Date;
 /**
  * 
  * @author Johannes Hiemer.
+ * @author Marco Di Martino
  *
  */
 public class JobProgress implements BaseEntity<String> {
@@ -37,6 +38,7 @@ public class JobProgress implements BaseEntity<String> {
 		this.id = serviceInstanceId;
 		this.state = progress;
 		this.date = new Date();
+		this.description="Creating service..."; // got error if empty
 	}
 
 	@Override

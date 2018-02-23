@@ -18,9 +18,9 @@ public class ServiceInstanceBindingResponse {
 
 	private Map<String, Object> credentials;
 
-	private String syslogDrainUrl;
+	private String syslogDrainUrl = "";
 
-	private String routeServiceUrl;
+	private String routeServiceUrl = "";
 
 	public ServiceInstanceBindingResponse(Map<String, Object> credentials, String syslogDrainUrl) {
 		this.credentials = credentials;
@@ -34,6 +34,7 @@ public class ServiceInstanceBindingResponse {
 	public ServiceInstanceBindingResponse(ServiceInstanceBinding binding) {
 		this.credentials = binding.getCredentials();
 		this.syslogDrainUrl = binding.getSyslogDrainUrl();
+		this.routeServiceUrl= "";
 	}
 
 	@JsonSerialize
