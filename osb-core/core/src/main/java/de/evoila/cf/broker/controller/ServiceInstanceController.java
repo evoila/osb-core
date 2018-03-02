@@ -150,7 +150,7 @@ public class ServiceInstanceController extends BaseController {
 
 		log.debug("ServiceInstance Deleted: " + instanceId);
 
-		return new ResponseEntity<String>("{}", HttpStatus.ACCEPTED); //was OK
+		return new ResponseEntity<String>("{}", HttpStatus.ACCEPTED);
 	}
 
 
