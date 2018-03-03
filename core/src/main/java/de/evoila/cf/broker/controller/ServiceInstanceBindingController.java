@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.Map;
 
@@ -46,7 +45,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
 		log.debug("ServiceInstanceBinding Created: " + bindingId);
 
-		return new ResponseEntity<ServiceInstanceBindingResponse>(response, HttpStatus.CREATED);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/{instanceId}/service_bindings/{bindingId}", method = RequestMethod.DELETE)
@@ -61,25 +60,23 @@ public class ServiceInstanceBindingController extends BaseController {
 		try {
 			bindingService.deleteServiceInstanceBinding(bindingId);
 		} catch (ServerviceInstanceBindingDoesNotExistsException e) {
-			return new ResponseEntity<String>("{}", HttpStatus.GONE);
+			return new ResponseEntity<>("{}", HttpStatus.GONE);
 		}
 
 		log.debug("ServiceInstanceBinding Deleted: " + bindingId);
 
-		return new ResponseEntity<String>("{}", HttpStatus.OK);
+		return new ResponseEntity<>("{}", HttpStatus.OK);
 	}
 
 	@ExceptionHandler(ServiceInstanceDoesNotExistException.class)
 	@ResponseBody
-	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceDoesNotExistException ex,
-			HttpServletResponse response) {
+	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceDoesNotExistException ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
 	@ExceptionHandler(ServiceInstanceBindingExistsException.class)
 	@ResponseBody
-	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceBindingExistsException ex,
-			HttpServletResponse response) {
+	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceBindingExistsException ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
 	}
 

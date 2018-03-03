@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 public abstract class BaseController {
 
 	private final Logger log = LoggerFactory.getLogger(BaseController.class);
-	
+
+
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ErrorMessage> handleException(HttpMessageNotReadableException ex, HttpServletResponse response) {
 	    return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
@@ -43,9 +44,10 @@ public abstract class BaseController {
 		log.warn("Exception", ex);
 	    return processErrorResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
+
+
 	protected ResponseEntity<ErrorMessage> processErrorResponse(String message, HttpStatus status) {
-		return new ResponseEntity<ErrorMessage>(new ErrorMessage(message), status);
+		return new ResponseEntity<>(new ErrorMessage(message), status);
 	}
-	
+
 }

@@ -30,8 +30,8 @@ class GeneralController extends BaseController {
     }
 
     @GetMapping(value = "/v2/manage/{serviceInstanceId}")
-    public ResponseEntity<ServiceInstanceView> getGeneralInformation (@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException, ServiceBrokerException {
-        return new ResponseEntity<ServiceInstanceView>(getServiceInstanceView(serviceInstanceId), HttpStatus.OK);
+    public ResponseEntity<ServiceInstanceView> getGeneralInformation(@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException, ServiceBrokerException {
+        return new ResponseEntity<>(getServiceInstanceView(serviceInstanceId), HttpStatus.OK);
     }
 
     private ServiceInstanceView getServiceInstanceView (String serviceInstanceId) throws ServiceInstanceDoesNotExistException, ServiceBrokerException {

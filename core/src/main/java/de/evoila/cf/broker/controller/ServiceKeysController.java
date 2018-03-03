@@ -3,7 +3,6 @@ package de.evoila.cf.broker.controller;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.ServiceInstanceBinding;
-import de.evoila.cf.broker.model.ServiceInstanceBindingResponse;
 import de.evoila.cf.broker.repository.BindingRepository;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.BindingService;
@@ -19,8 +18,6 @@ import java.util.UUID;
 
 /** @author Yannic Remmet. */
 @RestController
-
-
 @RequestMapping(value = "/v2/manage/servicekeys/{serviceInstanceId}")
 class ServiceKeysController extends BaseController {
 
@@ -28,7 +25,7 @@ class ServiceKeysController extends BaseController {
     BindingService bindingService;
     ServiceInstanceRepository serviceInstanceRepository;
 
-    ServiceKeysController (BindingRepository repository, BindingService service, ServiceInstanceRepository serviceInstanceRepository){
+    ServiceKeysController(BindingRepository repository, BindingService service, ServiceInstanceRepository serviceInstanceRepository){
         Assert.notNull(repository, "BindingRepository should not be null");
         Assert.notNull(service, "Binding Service should not be null");
         this.bindingRepository = repository;
@@ -37,25 +34,27 @@ class ServiceKeysController extends BaseController {
     }
 
     @GetMapping(value = "")
-    public ResponseEntity<Page<ServiceInstanceBinding>> getGeneralInformation (@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException, ServiceBrokerException {
+    public ResponseEntity<Page<ServiceInstanceBinding>> getGeneralInformation(@PathVariable String serviceInstanceId) {
         List<ServiceInstanceBinding> bindings = bindingRepository.getBindingsForServiceInstance(serviceInstanceId);
         return new ResponseEntity<>(new PageImpl<ServiceInstanceBinding>(bindings), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{serviceBindingId}")
-    public ResponseEntity<ServiceInstanceBinding> getServiceKey (@PathVariable String serviceInstanceId, @PathVariable String serviceBindingId) throws ServiceInstanceDoesNotExistException, ServiceBrokerException {
+    public ResponseEntity<ServiceInstanceBinding> getServiceKey(@PathVariable String serviceInstanceId, @PathVariable String serviceBindingId) {
         ServiceInstanceBinding binding = bindingRepository.findOne(serviceBindingId);
         return new ResponseEntity<>(binding, HttpStatus.OK);
     }
 
     @PostMapping(value = "")
-    public ResponseEntity<ServiceInstanceBinding> createServiceKey (@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceInstanceBindingExistsException, ServiceDefinitionDoesNotExistException {
+    public ResponseEntity<ServiceInstanceBinding> createServiceKey(@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException,
+            ServiceBrokerException, ServiceInstanceBindingExistsException, ServiceDefinitionDoesNotExistException {
         ServiceInstance instance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
         if(instance == null){
             throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
         }
+
         String bindingId = UUID.randomUUID().toString();
-        ServiceInstanceBindingResponse bindingResponse = bindingService.createServiceInstanceBinding(bindingId, serviceInstanceId, null, instance.getPlanId(), true, null, null);
+        bindingService.createServiceInstanceBinding(bindingId, serviceInstanceId, null, instance.getPlanId(), true, null, null);
         ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
         return new ResponseEntity<>(binding, HttpStatus.OK);
     }

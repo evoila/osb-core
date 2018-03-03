@@ -34,9 +34,6 @@ public class ServiceInstanceController extends BaseController {
 	@Autowired
 	private CatalogService catalogService;
 
-	public ServiceInstanceController() {
-	}
-
 	@RequestMapping(value = "/service_instances/{instanceId}", method = RequestMethod.PUT)
 	public ResponseEntity<ServiceInstanceResponse> createServiceInstance(
 			@PathVariable("instanceId") String serviceInstanceId,
@@ -67,25 +64,25 @@ public class ServiceInstanceController extends BaseController {
 		log.debug("ServiceInstance Created: " + serviceInstanceId);
 
 		if (response.isAsync())
-			return new ResponseEntity<ServiceInstanceResponse>(response, HttpStatus.ACCEPTED);
+			return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 		else
-			return new ResponseEntity<ServiceInstanceResponse>(response, HttpStatus.CREATED);
+			return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/service_instances/{instanceId}/last_operation", method = RequestMethod.GET)
 	public ResponseEntity<JobProgressResponse> lastOperation(@PathVariable("instanceId") String serviceInstanceId)
-			throws ServiceDefinitionDoesNotExistException, ServiceInstanceExistsException, ServiceBrokerException,
+			throws ServiceBrokerException,
 			ServiceInstanceDoesNotExistException {
 
 		JobProgressResponse serviceInstanceProcessingResponse = deploymentService.getLastOperation(serviceInstanceId);
 
-		return new ResponseEntity<JobProgressResponse>(serviceInstanceProcessingResponse, HttpStatus.OK);
+		return new ResponseEntity<>(serviceInstanceProcessingResponse, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/service_instances/{instanceId}", method = RequestMethod.DELETE)
 	public ResponseEntity<String> deleteServiceInstance(@PathVariable("instanceId") String instanceId,
 			@RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId)
-					throws ServiceBrokerException, AsyncRequiredException, ServiceInstanceDoesNotExistException {
+					throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
 
 		log.debug("DELETE: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
 				+ ", deleteServiceInstanceBinding(), serviceInstanceId = " + instanceId + ", serviceId = " + serviceId
@@ -95,10 +92,10 @@ public class ServiceInstanceController extends BaseController {
 
 		log.debug("ServiceInstance Deleted: " + instanceId);
 
-		return new ResponseEntity<String>("{}", HttpStatus.OK);
+		return new ResponseEntity<>("{}", HttpStatus.OK);
 	}
 
-	@Override
+	//@Override
 	@ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, AsyncRequiredException.class })
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(Exception ex, HttpServletResponse response) {
@@ -107,15 +104,13 @@ public class ServiceInstanceController extends BaseController {
 
 	@ExceptionHandler(ServiceInstanceExistsException.class)
 	@ResponseBody
-	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceExistsException ex,
-			HttpServletResponse response) {
+	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceExistsException ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
 	}
 
 	@ExceptionHandler(ServiceInstanceDoesNotExistException.class)
 	@ResponseBody
-	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceDoesNotExistException ex,
-			HttpServletResponse response) {
+	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceDoesNotExistException ex) {
 		return processErrorResponse("{}", HttpStatus.GONE);
 	}
 }
