@@ -1,14 +1,14 @@
 package de.evoila.cf.broker.model;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * An instance of a ServiceDefinition.
@@ -58,6 +58,15 @@ public class ServiceInstance implements BaseEntity<String> {
 	@JsonSerialize
 	@JsonProperty("context")
 	private Map<String, String> context;
+
+    @JsonIgnore
+    private String username;
+
+    @JsonIgnore
+    private String password;
+
+    @JsonIgnore
+    private String usergroup;
 
 	@SuppressWarnings("unused")
 	private ServiceInstance() {
@@ -110,6 +119,12 @@ public class ServiceInstance implements BaseEntity<String> {
 		if(context != null)
 			setContext(context);
 	}
+
+    public ServiceInstance(ServiceInstance serviceInstance, String internalId){
+        initialize(serviceInstance.id, serviceInstance.serviceDefinitionId, serviceInstance.planId,
+                serviceInstance.organizationGuid, serviceInstance.spaceGuid, serviceInstance.parameters);
+        setInternalId(internalId);
+    }
 
 	@Override
 	public String getId() {
@@ -193,4 +208,16 @@ public class ServiceInstance implements BaseEntity<String> {
 	public void setContext(Map<String, String> context) {
 		this.context = new HashMap<String, String>(context);
 	}
+
+    public String getUsername() { return username; }
+
+    public void setUsername(String username) { this.username = username; }
+
+    public String getPassword() { return password; }
+
+    public void setPassword(String password) { this.password = password; }
+
+    public String getUsergroup() { return usergroup; }
+
+    public void setUsergroup(String usergroup) { this.usergroup = usergroup; }
 }
