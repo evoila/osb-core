@@ -7,8 +7,8 @@ de/evoila/cf/model/BackupJob$BackupDestination.class
 de/evoila/cf/model/enums/DestinationType.class
 de/evoila/cf/model/RestoreRequest.class
 de/evoila/cf/model/enums/RetentionStyle.class
-de/evoila/cf/model/FileDestination.class
 de/evoila/cf/model/DatabaseCredential.class
+de/evoila/cf/model/FileDestination.class
 de/evoila/cf/model/enums/JobStatus.class
 de/evoila/cf/model/enums/DatabaseType.class
 de/evoila/cf/model/BackupJob$1.class

@@ -6,14 +6,8 @@ package de.evoila.cf.broker.service.custom;
 import com.google.gson.JsonObject;
 import de.evoila.cf.broker.bean.impl.ExistingEndpointBeanImpl;
 import de.evoila.cf.broker.service.sample.raw.CouchDbService;
-import org.lightcouch.Replicator;
-import org.lightcouch.ReplicatorDocument;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-//import org.springframework.boot.context.properties.ConfigurationProperties;
-//import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
-
 import de.evoila.cf.broker.exception.PlatformException;
 import de.evoila.cf.broker.model.Plan;
 import de.evoila.cf.broker.model.ServiceInstance;
@@ -21,13 +15,9 @@ import de.evoila.cf.broker.service.sample.CouchDbCustomImplementation;
 import de.evoila.cf.cpi.existing.CustomExistingService;
 import de.evoila.cf.cpi.existing.CustomExistingServiceConnection;
 import de.evoila.cf.cpi.existing.ExistingServiceFactory;
-//import de.evoila.cf.broker.service.sample.raw.CouchDbService;
 import org.lightcouch.CouchDbClient;
-//import org.lightcouch.CouchDbInfo;
 import org.lightcouch.CouchDbException;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Johannes Hiemer

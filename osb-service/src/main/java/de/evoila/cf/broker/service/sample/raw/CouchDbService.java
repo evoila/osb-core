@@ -5,9 +5,6 @@ package de.evoila.cf.broker.service.sample.raw;
 
 import org.lightcouch.CouchDbClient;
 import org.lightcouch.CouchDbProperties;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonArray;
 import de.evoila.cf.cpi.existing.CustomExistingServiceConnection;
 
 import java.net.UnknownHostException;
@@ -35,11 +32,7 @@ public class CouchDbService implements CustomExistingServiceConnection {
 	private CouchDbClient couchDbClient;
 
 	public void createConnection(List<String> hosts, int port, String database, String  username, String  password) throws UnknownHostException {
-		/*
-		if (!(database.equals(db))){
-			database+="db-";
-		}
-		*/
+
        	config = new CouchDbProperties();
 
         config.setDbName(database);

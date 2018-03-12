@@ -11,11 +11,17 @@ import de.evoila.cf.broker.service.impl.BindingServiceImpl;
 import de.evoila.cf.broker.service.sample.CouchDbCustomImplementation;
 import de.evoila.cf.cpi.existing.ExistingServiceFactory;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.*;
 import org.apache.http.util.EntityUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -131,9 +137,24 @@ public class CreateInstanceTest {
 
     public HttpResponse performGet (String uri) throws Exception {
 
-        HttpClient c = new DefaultHttpClient();
+        HttpHost targetHost = new HttpHost(conn.getService().getConfig().getHost(), conn.getService().getConfig().getPort(), "http");
+        AuthCache authCache = new BasicAuthCache();
+        authCache.put(targetHost, new BasicScheme());
+
+        CredentialsProvider provider = new BasicCredentialsProvider();
+        UsernamePasswordCredentials uspwd = new UsernamePasswordCredentials(
+                                            conn.getService().getConfig().getUsername(),
+                                            conn.getService().getConfig().getPassword()
+                                            );
+        provider.setCredentials(AuthScope.ANY, uspwd);
+
+        final HttpClientContext context = HttpClientContext.create();
+        context.setCredentialsProvider(provider);
+        context.setAuthCache(authCache);
+
+        HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
         HttpGet get = new HttpGet(uri);
-        return c.execute(get);
+        return client.execute(get, context);
 
     }
 
