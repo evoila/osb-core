@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -20,7 +19,7 @@ import javax.validation.Valid;
  * @author Johannes Hiemer.
  * @author Christian Brinker, evoila.
  */
-@Controller
+@RestController
 @RequestMapping(value = "/v2")
 public class ServiceInstanceController extends BaseController {
 
@@ -34,7 +33,7 @@ public class ServiceInstanceController extends BaseController {
 	@Autowired
 	private CatalogService catalogService;
 
-	@RequestMapping(value = "/service_instances/{instanceId}", method = RequestMethod.PUT)
+	@PutMapping(value = "/service_instances/{instanceId}")
 	public ResponseEntity<ServiceInstanceResponse> createServiceInstance(
 			@PathVariable("instanceId") String serviceInstanceId,
 			@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
@@ -69,7 +68,7 @@ public class ServiceInstanceController extends BaseController {
 			return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
-	@RequestMapping(value = "/service_instances/{instanceId}/last_operation", method = RequestMethod.GET)
+	@GetMapping(value = "/service_instances/{instanceId}/last_operation")
 	public ResponseEntity<JobProgressResponse> lastOperation(@PathVariable("instanceId") String serviceInstanceId)
 			throws ServiceBrokerException,
 			ServiceInstanceDoesNotExistException {
@@ -79,7 +78,7 @@ public class ServiceInstanceController extends BaseController {
 		return new ResponseEntity<>(serviceInstanceProcessingResponse, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/service_instances/{instanceId}", method = RequestMethod.DELETE)
+	@DeleteMapping(value = "/service_instances/{instanceId}")
 	public ResponseEntity<String> deleteServiceInstance(@PathVariable("instanceId") String instanceId,
 			@RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId)
 					throws ServiceBrokerException, ServiceInstanceDoesNotExistException {

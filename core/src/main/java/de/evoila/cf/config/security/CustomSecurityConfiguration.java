@@ -58,6 +58,7 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
         	.authorizeRequests()
         		.antMatchers(HttpMethod.GET,"/v2/endpoint").authenticated()
 				.antMatchers(HttpMethod.GET,"/v2/catalog").authenticated()
+				.antMatchers(HttpMethod.GET,"/v2/catalog/").authenticated()
 				.antMatchers("/v2/service_instance/**").authenticated()
         		.antMatchers(HttpMethod.GET, "/info").authenticated()
         		.antMatchers(HttpMethod.GET, "/health").authenticated()

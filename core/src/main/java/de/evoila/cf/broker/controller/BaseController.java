@@ -10,8 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,13 +35,18 @@ public abstract class BaseController {
 	    }
 		return processErrorResponse(message, HttpStatus.UNPROCESSABLE_ENTITY);
 	}
-	
+
+
 	@ExceptionHandler(Exception.class)
-	@RequestMapping(value = { "/error" }, method = RequestMethod.GET)
+	@GetMapping(value = { "/error" })
 	public ResponseEntity<ErrorMessage> handleException(Exception ex, 
 			HttpServletResponse response) {
 		log.warn("Exception", ex);
-	    return processErrorResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		String errMessage = "";
+		if (ex != null && ex.getMessage() != null)
+			errMessage = ex.getMessage();
+
+	    return processErrorResponse(errMessage, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 

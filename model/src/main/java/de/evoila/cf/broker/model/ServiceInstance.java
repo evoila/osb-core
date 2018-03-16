@@ -59,6 +59,10 @@ public class ServiceInstance implements BaseEntity<String> {
 	@JsonProperty("context")
 	private Map<String, String> context;
 
+	@JsonSerialize
+	@JsonProperty("floatingIp_id")
+	private String floatingIpId;
+
     @JsonIgnore
     private String username;
 
@@ -220,4 +224,8 @@ public class ServiceInstance implements BaseEntity<String> {
     public String getUsergroup() { return usergroup; }
 
     public void setUsergroup(String usergroup) { this.usergroup = usergroup; }
+
+	public String getFloatingIpId() { return floatingIpId; }
+
+	public void setFloatingIpId(String floatingIpId) { this.floatingIpId = floatingIpId; }
 }

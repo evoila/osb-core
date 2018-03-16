@@ -1,12 +1,8 @@
 package de.evoila.cf.broker.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -33,7 +29,7 @@ public class Plan {
 
 	@JsonSerialize
 	@JsonProperty("metadata")
-	private Map<String, Object> metadata = new HashMap<String, Object>();
+	private Metadata metadata;
 	
 	@JsonSerialize
 	@JsonProperty(value="free", required=false)
@@ -42,14 +38,34 @@ public class Plan {
 	@JsonProperty(value = "plan_updateable",required = false, defaultValue = "false")
 	private boolean planUpdateable;
 
+	/**
+	 * Please use metadata section for custom mapping information
+	 */
+	@Deprecated
 	private int volumeSize;
 
+	/**
+	 * Please use metadata section for custom mapping information
+	 */
+	@Deprecated
 	private VolumeUnit volumeUnit;
 
+	/**
+	 * Please use metadata section for custom mapping information
+	 */
+	@Deprecated
 	private Platform platform;
 
+	/**
+	 * Please use metadata section for custom mapping information
+	 */
+	@Deprecated
 	private String flavorId;
 
+	/**
+	 * Please use metadata section for custom mapping information
+	 */
+	@Deprecated
 	private int connections;
 
 	public Plan() {
@@ -113,10 +129,10 @@ public class Plan {
 		this.volumeUnit = volumeUnit;
 	}
 
-	public Plan(String id, String name, String description, Map<String, Object> metadata, Platform platform,
+	public Plan(String id, String name, String description, Metadata metadata, Platform platform,
 			int volumeSize, VolumeUnit volumeUnit, String flavor, boolean free, int connections) {
 		this(id, name, description, platform, volumeSize, volumeUnit, flavor, free, connections);
-		setMetadata(metadata);
+		this.metadata = metadata;
 	}
 
 	public String getId() {
@@ -143,16 +159,12 @@ public class Plan {
 		this.description = description;
 	}
 
-	public Map<String, Object> getMetadata() {
+	public Metadata getMetadata() {
 		return metadata;
 	}
 
-	public void setMetadata(Map<String, Object> metadata) {
-		if (metadata == null) {
-			this.metadata = new HashMap<String, Object>();
-		} else {
-			this.metadata = metadata;
-		}
+	public void setMetadata(Metadata metadata) {
+		this.metadata = metadata;
 	}
 
 	public boolean isFree() {
