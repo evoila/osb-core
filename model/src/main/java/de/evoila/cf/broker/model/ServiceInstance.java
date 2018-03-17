@@ -124,7 +124,7 @@ public class ServiceInstance implements BaseEntity<String> {
 			setContext(context);
 	}
 
-    public ServiceInstance(ServiceInstance serviceInstance, String internalId){
+    public ServiceInstance(ServiceInstance serviceInstance, String internalId) {
         initialize(serviceInstance.id, serviceInstance.serviceDefinitionId, serviceInstance.planId,
                 serviceInstance.organizationGuid, serviceInstance.spaceGuid, serviceInstance.parameters);
         setInternalId(internalId);
