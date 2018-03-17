@@ -19,9 +19,9 @@ public class Metadata {
 
     private List<NetworkReference> networks;
 
-    private Map<String, Metadata> instanceGroupMetadata;
+    private Map<String, Metadata> instanceGroupMetadata = new HashMap<>();
 
-    private Map<String, Object> customParameters;
+    private Map<String, Object> customParameters = new HashMap<>();
 
     public Metadata() {}
 
@@ -81,11 +81,7 @@ public class Metadata {
     }
 
     public void setInstanceGroupMetadata(Map<String, Metadata> instanceGroupMetadata) {
-        if(instanceGroupMetadata != null) {
-            this.instanceGroupMetadata = instanceGroupMetadata;
-        } else {
-            this.instanceGroupMetadata = new HashMap<>();
-        }
+        this.instanceGroupMetadata = instanceGroupMetadata;
     }
 
     public Map<String, Object> getCustomParameters() {
@@ -93,10 +89,6 @@ public class Metadata {
     }
 
     public void setCustomParameters(Map<String, Object> customParameters) {
-        if(customParameters != null) {
-            this.customParameters = customParameters;
-        } else {
-            this.customParameters = new HashMap<>();
-        }
+        this.customParameters = customParameters;
     }
 }

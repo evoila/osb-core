@@ -3,35 +3,19 @@
  */
 package de.evoila.cf.broker.service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.annotation.Resource;
-
+import de.evoila.cf.broker.exception.*;
+import de.evoila.cf.broker.model.*;
+import de.evoila.cf.broker.repository.JobRepository;
+import de.evoila.cf.broker.repository.PlatformRepository;
+import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
+import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.evoila.cf.broker.exception.PlatformException;
-import de.evoila.cf.broker.exception.ServiceBrokerException;
-import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceExistsException;
-import de.evoila.cf.broker.model.JobProgress;
-import de.evoila.cf.broker.model.JobProgressResponse;
-import de.evoila.cf.broker.model.Plan;
-import de.evoila.cf.broker.model.ServiceInstance;
-import de.evoila.cf.broker.model.ServiceInstanceResponse;
-import de.evoila.cf.broker.repository.JobRepository;
-import de.evoila.cf.broker.repository.PlatformRepository;
-import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
-import de.evoila.cf.broker.repository.ServiceInstanceRepository;
-import de.evoila.cf.broker.service.AsyncDeploymentService;
-import de.evoila.cf.broker.service.DeploymentService;
-import de.evoila.cf.broker.service.PlatformService;
-import de.evoila.cf.cpi.custom.props.DomainBasedCustomPropertyHandler;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Christian Brinker.
@@ -40,14 +24,13 @@ import de.evoila.cf.cpi.custom.props.DomainBasedCustomPropertyHandler;
 @Service
 public class DeploymentServiceImpl implements DeploymentService {
 
-	@Autowired
-	private DomainBasedCustomPropertyHandler domainPropertyHandler;
+    Logger log = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	private PlatformRepository platformRepository;
 
 	@Autowired
-	ServiceDefinitionRepository serviceDefinitionRepository;
+    private ServiceDefinitionRepository serviceDefinitionRepository;
 
 	@Autowired
 	private ServiceInstanceRepository serviceInstanceRepository;
@@ -58,14 +41,9 @@ public class DeploymentServiceImpl implements DeploymentService {
 	@Autowired(required = false)
 	private AsyncDeploymentService asyncDeploymentService;
 
-	@Resource(name = "customProperties")
-	public Map<String, String> customProperties;
-	
-	Logger log = LoggerFactory.getLogger(getClass());
-
 	@Override
 	public JobProgressResponse getLastOperation(String serviceInstanceId)
-			throws ServiceInstanceDoesNotExistException, ServiceBrokerException {
+			throws ServiceInstanceDoesNotExistException {
 		JobProgress progress = asyncDeploymentService.getProgress(serviceInstanceId);
 
 		if (progress == null || !serviceInstanceRepository.containsServiceInstanceId(serviceInstanceId)) {
@@ -75,14 +53,12 @@ public class DeploymentServiceImpl implements DeploymentService {
 		return new JobProgressResponse(progress);
 	}
 
-
 	@Override
 	public ServiceInstanceResponse createServiceInstance(String serviceInstanceId, String serviceDefinitionId,
 			String planId, String organizationGuid, String spaceGuid, Map<String, String> parameters,
 			Map<String, String> context)
 					throws ServiceInstanceExistsException, ServiceBrokerException,
 					ServiceDefinitionDoesNotExistException {
-
 
 		serviceDefinitionRepository.validateServiceId(serviceDefinitionId);
 
@@ -92,10 +68,10 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 		ServiceInstance serviceInstance = new ServiceInstance(serviceInstanceId, serviceDefinitionId,
 				planId, organizationGuid, spaceGuid,
-				parameters == null ? new HashMap<String, String>()
-						: new HashMap<String, String>(parameters),
-				context == null ? new HashMap<String, String>() 
-						: new HashMap<String, String>(context));
+				parameters == null ? new HashMap<>()
+						: new HashMap<>(parameters),
+				context == null ? new HashMap<>()
+						: new HashMap<>(context));
 
 		Plan plan = serviceDefinitionRepository.getPlan(planId);
 
@@ -106,7 +82,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 		}
 		
 		if (platformService.isSyncPossibleOnCreate(plan)) {
-			return syncCreateInstance(serviceInstance, parameters, plan, platformService);
+			return new ServiceInstanceResponse(syncCreateInstance(serviceInstance, parameters, plan, platformService), false);
 		} else {
 			ServiceInstanceResponse serviceInstanceResponse = new ServiceInstanceResponse(serviceInstance, true);
 
@@ -118,93 +94,88 @@ public class DeploymentServiceImpl implements DeploymentService {
 		}
 	}
 
-	public ServiceInstanceResponse syncCreateInstance (ServiceInstance serviceInstance, Map<String, String> parameters,
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * de.evoila.cf.broker.service.ServiceInstanceService#deleteInstance(
+     * java.lang.String)
+     */
+    @Override
+    public void deleteServiceInstance(String instanceId)
+            throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
+        ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+
+        if (serviceInstance == null) {
+            throw new ServiceInstanceDoesNotExistException(instanceId);
+        }
+
+        Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
+
+        PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
+
+        if (platformService.isSyncPossibleOnDelete(serviceInstance)
+                && platformService.isSyncPossibleOnDelete(serviceInstance)) {
+            syncDeleteInstance(serviceInstance, platformService);
+        } else {
+            asyncDeploymentService.asyncDeleteInstance(this, instanceId, serviceInstance, platformService);
+        }
+    }
+
+	public ServiceInstance syncCreateInstance(ServiceInstance serviceInstance, Map<String, String> parameters,
                                                        Plan plan, PlatformService platformService) throws ServiceBrokerException {
-		ServiceInstance createdServiceInstance;
+
+	    // TODO: We need to decide which method we trigger when preCreateInstance fails
+        try {
+            serviceInstance = platformService.preCreateInstance(serviceInstance, plan);
+        } catch (PlatformException e) {
+            throw new ServiceBrokerException("Error during pre service instance creation", e);
+        }
+
 		try {
-			Map<String, String> mergedProperties = domainPropertyHandler.addDomainBasedCustomProperties(plan,
-					customProperties, serviceInstance);
-
-			if (parameters != null) {
-				for (Entry<String, String> entry : parameters.entrySet()) {
-					mergedProperties.putIfAbsent(entry.getKey(), entry.getValue());
-				}
-			}
-
-			createdServiceInstance = platformService.createInstance(serviceInstance, plan, mergedProperties);
+            serviceInstance = platformService.createInstance(serviceInstance, plan, parameters);
 		} catch (PlatformException e) {
 			serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
 
 			throw new ServiceBrokerException("Could not create instance due to: ", e);
 		}
 
-		if (createdServiceInstance.getInternalId() != null)
-			serviceInstanceRepository.addServiceInstance(createdServiceInstance.getId(), createdServiceInstance);
-		else {
-			serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
-
-			throw new ServiceBrokerException(
-					"Internal error. Service instance was not created. ID was: " + serviceInstance.getId());
-		}
-
 		try {
-			createdServiceInstance = platformService.postProvisioning(createdServiceInstance, plan);
+            serviceInstance = platformService.postCreateInstance(serviceInstance, plan);
 		} catch (PlatformException e) {
-			throw new ServiceBrokerException("Error during service availability verification", e);
+			throw new ServiceBrokerException("Error during post service instance creation", e);
 		}
 
-		return new ServiceInstanceResponse(createdServiceInstance, false);
+		serviceInstanceRepository.addServiceInstance(serviceInstance.getId(), serviceInstance);
+
+		return serviceInstance;
 	}
 
-	/**
-	 * 
-	 * @param instanceId
-	 * @return
-	 */
-	protected String getInternalId(String instanceId) {
-		return serviceInstanceRepository.getServiceInstance(instanceId).getInternalId();
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.evoila.cf.broker.service.ServiceInstanceService#deleteServiceInstance(
-	 * java.lang.String)
-	 */
-	@Override
-	public void deleteServiceInstance(String instanceId)
-			throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
-		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
 
-		if (serviceInstance == null) {
-			throw new ServiceInstanceDoesNotExistException(instanceId);
-		}
+	public void syncDeleteInstance(ServiceInstance serviceInstance, PlatformService platformService)
+			throws ServiceBrokerException {
 
-		Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
-		
-		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
-
-		if (platformService.isSyncPossibleOnDelete(serviceInstance)
-				&& platformService.isSyncPossibleOnDelete(serviceInstance)) {
-			syncDeleteInstance(serviceInstance, platformService);
-		} else {
-			asyncDeploymentService.asyncDeleteInstance(this, instanceId, serviceInstance, platformService);
-		}
-
-	}
-
-	public void syncDeleteInstance (ServiceInstance serviceInstance, PlatformService platformService)
-			throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
-		platformService.preDeprovisionServiceInstance(serviceInstance);
+        try {
+            platformService.preDeleteInstance(serviceInstance);
+        } catch (PlatformException e) {
+            throw new ServiceBrokerException("Error during pre service instance deletion", e);
+        }
 
 		try {
-			platformService.deleteServiceInstance(serviceInstance);
+			platformService.deleteInstance(serviceInstance);
 		} catch (PlatformException e) {
 			throw new ServiceBrokerException("Error during deletion of service", e);
 		}
 
-		serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
-		jobRepository.deleteJobProgress(serviceInstance.getId());
+        try {
+            platformService.postDeleteInstance(serviceInstance);
+        } catch (PlatformException e) {
+            throw new ServiceBrokerException("Error during pre service instance deletion", e);
+        }
+
+        serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
+        jobRepository.deleteJobProgress(serviceInstance.getId());
 	}
+
 }
