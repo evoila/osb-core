@@ -1,21 +1,19 @@
 package de.evoila.cf.broker.service.impl;
 
-import java.util.Map;
-
+import de.evoila.cf.broker.model.JobProgress;
+import de.evoila.cf.broker.model.Plan;
+import de.evoila.cf.broker.model.ServiceInstance;
+import de.evoila.cf.broker.service.AsyncDeploymentService;
 import de.evoila.cf.broker.service.DeploymentServiceImpl;
+import de.evoila.cf.broker.service.JobProgressService;
+import de.evoila.cf.broker.service.PlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
-import de.evoila.cf.broker.model.JobProgress;
-import de.evoila.cf.broker.model.Plan;
-import de.evoila.cf.broker.model.ServiceInstance;
-import de.evoila.cf.broker.service.AsyncDeploymentService;
-import de.evoila.cf.broker.service.JobProgressService;
-import de.evoila.cf.broker.service.PlatformService;
+import java.util.Map;
 
 @Service
 public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
@@ -32,7 +30,7 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
 		progressService.startJob(serviceInstance);
 
 		try {
-			deploymentService.syncCreateInstance(serviceInstance, parameters, plan, platformService);
+            deploymentService.syncCreateInstance(serviceInstance, parameters, plan, platformService);
 		} catch (Exception e) {
 			progressService.failJob(serviceInstance,
 					"Internal error during Instance creation, please contact our support.");
@@ -46,12 +44,11 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
 	@Async
 	@Override
 	public void asyncDeleteInstance(DeploymentServiceImpl deploymentService, String instanceId,
-			ServiceInstance serviceInstance, PlatformService platformService)
-					throws ServiceInstanceDoesNotExistException {
+			ServiceInstance serviceInstance, PlatformService platformService) {
 		progressService.startJob(serviceInstance);
 
 		try {
-			deploymentService.syncDeleteInstance(serviceInstance, platformService);
+            deploymentService.syncDeleteInstance(serviceInstance, platformService);
 		} catch (Exception e) {
 			progressService.failJob(serviceInstance,
 					"Internal error during Instance deletion, please contact our support.");
