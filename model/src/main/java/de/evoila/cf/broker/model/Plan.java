@@ -53,7 +53,6 @@ public class Plan {
 	/**
 	 * Please use metadata section for custom mapping information
 	 */
-	@Deprecated
 	private Platform platform;
 
 	/**

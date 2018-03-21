@@ -19,7 +19,7 @@ public class ServiceInstanceData {
 	public static Plan createDockerPlanData() {
 		Plan dockerPlan = new Plan("docker", "50 MB PostgreSQL DB Basic Instance",
 				"The most basic PostgreSQL plan currently available. Providing"
-			+ "50 MB of capcity in a PostgreSQL DB.", Platform.DOCKER, 25, VolumeUnit.M, "3", true, 100);
+			+ "50 MB of capcity in a PostgreSQL DB.", Platform.EXISTING_SERVICE, 25, VolumeUnit.M, "3", true, 100);
 		return dockerPlan;
 	}
 	
