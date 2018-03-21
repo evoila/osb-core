@@ -3,6 +3,7 @@
  */
 package de.evoila.cf.broker.service.sample;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.Gson;
@@ -11,18 +12,26 @@ import de.evoila.cf.broker.bean.impl.ExistingEndpointBeanImpl;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.model.NamesAndRoles;
 import de.evoila.cf.broker.service.sample.raw.CouchDbService;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.lightcouch.CouchDbClient;
 import org.lightcouch.CouchDbException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import de.evoila.cf.broker.model.UserDocument;
 import de.evoila.cf.broker.model.SecurityDocument;
-//import de.evoila.cf.broker.service.sample.raw.CouchDbService;
 import de.evoila.cf.cpi.existing.CustomExistingService;
 import de.evoila.cf.cpi.existing.CustomExistingServiceConnection;
 
@@ -41,6 +50,8 @@ public class CouchDbCustomImplementation implements CustomExistingService {
     private static final String PREFIX_ID = "org.couchdb.user:";
 
 	private CouchDbService service;
+
+	private static final Logger log = LoggerFactory.getLogger(CouchDbCustomImplementation.class);
 
 	@Autowired
 	private ExistingEndpointBeanImpl endpointBean;
@@ -112,9 +123,11 @@ public class CouchDbCustomImplementation implements CustomExistingService {
                 adminClient.get(1).toString(), security.toString());
     }
 
+    /* must implement a Preemptive Basic Authentication */
 	public static void send_put(CouchDbService connection, String database, String username,
                                    String password, String file_security) throws Exception {
 
+		String host = connection.getConfig().getHost();
 		String baseUri = connection.getCouchDbClient().getBaseUri().toString();
 		String credentials = username+":"+password;
         String http = baseUri.substring(0,7);
@@ -122,18 +135,28 @@ public class CouchDbCustomImplementation implements CustomExistingService {
 
 		String uri = http+credentials+"@"+baseUri+database+"/_security";
 
-        HttpClient c = new DefaultHttpClient();
 
-        StringEntity params =new StringEntity(file_security,"UTF-8");
+		HttpHost targetHost = new HttpHost(host, connection.getConfig().getPort(), "http");
+		AuthCache authCache = new BasicAuthCache();
+		authCache.put(targetHost, new BasicScheme());
 
-        HttpPut request = new HttpPut(uri);
+		CredentialsProvider provider = new BasicCredentialsProvider();
+		provider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
 
-        params.setContentType(APPLICATION_JSON);
-        request.addHeader(CONTENT_TYPE, APPLICATION_JSON);
-        request.addHeader("Accept", APPLICATION_JSON);
-        request.setEntity(params);
+		final HttpClientContext context = HttpClientContext.create();
+		context.setCredentialsProvider(provider);
+		context.setAuthCache(authCache);
 
-        HttpResponse response = c.execute(request);
+		HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+		StringEntity params = new StringEntity(file_security, "UTF-8");
+		HttpPut putRequest = new HttpPut(new URI(uri));
+
+		params.setContentType(APPLICATION_JSON);
+		putRequest.addHeader(CONTENT_TYPE,APPLICATION_JSON);
+		putRequest.addHeader("Accept", APPLICATION_JSON);
+		putRequest.setEntity(params);
+
+		HttpResponse response = client.execute(putRequest, context);
         if (response.getStatusLine().getStatusCode() != 200){
             throw new Exception("Error while updating _security document");
         }

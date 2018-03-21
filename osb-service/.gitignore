@@ -17,3 +17,5 @@ ca.pem
 */paho*
 *.log
 */bin
+service-broker-template.log
+osb-service/src/main/resources/static/stats.json
