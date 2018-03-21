@@ -1,16 +1,7 @@
-package de.evoila.cf.broker.model;
+package de.evoila.cf.broker.service.custom;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * @author Marco Di Martino
@@ -26,7 +17,7 @@ public class SecurityDocument {
     @SerializedName("members")
     private NamesAndRoles members;
 
-    public SecurityDocument (NamesAndRoles admins, NamesAndRoles members) {
+    public SecurityDocument(NamesAndRoles admins, NamesAndRoles members) {
         setAdmins(admins);
         setMembers(members);
     }

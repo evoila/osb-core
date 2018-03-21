@@ -1,4 +1,4 @@
-package de.evoila.cf.broker.model;
+package de.evoila.cf.broker.service.custom;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

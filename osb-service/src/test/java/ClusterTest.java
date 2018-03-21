@@ -7,6 +7,7 @@ import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.DeploymentServiceImpl;
 import de.evoila.cf.broker.service.custom.CouchDbExistingServiceFactory;
+import de.evoila.cf.broker.service.custom.UserDocument;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
 import de.evoila.cf.broker.service.sample.CouchDbCustomImplementation;
 import de.evoila.cf.broker.service.sample.raw.CouchDbService;

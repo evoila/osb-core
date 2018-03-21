@@ -1,12 +1,9 @@
-package de.evoila.cf.broker.model;
+package de.evoila.cf.broker.service.custom;
 
 
-import com.google.gson.annotations.*;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 
 /**
