@@ -41,7 +41,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	@Autowired
 	protected HAProxyService haProxyService;
 
-	protected abstract void deleteBinding(String bindingId, ServiceInstance serviceInstance)
+	protected abstract void deleteBinding(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
 			throws ServiceBrokerException;
 
 	@Override
@@ -49,7 +49,7 @@ public abstract class BindingServiceImpl implements BindingService {
 																	   String serviceId, String planId, boolean generateServiceKey,
 																	   String appGuid, String route)
 			throws ServiceInstanceBindingExistsException, ServiceBrokerException,
-			ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
+			ServiceInstanceDoesNotExistException {
 
 		validateBindingNotExists(bindingId, instanceId);
 
@@ -98,8 +98,8 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	@Override
-	public void deleteServiceInstanceBinding(String bindingId)
-			throws ServiceBrokerException, ServerviceInstanceBindingDoesNotExistsException {
+	public void deleteServiceInstanceBinding(String bindingId, String planId)
+			throws ServerviceInstanceBindingDoesNotExistsException {
 		ServiceInstance serviceInstance = getBinding(bindingId);
 
 		try {
@@ -109,7 +109,9 @@ public abstract class BindingServiceImpl implements BindingService {
 				haProxyService.removeAgent(serviceInstance.getHosts(), bindingId);
 			}
 
-			deleteBinding(bindingId, serviceInstance);
+            Plan plan = serviceDefinitionRepository.getPlan(planId);
+
+			deleteBinding(binding, serviceInstance, plan);
 		} catch (ServiceBrokerException e) {
 			log.error("Could not cleanup service binding", e);
 		} finally {

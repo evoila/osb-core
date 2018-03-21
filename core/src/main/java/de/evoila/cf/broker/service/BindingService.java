@@ -24,8 +24,7 @@ public interface BindingService {
      * @throws ServiceBrokerException
      * @throws ServiceInstanceDoesNotExistException
      */
-
-    public ServiceInstanceBindingResponse createServiceInstanceBinding (String bindingId, String instanceId,
+    ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
                                                                         String serviceId, String planId, boolean generateServiceKey,
                                                                         String appGuid, String route)
           throws ServiceInstanceBindingExistsException, ServiceBrokerException,
@@ -35,17 +34,17 @@ public interface BindingService {
      * @param id
      * @return The ServiceInstanceBinding or null if one does not exist.
      */
-    ServiceInstanceBinding getServiceInstanceBinding (String id);
+    ServiceInstanceBinding getServiceInstanceBinding(String id);
 
     /**
      * Delete the service instance binding. If a binding doesn't exist, return
      * null.
      *
-     * @param id
+     * @param bindingId, planId
      * @throws ServiceBrokerException
      * @throws ServerviceInstanceBindingDoesNotExistsException
      */
-    void deleteServiceInstanceBinding (String id)
+    void deleteServiceInstanceBinding(String bindingId, String planId)
           throws ServiceBrokerException, ServerviceInstanceBindingDoesNotExistsException;
 
 }
