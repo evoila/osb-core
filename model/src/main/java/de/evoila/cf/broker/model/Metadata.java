@@ -19,20 +19,22 @@ public class Metadata {
 
     private List<NetworkReference> networks;
 
-    private Map<String, Metadata> instanceGroupMetadata = new HashMap<>();
+    private String ingressInstanceGroup;
+
+    private Map<String, Metadata> instanceGroupSettings= new HashMap<>();
 
     private Map<String, Object> customParameters = new HashMap<>();
 
     public Metadata() {}
 
     public Metadata(int connections, int nodes, String vm_type, String persistent_disk_type, List<NetworkReference> networks,
-                    Map<String, Metadata> instanceGroupMetadata, Map<String, Object> customParameters) {
+                    Map<String, Metadata> instanceGroupSettings, Map<String, Object> customParameters) {
         this.connections = connections;
         this.nodes = nodes;
         this.vm_type = vm_type;
         this.persistent_disk_type = persistent_disk_type;
         this.networks = networks;
-        setInstanceGroupMetadata(instanceGroupMetadata);
+        setInstanceGroupMetadata(instanceGroupSettings);
         setCustomParameters(customParameters);
     }
 
@@ -76,12 +78,20 @@ public class Metadata {
         this.networks = networks;
     }
 
-    public Map<String, Metadata> getInstanceGroupMetadata() {
-        return instanceGroupMetadata;
+    public String getIngressInstanceGroup() {
+        return ingressInstanceGroup;
     }
 
-    public void setInstanceGroupMetadata(Map<String, Metadata> instanceGroupMetadata) {
-        this.instanceGroupMetadata = instanceGroupMetadata;
+    public void setIngressInstanceGroup(String ingressInstanceGroup) {
+        this.ingressInstanceGroup = ingressInstanceGroup;
+    }
+
+    public Map<String, Metadata> getInstanceGroupMetadata() {
+        return instanceGroupSettings;
+    }
+
+    public void setInstanceGroupMetadata(Map<String, Metadata> instanceGroupSettings) {
+        this.instanceGroupSettings = instanceGroupSettings;
     }
 
     public Map<String, Object> getCustomParameters() {

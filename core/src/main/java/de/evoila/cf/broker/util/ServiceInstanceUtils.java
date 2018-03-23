@@ -21,4 +21,15 @@ public class ServiceInstanceUtils {
         }
         return serverAddress;
     }
+
+    public static String connectionUrl(List<ServerAddress> serverAddresses) {
+        String url = "";
+        for (ServerAddress serverAddress : serverAddresses) {
+            if (url.length() > 0)
+                url = url.concat(",");
+
+            url = url.concat(serverAddress.getIp() + ":" + serverAddress.getPort());
+        }
+        return url;
+    }
 }
