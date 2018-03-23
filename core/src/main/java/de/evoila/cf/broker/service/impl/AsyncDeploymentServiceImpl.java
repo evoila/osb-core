@@ -43,12 +43,12 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
 
 	@Async
 	@Override
-	public void asyncDeleteInstance(DeploymentServiceImpl deploymentService, String instanceId,
-			ServiceInstance serviceInstance, PlatformService platformService) {
+	public void asyncDeleteInstance(DeploymentServiceImpl deploymentService,
+			ServiceInstance serviceInstance, Plan plan, PlatformService platformService) {
 		progressService.startJob(serviceInstance);
 
 		try {
-            deploymentService.syncDeleteInstance(serviceInstance, platformService);
+            deploymentService.syncDeleteInstance(serviceInstance, plan, platformService);
 		} catch (Exception e) {
 			progressService.failJob(serviceInstance,
 					"Internal error during Instance deletion, please contact our support.");

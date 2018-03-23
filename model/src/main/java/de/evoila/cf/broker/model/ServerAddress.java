@@ -9,9 +9,11 @@ package de.evoila.cf.broker.model;
  */
 public class ServerAddress {
 	
-	private String ip;
-	private int port;
 	private String name;
+
+	private String ip;
+
+	private int port;
 
 	public ServerAddress() {
 		super();
@@ -42,27 +44,27 @@ public class ServerAddress {
 		this.port = address.port;
 	}
 
-	public String getIp() {
-		return ip;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public int getPort() {
-		return port;
-	}
+    public String getIp() {
+        return ip;
+    }
 
-	public void setPort(int port) {
-		this.port = port;
-	}
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public int getPort() {
+        return port;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setPort(int port) {
+        this.port = port;
+    }
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +54,7 @@ public class ServiceInstance implements BaseEntity<String> {
 
 	@JsonSerialize
 	@JsonProperty("hosts")
-	private List<ServerAddress> hosts;
+	private List<ServerAddress> hosts = new ArrayList<>();
 	
 	@JsonSerialize
 	@JsonProperty("context")

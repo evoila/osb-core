@@ -89,7 +89,7 @@ public interface PlatformService {
 	 * @throws ServiceInstanceDoesNotExistException 
 	 * @throws ServiceBrokerException 
 	 */
-	void deleteInstance(ServiceInstance serviceInstance) throws PlatformException;
+	void deleteInstance(ServiceInstance serviceInstance, Plan plan) throws PlatformException;
 
     /**
      *
