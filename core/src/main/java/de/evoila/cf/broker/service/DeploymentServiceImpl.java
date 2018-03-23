@@ -94,13 +94,6 @@ public class DeploymentServiceImpl implements DeploymentService {
 		}
 	}
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * de.evoila.cf.broker.service.ServiceInstanceService#deleteInstance(
-     * java.lang.String)
-     */
     @Override
     public void deleteServiceInstance(String instanceId)
             throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
@@ -116,9 +109,9 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         if (platformService.isSyncPossibleOnDelete(serviceInstance)
                 && platformService.isSyncPossibleOnDelete(serviceInstance)) {
-            syncDeleteInstance(serviceInstance, platformService);
+            syncDeleteInstance(serviceInstance, plan, platformService);
         } else {
-            asyncDeploymentService.asyncDeleteInstance(this, instanceId, serviceInstance, platformService);
+            asyncDeploymentService.asyncDeleteInstance(this, serviceInstance, plan, platformService);
         }
     }
 
@@ -151,9 +144,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 		return serviceInstance;
 	}
 
-
-
-	public void syncDeleteInstance(ServiceInstance serviceInstance, PlatformService platformService)
+	public void syncDeleteInstance(ServiceInstance serviceInstance, Plan plan, PlatformService platformService)
 			throws ServiceBrokerException {
 
         try {
@@ -163,7 +154,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         }
 
 		try {
-			platformService.deleteInstance(serviceInstance);
+			platformService.deleteInstance(serviceInstance, plan);
 		} catch (PlatformException e) {
 			throw new ServiceBrokerException("Error during deletion of service", e);
 		}

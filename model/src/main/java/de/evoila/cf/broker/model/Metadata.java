@@ -19,20 +19,20 @@ public class Metadata {
 
     private List<NetworkReference> networks;
 
-    private Map<String, Metadata> instanceGroupMetadata = new HashMap<>();
+    private Map<String, Metadata> instances = new HashMap<>();
 
     private Map<String, Object> customParameters = new HashMap<>();
 
     public Metadata() {}
 
     public Metadata(int connections, int nodes, String vm_type, String persistent_disk_type, List<NetworkReference> networks,
-                    Map<String, Metadata> instanceGroupMetadata, Map<String, Object> customParameters) {
+                    Map<String, Metadata> instances, Map<String, Object> customParameters) {
         this.connections = connections;
         this.nodes = nodes;
         this.vm_type = vm_type;
         this.persistent_disk_type = persistent_disk_type;
         this.networks = networks;
-        setInstanceGroupMetadata(instanceGroupMetadata);
+        setInstanceGroupMetadata(instances);
         setCustomParameters(customParameters);
     }
 

@@ -21,4 +21,8 @@ public class ServiceInstanceUtils {
         }
         return serverAddress;
     }
+
+    public static ServerAddress serverAddress(String name, String host, int port) {
+        return new ServerAddress(name, host, port);
+    }
 }
