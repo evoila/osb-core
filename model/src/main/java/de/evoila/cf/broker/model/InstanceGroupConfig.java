@@ -4,9 +4,9 @@ import java.util.List;
 
 public class InstanceGroupConfig {
 
-    protected int connections;
+    protected Integer connections;
 
-    protected int nodes;
+    protected Integer nodes;
 
     protected String vmType;
 
@@ -14,19 +14,19 @@ public class InstanceGroupConfig {
 
     protected List<NetworkReference> networks;
 
-    public int getConnections() {
+    public Integer getConnections() {
         return connections;
     }
 
-    public void setConnections(int connections) {
+    public void setConnections(Integer connections) {
         this.connections = connections;
     }
 
-    public int getNodes() {
+    public Integer getNodes() {
         return nodes;
     }
 
-    public void setNodes(int nodes) {
+    public void setNodes(Integer nodes) {
         this.nodes = nodes;
     }
 
