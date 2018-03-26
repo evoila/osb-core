@@ -79,16 +79,12 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(binding);
+
 		bindingRepository.addInternalBinding(binding);
 
 		return response;
 	}
 
-	/**
-	 * @param serviceInstance
-	 * @param route
-	 * @return
-	 */
 	protected abstract RouteBinding bindRoute(ServiceInstance serviceInstance, String route);
 
 	protected ServiceInstanceBinding createServiceInstanceBinding(String bindingId, String serviceInstanceId,
@@ -138,10 +134,8 @@ public abstract class BindingServiceImpl implements BindingService {
 		return serviceInstanceRepository.getServiceInstance(serviceInstanceId);
 	}
 
-
 	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                     ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException {
-
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalAddresses.get(0));
 
 		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
@@ -150,23 +144,13 @@ public abstract class BindingServiceImpl implements BindingService {
 		return serviceInstanceBinding;
 	}
 
-
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                 ServiceInstance serviceInstance, Plan plan)
-			throws ServiceBrokerException {
+                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
-
 
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, null);
 	}
 
-	/**
-	 * @param bindingId
-	 * @param serviceInstance
-	 * @param plan
-	 * @return
-	 * @throws ServiceBrokerException
-	 */
 	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                              ServiceInstance serviceInstance, Plan plan, ServerAddress serverAddress) throws ServiceBrokerException;
 
