@@ -46,10 +46,11 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	@Override
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
-																	   String serviceId, String planId, boolean generateServiceKey,
-																	   String appGuid, String route)
+            ServiceInstanceBindingRequest serviceInstanceBindingRequest, String route)
 			throws ServiceInstanceBindingExistsException, ServiceBrokerException,
 			ServiceInstanceDoesNotExistException {
+
+	    String planId = serviceInstanceBindingRequest.getPlanId();
 
 		validateBindingNotExists(bindingId, instanceId);
 
@@ -69,12 +70,12 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		ServiceInstanceBinding binding;
-		if (generateServiceKey) {
+		if (serviceInstanceBindingRequest.getAppGuid() == null) {
 			List<ServerAddress> externalServerAddresses = haProxyService.appendAgent(serviceInstance.getHosts(), bindingId, instanceId);
 
-			binding = bindServiceKey(bindingId, serviceInstance, plan, externalServerAddresses);
+			binding = bindServiceKey(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalServerAddresses);
 		} else {
-			binding = bindService(bindingId, serviceInstance, plan);
+			binding = bindService(bindingId, serviceInstanceBindingRequest, serviceInstance, plan);
 		}
 
 		ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(binding);
@@ -138,10 +139,10 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 
-	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstance serviceInstance, Plan plan,
-													List<ServerAddress> externalAddresses) throws ServiceBrokerException {
+	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
+                                                    ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException {
 
-		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, plan, externalAddresses.get(0));
+		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalAddresses.get(0));
 
 		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
 				credentials, null);
@@ -150,9 +151,10 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 
-	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstance serviceInstance, Plan plan)
+	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
+                                                 ServiceInstance serviceInstance, Plan plan)
 			throws ServiceBrokerException {
-		Map<String, Object> credentials = createCredentials(bindingId, serviceInstance, plan, null);
+		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
 
 
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, null);
@@ -165,7 +167,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	 * @return
 	 * @throws ServiceBrokerException
 	 */
-	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstance serviceInstance,
-                                                             Plan plan, ServerAddress serverAddress) throws ServiceBrokerException;
+	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
+                                                             ServiceInstance serviceInstance, Plan plan, ServerAddress serverAddress) throws ServiceBrokerException;
 
 }

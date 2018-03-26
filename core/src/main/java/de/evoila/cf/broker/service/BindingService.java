@@ -2,6 +2,7 @@ package de.evoila.cf.broker.service;
 
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.ServiceInstanceBinding;
+import de.evoila.cf.broker.model.ServiceInstanceBindingRequest;
 import de.evoila.cf.broker.model.ServiceInstanceBindingResponse;
 
 /**
@@ -12,23 +13,20 @@ import de.evoila.cf.broker.model.ServiceInstanceBindingResponse;
 public interface BindingService {
 
     /**
-     * Create a new binding to a service instance.
      *
-     * @param bindingId  The id provided by the cloud controller
-     * @param instanceId The id of the service instance
-     * @param serviceId  The id of the service
-     * @param planId     The plan used for this binding
-     * @param appGuid    The guid of the app for the binding
+     * @param bindingId
+     * @param instanceId
+     * @param request
+     * @param route
      * @return
-     * @throws ServiceInstanceBindingExistsException if the same binding already exists.
+     * @throws ServiceInstanceBindingExistsException
      * @throws ServiceBrokerException
      * @throws ServiceInstanceDoesNotExistException
+     * @throws ServiceDefinitionDoesNotExistException
      */
-    ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
-                                                                        String serviceId, String planId, boolean generateServiceKey,
-                                                                        String appGuid, String route)
+    ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId, ServiceInstanceBindingRequest request, String route)
           throws ServiceInstanceBindingExistsException, ServiceBrokerException,
-                       ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException;
+            ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException;
 
     /**
      * @param id
