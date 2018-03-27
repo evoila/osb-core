@@ -38,7 +38,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	@Autowired
 	protected RouteBindingRepository routeBindingRepository;
 
-	@Autowired
+	@Autowired(required = false)
 	protected HAProxyService haProxyService;
 
 	protected abstract void deleteBinding(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
@@ -70,7 +70,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		ServiceInstanceBinding binding;
-		if (serviceInstanceBindingRequest.getAppGuid() == null) {
+		if (serviceInstanceBindingRequest.getAppGuid() == null && haProxyService != null) {
 			List<ServerAddress> externalServerAddresses = haProxyService.appendAgent(serviceInstance.getHosts(), bindingId, instanceId);
 
 			binding = bindServiceKey(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalServerAddresses);
@@ -102,7 +102,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		try {
 			ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
 			List<ServerAddress> externalServerAddresses = binding.getExternalServerAddresses();
-			if (externalServerAddresses != null) {
+			if (externalServerAddresses != null && haProxyService != null) {
 				haProxyService.removeAgent(serviceInstance.getHosts(), bindingId);
 			}
 
