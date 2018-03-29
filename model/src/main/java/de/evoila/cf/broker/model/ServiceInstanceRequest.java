@@ -18,7 +18,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * @author Johannes Hiemer.
  */
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
+<<<<<<< HEAD
 public class ServiceInstanceRequest {
+=======
+public class 	ServiceInstanceRequest {
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 
 	@JsonSerialize
 	@JsonProperty("context")

@@ -31,7 +31,11 @@ public class Catalog {
 
 	private void setServices(List<ServiceDefinition> services) {
 		if ( services == null ) {
+<<<<<<< HEAD
 			this.services = new ArrayList<ServiceDefinition>();
+=======
+			this.services = new ArrayList<>();
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 		} else {
 			this.services= services;
 		} 

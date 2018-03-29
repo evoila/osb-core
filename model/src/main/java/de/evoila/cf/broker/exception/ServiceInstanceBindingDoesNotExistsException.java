@@ -7,12 +7,12 @@ package de.evoila.cf.broker.exception;
  * @author Christian Brinker, evoila.
  *
  */
-public class ServerviceInstanceBindingDoesNotExistsException extends Exception {
+public class ServiceInstanceBindingDoesNotExistsException extends Exception {
 	private static final long serialVersionUID = -1879753092397657116L;
 
 	private String bindingId;
 
-	public ServerviceInstanceBindingDoesNotExistsException(String bindingId) {
+	public ServiceInstanceBindingDoesNotExistsException(String bindingId) {
 		this.bindingId = bindingId;
 	}
 
@@ -21,3 +21,4 @@ public class ServerviceInstanceBindingDoesNotExistsException extends Exception {
 		return "ServiceInstanceBinding does not exist: id = " + bindingId;
 	}
 }
+

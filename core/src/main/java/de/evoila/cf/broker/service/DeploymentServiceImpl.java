@@ -54,6 +54,19 @@ public class DeploymentServiceImpl implements DeploymentService {
 	}
 
 	@Override
+	public void updateServiceInstance(String instanceId, String planId) throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
+
+
+		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+		if (serviceInstance == null){
+			throw new ServiceInstanceDoesNotExistException(instanceId);
+		}
+
+		serviceInstance.updatePlanId(planId);
+		serviceInstanceRepository.updateServiceInstancePlan(serviceInstance);
+	}
+
+	@Override
 	public ServiceInstanceResponse createServiceInstance(String serviceInstanceId, String serviceDefinitionId,
 			String planId, String organizationGuid, String spaceGuid, Map<String, String> parameters,
 			Map<String, String> context)

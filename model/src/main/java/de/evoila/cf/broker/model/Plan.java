@@ -178,11 +178,11 @@ public class Plan {
 		this.free = free;
 	}
 
-	public boolean isPlanUpdateable () {
+	public boolean isPlanUpdateable() {
 		return planUpdateable;
 	}
 
-	public void setPlanUpdateable (boolean planUpdateable) {
+	public void setPlanUpdateable(boolean planUpdateable) {
 		this.planUpdateable = planUpdateable;
 	}
 }

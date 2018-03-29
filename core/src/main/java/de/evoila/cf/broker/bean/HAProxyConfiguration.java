@@ -46,6 +46,10 @@ public class HAProxyConfiguration {
 	}
 
 	public String getAuthToken() {
-		return auth.getToken();
+		if (auth == null){
+			return null;
+		}else {
+			return auth.getToken();
+		}
 	}
 }

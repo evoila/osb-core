@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CatalogController extends BaseController {
 	
 	private final Logger logger = LoggerFactory.getLogger(CatalogController.class);
-	
+
 	@Autowired 
 	private CatalogService service;
 
@@ -25,5 +25,4 @@ public class CatalogController extends BaseController {
 		logger.debug("GET: getCatalog()");
 		return service.getCatalog();
 	}
-	
 }

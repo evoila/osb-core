@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 
 /** @author Johannes Hiemer. */
@@ -58,7 +59,8 @@ public class AuthenticationController extends BaseController {
 	}
 
     @GetMapping(value = "/{serviceInstanceId}")
-    public Object authRedirect(@PathVariable String serviceInstanceId) throws URISyntaxException {
+
+    public Object authRedirect(@PathVariable String serviceInstanceId) throws URISyntaxException, IOException {
     	ServiceDefinition serviceDefinition = resolveServiceDefinitionByServiceInstanceId(serviceInstanceId);
     	if (serviceDefinition != null && serviceDefinition.getDashboard() != null
 				&& serviceDefinition.getDashboard().getAuthEndpoint() != null

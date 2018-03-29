@@ -33,4 +33,5 @@ public interface DeploymentService {
 
 	void deleteServiceInstance(String instanceId) throws ServiceBrokerException, ServiceInstanceDoesNotExistException;
 
+	void updateServiceInstance(String instanceId, String planId) throws ServiceBrokerException, ServiceInstanceDoesNotExistException;
 }

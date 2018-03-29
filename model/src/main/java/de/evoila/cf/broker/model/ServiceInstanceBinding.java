@@ -1,7 +1,10 @@
 package de.evoila.cf.broker.model;
 
+<<<<<<< HEAD
 import de.evoila.cf.broker.model.volume.VolumeMount;
 
+=======
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +31,11 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 
 	private List<ServerAddress> externalServerAddresses;
 
+<<<<<<< HEAD
     private List<VolumeMount> volumeMounts;
 
+=======
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 	public ServiceInstanceBinding() {
 		super();
 	}
@@ -87,6 +93,7 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 		this.externalServerAddresses = externalServerAddresses;
 	}
 
+<<<<<<< HEAD
     public List<VolumeMount> getVolumeMounts() {
         return volumeMounts;
     }
@@ -94,4 +101,6 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
     public void setVolumeMounts(List<VolumeMount> volumeMounts) {
         this.volumeMounts = volumeMounts;
     }
+=======
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 }

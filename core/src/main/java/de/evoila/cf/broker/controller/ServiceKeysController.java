@@ -26,6 +26,7 @@ class ServiceKeysController extends BaseController {
     ServiceInstanceRepository serviceInstanceRepository;
 
     ServiceKeysController(BindingRepository repository, BindingService service, ServiceInstanceRepository serviceInstanceRepository){
+
         Assert.notNull(repository, "BindingRepository should not be null");
         Assert.notNull(service, "Binding Service should not be null");
         this.bindingRepository = repository;
@@ -35,6 +36,7 @@ class ServiceKeysController extends BaseController {
 
     @GetMapping(value = "")
     public ResponseEntity<Page<ServiceInstanceBinding>> getGeneralInformation(@PathVariable String serviceInstanceId) {
+
         List<ServiceInstanceBinding> bindings = bindingRepository.getBindingsForServiceInstance(serviceInstanceId);
         return new ResponseEntity<>(new PageImpl<ServiceInstanceBinding>(bindings), HttpStatus.OK);
     }
@@ -52,7 +54,6 @@ class ServiceKeysController extends BaseController {
         if(instance == null){
             throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
         }
-
         String bindingId = UUID.randomUUID().toString();
         bindingService.createServiceInstanceBinding(bindingId, serviceInstanceId, null, null);
         ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);

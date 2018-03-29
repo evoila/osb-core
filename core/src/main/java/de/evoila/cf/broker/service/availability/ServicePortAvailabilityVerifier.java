@@ -10,7 +10,6 @@ import java.util.List;
 
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.service.ServiceInstanceAvailabilityVerifier;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ import de.evoila.cf.broker.model.ServerAddress;
  */
 @Service
 public class ServicePortAvailabilityVerifier implements ServiceInstanceAvailabilityVerifier {
-
 
 	private static final int SOCKET_TIMEOUT = 30000;
 
@@ -41,7 +39,6 @@ public class ServicePortAvailabilityVerifier implements ServiceInstanceAvailabil
 			log.info("Starting new timeout interval was interrupted.", e1);
 		}
 	}
-
 
 	private boolean execute(String ip, int port) {
 		boolean available = false;
@@ -71,13 +68,12 @@ public class ServicePortAvailabilityVerifier implements ServiceInstanceAvailabil
 		return available;
 	}
 
-
 	private boolean verifyServiceAvailability(String ip, int port, boolean useInitialTimeout) throws PlatformException {
 		boolean available = false;
 
 		if (useInitialTimeout)
 			this.timeout(INITIAL_TIMEOUT);
-
+		
 		for (int i = 0; i < connectionTimeouts; i++) {
 			available = this.execute(ip, port);
 
@@ -90,7 +86,6 @@ public class ServicePortAvailabilityVerifier implements ServiceInstanceAvailabil
 		log.info("Service Port availability (last status during request): {}", available);
 		return available;
 	}
-
 
 	public boolean verifyServiceAvailability(ServiceInstance serviceInstance, boolean useInitialTimeout) throws PlatformException {
 		List<ServerAddress> serverAddresses = serviceInstance.getHosts();

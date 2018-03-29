@@ -155,6 +155,10 @@ public class ServiceInstance implements BaseEntity<String> {
 	private void setPlanId(String planId) {
 		this.planId = planId;
 	}
+	
+	public void updatePlanId(String planId){
+		this.setPlanId(planId);
+	}
 
 	public String getOrganizationGuid() {
 		return organizationGuid;

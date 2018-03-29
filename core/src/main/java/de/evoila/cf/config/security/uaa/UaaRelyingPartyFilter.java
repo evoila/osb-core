@@ -89,12 +89,20 @@ public class UaaRelyingPartyFilter extends GenericFilterBean {
             return;
         }
 
+<<<<<<< HEAD
         // We need to handle the tokens here, check the implementation how to resovle it
+=======
+        // We need to handle the tokens here, check the implementation how to resolve it
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
         String token = UaaFilterUtils.tryResolveToken(request, HttpHeaders.AUTHORIZATION);
         try {
 
             if (token == null) {
                 throw new AuthenticationCredentialsNotFoundException("No authorization header present.");
+<<<<<<< HEAD
+=======
+
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
             }
 
             Authentication authResult =
@@ -125,7 +133,10 @@ public class UaaRelyingPartyFilter extends GenericFilterBean {
             logger.debug("Updated SecurityContextHolder to contain null Authentication");
             logger.debug("Delegating to authentication failure handler " + failureHandler);
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
         failureHandler.onAuthenticationFailure(request, response, failed);
     }
 

@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.service.impl;
 
+
 import de.evoila.cf.broker.model.JobProgress;
 import de.evoila.cf.broker.model.Plan;
 import de.evoila.cf.broker.model.ServiceInstance;
@@ -49,6 +50,7 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
 
 		try {
             deploymentService.syncDeleteInstance(serviceInstance, plan, platformService);
+
 		} catch (Exception e) {
 			progressService.failJob(serviceInstance,
 					"Internal error during Instance deletion, please contact our support.");

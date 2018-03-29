@@ -15,6 +15,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * 
  * @author sgreenberg@gopivotal.com
  * @author Johannes Hiemer.
+<<<<<<< HEAD
+=======
+ * @author Marco Di Martino.
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
  *
  */
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
@@ -60,36 +64,79 @@ public class ServiceDefinition {
 	@JsonProperty("dashboard_client")
 	private DashboardClient dashboardClient;
 
+<<<<<<< HEAD
 	public ServiceDefinition() {
 		super();
 	};
 
 	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans) {
+=======
+	@JsonSerialize
+	@JsonProperty("plan_updateable") // misspelling of attribute kept, do not change it
+	private boolean updateable;
+
+
+	public ServiceDefinition() {
+		super();
+	}
+
+	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans, boolean updatable) {
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.bindable = bindable;
 		this.setPlans(plans);
+<<<<<<< HEAD
 	}
 
 	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans,
+=======
+		this.updateable = updatable;
+	}
+
+	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans, boolean updatable,
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 			List<String> requires) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.bindable = bindable;
+<<<<<<< HEAD
+=======
+		this.updateable = updatable;
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 		this.setPlans(plans);
 		this.setRequires(requires);
 	}
 
+<<<<<<< HEAD
 	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans,
 			List<String> tags, Map<String, Object> metadata, List<String> requires) {
 		this(id, name, description, bindable, plans);
+=======
+	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans, boolean updatable,
+			List<String> tags, Map<String, Object> metadata, List<String> requires) {
+		this(id, name, description, bindable, plans, updatable);
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 		setTags(tags);
 		setMetadata(metadata);
 		setRequires(requires);
 	}
 
+<<<<<<< HEAD
+=======
+	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans) {
+		/*this.id = id;
+		this.name = name;
+		this.description = description;
+		this.bindable = bindable;
+		this.setPlans(plans);
+		this.updatable=updatable;*/
+		this(id, name, description, bindable, plans, false);
+	}
+
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 	public String getId() {
 		return id;
 	}
@@ -122,6 +169,17 @@ public class ServiceDefinition {
 		this.bindable = bindable;
 	}
 
+<<<<<<< HEAD
+=======
+	public boolean isUpdateable() {
+		return updateable;
+	}
+
+	public void setPlan_updateable(boolean updatable) {
+		this.updateable = updatable;
+	}
+
+>>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 	public List<Plan> getPlans() {
 		return plans;
 	}
