@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
- * Created by jannikheyl on 13.02.18.
- * @author Marco Di Martino
+ * @author Jannik Heyl, Johannes Hiemer.
  */
 public class VolumeMount {
 
@@ -21,7 +20,6 @@ public class VolumeMount {
     @JsonProperty("mode")
     private VolumeMode mode;
 
-    @JsonSerialize
     @JsonProperty("device_type")
     private DeviceType deviceType;
 
