@@ -1,7 +1,10 @@
 package de.evoila.cf.broker.exception;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+/**
+ * @author Marco Di Martino.
+ *
+ */
+
 import java.util.Map;
 
 public class ParameterNotNullException extends Exception {
@@ -17,6 +20,6 @@ public class ParameterNotNullException extends Exception {
 
     @Override
     public String getMessage() {
-        return "Expected field parameters to be null"; //, but found values :" + param;
+        return "Expected field parameters to be null"; 
     }
 }

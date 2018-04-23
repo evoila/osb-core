@@ -1,17 +1,14 @@
 package de.evoila.cf.broker.model;
 
-<<<<<<< HEAD
 import de.evoila.cf.broker.model.volume.VolumeMount;
 
-=======
->>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * A binding to a service instance
- * 
+ *
  * @author sgreenberg@gopivotal.com
  * @author Johannes Hiemer.
  */
@@ -31,17 +28,14 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 
 	private List<ServerAddress> externalServerAddresses;
 
-<<<<<<< HEAD
-    private List<VolumeMount> volumeMounts;
+	private List<VolumeMount> volumeMounts;
 
-=======
->>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 	public ServiceInstanceBinding() {
 		super();
 	}
 
 	public ServiceInstanceBinding(String id, String serviceInstanceId, Map<String, Object> credentials,
-			String syslogDrainUrl) {
+								  String syslogDrainUrl) {
 		this.id = id;
 		this.serviceInstanceId = serviceInstanceId;
 		setCredentials(credentials);
@@ -63,7 +57,7 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 
 	private void setCredentials(Map<String, Object> credentials) {
 		if (credentials == null) {
-			credentials = new HashMap<String, Object>();
+			credentials = new HashMap<>();
 		} else {
 			this.credentials = credentials;
 		}
@@ -93,14 +87,11 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 		this.externalServerAddresses = externalServerAddresses;
 	}
 
-<<<<<<< HEAD
-    public List<VolumeMount> getVolumeMounts() {
-        return volumeMounts;
-    }
+	public List<VolumeMount> getVolumeMounts() {
+		return volumeMounts;
+	}
 
-    public void setVolumeMounts(List<VolumeMount> volumeMounts) {
-        this.volumeMounts = volumeMounts;
-    }
-=======
->>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
+	public void setVolumeMounts(List<VolumeMount> volumeMounts) {
+		this.volumeMounts = volumeMounts;
+	}
 }

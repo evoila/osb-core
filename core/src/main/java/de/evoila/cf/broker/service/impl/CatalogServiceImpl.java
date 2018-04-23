@@ -3,6 +3,7 @@ package de.evoila.cf.broker.service.impl;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +14,7 @@ import de.evoila.cf.broker.service.CatalogService;
 /**
  * An implementation of the CatalogService that gets the catalog injected (ie
  * configure in spring config)
- * 
+ *
  * @author sgreenberg@gopivotal.com
  * @author Christian Brinker, evoila.
  */

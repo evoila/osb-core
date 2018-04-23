@@ -56,7 +56,7 @@ public class ServiceInstanceController extends BaseController {
 			@Valid @RequestBody ServiceInstanceRequest request) throws ServiceDefinitionDoesNotExistException,
 					ServiceInstanceExistsException, ServiceBrokerException, AsyncRequiredException, ParameterNotNullException {
 
-		if (acceptsIncomplete == null) {
+		if (acceptsIncomplete == null || !acceptsIncomplete) {
 			throw new AsyncRequiredException();
 		}
 
@@ -149,7 +149,6 @@ public class ServiceInstanceController extends BaseController {
 	return new ResponseEntity<>("{}", HttpStatus.ACCEPTED);
 	}
 
-	//@Override
 	@ExceptionHandler(ParameterNotNullException.class)
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(ParameterNotNullException ex, HttpServletResponse response){

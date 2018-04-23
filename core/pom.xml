@@ -2,44 +2,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-<<<<<<< HEAD
     <artifactId>core</artifactId>
     <packaging>jar</packaging>
     <name>core</name>
     <modelVersion>4.0.0</modelVersion>
 
-=======
-	<properties>
-		<parent.version>1.2.0</parent.version>
-	</properties>
-
-	<modelVersion>4.0.0</modelVersion>
->>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 	<parent>
 		<groupId>de.evoila.cf.broker</groupId>
 		<artifactId>parent</artifactId>
 		<version>1.2.0</version>
 		<relativePath>../</relativePath>
 	</parent>
-<<<<<<< HEAD
 
     <properties>
         <parent.version>1.2.0</parent.version>
     </properties>
 
     <dependencies>
-=======
-	<artifactId>core</artifactId>
-	<packaging>jar</packaging>
-	<name>core</name>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
-
->>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -58,7 +37,6 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
-<<<<<<< HEAD
 		</dependency>
 
         <dependency>
@@ -71,16 +49,6 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-jwt</artifactId>
 			<version>1.0.9.RELEASE</version>
-=======
-			<version>1.13.1.RELEASE</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-jwt</artifactId>
-			<version>1.0.7.RELEASE</version>
-			<scope>compile</scope>
->>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 		</dependency>
 
 		<dependency>
@@ -93,7 +61,6 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
-<<<<<<< HEAD
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
@@ -115,15 +82,6 @@
         </dependency>
 
         <dependency>
-=======
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-bus-amqp</artifactId>
-			<version>1.3.1.RELEASE</version>
-		</dependency>
-
-		<dependency>
->>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 		</dependency>
@@ -146,81 +104,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-<<<<<<< HEAD
 			<groupId>de.evoila.cf.broker</groupId>
 			<artifactId>backup-model</artifactId>
 			<version>${parent.version}</version>
 		</dependency>
 	</dependencies>
 
-=======
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>de.evoila.cf.broker</groupId>
-			<artifactId>backup-model</artifactId>
-			<version>1.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.amqp</groupId>
-			<artifactId>spring-rabbit</artifactId>
-		</dependency>
-	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id> <!-- this is used for inheritance merges -->
-						<phase>package</phase> <!-- bind to the packaging phase -->
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
->>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 </project>

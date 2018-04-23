@@ -29,14 +29,11 @@ public class Plan {
 
 	@JsonSerialize
 	@JsonProperty("metadata")
-	private Metadata metadata;
+	private Metadata metadata  = new Metadata();
 	
 	@JsonSerialize
 	@JsonProperty(value="free", required=false)
 	private boolean free = true;
-
-	@JsonProperty(value = "plan_updateable",required = false, defaultValue = "false")
-	private boolean planUpdateable;
 
 	/**
 	 * Please use metadata section for custom mapping information
@@ -126,6 +123,7 @@ public class Plan {
 		this.flavorId = flavorId;
 		this.connections = connections;
 		this.volumeUnit = volumeUnit;
+		this.metadata = new Metadata();
 	}
 
 	public Plan(String id, String name, String description, Metadata metadata, Platform platform,
@@ -176,13 +174,5 @@ public class Plan {
 
 	public void setFree(boolean free) {
 		this.free = free;
-	}
-
-	public boolean isPlanUpdateable() {
-		return planUpdateable;
-	}
-
-	public void setPlanUpdateable(boolean planUpdateable) {
-		this.planUpdateable = planUpdateable;
 	}
 }

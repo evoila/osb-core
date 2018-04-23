@@ -1,22 +1,32 @@
 package de.evoila.cf.broker.model.volume;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Created by jannikheyl on 13.02.18.
+ * @author Marco Di Martino
  */
 public class VolumeMount {
 
+    @JsonSerialize
+    @JsonProperty("driver")
     private String driver;
 
+    @JsonSerialize
     @JsonProperty("container_dir")
     private String containerDir;
 
+    @JsonSerialize
+    @JsonProperty("mode")
     private VolumeMode mode;
 
-    @JsonProperty("deviceType")
+    @JsonSerialize
+    @JsonProperty("device_type")
     private DeviceType deviceType;
 
+    @JsonSerialize
+    @JsonProperty("device")
     private Device device;
 
     public VolumeMount() {}

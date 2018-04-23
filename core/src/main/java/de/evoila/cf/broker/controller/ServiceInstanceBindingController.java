@@ -27,7 +27,7 @@ public class ServiceInstanceBindingController extends BaseController {
 	@Autowired
 	private BindingServiceImpl bindingService;
 
-	@RequestMapping(value = "/{instanceId}/service_bindings/{bindingId}", method = RequestMethod.PUT)
+	@PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
 	public ResponseEntity<ServiceInstanceBindingResponse> bindServiceInstance(
 			@PathVariable("instanceId") String instanceId, @PathVariable("bindingId") String bindingId,
 			@Valid @RequestBody ServiceInstanceBindingRequest request)
@@ -46,7 +46,7 @@ public class ServiceInstanceBindingController extends BaseController {
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
-	@RequestMapping(value = "/{instanceId}/service_bindings/{bindingId}", method = RequestMethod.DELETE)
+	@DeleteMapping(value = "/{instanceId}/service_bindings/{bindingId}")
 	public ResponseEntity<String> deleteServiceInstanceBinding(@PathVariable("instanceId") String instanceId,
 			@PathVariable("bindingId") String bindingId, @RequestParam("service_id") String serviceId,
 			@RequestParam("plan_id") String planId) throws ServiceBrokerException {
@@ -57,7 +57,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
 		try {
 			bindingService.deleteServiceInstanceBinding(bindingId, planId);
-		} catch (ServerviceInstanceBindingDoesNotExistsException e) {
+		} catch (ServiceInstanceBindingDoesNotExistsException e) {
 			return new ResponseEntity<>("{}", HttpStatus.GONE);
 		}
 

@@ -63,7 +63,7 @@ class ServiceKeysController extends BaseController {
     @DeleteMapping(value = "/{serviceBindingId}")
     public ResponseEntity delete(@PathVariable String serviceInstanceId,
                                  @PathVariable String serviceBindingId, @RequestParam("plan_id") String planId)
-            throws ServerviceInstanceBindingDoesNotExistsException, ServiceBrokerException {
+            throws ServiceInstanceBindingDoesNotExistsException, ServiceBrokerException {
         bindingService.deleteServiceInstanceBinding(serviceBindingId, planId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

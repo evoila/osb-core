@@ -2,17 +2,14 @@ package de.evoila.cf.broker.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-<<<<<<< HEAD
-=======
 import com.fasterxml.jackson.annotation.JsonIgnore;
->>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * The response from the broker sent back to the cloud controller on a
  * successful service instance creation request
- * 
+ *
  * @author sgreenberg@gopivotal.com
  * @author Johannes Hiemer.
  * @author Christian Brinker, evoila.
@@ -23,12 +20,8 @@ public class ServiceInstanceResponse {
 	@JsonSerialize
 	@JsonProperty("dashboard_url")
 	private String dashboardUrl;
-<<<<<<< HEAD
-	
-=======
 
 	@JsonIgnore
->>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 	private boolean isAsync;
 
 	public ServiceInstanceResponse() {
@@ -51,10 +44,7 @@ public class ServiceInstanceResponse {
 		this.dashboardUrl = dashboardUrl;
 	}
 
-<<<<<<< HEAD
-=======
 	@JsonIgnore
->>>>>>> fa9995f88f7b8d18ca2a28f93b9861bda220847f
 	public boolean isAsync() {
 		return isAsync;
 	}

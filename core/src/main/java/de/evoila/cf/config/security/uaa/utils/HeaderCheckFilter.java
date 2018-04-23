@@ -1,5 +1,9 @@
 package de.evoila.cf.config.security.uaa.utils;
 
+/**
+ * @author Marco Di Martino.
+ */
+
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
