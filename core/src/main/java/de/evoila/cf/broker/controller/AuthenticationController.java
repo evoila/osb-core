@@ -59,7 +59,6 @@ public class AuthenticationController extends BaseController {
 	}
 
     @GetMapping(value = "/{serviceInstanceId}")
-
     public Object authRedirect(@PathVariable String serviceInstanceId) throws URISyntaxException, IOException {
     	ServiceDefinition serviceDefinition = resolveServiceDefinitionByServiceInstanceId(serviceInstanceId);
     	if (serviceDefinition != null && serviceDefinition.getDashboard() != null

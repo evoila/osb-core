@@ -98,9 +98,7 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@PatchMapping(value= "/service_instances/{instanceId}")
-	public ResponseEntity<String> updateServiceInstance(
-
-				@PathVariable("instanceId") String serviceInstanceId,
+	public ResponseEntity<String> updateServiceInstance(@PathVariable("instanceId") String serviceInstanceId,
 				@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 				@RequestBody ServiceInstanceRequest request) throws ServiceBrokerException, ServiceInstanceDoesNotExistException,
 				ParameterNotNullException, AsyncRequiredException, ServiceDefinitionDoesNotExistException {
