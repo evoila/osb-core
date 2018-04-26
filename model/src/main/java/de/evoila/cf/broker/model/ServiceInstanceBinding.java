@@ -71,6 +71,8 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 		return appGuid;
 	}
 
+	public void setAppGuid(String appGuid) { this.appGuid = appGuid; }
+
 	public Map<String, String> getParameters() {
 		return parameters;
 	}
