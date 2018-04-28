@@ -22,16 +22,15 @@ public class ServiceInstanceBindingResponse {
 
 	private Map<String, Object> credentials;
 
-	private String syslogDrainUrl = "";
+	private String syslogDrainUrl;
 
-	private String routeServiceUrl = "";
+	private String routeServiceUrl;
 
 	private List<VolumeMount> volumeMounts;
 
 	public ServiceInstanceBindingResponse(Map<String, Object> credentials, String syslogDrainUrl) {
 		this.credentials = credentials;
 		this.syslogDrainUrl = syslogDrainUrl;
-		this.routeServiceUrl = "";
 	}
 
 	public ServiceInstanceBindingResponse(String routeServiceUrl) {
@@ -41,11 +40,8 @@ public class ServiceInstanceBindingResponse {
 	public ServiceInstanceBindingResponse(ServiceInstanceBinding binding) {
 		this.credentials = binding.getCredentials();
 		this.syslogDrainUrl = binding.getSyslogDrainUrl();
-		this.routeServiceUrl = "";
 		if (binding.getVolumeMounts() != null && binding.getVolumeMounts().size() > 0) {
 			this.volumeMounts = binding.getVolumeMounts();
-		}else{
-			this.volumeMounts = new ArrayList<>();
 		}
 	}
 
