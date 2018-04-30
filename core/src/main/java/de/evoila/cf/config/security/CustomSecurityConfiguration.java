@@ -6,6 +6,7 @@ import de.evoila.cf.config.security.uaa.handler.CommonCorsAuthenticationEntryPoi
 import de.evoila.cf.config.security.uaa.handler.UaaRelyingPartyAuthenticationFailureHandler;
 import de.evoila.cf.config.security.uaa.handler.UaaRelyingPartyAuthenticationSuccessHandler;
 import de.evoila.cf.config.security.uaa.provider.UaaRelyingPartyAuthenticationProvider;
+import de.evoila.cf.config.security.uaa.utils.Endpoints;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+
+import javax.xml.ws.Endpoint;
 
 /**
  * @author Johannes Hiemer.
@@ -58,18 +61,18 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
     protected void configure(HttpSecurity http) throws Exception {
         http
         	.authorizeRequests()
-        		.antMatchers(HttpMethod.GET,"/v2/endpoint").authenticated()
-				.antMatchers(HttpMethod.GET,"/v2/catalog").authenticated()
-				.antMatchers("/v2/service_instances/**").authenticated()
-        		.antMatchers(HttpMethod.GET, "/info").authenticated()
-        		.antMatchers(HttpMethod.GET, "/health").authenticated()
-				.antMatchers(HttpMethod.GET, "/error").authenticated()
+        		.antMatchers(HttpMethod.GET, Endpoints.V2_ENDPOINT).authenticated()
+				.antMatchers(HttpMethod.GET, Endpoints.V2_CATALOG).authenticated()
+				.antMatchers(Endpoints.V2_SERVICE_INSTANCES+"/**").authenticated()
+        		.antMatchers(HttpMethod.GET, Endpoints.INFO).authenticated()
+        		.antMatchers(HttpMethod.GET, Endpoints.HEALTH).authenticated()
+				.antMatchers(HttpMethod.GET, Endpoints._ERROR).authenticated()
 
-			.antMatchers(HttpMethod.GET, "/env").authenticated()
-				.antMatchers(HttpMethod.GET,"/v2/dashboard/{serviceInstanceId}").permitAll()
-				.antMatchers(HttpMethod.GET,"/v2/dashboard/{serviceInstanceId}/confirm").permitAll()
-				.antMatchers("/v2/backup/**").permitAll()
-				.antMatchers("/v2/dashboard/manage/**").authenticated()
+			.antMatchers(HttpMethod.GET, Endpoints.ENV).authenticated()
+				.antMatchers(HttpMethod.GET, Endpoints.V2_DASHBOARD+"/{serviceInstanceId}").permitAll()
+				.antMatchers(HttpMethod.GET, Endpoints.V2_DASHBOARD+"/{serviceInstanceId}/confirm").permitAll()
+				.antMatchers(Endpoints.V2_BACKUP+"/**").permitAll()
+				.antMatchers(Endpoints.V2_DASHBOARD_MANAGE+"/**").authenticated()
 				.and()
         	.httpBasic()
 				.and()
