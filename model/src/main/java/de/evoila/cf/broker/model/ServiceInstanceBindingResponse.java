@@ -43,8 +43,6 @@ public class ServiceInstanceBindingResponse {
 		this.syslogDrainUrl = binding.getSyslogDrainUrl();
 		if (binding.getVolumeMounts() != null && binding.getVolumeMounts().size() > 0) {
 			this.volumeMounts = binding.getVolumeMounts();
-		} else {
-			this.volumeMounts = new ArrayList<>();
 		}
 	}
 
@@ -81,6 +79,7 @@ public class ServiceInstanceBindingResponse {
 	}
 
 	@JsonSerialize
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	@JsonProperty("volume_mounts")
     public List<VolumeMount> getVolumeMounts() {
         return volumeMounts;
