@@ -50,9 +50,12 @@ public class BaseConfiguration {
     public FilterRegistrationBean headerCheck() {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setFilter(new HeaderCheckFilter());
-        registration.addUrlPatterns("/", "/*", "/v2/*");
-        // In case you want the filter to apply to specific URL patterns only
-        //registration.addUrlPatterns("/v2/*");
+        registration.addUrlPatterns(
+            "/v2/catalog*",
+            "/v2/service_instances/*",
+            "/v2/service_instances/*/last_operation",
+            "/v2/service_instances/*/service_bindings/*"
+        );
         return registration;
     }
 
