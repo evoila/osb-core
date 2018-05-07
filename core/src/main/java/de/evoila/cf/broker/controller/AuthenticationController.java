@@ -108,6 +108,7 @@ public class AuthenticationController extends BaseController {
 					.getAccessAndRefreshToken(dashboard.getAuthEndpoint(), authCode, dashboardClient, redirectUri);
 
 			if (token != null) {
+                mav.addObject("baseHref", "/v2/authentication/" + serviceInstanceId);
 				mav.addObject("token", TOKEN_PREFIX + token.getAccessToken());
 				mav.addObject("serviceInstanceId", serviceInstanceId);
 				mav.addObject("endpointUrl", generalConfiguration.getEndpointUrl());
@@ -122,5 +123,18 @@ public class AuthenticationController extends BaseController {
 
 		return mav;
 	}
+
+	/**
+    @GetMapping(value = "/{serviceInstanceId}/test")
+    public Object test(@PathVariable String serviceInstanceId) throws Exception {
+        ModelAndView mav = new ModelAndView("index");
+        mav.addObject("baseHref", "/v2/authentication/" + serviceInstanceId + "/test");
+        mav.addObject("token", TOKEN_PREFIX + "iojsiofksdfifid");
+        mav.addObject("serviceInstanceId", serviceInstanceId);
+        mav.addObject("endpointUrl", generalConfiguration.getEndpointUrl());
+
+        return mav;
+    }
+    **/
 
 }
