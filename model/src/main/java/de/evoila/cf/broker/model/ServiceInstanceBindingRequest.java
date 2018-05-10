@@ -35,17 +35,17 @@ public class ServiceInstanceBindingRequest {
 
 	@JsonSerialize
 	@JsonProperty("parameters")
-	private Map<String, String> parameters;
+	private Map<String, Object> parameters;
 
 	@JsonSerialize
 	@JsonProperty("bind_resource")
-	private Map<String, String> bindResource;
+	private Map<String, Object> bindResource;
 
 	public ServiceInstanceBindingRequest() {
 	}
 
 	public ServiceInstanceBindingRequest(String serviceDefinitionId, String planId, String appGuid,
-			Map<String, String> bindResource) {
+			Map<String, Object> bindResource) {
 		this.serviceDefinitionId = serviceDefinitionId;
 		this.planId = planId;
 		this.appGuid = appGuid;
@@ -81,19 +81,19 @@ public class ServiceInstanceBindingRequest {
 		this.appGuid = appGuid;
 	}
 
-	public Map<String, String> getParameters() {
+	public Map<String, Object> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(Map<String, String> parameters) {
+	public void setParameters(Map<String, Object> parameters) {
 		this.parameters = parameters;
 	}
 
-	public Map<String, String> getBindResource() {
+	public Map<String, Object> getBindResource() {
 		return bindResource;
 	}
 
-	public void setBindResource(Map<String, String> bindResource) {
+	public void setBindResource(Map<String, Object> bindResource) {
 		this.bindResource = bindResource;
 	}
 

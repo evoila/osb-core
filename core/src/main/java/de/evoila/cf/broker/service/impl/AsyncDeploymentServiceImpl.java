@@ -27,7 +27,7 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
 	@Async
 	@Override
 	public void asyncCreateInstance(DeploymentServiceImpl deploymentService, ServiceInstance serviceInstance,
-                                    Map<String, String> parameters, Plan plan, PlatformService platformService) {
+                                    Map<String, Object> parameters, Plan plan, PlatformService platformService) {
 		progressService.startJob(serviceInstance);
 
 		try {

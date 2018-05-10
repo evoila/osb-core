@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,7 +69,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 	@Override
 	public ServiceInstanceResponse createServiceInstance(String serviceInstanceId, String serviceDefinitionId,
-			String planId, String organizationGuid, String spaceGuid, Map<String, String> parameters,
+			String planId, String organizationGuid, String spaceGuid, Map<String, Object> parameters,
 			Map<String, String> context)
 					throws ServiceInstanceExistsException, ServiceBrokerException,
 					ServiceDefinitionDoesNotExistException {
@@ -80,11 +81,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 		}
 
 		ServiceInstance serviceInstance = new ServiceInstance(serviceInstanceId, serviceDefinitionId,
-				planId, organizationGuid, spaceGuid,
-				parameters == null ? new HashMap<>()
-						: new HashMap<>(parameters),
-				context == null ? new HashMap<>()
-						: new HashMap<>(context));
+				planId, organizationGuid, spaceGuid, parameters, context);
 
 		Plan plan = serviceDefinitionRepository.getPlan(planId);
 
@@ -128,7 +125,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         }
     }
 
-	public ServiceInstance syncCreateInstance(ServiceInstance serviceInstance, Map<String, String> parameters,
+	public ServiceInstance syncCreateInstance(ServiceInstance serviceInstance, Map<String, Object> parameters,
                                                        Plan plan, PlatformService platformService) throws ServiceBrokerException {
 
 	    // TODO: We need to decide which method we trigger when preCreateInstance fails

@@ -46,7 +46,7 @@ public class ServiceInstance implements BaseEntity<String> {
 
 	@JsonSerialize
 	@JsonProperty("parameters")
-	private Map<String, String> parameters = new HashMap<String, String>();
+	private Map<String, Object> parameters = new HashMap<>();
 
 	@JsonSerialize
 	@JsonProperty("internal_id")
@@ -78,13 +78,13 @@ public class ServiceInstance implements BaseEntity<String> {
 	}
 
 	public ServiceInstance(String id, String serviceDefinitionId, String planId, String organizationGuid,
-			String spaceGuid, Map<String, String> parameters, String dashboardUrl) {
+			String spaceGuid, Map<String, Object> parameters, String dashboardUrl) {
 		initialize(id, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
 		setDashboardUrl(dashboardUrl);
 	}
 
 	private void initialize(String id, String serviceDefinitionId, String planId, String organizationGuid,
-			String spaceGuid, Map<String, String> parameters) {
+			String spaceGuid, Map<String, Object> parameters) {
 		setId(id);
 		setServiceDefinitionId(serviceDefinitionId);
 		setPlanId(planId);
@@ -95,7 +95,7 @@ public class ServiceInstance implements BaseEntity<String> {
 	}
 
 	public ServiceInstance(String serviceInstanceId, String serviceDefintionId, String planId, String organizationGuid,
-			String spaceGuid, Map<String, String> parameters, String dashboardUrl, String internalId) {
+			String spaceGuid, Map<String, Object> parameters, String dashboardUrl, String internalId) {
 		initialize(id, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
 		setInternalId(internalId);
 		setDashboardUrl(dashboardUrl);
@@ -119,7 +119,7 @@ public class ServiceInstance implements BaseEntity<String> {
 	}
 
 	public ServiceInstance(String serviceInstanceId, String serviceDefinitionId, String planId, String organizationGuid,
-			String spaceGuid, Map<String, String> parameters, Map<String, String> context) {
+			String spaceGuid, Map<String, Object> parameters, Map<String, String> context) {
 		initialize(serviceInstanceId, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
 		if(context != null)
 			setContext(context);
@@ -184,13 +184,11 @@ public class ServiceInstance implements BaseEntity<String> {
 		this.dashboardUrl = dashboardUrl;
 	}
 
-	public Map<String, String> getParameters() {
-		if(parameters == null)
-			parameters = new HashMap<>();
+	public Map<String, Object> getParameters() {
 		return parameters;
 	}
 
-	private void setParameters(Map<String, String> parameters) {
+	private void setParameters(Map<String, Object> parameters) {
 		this.parameters = new HashMap<>(parameters);
 	}
 

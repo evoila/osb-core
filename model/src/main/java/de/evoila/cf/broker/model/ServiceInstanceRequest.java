@@ -22,7 +22,7 @@ public class ServiceInstanceRequest {
 
 	@JsonSerialize
 	@JsonProperty("context")
-	private Map<String, String> context;
+	private Map<String, String> context = new HashMap<>();
 	
 	@NotEmpty
 	@JsonSerialize
@@ -46,7 +46,7 @@ public class ServiceInstanceRequest {
 	
 	@JsonSerialize
 	@JsonProperty("parameters")
-	private Map<String, String> parameters;
+	private Map<String, Object> parameters = new HashMap<>();
 	
 	public ServiceInstanceRequest() {}
 	
@@ -90,11 +90,11 @@ public class ServiceInstanceRequest {
 		this.spaceGuid = spaceGuid;
 	}
 
-	public Map<String, String> getParameters() {
+	public Map<String, Object> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(Map<String, String> parameters) {
+	public void setParameters(Map<String, Object> parameters) {
 		this.parameters = parameters;
 	}
 
@@ -103,6 +103,6 @@ public class ServiceInstanceRequest {
 	}
 
 	public void setContext(Map<String, String> context) {
-		this.context = new HashMap<String, String>(context);
+		this.context = context;
 	}
 }

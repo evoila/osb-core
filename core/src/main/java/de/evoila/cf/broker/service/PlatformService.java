@@ -57,7 +57,7 @@ public interface PlatformService {
 	 * @return new ServiceInstance with updated fields
 	 * @throws Exception 
 	 */
-	ServiceInstance createInstance(ServiceInstance serviceInstance, Plan plan, Map<String, String> customParameters) throws PlatformException;
+	ServiceInstance createInstance(ServiceInstance serviceInstance, Plan plan, Map<String, Object> customParameters) throws PlatformException;
 
     /**
      *
@@ -105,6 +105,6 @@ public interface PlatformService {
 	 * @param plan
 	 * @return new ServiceInstance with updated fields
 	 */
-	ServiceInstance updateInstance(ServiceInstance serviceInstance, Plan plan) throws PlatformException;
+	ServiceInstance updateInstance(ServiceInstance serviceInstance, Plan plan, Map<String, Object> customParameters) throws PlatformException;
 
 }

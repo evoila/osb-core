@@ -26,7 +26,7 @@ public interface DeploymentService {
 			throws ServiceInstanceDoesNotExistException, ServiceBrokerException;
 
 	ServiceInstanceResponse createServiceInstance(String serviceInstanceId, String serviceDefinitionId,
-			String planId, String organizationGuid, String spaceGuid, Map<String, String> parameters,
+			String planId, String organizationGuid, String spaceGuid, Map<String, Object> parameters,
 			Map<String, String> context)
 					throws ServiceInstanceExistsException, ServiceBrokerException,
 					ServiceDefinitionDoesNotExistException;

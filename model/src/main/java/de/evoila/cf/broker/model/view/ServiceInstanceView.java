@@ -37,7 +37,7 @@ public class ServiceInstanceView {
         return plan.getDescription();
     }
 
-    public Map<String, String> getParameters() {
+    public Map<String, Object> getParameters() {
         return serviceInstance.getParameters();
     }
 

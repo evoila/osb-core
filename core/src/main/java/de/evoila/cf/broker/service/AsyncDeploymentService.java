@@ -16,7 +16,7 @@ import java.util.Map;
 public interface AsyncDeploymentService {
 
 	void asyncCreateInstance(DeploymentServiceImpl deploymentService, ServiceInstance serviceInstance,
-			Map<String, String> parameters, Plan plan, PlatformService platformService);
+			Map<String, Object> parameters, Plan plan, PlatformService platformService);
 
 	void asyncDeleteInstance(DeploymentServiceImpl deploymentService,
 			ServiceInstance serviceInstance, Plan plan, PlatformService platformService)
