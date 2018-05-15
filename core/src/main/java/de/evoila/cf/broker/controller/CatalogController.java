@@ -43,14 +43,19 @@ public class CatalogController extends BaseController {
                 env -> (env.equalsIgnoreCase(TEST_PROFILE)))) {
 
             catalog.getServices().stream().map(service -> {
-                service.setName(service.getName() + "-" + TEST_PROFILE);
-                service.setId(replaceLastChar(service.getId()));
+                if (service.getName().indexOf(TEST_PROFILE) == -1)
+                    service.setName(service.getName() + "-" + TEST_PROFILE);
 
+                service.setId(replaceLastChar(service.getId()));
                 service.getDashboardClient()
                         .setSecret(replaceLastChar(service.getDashboardClient().getSecret()));
-                service.getDashboardClient().setId(
-                        service.getDashboardClient().getId() + "-" + TEST_PROFILE
-                );
+
+
+                if (service.getDashboardClient().getId().indexOf(TEST_PROFILE) == -1)
+                    service.getDashboardClient().setId(
+                            service.getDashboardClient().getId() + "-" + TEST_PROFILE
+                    );
+
                 service.getDashboard().setUrl(
                         replaceUrl(service.getDashboard().getUrl())
                 );
@@ -80,11 +85,12 @@ public class CatalogController extends BaseController {
 	    try {
             URL url = new URL(urlStr);
 
-            String host = new String(url.getHost());
-            URL newURL = new URL(url.getProtocol(), host.replace(".", "-" + TEST_PROFILE + "."),
-                    url.getPort(), url.getFile());
-
-            urlStr = newURL.toString();
+            if (url.getHost().indexOf(TEST_PROFILE) == -1) {
+                String host = new String(url.getHost());
+                URL newURL = new URL(url.getProtocol(), host.replace(".", "-" + TEST_PROFILE + "."),
+                        url.getPort(), url.getFile());
+                urlStr = newURL.toString();
+            }
         } catch(MalformedURLException ex) {
             logger.info("Exception replacing URL", ex);
         }
