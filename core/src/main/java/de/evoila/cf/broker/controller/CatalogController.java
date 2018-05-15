@@ -80,7 +80,7 @@ public class CatalogController extends BaseController {
 	    try {
             URL url = new URL(urlStr);
 
-            String host = url.getHost();
+            String host = new String(url.getHost());
             URL newURL = new URL(url.getProtocol(), host.replace(".", "-" + TEST_PROFILE + "."),
                     url.getPort(), url.getFile());
 
