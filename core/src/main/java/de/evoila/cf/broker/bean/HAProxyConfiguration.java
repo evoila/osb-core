@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 /** @author Rene Schollmeyer */
 @Service
 @ConfigurationProperties(prefix = "haproxy")
-@ConditionalOnProperty(prefix = "haproxy", name = {"uri", "auth"}, havingValue = "")
+@ConditionalOnProperty(prefix = "haproxy", name = {"uri", "auth"})
 public class HAProxyConfiguration {
 
 	private String uri;
