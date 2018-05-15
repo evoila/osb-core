@@ -86,8 +86,8 @@ public class CatalogController extends BaseController {
             URL url = new URL(urlStr);
 
             if (url.getHost().indexOf(TEST_PROFILE) == -1) {
-                String host = new String(url.getHost());
-                URL newURL = new URL(url.getProtocol(), host.replace(".", "-" + TEST_PROFILE + "."),
+                URL newURL = new URL(url.getProtocol(),
+                        url.getHost().replaceFirst("\\.", "-" + TEST_PROFILE + "."),
                         url.getPort(), url.getFile());
                 urlStr = newURL.toString();
             }
