@@ -5,12 +5,12 @@ package de.evoila.cf.broker.bean;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Configuration;
 
 /** @author Rene Schollmeyer */
-@Service
+@Configuration
 @ConfigurationProperties(prefix = "haproxy")
-@ConditionalOnProperty(prefix = "haproxy", name = {"uri", "auth"}, havingValue = "")
+@ConditionalOnProperty(prefix = "haproxy", name = {"uri", "auth.token"})
 public class HAProxyConfiguration {
 
 	private String uri;
@@ -18,6 +18,7 @@ public class HAProxyConfiguration {
 	private Auth auth;
 	
 	public static class Auth {
+
 		private String token;
 
 		public String getToken() {
@@ -46,6 +47,6 @@ public class HAProxyConfiguration {
 	}
 
 	public String getAuthToken() {
-			return auth.getToken();
+	    return auth.getToken();
 	}
 }
