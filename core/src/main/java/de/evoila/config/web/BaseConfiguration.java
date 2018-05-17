@@ -51,10 +51,11 @@ public class BaseConfiguration {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setFilter(new HeaderCheckFilter());
         registration.addUrlPatterns(
-            "/v2/catalog*",
-            "/v2/service_instances/*",
-            "/v2/service_instances/*/last_operation",
-            "/v2/service_instances/*/service_bindings/*"
+                "/v2/catalog",
+                "/v2/catalog*",
+                "/v2/service_instances/*",
+                "/v2/service_instances/*/last_operation",
+                "/v2/service_instances/*/service_bindings/*"
         );
         return registration;
     }
