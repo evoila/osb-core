@@ -4,6 +4,7 @@ public class Endpoints {
 
     public static final String V2_ENDPOINT = "/v2/endpoint";
     public static final String V2_CATALOG = "/v2/catalog";
+    public static final String V2_CATALOG_2 = "/v2/catalog/";
     public static final String V2_SERVICE_INSTANCES = "/v2/service_instances";
     public static final String V2_SERVICE_INSTANCES_ID ="/service_instances/{instanceId}";
     public static final String V2_SERVICE_INSTANCES_LO = "/service_instances/{instanceId}/last_operation";
