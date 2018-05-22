@@ -29,19 +29,20 @@ public interface BindingService {
             ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException;
 
     /**
+     *
      * @param id
-     * @return The ServiceInstanceBinding or null if one does not exist.
+     * @return
      */
     ServiceInstanceBinding getServiceInstanceBinding(String id);
 
     /**
-     * Delete the service instance binding. If a binding doesn't exist, return
-     * null.
      *
-     * @param bindingId, planId
+     * @param bindingId
+     * @param planId
      * @throws ServiceBrokerException
      * @throws ServiceInstanceBindingDoesNotExistsException
+     * @throws ServiceDefinitionDoesNotExistException
      */
     void deleteServiceInstanceBinding(String bindingId, String planId)
-          throws ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException;
+          throws ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException;
 }

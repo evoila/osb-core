@@ -8,6 +8,7 @@ import de.evoila.cf.broker.model.Catalog;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -17,6 +18,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
  * @author Johannes Hiemer.
  * @author Marco Di Martino
  */
+@Order(50)
 @Configuration
 @EnableConfigurationProperties(Catalog.class)
 public class BaseConfiguration {
@@ -52,7 +54,7 @@ public class BaseConfiguration {
         registration.setFilter(new HeaderCheckFilter());
         registration.addUrlPatterns(
                 "/v2/catalog",
-                "/v2/catalog*",
+                "/v2/catalog/",
                 "/v2/service_instances/*",
                 "/v2/service_instances/*/last_operation",
                 "/v2/service_instances/*/service_bindings/*"

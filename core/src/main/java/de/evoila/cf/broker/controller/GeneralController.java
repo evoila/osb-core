@@ -1,6 +1,7 @@
 package de.evoila.cf.broker.controller;
 
 import de.evoila.cf.broker.exception.ServiceBrokerException;
+import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.Plan;
 import de.evoila.cf.broker.model.ServiceInstance;
@@ -14,10 +15,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-/** @author Yannic Remmet. */
+/**
+ * @author  Yannic Remmet & Johannes Hiemer, evoila.
+ */
 @RestController
-
-class GeneralController extends BaseController {
+public class GeneralController extends BaseController {
 
     ServiceInstanceRepository repository;
     ServiceDefinitionRepository serviceDefinitionRepository;
@@ -30,11 +32,8 @@ class GeneralController extends BaseController {
     }
 
     @GetMapping(value = "/v2/manage/{serviceInstanceId}")
-    public ResponseEntity<ServiceInstanceView> getGeneralInformation(@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException, ServiceBrokerException {
-        return new ResponseEntity<>(getServiceInstanceView(serviceInstanceId), HttpStatus.OK);
-    }
-
-    private ServiceInstanceView getServiceInstanceView (String serviceInstanceId) throws ServiceInstanceDoesNotExistException, ServiceBrokerException {
+    public ResponseEntity<ServiceInstanceView> getGeneralInformation(@PathVariable String serviceInstanceId) throws
+            ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
         ServiceInstance serviceInstance = repository.getServiceInstance(serviceInstanceId);
 
         if(serviceInstance == null){
@@ -43,6 +42,10 @@ class GeneralController extends BaseController {
 
         Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
 
-        return new ServiceInstanceView(serviceInstance, plan);
+        ServiceInstanceView serviceInstanceView = new ServiceInstanceView(serviceInstance, plan);
+
+        return new ResponseEntity<>(serviceInstanceView, HttpStatus.OK);
     }
+
+
 }

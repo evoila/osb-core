@@ -57,7 +57,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
 		try {
 			bindingService.deleteServiceInstanceBinding(bindingId, planId);
-		} catch (ServiceInstanceBindingDoesNotExistsException e) {
+		} catch (ServiceInstanceBindingDoesNotExistsException | ServiceDefinitionDoesNotExistException e) {
 			return new ResponseEntity<>("{}", HttpStatus.GONE);
 		}
 

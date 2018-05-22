@@ -13,7 +13,7 @@ import de.evoila.cf.broker.model.ServiceInstanceResponse;
 import java.util.Map;
 
 /**
- * @author Christian Brinker, evoila.
+ * @author Christian Brinker && Johannes Hiemer, evoila.
  *
  */
 public interface DeploymentService {
@@ -31,7 +31,8 @@ public interface DeploymentService {
 					throws ServiceInstanceExistsException, ServiceBrokerException,
 					ServiceDefinitionDoesNotExistException;
 
-	void deleteServiceInstance(String instanceId) throws ServiceBrokerException, ServiceInstanceDoesNotExistException;
+	void deleteServiceInstance(String instanceId) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
+            ServiceInstanceDoesNotExistException;
 
 	void updateServiceInstance(String instanceId, String planId) throws ServiceBrokerException, ServiceInstanceDoesNotExistException;
 }

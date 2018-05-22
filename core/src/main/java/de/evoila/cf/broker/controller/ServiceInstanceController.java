@@ -130,7 +130,8 @@ public class ServiceInstanceController extends BaseController {
 	public ResponseEntity<String> deleteServiceInstance(@PathVariable("instanceId") String instanceId,
 														@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 														@RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId)
-			throws 	ServiceBrokerException, AsyncRequiredException, ServiceInstanceDoesNotExistException {
+			throws ServiceBrokerException, AsyncRequiredException,
+            ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException {
 
 		log.debug("DELETE: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
 				+ ", deleteServiceInstanceBinding(), serviceInstanceId = " + instanceId + ", serviceId = " + serviceId
@@ -153,11 +154,17 @@ public class ServiceInstanceController extends BaseController {
 		return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
 	}
 
-	@ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, AsyncRequiredException.class })
+	@ExceptionHandler({ AsyncRequiredException.class })
 	@ResponseBody
-	public ResponseEntity<ErrorMessage> handleException(Exception ex, HttpServletResponse response) {
+	public ResponseEntity<ErrorMessage> handleException(AsyncRequiredException ex, HttpServletResponse response) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);	
 	}
+
+    @ExceptionHandler({ ServiceDefinitionDoesNotExistException.class })
+    @ResponseBody
+    public ResponseEntity<ErrorMessage> handleException(ServiceDefinitionDoesNotExistException ex, HttpServletResponse response) {
+        return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 
 	@ExceptionHandler(ServiceInstanceExistsException.class)
 	@ResponseBody

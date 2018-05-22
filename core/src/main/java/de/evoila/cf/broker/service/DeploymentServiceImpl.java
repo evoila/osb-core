@@ -106,7 +106,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     @Override
     public void deleteServiceInstance(String instanceId)
-            throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
+            throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
 
         if (serviceInstance == null) {

@@ -47,7 +47,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	@Override
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
             ServiceInstanceBindingRequest serviceInstanceBindingRequest, String route)
-			throws ServiceInstanceBindingExistsException, ServiceBrokerException,
+			throws ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException,
 			ServiceInstanceDoesNotExistException {
 
 	    String planId = serviceInstanceBindingRequest.getPlanId();
@@ -95,9 +95,8 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	@Override
-
 	public void deleteServiceInstanceBinding(String bindingId, String planId)
-			throws ServiceInstanceBindingDoesNotExistsException {
+			throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException {
 		ServiceInstance serviceInstance = getBinding(bindingId);
 
 		try {
