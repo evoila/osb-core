@@ -1,0 +1,98 @@
+{
+	"schemas": {
+	    "service_instance": {
+	        "create": {
+	            "parameters": { 
+	                "$schema": "http://json-schema.org/draft-04/schema#",
+	                "type": "object",
+	                "properties": {
+	                    "billing": {
+	                        "description": "testdescription",
+	                        "type": "string"
+	                    },
+	                    "otherstuff": {
+	                        "description": "otherdescription",
+	                        "type": "string"
+	                    },
+	                    "direction": {
+	                        "type": "string",
+	                        "enum": [ errorhere {
+	                            "N",
+	                            "E",
+	                            "S",
+	                            "W"
+	                        ]
+	                    },
+	                    "angle": {
+	                        "type": "integer",
+	                        "enum": [
+	                            0,
+	                            90,
+	                            180,
+	                            270
+	                        ]
+	                    },
+	                    "specials": {
+	                        "type": "array",
+	                        "items": []
+	                    },
+	                    "morespecials": {
+	                        "type": "array",
+	                        "items": [
+	                            {
+	                                "description": "extraspecial_number_description",
+	                                "type": "number"
+	                            },
+	                            {
+	                                "description": "extraspecial_string_description",
+	                                "type": "string"
+	                            }
+	                        ]
+	                    },
+	                    "someObject": {
+	                        "type": "object",
+	                        "properties": {
+	                            "description": "nestedObject",
+	                            "type": "string"
+	                        }
+	                    }
+	                }
+	            }
+	        },
+	        "update": {
+	            "parameters": {
+	                "$schema": "http://json-schema.org/draft-04/schema#",
+	                "type": "object",
+	                "properties": {
+	                    "billing": {
+	                        "description": "testdescription2",
+	                        "type": "string"
+	                    },
+	                    "otherstuff": {
+	                        "description": "otherdescription2",
+	                        "type": "string"
+	                    }
+	                }
+	            }
+	        }
+	    },
+	    "service_binding": {
+	        "create": {
+	            "parameters": {
+	                "$schema": "http://json-schema.org/draft-04/schema#",
+	                "type": "object",
+	                "properties": {
+	                    "billing": {
+	                        "description": "testdescription3",
+	                        "type": "string"
+	                    },
+	                    "otherstuff": {
+	                        "description": "otherdescription3",
+	                        "type": "string"
+	                    }
+	                }
+	            }
+	        }
+	    }
+	}
+}
