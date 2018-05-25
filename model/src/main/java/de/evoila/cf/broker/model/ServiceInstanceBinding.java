@@ -34,6 +34,12 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 		super();
 	}
 
+    public ServiceInstanceBinding(String id, String serviceInstanceId, Map<String, Object> credentials) {
+        this.id = id;
+        this.serviceInstanceId = serviceInstanceId;
+        setCredentials(credentials);
+    }
+
 	public ServiceInstanceBinding(String id, String serviceInstanceId, Map<String, Object> credentials,
 								  String syslogDrainUrl) {
 		this.id = id;
@@ -56,11 +62,7 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 	}
 
 	private void setCredentials(Map<String, Object> credentials) {
-		if (credentials == null) {
-			credentials = new HashMap<>();
-		} else {
-			this.credentials = credentials;
-		}
+	    this.credentials = credentials;
 	}
 
 	public String getSyslogDrainUrl() {

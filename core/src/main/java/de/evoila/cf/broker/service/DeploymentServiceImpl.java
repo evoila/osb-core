@@ -132,20 +132,21 @@ public class DeploymentServiceImpl implements DeploymentService {
         try {
             serviceInstance = platformService.preCreateInstance(serviceInstance, plan);
         } catch (PlatformException e) {
+            this.syncDeleteInstance(serviceInstance, plan, platformService);
             throw new ServiceBrokerException("Error during pre service instance creation", e);
         }
 
 		try {
             serviceInstance = platformService.createInstance(serviceInstance, plan, parameters);
 		} catch (PlatformException e) {
-			serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
-
-			throw new ServiceBrokerException("Could not create instance due to: ", e);
+            this.syncDeleteInstance(serviceInstance, plan, platformService);
+            throw new ServiceBrokerException("Could not create instance due to: ", e);
 		}
 
 		try {
             serviceInstance = platformService.postCreateInstance(serviceInstance, plan);
 		} catch (PlatformException e) {
+            this.syncDeleteInstance(serviceInstance, plan, platformService);
 			throw new ServiceBrokerException("Error during post service instance creation", e);
 		}
 
