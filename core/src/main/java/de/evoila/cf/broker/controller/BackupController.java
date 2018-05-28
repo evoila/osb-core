@@ -16,8 +16,9 @@ import java.util.HashMap;
 /** @author Yannic Remmet. */
 @RestController
 @RequestMapping(value = "/v2/manage/backup")
-@ConditionalOnBean(name="backupService") // Needs to be the Bean Name in this case otherwise Spring tries to create the controller
+@ConditionalOnBean(name="backupService")
 class BackupController extends BaseController {
+
     private BackupService backupService;
 
     public BackupController(BackupService service){
@@ -26,13 +27,15 @@ class BackupController extends BaseController {
     }
 
     @PostMapping(value = "/{serviceInstanceId}/backup")
-    public ResponseEntity<Object> backupNow(@PathVariable String serviceInstanceId, @RequestBody BackupRequest fileDestination) throws ServiceInstanceDoesNotExistException {
+    public ResponseEntity<Object> backupNow(@PathVariable String serviceInstanceId, @RequestBody BackupRequest fileDestination)
+            throws ServiceInstanceDoesNotExistException {
         ResponseEntity<Object> response = backupService.backupNow(serviceInstanceId, fileDestination);
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
     }
 
     @PostMapping(value = "/{serviceInstanceId}/restore")
-    public ResponseEntity<HashMap> restoreNow(@PathVariable String serviceInstanceId, @RequestBody RestoreRequest fileDestination) throws ServiceInstanceDoesNotExistException {
+    public ResponseEntity<HashMap> restoreNow(@PathVariable String serviceInstanceId, @RequestBody RestoreRequest fileDestination)
+            throws ServiceInstanceDoesNotExistException {
         ResponseEntity<HashMap> response = backupService.restoreNow(serviceInstanceId, fileDestination);
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
     }
@@ -65,7 +68,8 @@ class BackupController extends BaseController {
     }
 
     @PostMapping(value = "/{serviceInstanceId}/plans")
-    public ResponseEntity<HashMap> postPlan(@PathVariable String serviceInstanceId, @RequestBody HashMap plan) throws ServiceInstanceDoesNotExistException {
+    public ResponseEntity<HashMap> postPlan(@PathVariable String serviceInstanceId, @RequestBody HashMap plan)
+            throws ServiceInstanceDoesNotExistException {
         ResponseEntity<HashMap> response = backupService.postPlan(serviceInstanceId, plan);
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
     }
@@ -73,7 +77,7 @@ class BackupController extends BaseController {
 
     @GetMapping(value = "/{serviceInstanceId}/plans/{planId}")
     public ResponseEntity<HashMap> getPlan(@PathVariable String serviceInstanceId,
-                                             @PathVariable String planId) throws ServiceInstanceDoesNotExistException {
+                                             @PathVariable String planId) {
         ResponseEntity<HashMap> response = backupService.getPlan(serviceInstanceId, planId);
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
     }
@@ -102,7 +106,7 @@ class BackupController extends BaseController {
     }
 
     @PostMapping(value = "/{serviceInstanceId}/destinations")
-    public ResponseEntity<HashMap> postDestination(@PathVariable String serviceInstanceId, @RequestBody HashMap plan) throws ServiceInstanceDoesNotExistException {
+    public ResponseEntity<HashMap> postDestination(@PathVariable String serviceInstanceId, @RequestBody HashMap plan) {
         ResponseEntity<HashMap> response = backupService.postDestination(serviceInstanceId, plan);
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
     }
@@ -110,7 +114,7 @@ class BackupController extends BaseController {
 
     @GetMapping(value = "/{serviceInstanceId}/destinations/{destinationId}")
     public ResponseEntity<HashMap> getDestination(@PathVariable String serviceInstanceId,
-                                           @PathVariable String destinationId) throws ServiceInstanceDoesNotExistException {
+                                           @PathVariable String destinationId)  {
         ResponseEntity<HashMap> response = backupService.getDestination(serviceInstanceId, destinationId);
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
     }
@@ -131,7 +135,7 @@ class BackupController extends BaseController {
     }
 
     @PostMapping(value = "/{serviceInstanceId}/destinations/validate")
-    public ResponseEntity<HashMap> validateDestination(@PathVariable String serviceInstanceId, @RequestBody HashMap plan) throws ServiceInstanceDoesNotExistException {
+    public ResponseEntity<HashMap> validateDestination(@PathVariable String serviceInstanceId, @RequestBody HashMap plan) {
         ResponseEntity<HashMap> response = backupService.validateDestination(serviceInstanceId, plan);
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
     }

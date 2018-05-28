@@ -11,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,6 +29,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 @Service
+@ConditionalOnBean(BackupServiceImpl.BackupServiceCondition.class)
 public class BackupServiceImpl implements BackupService {
 
     private static final Logger logger = LoggerFactory.getLogger(BackupServiceImpl.class);
@@ -34,6 +38,23 @@ public class BackupServiceImpl implements BackupService {
     InstanceCredentialService credentialService;
     BackupConfiguration config;
     RabbitTemplate template;
+
+    @Configuration
+    static class BackupServiceCondition extends AllNestedConditions {
+
+        public BackupServiceCondition () {
+            super(ConfigurationPhase.REGISTER_BEAN);
+        }
+
+        @ConditionalOnBean(BackupConfiguration.class)
+        static class onBackupConfiguration {}
+
+        @ConditionalOnBean(RabbitTemplate.class)
+        static class onRabbitTemplate {}
+
+        @ConditionalOnBean(InstanceCredentialService.class)
+        static class onCredentialService {}
+    }
 
     public BackupServiceImpl(BackupConfiguration config, InstanceCredentialService credentialService, RabbitTemplate rabbitTemplate) {
         Assert.notNull(config, "BackupConfiguration can not be null");

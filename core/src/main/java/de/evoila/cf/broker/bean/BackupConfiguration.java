@@ -56,7 +56,7 @@ public class BackupConfiguration {
         this.queue = queue;
     }
 
-    public static class Queue{
+    public static class Queue {
         private String exchange;
         private String routingKey;
         private String queue;
