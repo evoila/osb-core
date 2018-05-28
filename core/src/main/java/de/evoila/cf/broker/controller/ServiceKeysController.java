@@ -3,6 +3,7 @@ package de.evoila.cf.broker.controller;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.ServiceInstanceBinding;
+import de.evoila.cf.broker.model.ServiceInstanceBindingRequest;
 import de.evoila.cf.broker.repository.BindingRepository;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.BindingService;
@@ -49,9 +50,16 @@ public class ServiceKeysController extends BaseController {
     public ResponseEntity<ServiceInstanceBinding> createServiceKey(@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException,
             ServiceBrokerException, ServiceInstanceBindingExistsException, ServiceDefinitionDoesNotExistException {
         ServiceInstance instance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+
         if(instance == null){
             throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
         }
+
+        ServiceInstanceBindingRequest serviceInstanceBindingRequest = new ServiceInstanceBindingRequest(
+                instance.getServiceDefinitionId(),
+                instance.getPlanId()
+        );
+
         String bindingId = UUID.randomUUID().toString();
         bindingService.createServiceInstanceBinding(bindingId, serviceInstanceId, null, null);
         ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
