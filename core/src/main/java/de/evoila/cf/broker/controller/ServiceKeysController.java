@@ -19,14 +19,13 @@ import java.util.UUID;
 /** @author Yannic Remmet. */
 @RestController
 @RequestMapping(value = "/v2/manage/servicekeys/{serviceInstanceId}")
-class ServiceKeysController extends BaseController {
+public class ServiceKeysController extends BaseController {
 
     BindingRepository bindingRepository;
     BindingService bindingService;
     ServiceInstanceRepository serviceInstanceRepository;
 
-    ServiceKeysController(BindingRepository repository, BindingService service, ServiceInstanceRepository serviceInstanceRepository){
-
+    public ServiceKeysController(BindingRepository repository, BindingService service, ServiceInstanceRepository serviceInstanceRepository) {
         Assert.notNull(repository, "BindingRepository should not be null");
         Assert.notNull(service, "Binding Service should not be null");
         this.bindingRepository = repository;
@@ -36,9 +35,8 @@ class ServiceKeysController extends BaseController {
 
     @GetMapping(value = "")
     public ResponseEntity<Page<ServiceInstanceBinding>> getGeneralInformation(@PathVariable String serviceInstanceId) {
-
         List<ServiceInstanceBinding> bindings = bindingRepository.getBindingsForServiceInstance(serviceInstanceId);
-        return new ResponseEntity<>(new PageImpl<ServiceInstanceBinding>(bindings), HttpStatus.OK);
+        return new ResponseEntity<>(new PageImpl<>(bindings), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{serviceBindingId}")

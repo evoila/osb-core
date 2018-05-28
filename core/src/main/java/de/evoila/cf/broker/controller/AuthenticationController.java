@@ -13,7 +13,7 @@ import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.oauth.CompositeAccessToken;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.CatalogService;
-import evoila.cf.broker.openid.OpenIdAuthenticationUtils;
+import de.evoila.cf.config.security.openid.OpenIdAuthenticationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
