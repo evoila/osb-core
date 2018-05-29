@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 @Service
-@ConditionalOnBean(BackupServiceImpl.BackupServiceCondition.class)
+//@ConditionalOnBean(BackupServiceImpl.BackupServiceCondition.class)
 public class BackupServiceImpl implements BackupService {
 
     private static final Logger logger = LoggerFactory.getLogger(BackupServiceImpl.class);
