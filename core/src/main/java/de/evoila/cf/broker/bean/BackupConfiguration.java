@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 /** @author Yannic Remmet */
 @Configuration
-@ConfigurationProperties(prefix="backup")
+@ConfigurationProperties(prefix= "backup")
 @ConditionalOnProperty(prefix = "backup", name = {"uri", "user", "password", "queue.exchange", "queue.queue"})
 public class BackupConfiguration {
 

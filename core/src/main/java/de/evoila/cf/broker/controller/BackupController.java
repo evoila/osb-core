@@ -2,13 +2,14 @@ package de.evoila.cf.broker.controller;
 
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.service.BackupService;
+import de.evoila.cf.broker.bean.ConditionOnBackupService;
 import de.evoila.cf.model.BackupRequest;
 import de.evoila.cf.model.RestoreRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -16,15 +17,11 @@ import java.util.HashMap;
 /** @author Yannic Remmet. */
 @RestController
 @RequestMapping(value = "/v2/manage/backup")
-@ConditionalOnBean(BackupService.class)
+@ConditionalOnBean(ConditionOnBackupService.class)
 public class BackupController extends BaseController {
 
+    @Autowired
     private BackupService backupService;
-
-    public BackupController(BackupService service){
-        Assert.notNull(service, "The backup service can not be null");
-        this.backupService = service;
-    }
 
     @PostMapping(value = "/{serviceInstanceId}/backup")
     public ResponseEntity<Object> backupNow(@PathVariable String serviceInstanceId, @RequestBody BackupRequest fileDestination)

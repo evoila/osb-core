@@ -5,7 +5,6 @@ import de.evoila.cf.broker.model.JobProgress;
 import de.evoila.cf.broker.model.Plan;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.service.AsyncDeploymentService;
-import de.evoila.cf.broker.service.DeploymentServiceImpl;
 import de.evoila.cf.broker.service.JobProgressService;
 import de.evoila.cf.broker.service.PlatformService;
 import org.slf4j.Logger;
