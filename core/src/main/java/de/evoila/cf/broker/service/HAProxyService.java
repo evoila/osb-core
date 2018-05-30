@@ -67,7 +67,9 @@ public abstract class HAProxyService {
 	}
 
 	public List<ServerAddress> appendAgent(List<ServerAddress> internalAddresses, String bindingId, String instanceId) throws ServiceBrokerException {
-		List<ServerAddress> externalAddresses = internalAddresses.stream().map(in -> new HAProxyServerAddress(in, getMode(in), getOptions(in))).map(in -> appendSingleAgent(in, bindingId, instanceId))
+		List<ServerAddress> externalAddresses = internalAddresses.stream()
+                .map(in -> new HAProxyServerAddress(in, getMode(in), getOptions(in)))
+                .map(in -> appendSingleAgent(in, bindingId, instanceId))
 				.filter(in -> in != null).collect(Collectors.toList());
 
 		if (externalAddresses.size() < internalAddresses.size())

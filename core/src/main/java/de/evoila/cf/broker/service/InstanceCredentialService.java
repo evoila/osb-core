@@ -5,6 +5,6 @@ import de.evoila.cf.model.DatabaseCredential;
 
 public interface InstanceCredentialService {
 
-    DatabaseCredential getCredentialsForInstanceId (String serviceInstanceId) throws ServiceInstanceDoesNotExistException;
+    DatabaseCredential getCredentialsForInstanceId(String serviceInstanceId) throws ServiceInstanceDoesNotExistException;
 
 }

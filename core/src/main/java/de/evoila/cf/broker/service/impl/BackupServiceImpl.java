@@ -29,25 +29,30 @@ import java.util.Iterator;
 import java.util.Map;
 
 @Service
-//@ConditionalOnBean(BackupServiceImpl.BackupServiceCondition.class)
+@ConditionalOnBean(BackupServiceImpl.BackupServiceCondition.class)
 public class BackupServiceImpl implements BackupService {
 
-    private static final Logger logger = LoggerFactory.getLogger(BackupServiceImpl.class);
+    static final Logger logger = LoggerFactory.getLogger(BackupServiceImpl.class);
     private final RestTemplate rest;
     private final HttpHeaders headers;
     InstanceCredentialService credentialService;
     BackupConfiguration config;
-    RabbitTemplate template;
+    RabbitTemplate rabbitTemplate;
 
     @Configuration
     static class BackupServiceCondition extends AllNestedConditions {
 
+        static final Logger logger = LoggerFactory.getLogger(BackupServiceImpl.class);
+
         public BackupServiceCondition () {
             super(ConfigurationPhase.REGISTER_BEAN);
+            logger.info("###################################");
+            logger.info("  Starting BackupServiceCondition  ");
+            logger.info("###################################");
         }
 
         @ConditionalOnBean(BackupConfiguration.class)
-        static class onBackupConfiguration {}
+        static class onBackupConfiguration { }
 
         @ConditionalOnBean(RabbitTemplate.class)
         static class onRabbitTemplate {}
@@ -64,14 +69,14 @@ public class BackupServiceImpl implements BackupService {
         this.config = config;
         this.credentialService = credentialService;
         this.rest = new RestTemplate();
-        this.template = rabbitTemplate;
+        this.rabbitTemplate = rabbitTemplate;
 
         this.headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
         headers.add("Accept", "application/json");
         headers.add("Authorization", encodeCredentials());
 
-        template.setMessageConverter(new Jackson2JsonMessageConverter());
+        this.rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
     }
 
     private String encodeCredentials () {
@@ -86,7 +91,7 @@ public class BackupServiceImpl implements BackupService {
 
         BackupConfiguration.Queue queue = this.config.getQueue();
         if (queue != null){
-            template.convertAndSend(queue.getExchange(), queue.getRoutingKey(),body);
+            rabbitTemplate.convertAndSend(queue.getExchange(), queue.getRoutingKey(),body);
         } else {
             String msg = "Backup RabbitMQ config is null. Please check configuration";
             logger.error(msg);
@@ -101,7 +106,7 @@ public class BackupServiceImpl implements BackupService {
         DatabaseCredential credentials = credentialService.getCredentialsForInstanceId(serviceInstanceId);
         body.setDestination(credentials);
 
-        template.convertAndSend(this.config.getQueue().getExchange(),
+        rabbitTemplate.convertAndSend(this.config.getQueue().getExchange(),
                                 this.config.getQueue().getRoutingKey(),body);
 
         return new ResponseEntity<>(new HashMap(), HttpStatus.CREATED);

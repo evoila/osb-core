@@ -16,8 +16,8 @@ import java.util.HashMap;
 /** @author Yannic Remmet. */
 @RestController
 @RequestMapping(value = "/v2/manage/backup")
-@ConditionalOnBean(name="backupService")
-class BackupController extends BaseController {
+@ConditionalOnBean(BackupService.class)
+public class BackupController extends BaseController {
 
     private BackupService backupService;
 

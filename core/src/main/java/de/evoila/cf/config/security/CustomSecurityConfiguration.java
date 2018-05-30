@@ -18,11 +18,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-
-import javax.xml.ws.Endpoint;
 
 /**
  * @author Johannes Hiemer.
@@ -48,7 +45,7 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 			.inMemoryAuthentication()
 			.withUser(authentication.getUsername())
 			.password(authentication.getPassword())
-			.roles(authentication.getRole());
+			.roles(authentication.getRole(), "ACTUATOR");
 	}
 
     @Bean 
