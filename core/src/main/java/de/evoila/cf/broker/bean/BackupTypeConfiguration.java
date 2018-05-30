@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 /** @author Yannic Remmet */
 @Configuration
 @ConfigurationProperties(prefix= "backup")
-@ConditionalOnProperty(prefix = "backup", name = {"type"})
+@ConditionalOnProperty(prefix = "backupsssss", name = {"type"})
 public class BackupTypeConfiguration {
 
     private String type;

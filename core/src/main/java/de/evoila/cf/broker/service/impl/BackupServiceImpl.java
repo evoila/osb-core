@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,7 +31,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 @Service
-@ConditionalOnBean(ConditionOnBackupService.class)
+@Conditional(ConditionOnBackupService.class)
 public class BackupServiceImpl implements BackupService {
 
     private static final Logger logger = LoggerFactory.getLogger(BackupServiceImpl.class);
