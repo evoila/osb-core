@@ -38,16 +38,12 @@ public class ServiceInstanceController extends BaseController {
 			@PathVariable("instanceId") String serviceInstanceId,
 			@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 			@Valid @RequestBody ServiceInstanceRequest request) throws ServiceDefinitionDoesNotExistException,
-					ServiceInstanceExistsException, ServiceBrokerException, AsyncRequiredException, ParameterNotNullException {
+					ServiceInstanceExistsException, ServiceBrokerException, AsyncRequiredException {
 
 		if (acceptsIncomplete == null || !acceptsIncomplete) {
 			throw new AsyncRequiredException();
 		}
 
-		// currently not dealing with parameters
-		if (request.getParameters() != null && request.getParameters().size() > 0){
-			throw new ParameterNotNullException(request.getParameters());
-		}
 		log.debug("PUT: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
 				+ ", createServiceInstance(), serviceInstanceId = " + serviceInstanceId);
 
@@ -57,9 +53,7 @@ public class ServiceInstanceController extends BaseController {
 			throw new ServiceDefinitionDoesNotExistException(request.getServiceDefinitionId());
 		}
 
-		ServiceInstanceResponse response = deploymentService.createServiceInstance(serviceInstanceId,
-				request.getServiceDefinitionId(), request.getPlanId(), request.getOrganizationGuid(),
-				request.getSpaceGuid(), request.getParameters(), request.getContext());
+		ServiceInstanceResponse response = deploymentService.createServiceInstance(serviceInstanceId, request);
 
 
 		if (DashboardUtils.hasDashboard(svc))
@@ -74,7 +68,7 @@ public class ServiceInstanceController extends BaseController {
 
 	@GetMapping(value = "/service_instances/{instanceId}/last_operation")
 	public ResponseEntity<JobProgressResponse> lastOperation(@PathVariable("instanceId") String serviceInstanceId)
-			throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
+			throws ServiceInstanceDoesNotExistException {
 
 		JobProgressResponse serviceInstanceProcessingResponse = deploymentService.getLastOperation(serviceInstanceId);
 
@@ -84,10 +78,11 @@ public class ServiceInstanceController extends BaseController {
 	@PatchMapping(value= "/service_instances/{instanceId}")
 	public ResponseEntity<String> updateServiceInstance(@PathVariable("instanceId") String serviceInstanceId,
 				@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
-				@RequestBody ServiceInstanceRequest request) throws ServiceBrokerException, ServiceInstanceDoesNotExistException,
-				ParameterNotNullException, AsyncRequiredException, ServiceDefinitionDoesNotExistException {
+				@RequestBody ServiceInstanceRequest request) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
+            ServiceInstanceDoesNotExistException, AsyncRequiredException {
+
 		if (request.getServiceDefinitionId() == null){
-			return new ResponseEntity<String>("Missing required fields: service_id", HttpStatus.BAD_REQUEST );
+			return new ResponseEntity<>("Missing required fields: service_id", HttpStatus.BAD_REQUEST );
 		}
 
 		log.debug("PATCH: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
@@ -97,16 +92,12 @@ public class ServiceInstanceController extends BaseController {
 			throw new AsyncRequiredException();
 		}
 
-		if (request.getParameters() != null && request.getParameters().size() > 0) {
-			throw new ParameterNotNullException(request.getParameters());
-		}
-
 		if (catalogService.getServiceDefinition(request.getServiceDefinitionId()).isUpdateable()){
-			deploymentService.updateServiceInstance(serviceInstanceId, request.getPlanId());
-		}else{
-			return new ResponseEntity<String>("{}", HttpStatus.UNPROCESSABLE_ENTITY);
+			deploymentService.updateServiceInstance(serviceInstanceId, request);
+		} else {
+			return new ResponseEntity<>("{}", HttpStatus.UNPROCESSABLE_ENTITY);
 		}
-		return new ResponseEntity<String>("{}", HttpStatus.ACCEPTED);
+		return new ResponseEntity<>("{}", HttpStatus.ACCEPTED);
 
 	}
 

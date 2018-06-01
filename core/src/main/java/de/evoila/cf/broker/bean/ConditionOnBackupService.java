@@ -11,11 +11,11 @@ public class ConditionOnBackupService extends AllNestedConditions {
         super(ConfigurationPhase.REGISTER_BEAN);
     }
 
-    @ConditionalOnBean(BackupTypeConfiguration.class)
-    static class OnBackupTypeConfiguration {
-    }
-
     @ConditionalOnBean(BackupConfiguration.class)
     static class OnBackupConfiguration {
+    }
+
+    @ConditionalOnBean(BackupTypeConfiguration.class)
+    static class OnBackupTypeConfiguration {
     }
 }

@@ -14,6 +14,7 @@ import de.evoila.cf.broker.service.HAProxyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -46,31 +47,30 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	@Override
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
-            ServiceInstanceBindingRequest serviceInstanceBindingRequest, String route)
+            ServiceInstanceBindingRequest serviceInstanceBindingRequest)
 			throws ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException,
 			ServiceInstanceDoesNotExistException {
-
-	    String planId = serviceInstanceBindingRequest.getPlanId();
 
 		validateBindingNotExists(bindingId, instanceId);
 
 		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-
 		if (serviceInstance == null) {
 			throw new ServiceInstanceDoesNotExistException(instanceId);
 		}
 
-		Plan plan = serviceDefinitionRepository.getPlan(planId);
+		Plan plan = serviceDefinitionRepository.getPlan(serviceInstanceBindingRequest.getPlanId());
 
-		if (route != null) {
-			RouteBinding routeBinding = bindRoute(serviceInstance, route);
+		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
+                .isEmpty(serviceInstanceBindingRequest.getBindResource().getRoute())) {
+
+			RouteBinding routeBinding = bindRoute(serviceInstance, serviceInstanceBindingRequest.getBindResource().getRoute());
 			routeBindingRepository.addRouteBinding(routeBinding);
 			ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(routeBinding.getRoute());
 			return response;
 		}
 
 		ServiceInstanceBinding binding;
-		if (serviceInstanceBindingRequest.getAppGuid() == null && haProxyService != null) {
+		if (haProxyService != null && serviceInstanceBindingRequest.getAppGuid() == null) {
 			List<ServerAddress> externalServerAddresses = haProxyService.appendAgent(serviceInstance.getHosts(), bindingId, instanceId);
 
 			binding = bindServiceKey(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalServerAddresses);
@@ -78,11 +78,9 @@ public abstract class BindingServiceImpl implements BindingService {
 			binding = bindService(bindingId, serviceInstanceBindingRequest, serviceInstance, plan);
 		}
 
-		ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(binding);
-
 		bindingRepository.addInternalBinding(binding);
 
-		return response;
+		return new ServiceInstanceBindingResponse(binding);
 	}
 
 	protected abstract RouteBinding bindRoute(ServiceInstance serviceInstance, String route);
@@ -122,7 +120,6 @@ public abstract class BindingServiceImpl implements BindingService {
 			throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
 		}
 	}
-
 
 	protected ServiceInstance getBinding(String bindingId) throws ServiceInstanceBindingDoesNotExistsException {
 		if (!bindingRepository.containsInternalBindingId(bindingId)) {

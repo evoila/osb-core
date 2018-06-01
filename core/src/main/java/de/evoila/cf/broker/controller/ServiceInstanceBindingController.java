@@ -12,8 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
-import java.util.Map;
 
 /** @author Johannes Hiemer. */
 @Controller
@@ -28,8 +28,8 @@ public class ServiceInstanceBindingController extends BaseController {
 	private BindingServiceImpl bindingService;
 
 	@PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-	public ResponseEntity<ServiceInstanceBindingResponse> bindServiceInstance(
-			@PathVariable("instanceId") String instanceId, @PathVariable("bindingId") String bindingId,
+	public ResponseEntity<ServiceInstanceBindingResponse> bindServiceInstance(@PathVariable("instanceId") String instanceId,
+            @PathVariable("bindingId") String bindingId,
 			@Valid @RequestBody ServiceInstanceBindingRequest request)
 					throws ServiceInstanceDoesNotExistException, ServiceInstanceBindingExistsException,
 					ServiceBrokerException, ServiceDefinitionDoesNotExistException {
@@ -37,9 +37,13 @@ public class ServiceInstanceBindingController extends BaseController {
 		log.debug("PUT: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
 				+ ", bindServiceInstance(), instanceId = " + instanceId + ", bindingId = " + bindingId);
 
-		Map<String, Object> bindResource = request.getBindResource();
-		String route = (bindResource != null) ? (String) bindResource.get("route") : null;
-		ServiceInstanceBindingResponse response = bindingService.createServiceInstanceBinding(bindingId, instanceId, request, route);
+		// AppGuid Field is deprecated and won't be maintained in future. According to OSB spec at:
+        // https://github.com/openservicebrokerapi/servicebroker/blob/master/spec.md#bind-resource-object
+        // AppGuid may not be present and empty
+		if (request.getAppGuid() != null && request.getAppGuid().isEmpty())
+            return new ResponseEntity("{}", HttpStatus.BAD_REQUEST);
+
+		ServiceInstanceBindingResponse response = bindingService.createServiceInstanceBinding(bindingId, instanceId, request);
 
 		log.debug("ServiceInstanceBinding Created: " + bindingId);
 

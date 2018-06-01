@@ -61,7 +61,7 @@ public class ServiceKeysController extends BaseController {
         );
 
         String bindingId = UUID.randomUUID().toString();
-        bindingService.createServiceInstanceBinding(bindingId, serviceInstanceId, serviceInstanceBindingRequest, null);
+        bindingService.createServiceInstanceBinding(bindingId, serviceInstanceId, serviceInstanceBindingRequest);
         ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
         return new ResponseEntity<>(binding, HttpStatus.OK);
     }

@@ -1,13 +1,12 @@
 package de.evoila.cf.broker.model;
 
-import java.util.Map;
-
-import org.hibernate.validator.constraints.NotEmpty;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import java.util.Map;
 
 /**
  * Request sent from the cloud controller to bind to a service instance.
@@ -39,13 +38,12 @@ public class ServiceInstanceBindingRequest {
 
 	@JsonSerialize
 	@JsonProperty("bind_resource")
-	private Map<String, Object> bindResource;
+	private BindResource bindResource;
 
-	public ServiceInstanceBindingRequest() {
-	}
+	public ServiceInstanceBindingRequest() {}
 
 	public ServiceInstanceBindingRequest(String serviceDefinitionId, String planId, String appGuid,
-			Map<String, Object> bindResource) {
+                                         BindResource bindResource) {
 		this.serviceDefinitionId = serviceDefinitionId;
 		this.planId = planId;
 		this.appGuid = appGuid;
@@ -89,11 +87,11 @@ public class ServiceInstanceBindingRequest {
 		this.parameters = parameters;
 	}
 
-	public Map<String, Object> getBindResource() {
+	public BindResource getBindResource() {
 		return bindResource;
 	}
 
-	public void setBindResource(Map<String, Object> bindResource) {
+	public void setBindResource(BindResource bindResource) {
 		this.bindResource = bindResource;
 	}
 

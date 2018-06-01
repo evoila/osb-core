@@ -100,11 +100,33 @@ public interface PlatformService {
      */
     void postDeleteInstance(ServiceInstance serviceInstance) throws PlatformException;
 
+    /**
+     *
+     * @param serviceInstance
+     * @param plan
+     * @return
+     * @throws ServiceBrokerException
+     * @throws PlatformException
+     */
+    ServiceInstance preUpdateInstance(ServiceInstance serviceInstance, Plan plan)
+            throws PlatformException;
+
 	/**
 	 * @param serviceInstance
 	 * @param plan
 	 * @return new ServiceInstance with updated fields
 	 */
 	ServiceInstance updateInstance(ServiceInstance serviceInstance, Plan plan, Map<String, Object> customParameters) throws PlatformException;
+
+    /**
+     *
+     * @param serviceInstance
+     * @param plan
+     * @return
+     * @throws ServiceBrokerException
+     * @throws PlatformException
+     */
+    ServiceInstance postUpdateInstance(ServiceInstance serviceInstance, Plan plan)
+            throws PlatformException;
 
 }

@@ -1,11 +1,9 @@
 package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.bean.BackupConfiguration;
-import de.evoila.cf.broker.bean.BackupTypeConfiguration;
 import de.evoila.cf.broker.bean.ConditionOnBackupService;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
-import de.evoila.cf.broker.model.ServiceInstance;
-import de.evoila.cf.broker.repository.ServiceInstanceRepository;
+import de.evoila.cf.broker.service.BackupCustomService;
 import de.evoila.cf.broker.service.BackupService;
 import de.evoila.cf.model.BackupRequest;
 import de.evoila.cf.model.DatabaseCredential;
@@ -42,22 +40,19 @@ public class BackupServiceImpl implements BackupService {
 
     private BackupConfiguration backupConfiguration;
 
-    private BackupTypeConfiguration backupTypeConfiguration;
-
     private RabbitTemplate rabbitTemplate;
 
-    private ServiceInstanceRepository serviceInstanceRepository;
+    private BackupCustomService backupCustomService;
 
-    public BackupServiceImpl(BackupConfiguration backupConfiguration, BackupTypeConfiguration backupTypeConfiguration,
-                             ServiceInstanceRepository serviceInstanceRepository, RabbitTemplate rabbitTemplate) {
-        Assert.notNull(serviceInstanceRepository, "ServiceInstanceRepository can not be null");
+    public BackupServiceImpl(BackupConfiguration backupConfiguration, BackupCustomService backupCustomService,
+                             RabbitTemplate rabbitTemplate) {
+        Assert.notNull(backupConfiguration, "BackupConfiguration can not be null");
         Assert.notNull(rabbitTemplate, "RabbitTemplate can not be null");
 
         this.backupConfiguration = backupConfiguration;
-        this.backupTypeConfiguration = backupTypeConfiguration;
+        this.backupCustomService = backupCustomService;
         this.restTemplate = new RestTemplate();
         this.rabbitTemplate = rabbitTemplate;
-        this.serviceInstanceRepository = serviceInstanceRepository;
         this.rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
     }
 
@@ -69,23 +64,6 @@ public class BackupServiceImpl implements BackupService {
         headers.add("Authorization", encodeCredentials());
     }
 
-    public DatabaseCredential getCredentialsForInstanceId(String serviceInstanceId) throws ServiceInstanceDoesNotExistException {
-        ServiceInstance instance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
-        if(instance == null || instance.getHosts().size() <= 0) {
-            throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
-        }
-
-        DatabaseCredential credential = new DatabaseCredential();
-        credential.setContext(serviceInstanceId);
-        credential.setUsername(serviceInstanceId);
-        credential.setPassword(serviceInstanceId);
-        credential.setHostname(instance.getHosts().get(0).getIp());
-        credential.setPort(instance.getHosts().get(0).getPort());
-        credential.setType(backupTypeConfiguration.getType());
-
-        return credential;
-    }
-
     private String encodeCredentials () {
         String str = backupConfiguration.getUser() + ":" + backupConfiguration.getPassword();
         return "Basic " + Base64.getEncoder().encodeToString(str.getBytes());
@@ -93,7 +71,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public ResponseEntity<Object> backupNow(String serviceInstanceId, BackupRequest body) throws ServiceInstanceDoesNotExistException {
-        DatabaseCredential credential = this.getCredentialsForInstanceId(serviceInstanceId);
+        DatabaseCredential credential = backupCustomService.getCredentialsForInstanceId(serviceInstanceId);
         body.setSource(credential);
 
         BackupConfiguration.Queue queue = this.backupConfiguration.getQueue();
@@ -110,7 +88,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public ResponseEntity<HashMap> restoreNow(String serviceInstanceId, RestoreRequest body) throws ServiceInstanceDoesNotExistException {
-        DatabaseCredential credentials = this.getCredentialsForInstanceId(serviceInstanceId);
+        DatabaseCredential credentials = backupCustomService.getCredentialsForInstanceId(serviceInstanceId);
         body.setDestination(credentials);
 
         rabbitTemplate.convertAndSend(this.backupConfiguration.getQueue().getExchange(),
@@ -174,7 +152,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public ResponseEntity<HashMap> postPlan(String serviceInstanceId, HashMap plan) throws ServiceInstanceDoesNotExistException {
-        DatabaseCredential credentials = this.getCredentialsForInstanceId(serviceInstanceId);
+        DatabaseCredential credentials = backupCustomService.getCredentialsForInstanceId(serviceInstanceId);
         plan.put("source", credentials);
         HttpEntity entity = new HttpEntity(plan, headers);
         ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/plans",
@@ -194,7 +172,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public ResponseEntity<HashMap> updatePlan(String serviceInstanceId, String planId, HashMap plan) throws ServiceInstanceDoesNotExistException {
-        DatabaseCredential credentials = this.getCredentialsForInstanceId(serviceInstanceId);
+        DatabaseCredential credentials = backupCustomService.getCredentialsForInstanceId(serviceInstanceId);
         plan.put("source", credentials);
         HttpEntity entity = new HttpEntity(plan, headers);
         ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/plans/" + planId,

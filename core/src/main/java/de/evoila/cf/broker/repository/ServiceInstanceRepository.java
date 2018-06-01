@@ -16,6 +16,6 @@ public interface ServiceInstanceRepository {
 
 	void deleteServiceInstance(String serviceInstanceId);
 
-	void updateServiceInstancePlan(ServiceInstance serviceInstance);
+	void updateServiceInstance(ServiceInstance serviceInstance);
 
 }

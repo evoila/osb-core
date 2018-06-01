@@ -19,6 +19,9 @@ public interface AsyncDeploymentService {
 	void asyncCreateInstance(DeploymentServiceImpl deploymentService, ServiceInstance serviceInstance,
                              Map<String, Object> parameters, Plan plan, PlatformService platformService);
 
+    void asyncUpdateInstance(DeploymentServiceImpl deploymentService, ServiceInstance serviceInstance,
+                             Map<String, Object> parameters, Plan plan, PlatformService platformService);
+
 	void asyncDeleteInstance(DeploymentServiceImpl deploymentService,
 			ServiceInstance serviceInstance, Plan plan, PlatformService platformService)
 					throws ServiceInstanceDoesNotExistException;
