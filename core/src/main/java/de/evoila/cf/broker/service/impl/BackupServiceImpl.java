@@ -2,12 +2,11 @@ package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.bean.BackupConfiguration;
 import de.evoila.cf.broker.bean.ConditionOnBackupService;
+import de.evoila.cf.broker.controller.utils.RestPageImpl;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.service.BackupCustomService;
 import de.evoila.cf.broker.service.BackupService;
-import de.evoila.cf.model.BackupRequest;
-import de.evoila.cf.model.DatabaseCredential;
-import de.evoila.cf.model.RestoreRequest;
+import de.evoila.cf.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -23,10 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Conditional(ConditionOnBackupService.class)
@@ -69,47 +65,6 @@ public class BackupServiceImpl implements BackupService {
         return "Basic " + Base64.getEncoder().encodeToString(str.getBytes());
     }
 
-    @Override
-    public ResponseEntity<Object> backupNow(String serviceInstanceId, BackupRequest body) throws ServiceInstanceDoesNotExistException {
-        DatabaseCredential credential = backupCustomService.getCredentialsForInstanceId(serviceInstanceId);
-        body.setSource(credential);
-
-        BackupConfiguration.Queue queue = this.backupConfiguration.getQueue();
-        if (queue != null){
-            rabbitTemplate.convertAndSend(queue.getExchange(), queue.getRoutingKey(),body);
-        } else {
-            String msg = "Backup RabbitMQ backupConfiguration is null. Please check configuration";
-            logger.error(msg);
-            return new ResponseEntity<>(msg,HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return new ResponseEntity<>(new HashMap(),HttpStatus.CREATED);
-    }
-
-    @Override
-    public ResponseEntity<HashMap> restoreNow(String serviceInstanceId, RestoreRequest body) throws ServiceInstanceDoesNotExistException {
-        DatabaseCredential credentials = backupCustomService.getCredentialsForInstanceId(serviceInstanceId);
-        body.setDestination(credentials);
-
-        rabbitTemplate.convertAndSend(this.backupConfiguration.getQueue().getExchange(),
-                                this.backupConfiguration.getQueue().getRoutingKey(),body);
-
-        return new ResponseEntity<>(new HashMap(), HttpStatus.CREATED);
-    }
-
-    @Override
-    public ResponseEntity<HashMap> getJobs(String serviceInstanceId, Pageable pageable) {
-        Map<String, String> uriParams = new HashMap<>();
-        uriParams.put("serviceInstanceId", serviceInstanceId);
-
-        HttpEntity entity = new HttpEntity(headers);
-        ResponseEntity<HashMap> response = restTemplate
-                .exchange(buildUri("/jobs/byInstance/{serviceInstanceId}", pageable).buildAndExpand(uriParams).toUri(),
-                    HttpMethod.GET, entity, new ParameterizedTypeReference<HashMap>() {});
-
-        return response;
-    }
-
     private UriComponentsBuilder buildUri(String path, Pageable pageable) {
         UriComponentsBuilder builder = UriComponentsBuilder
                 .fromUriString(backupConfiguration.getUri() + path);
@@ -128,125 +83,182 @@ public class BackupServiceImpl implements BackupService {
     }
 
     @Override
-    public ResponseEntity<HashMap> getPlans(String serviceInstanceId, Pageable pageable) {
+    public ResponseEntity<List<BackupItem>> getItems(String serviceInstanceId) {
+        List<BackupItem> backupItems = new ArrayList<>();
+        try {
+            for (Map.Entry<String, String> item : this.backupCustomService.getItems(serviceInstanceId).entrySet())
+                backupItems.add(new BackupItem(item.getKey(), item.getValue()));
+
+        } catch(Exception ex) {
+            return new ResponseEntity("Could not load entitled items", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity(backupItems, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> backupNow(String planId, BackupRequest backupRequest) {
+        BackupPlan plan = this.getPlan(planId).getBody();
+        backupRequest.setDestinationId(plan.getDestinationId());
+        backupRequest.setPlan(plan);
+
+        BackupConfiguration.Queue queue = this.backupConfiguration.getQueue();
+        if (queue != null){
+            rabbitTemplate.convertAndSend(queue.getExchange(), queue.getRoutingKey(), backupRequest);
+        } else {
+            String msg = "Backup RabbitMQ backupConfiguration is null. Please check configuration";
+            logger.error(msg);
+            return new ResponseEntity<>(msg,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(new HashMap(),HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<HashMap> restoreNow(String planId, RestoreRequest restoreRequest) {
+        BackupPlan plan = this.getPlan(planId).getBody();
+        restoreRequest.setPlan(plan);
+
+        rabbitTemplate.convertAndSend(this.backupConfiguration.getQueue().getExchange(),
+                                this.backupConfiguration.getQueue().getRoutingKey(), restoreRequest);
+
+        return new ResponseEntity<>(new HashMap(), HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<RestPageImpl<BackupJob>> getJobs(String serviceInstanceId, Pageable pageable) {
         Map<String, String> uriParams = new HashMap<>();
         uriParams.put("serviceInstanceId", serviceInstanceId);
 
-
         HttpEntity entity = new HttpEntity(headers);
-        ResponseEntity<HashMap> response = restTemplate
-                .exchange(buildUri("/plans/byInstance/{serviceInstanceId}", pageable).buildAndExpand(uriParams).toUri(),
-                        HttpMethod.GET, entity, new ParameterizedTypeReference<HashMap>() {});
+        ResponseEntity<RestPageImpl<BackupJob>> response = restTemplate
+                .exchange(buildUri("/jobs/byInstance/{serviceInstanceId}", pageable).buildAndExpand(uriParams).toUri(),
+                    HttpMethod.GET, entity, new ParameterizedTypeReference<RestPageImpl<BackupJob>>() {});
 
         return response;
     }
 
     @Override
-    public ResponseEntity<HashMap> deleteJob(String serviceInstanceId, String jobid) {
+    public ResponseEntity<RestPageImpl<BackupPlan>> getPlans(String serviceInstanceId, Pageable pageable) {
+        Map<String, String> uriParams = new HashMap<>();
+        uriParams.put("serviceInstanceId", serviceInstanceId);
+
         HttpEntity entity = new HttpEntity(headers);
-        ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/jobs/" + jobid,
-                                                HttpMethod.DELETE, entity, HashMap.class
+        ResponseEntity<RestPageImpl<BackupPlan>> response = restTemplate
+                .exchange(buildUri("/plans/byInstance/{serviceInstanceId}", pageable).buildAndExpand(uriParams).toUri(),
+                        HttpMethod.GET, entity, new ParameterizedTypeReference<RestPageImpl<BackupPlan>>() {});
+
+        return response;
+    }
+
+    @Override
+    public ResponseEntity<BackupJob> deleteJob(String jobId) {
+        HttpEntity entity = new HttpEntity(headers);
+        ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/jobs/" + jobId,
+                                                HttpMethod.DELETE, entity, BackupJob.class
         );
         return response;
     }
 
     @Override
-    public ResponseEntity<HashMap> postPlan(String serviceInstanceId, HashMap plan) throws ServiceInstanceDoesNotExistException {
-        DatabaseCredential credentials = backupCustomService.getCredentialsForInstanceId(serviceInstanceId);
-        plan.put("source", credentials);
+    public ResponseEntity<BackupPlan> postPlan(String serviceInstanceId, BackupPlan plan) throws ServiceInstanceDoesNotExistException {
+        EndpointCredential credentials = backupCustomService.getCredentials(serviceInstanceId);
+        plan.setSource(credentials);
+        plan.setServiceInstanceId(serviceInstanceId);
         HttpEntity entity = new HttpEntity(plan, headers);
         ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/plans",
-                                                HttpMethod.POST, entity, HashMap.class
+                                                HttpMethod.POST, entity, BackupPlan.class
         );
         return response;
     }
 
     @Override
-    public ResponseEntity<HashMap> deletePlan(String serviceInstanceId, String planid) {
+    public ResponseEntity<BackupPlan> deletePlan(String planId) {
         HttpEntity entity = new HttpEntity(headers);
-        ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/plans/" + planid,
-                                                HttpMethod.DELETE, entity, HashMap.class
+        ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/plans/" + planId,
+                                                HttpMethod.DELETE, entity, BackupPlan.class
         );
         return response;
     }
 
     @Override
-    public ResponseEntity<HashMap> updatePlan(String serviceInstanceId, String planId, HashMap plan) throws ServiceInstanceDoesNotExistException {
-        DatabaseCredential credentials = backupCustomService.getCredentialsForInstanceId(serviceInstanceId);
-        plan.put("source", credentials);
+    public ResponseEntity<BackupPlan> updatePlan(String serviceInstanceId, String planId, BackupPlan plan) throws ServiceInstanceDoesNotExistException {
+        EndpointCredential credentials = backupCustomService.getCredentials(serviceInstanceId);
+        plan.setSource(credentials);
         HttpEntity entity = new HttpEntity(plan, headers);
         ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/plans/" + planId,
-                                                HttpMethod.PUT, entity, HashMap.class
+                                                HttpMethod.PUT, entity, BackupPlan.class
         );
         return response;
     }
 
     @Override
-    public ResponseEntity<HashMap> getJob(String serviceInstanceId, String jobid) {
+    public ResponseEntity<BackupJob> getJob(String jobId) {
         HttpEntity entity = new HttpEntity(headers);
-        return restTemplate.exchange(backupConfiguration.getUri()+ "/jobs/" +jobid,HttpMethod.GET,entity,HashMap.class);
+        return restTemplate.exchange(backupConfiguration.getUri()+ "/jobs/" + jobId, HttpMethod.GET, entity, BackupJob.class);
     }
 
     @Override
-    public ResponseEntity<HashMap> getPlan(String serviceInstanceId, String planId) {
+    public ResponseEntity<BackupPlan> getPlan(String planId) {
         HttpEntity entity = new HttpEntity(headers);
-        return restTemplate.exchange(backupConfiguration.getUri()+ "/plans/" +planId,HttpMethod.GET,entity,HashMap.class);
+        return restTemplate.exchange(backupConfiguration.getUri()+ "/plans/" + planId, HttpMethod.GET, entity, BackupPlan.class);
     }
 
     @Override
-    public ResponseEntity<HashMap> getDestinations(String serviceInstanceId, Pageable pageable) {
+    public ResponseEntity<RestPageImpl<FileDestination>> getDestinations(String serviceInstanceId, Pageable pageable) {
         Map<String, String> uriParams = new HashMap<>();
         uriParams.put("serviceInstanceId", serviceInstanceId);
 
         HttpEntity entity = new HttpEntity(headers);
-        ResponseEntity<HashMap> response = restTemplate
+        ResponseEntity<RestPageImpl<FileDestination>> response = restTemplate
                                  .exchange(buildUri("/destinations/byInstance/{serviceInstanceId}", pageable)
                                  .buildAndExpand(uriParams).toUri(),
-                                       HttpMethod.GET, entity, new ParameterizedTypeReference<HashMap>() {});
+                                       HttpMethod.GET, entity, new ParameterizedTypeReference<RestPageImpl<FileDestination>>() {});
         return response;
     }
 
     @Override
-    public ResponseEntity<HashMap> getDestination(String serviceInstanceId, String destinationId) {
+    public ResponseEntity<FileDestination> getDestination(String destinationId) {
         HttpEntity entity = new HttpEntity(headers);
-        return restTemplate.exchange(backupConfiguration.getUri()+ "/destinations/" +destinationId,HttpMethod.GET,entity,HashMap.class);
+        return restTemplate.exchange(backupConfiguration.getUri()+ "/destinations/" + destinationId, HttpMethod.GET,
+                entity, FileDestination.class);
     }
 
     @Override
-    public ResponseEntity<HashMap> postDestination(String serviceInstanceId, HashMap dest) {
-        HttpEntity entity = new HttpEntity(dest, headers);
-        dest.put("instanceId", serviceInstanceId);
+    public ResponseEntity<FileDestination> postDestination(String serviceInstanceId, FileDestination fileDestination) {
+        HttpEntity entity = new HttpEntity(fileDestination, headers);
+        fileDestination.setInstanceId(serviceInstanceId);
         ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/destinations",
-                                                HttpMethod.POST, entity, HashMap.class
+                                                HttpMethod.POST, entity, FileDestination.class
         );
         return response;
     }
 
     @Override
-    public ResponseEntity<HashMap> updateDestination(String serviceInstanceId, String destinationId, HashMap dest)  {
-        HttpEntity entity = new HttpEntity(dest, headers);
-        dest.put("instanceId", serviceInstanceId);
+    public ResponseEntity<FileDestination> updateDestination(String serviceInstanceId, String destinationId, FileDestination fileDestination)  {
+        HttpEntity entity = new HttpEntity(fileDestination, headers);
+        fileDestination.setInstanceId(serviceInstanceId);
         ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/destinations/" + destinationId,
-                                                HttpMethod.PUT, entity, HashMap.class
+                                                HttpMethod.PUT, entity, FileDestination.class
         );
         return response;
     }
 
     @Override
-    public ResponseEntity<HashMap> deleteDestination(String serviceInstanceId, String destinationId) {
+    public ResponseEntity<FileDestination> deleteDestination(String destinationId) {
         HttpEntity entity = new HttpEntity(headers);
         ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/destinations/" + destinationId,
-                                                HttpMethod.DELETE, entity, HashMap.class
+                                                HttpMethod.DELETE, entity, FileDestination.class
         );
         return response;
     }
 
     @Override
-    public ResponseEntity<HashMap> validateDestination(String serviceInstanceId, HashMap dest) {
-        HttpEntity entity = new HttpEntity(dest, headers);
-        dest.put("instanceId", serviceInstanceId);
+    public ResponseEntity<FileDestination> validateDestination(String serviceInstanceId, FileDestination fileDestination) {
+        HttpEntity entity = new HttpEntity(fileDestination, headers);
+        fileDestination.setInstanceId(serviceInstanceId);
         ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/destinations/validate",
-                                                HttpMethod.POST, entity, HashMap.class
+                                                HttpMethod.POST, entity, FileDestination.class
         );
         return response;
     }

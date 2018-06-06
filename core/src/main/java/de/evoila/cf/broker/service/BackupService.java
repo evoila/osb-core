@@ -1,44 +1,47 @@
 package de.evoila.cf.broker.service;
 
+import de.evoila.cf.broker.controller.utils.RestPageImpl;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
-import de.evoila.cf.model.BackupRequest;
-import de.evoila.cf.model.RestoreRequest;
+import de.evoila.cf.model.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
+import java.util.List;
 
 public interface BackupService {
 
     ResponseEntity<Object> backupNow(String serviceInstanceId, BackupRequest fileDestination) throws ServiceInstanceDoesNotExistException;
 
-    ResponseEntity<HashMap> restoreNow (String serviceInstanceId, RestoreRequest fileDestination) throws ServiceInstanceDoesNotExistException;
+    ResponseEntity<HashMap> restoreNow(String serviceInstanceId, RestoreRequest fileDestination) throws ServiceInstanceDoesNotExistException;
 
-    ResponseEntity<HashMap> getJobs (String serviceInstanceId, Pageable pageable);
+    ResponseEntity<RestPageImpl<BackupJob>> getJobs(String serviceInstanceId, Pageable pageable);
 
-    ResponseEntity<HashMap> getPlans (String serviceInstanceId, Pageable pageable);
+    ResponseEntity<RestPageImpl<BackupPlan>> getPlans(String serviceInstanceId, Pageable pageable);
 
-    ResponseEntity<HashMap> deleteJob (String serviceInstanceId, String jobid);
+    ResponseEntity<BackupJob> deleteJob(String jobId);
 
-    ResponseEntity<HashMap> postPlan (String serviceInstanceId, HashMap plan) throws ServiceInstanceDoesNotExistException;
+    ResponseEntity<BackupPlan> postPlan(String serviceInstanceId, BackupPlan plan) throws ServiceInstanceDoesNotExistException;
 
-    ResponseEntity<HashMap> deletePlan (String serviceInstanceId, String planid);
+    ResponseEntity<BackupPlan> deletePlan(String planId);
 
-    ResponseEntity<HashMap> updatePlan (String serviceInstanceId, String planId, HashMap plan) throws ServiceInstanceDoesNotExistException;
+    ResponseEntity<BackupPlan> updatePlan(String serviceInstanceId, String planId, BackupPlan plan) throws ServiceInstanceDoesNotExistException;
 
-    ResponseEntity<HashMap> getJob (String serviceInstanceId, String jobid);
+    ResponseEntity<BackupJob> getJob(String jobId);
 
-    ResponseEntity<HashMap> getPlan (String serviceInstanceId, String planId);
+    ResponseEntity<BackupPlan> getPlan(String planId);
 
-    ResponseEntity<HashMap> getDestinations (String serviceInstanceId, Pageable pageable);
+    ResponseEntity<RestPageImpl<FileDestination>> getDestinations(String serviceInstanceId, Pageable pageable);
 
-    ResponseEntity<HashMap> getDestination (String serviceInstanceId, String destinationId);
+    ResponseEntity<FileDestination> getDestination(String destinationId);
 
-    ResponseEntity<HashMap> postDestination (String serviceInstanceId, HashMap plan);
+    ResponseEntity<FileDestination> postDestination(String serviceInstanceId, FileDestination fileDestination);
 
-    ResponseEntity<HashMap> updateDestination (String serviceInstanceId, String destinationId, HashMap plan) throws ServiceInstanceDoesNotExistException;
+    ResponseEntity<FileDestination> updateDestination(String serviceInstanceId, String destinationId, FileDestination fileDestination) throws ServiceInstanceDoesNotExistException;
 
-    ResponseEntity<HashMap> deleteDestination (String serviceInstanceId, String destinationId);
+    ResponseEntity<FileDestination> deleteDestination(String destinationId);
 
-    ResponseEntity<HashMap> validateDestination (String serviceInstanceId, HashMap plan);
+    ResponseEntity<FileDestination> validateDestination(String serviceInstanceId, FileDestination fileDestination);
+    
+    ResponseEntity<List<BackupItem>> getItems(String serviceInstanceId);
 }
