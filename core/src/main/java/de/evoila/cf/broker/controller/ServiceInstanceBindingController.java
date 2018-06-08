@@ -32,7 +32,8 @@ public class ServiceInstanceBindingController extends BaseController {
             @PathVariable("bindingId") String bindingId,
 			@Valid @RequestBody ServiceInstanceBindingRequest request)
 					throws ServiceInstanceDoesNotExistException, ServiceInstanceBindingExistsException,
-					ServiceBrokerException, ServiceDefinitionDoesNotExistException {
+					ServiceBrokerException, ServiceDefinitionDoesNotExistException,
+					ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException {
 
 		log.debug("PUT: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
 				+ ", bindServiceInstance(), instanceId = " + instanceId + ", bindingId = " + bindingId);
@@ -75,11 +76,23 @@ public class ServiceInstanceBindingController extends BaseController {
 	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceDoesNotExistException ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 	}
+	
+	@ExceptionHandler(ServiceBrokerFeatureIsNotSupportedException.class)
+	@ResponseBody
+	public ResponseEntity<ErrorMessage> handleException(ServiceBrokerFeatureIsNotSupportedException ex) {
+		return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+	}
 
 	@ExceptionHandler(ServiceInstanceBindingExistsException.class)
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceBindingExistsException ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
+	}
+	
+	@ExceptionHandler(ServiceInstanceBindingBadRequestException.class)
+	@ResponseBody
+	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceBindingBadRequestException ex) {
+		return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
 	}
 
 }
