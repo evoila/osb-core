@@ -26,7 +26,8 @@ public interface BindingService {
      */
     ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId, ServiceInstanceBindingRequest request)
           throws ServiceInstanceBindingExistsException, ServiceBrokerException,
-            ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException;
+            ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException,
+            ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException;
 
     /**
      *

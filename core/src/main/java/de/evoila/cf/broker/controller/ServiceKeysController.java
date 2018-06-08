@@ -48,7 +48,8 @@ public class ServiceKeysController extends BaseController {
 
     @PostMapping(value = "")
     public ResponseEntity<ServiceInstanceBinding> createServiceKey(@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException,
-            ServiceBrokerException, ServiceInstanceBindingExistsException, ServiceDefinitionDoesNotExistException {
+            ServiceBrokerException, ServiceInstanceBindingExistsException, ServiceDefinitionDoesNotExistException,
+            ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException {
         ServiceInstance instance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
 
         if(instance == null){
