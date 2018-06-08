@@ -3,8 +3,6 @@ package de.evoila.cf.broker.controller;
 import de.evoila.cf.broker.model.ErrorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.MethodParameter;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -12,7 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
+
 import javax.servlet.http.HttpServletResponse;
 
 /** @author Johannes Hiemer.
@@ -20,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 public abstract class BaseController {
 
 	private final Logger log = LoggerFactory.getLogger(BaseController.class);
-
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ErrorMessage> handleException(HttpMessageNotReadableException ex, HttpServletResponse response) {

@@ -14,6 +14,7 @@ import de.evoila.cf.broker.service.HAProxyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -46,31 +47,30 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	@Override
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
-            ServiceInstanceBindingRequest serviceInstanceBindingRequest, String route)
-			throws ServiceInstanceBindingExistsException, ServiceBrokerException,
-			ServiceInstanceDoesNotExistException {
-
-	    String planId = serviceInstanceBindingRequest.getPlanId();
+			ServiceInstanceBindingRequest serviceInstanceBindingRequest) throws ServiceInstanceBindingExistsException,
+			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException,
+			ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException {
 
 		validateBindingNotExists(bindingId, instanceId);
 
 		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-
 		if (serviceInstance == null) {
 			throw new ServiceInstanceDoesNotExistException(instanceId);
 		}
 
-		Plan plan = serviceDefinitionRepository.getPlan(planId);
+		Plan plan = serviceDefinitionRepository.getPlan(serviceInstanceBindingRequest.getPlanId());
 
-		if (route != null) {
-			RouteBinding routeBinding = bindRoute(serviceInstance, route);
+		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
+                .isEmpty(serviceInstanceBindingRequest.getBindResource().getRoute())) {
+
+			RouteBinding routeBinding = bindRoute(serviceInstance, serviceInstanceBindingRequest.getBindResource().getRoute());
 			routeBindingRepository.addRouteBinding(routeBinding);
 			ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(routeBinding.getRoute());
 			return response;
 		}
 
 		ServiceInstanceBinding binding;
-		if (serviceInstanceBindingRequest.getAppGuid() == null && haProxyService != null) {
+		if (haProxyService != null && serviceInstanceBindingRequest.getAppGuid() == null) {
 			List<ServerAddress> externalServerAddresses = haProxyService.appendAgent(serviceInstance.getHosts(), bindingId, instanceId);
 
 			binding = bindServiceKey(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalServerAddresses);
@@ -78,11 +78,9 @@ public abstract class BindingServiceImpl implements BindingService {
 			binding = bindService(bindingId, serviceInstanceBindingRequest, serviceInstance, plan);
 		}
 
-		ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(binding);
-
 		bindingRepository.addInternalBinding(binding);
 
-		return response;
+		return new ServiceInstanceBindingResponse(binding);
 	}
 
 	protected abstract RouteBinding bindRoute(ServiceInstance serviceInstance, String route);
@@ -95,9 +93,8 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	@Override
-
 	public void deleteServiceInstanceBinding(String bindingId, String planId)
-			throws ServiceInstanceBindingDoesNotExistsException {
+			throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException {
 		ServiceInstance serviceInstance = getBinding(bindingId);
 
 		try {
@@ -124,7 +121,6 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 	}
 
-
 	protected ServiceInstance getBinding(String bindingId) throws ServiceInstanceBindingDoesNotExistsException {
 		if (!bindingRepository.containsInternalBindingId(bindingId)) {
 			throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
@@ -137,20 +133,20 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                    ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException {
+                                                    ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException, ServiceBrokerFeatureIsNotSupportedException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalAddresses.get(0));
 
 		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
-				credentials, "");
+				credentials);
 		serviceInstanceBinding.setExternalServerAddresses(externalAddresses);
 		return serviceInstanceBinding;
 	}
 
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException {
+                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, ServiceInstanceBindingBadRequestException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
 
-		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials, "");
+		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
 	}
 
 	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,

@@ -11,15 +11,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author sgreenberg@gopivotal.com
  * @author Johannes Hiemer.
  */
-
 @ConfigurationProperties("catalog")
 public class Catalog {
 
 	private List<ServiceDefinition> services = new ArrayList<ServiceDefinition>();
 	
-	public Catalog() {
-		
-	}
+	public Catalog() {}
 	
 	public Catalog(List<ServiceDefinition> services) {
 		this.setServices(services); 

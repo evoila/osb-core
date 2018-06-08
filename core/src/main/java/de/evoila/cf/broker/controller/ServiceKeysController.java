@@ -3,6 +3,7 @@ package de.evoila.cf.broker.controller;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.ServiceInstanceBinding;
+import de.evoila.cf.broker.model.ServiceInstanceBindingRequest;
 import de.evoila.cf.broker.repository.BindingRepository;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.BindingService;
@@ -19,14 +20,13 @@ import java.util.UUID;
 /** @author Yannic Remmet. */
 @RestController
 @RequestMapping(value = "/v2/manage/servicekeys/{serviceInstanceId}")
-class ServiceKeysController extends BaseController {
+public class ServiceKeysController extends BaseController {
 
     BindingRepository bindingRepository;
     BindingService bindingService;
     ServiceInstanceRepository serviceInstanceRepository;
 
-    ServiceKeysController(BindingRepository repository, BindingService service, ServiceInstanceRepository serviceInstanceRepository){
-
+    public ServiceKeysController(BindingRepository repository, BindingService service, ServiceInstanceRepository serviceInstanceRepository) {
         Assert.notNull(repository, "BindingRepository should not be null");
         Assert.notNull(service, "Binding Service should not be null");
         this.bindingRepository = repository;
@@ -36,9 +36,8 @@ class ServiceKeysController extends BaseController {
 
     @GetMapping(value = "")
     public ResponseEntity<Page<ServiceInstanceBinding>> getGeneralInformation(@PathVariable String serviceInstanceId) {
-
         List<ServiceInstanceBinding> bindings = bindingRepository.getBindingsForServiceInstance(serviceInstanceId);
-        return new ResponseEntity<>(new PageImpl<ServiceInstanceBinding>(bindings), HttpStatus.OK);
+        return new ResponseEntity<>(new PageImpl<>(bindings), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{serviceBindingId}")
@@ -49,22 +48,38 @@ class ServiceKeysController extends BaseController {
 
     @PostMapping(value = "")
     public ResponseEntity<ServiceInstanceBinding> createServiceKey(@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException,
-            ServiceBrokerException, ServiceInstanceBindingExistsException, ServiceDefinitionDoesNotExistException {
+            ServiceBrokerException, ServiceInstanceBindingExistsException, ServiceDefinitionDoesNotExistException,
+            ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException {
         ServiceInstance instance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+
         if(instance == null){
             throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
         }
+
+        ServiceInstanceBindingRequest serviceInstanceBindingRequest = new ServiceInstanceBindingRequest(
+                instance.getServiceDefinitionId(),
+                instance.getPlanId()
+        );
+
         String bindingId = UUID.randomUUID().toString();
-        bindingService.createServiceInstanceBinding(bindingId, serviceInstanceId, null, null);
+        bindingService.createServiceInstanceBinding(bindingId, serviceInstanceId, serviceInstanceBindingRequest);
         ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
         return new ResponseEntity<>(binding, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{serviceBindingId}")
     public ResponseEntity delete(@PathVariable String serviceInstanceId,
-                                 @PathVariable String serviceBindingId, @RequestParam("plan_id") String planId)
-            throws ServiceInstanceBindingDoesNotExistsException, ServiceBrokerException {
-        bindingService.deleteServiceInstanceBinding(serviceBindingId, planId);
+                                 @PathVariable String serviceBindingId)
+            throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException,
+            ServiceInstanceBindingDoesNotExistsException, ServiceBrokerException {
+
+        ServiceInstance instance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+
+        if(instance == null){
+            throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
+        }
+
+        bindingService.deleteServiceInstanceBinding(serviceBindingId, instance.getPlanId());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

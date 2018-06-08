@@ -1,4 +1,4 @@
-package evoila.cf.broker.openid;
+package de.evoila.cf.config.security.openid;
 
 import de.evoila.cf.broker.model.DashboardClient;
 import de.evoila.cf.broker.model.oauth.CompositeAccessToken;

@@ -8,37 +8,30 @@ import de.evoila.cf.broker.model.Plan;
 import de.evoila.cf.broker.model.ServiceDefinition;
 
 /**
- * @author Christian Brinker, evoila.
+ * @author Christian Brinker & Johannes Hiemer, evoila.
  *
  */
 public interface ServiceDefinitionRepository {
 
-	// Depl
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.evoila.cf.broker.service.impl.ServiceDefinitionRepository#
-	 * getServiceDefinition()
-	 */
+    /**
+     *
+     * @return ServiceDefinition
+     */
 	List<ServiceDefinition> getServiceDefinition();
 
-	// Depl
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.evoila.cf.broker.service.impl.ServiceDefinitionRepository#
-	 * validateServiceId(java.lang.String)
-	 */
+    /**
+     *
+     * @param serviceDefinitionId
+     * @throws ServiceDefinitionDoesNotExistException
+     */
 	void validateServiceId(String serviceDefinitionId) throws ServiceDefinitionDoesNotExistException;
 
-	// Depl + Bind
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.evoila.cf.broker.service.impl.ServiceDefinitionRepository#getPlan(java
-	 * .lang.String)
-	 */
-	Plan getPlan(String planId) throws ServiceBrokerException;
+    /**
+     *
+     * @param planId
+     * @return Plan
+     * @throws ServiceDefinitionDoesNotExistException
+     */
+	Plan getPlan(String planId) throws ServiceDefinitionDoesNotExistException;
 
 }

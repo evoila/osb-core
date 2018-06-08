@@ -18,11 +18,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-
-import javax.xml.ws.Endpoint;
 
 /**
  * @author Johannes Hiemer.
@@ -48,7 +45,7 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 			.inMemoryAuthentication()
 			.withUser(authentication.getUsername())
 			.password(authentication.getPassword())
-			.roles(authentication.getRole());
+			.roles(authentication.getRole(), "ACTUATOR");
 	}
 
     @Bean 
@@ -63,15 +60,15 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
         	.authorizeRequests()
         		.antMatchers(HttpMethod.GET, Endpoints.V2_ENDPOINT).authenticated()
 				.antMatchers(HttpMethod.GET, Endpoints.V2_CATALOG).authenticated()
-                .antMatchers(HttpMethod.GET, Endpoints.V2_CATALOG_2).authenticated()
-				.antMatchers(Endpoints.V2_SERVICE_INSTANCES+"/**").authenticated()
+                .antMatchers(HttpMethod.GET, Endpoints.V2_CATALOG_EXT).authenticated()
+				.antMatchers(Endpoints.V2_SERVICE_INSTANCES).authenticated()
         		.antMatchers(HttpMethod.GET, Endpoints.INFO).authenticated()
         		.antMatchers(HttpMethod.GET, Endpoints.HEALTH).authenticated()
 				.antMatchers(HttpMethod.GET, Endpoints._ERROR).authenticated()
 
 			.antMatchers(HttpMethod.GET, Endpoints.ENV).authenticated()
-				.antMatchers(HttpMethod.GET, Endpoints.V2_DASHBOARD+"/{serviceInstanceId}").permitAll()
-				.antMatchers(HttpMethod.GET, Endpoints.V2_DASHBOARD+"/{serviceInstanceId}/confirm").permitAll()
+				.antMatchers(HttpMethod.GET, Endpoints.V2_DASHBOARD_SID).permitAll()
+				.antMatchers(HttpMethod.GET, Endpoints.V2_DASHBOARD_SID_CONFIRM).permitAll()
 				.antMatchers(Endpoints.V2_BACKUP+"/**").permitAll()
 				.antMatchers(Endpoints.V2_DASHBOARD_MANAGE+"/**").authenticated()
 				.and()

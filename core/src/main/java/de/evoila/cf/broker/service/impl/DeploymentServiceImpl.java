@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.evoila.cf.broker.service;
+package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
@@ -9,13 +9,14 @@ import de.evoila.cf.broker.repository.JobRepository;
 import de.evoila.cf.broker.repository.PlatformRepository;
 import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
+import de.evoila.cf.broker.service.AsyncDeploymentService;
+import de.evoila.cf.broker.service.DeploymentService;
+import de.evoila.cf.broker.service.PlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -55,58 +56,67 @@ public class DeploymentServiceImpl implements DeploymentService {
 	}
 
 	@Override
-	public void updateServiceInstance(String instanceId, String planId) throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
-
-
-		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-		if (serviceInstance == null){
-			throw new ServiceInstanceDoesNotExistException(instanceId);
-		}
-
-		serviceInstance.updatePlanId(planId);
-		serviceInstanceRepository.updateServiceInstancePlan(serviceInstance);
-	}
-
-	@Override
-	public ServiceInstanceResponse createServiceInstance(String serviceInstanceId, String serviceDefinitionId,
-			String planId, String organizationGuid, String spaceGuid, Map<String, Object> parameters,
-			Map<String, String> context)
+	public ServiceInstanceResponse createServiceInstance(String serviceInstanceId, ServiceInstanceRequest request)
 					throws ServiceInstanceExistsException, ServiceBrokerException,
 					ServiceDefinitionDoesNotExistException {
 
-		serviceDefinitionRepository.validateServiceId(serviceDefinitionId);
+		serviceDefinitionRepository.validateServiceId(request.getServiceDefinitionId());
 
 		if (serviceInstanceRepository.containsServiceInstanceId(serviceInstanceId)) {
-			throw new ServiceInstanceExistsException(serviceInstanceId, serviceDefinitionId);
+			throw new ServiceInstanceExistsException(serviceInstanceId, request.getServiceDefinitionId());
 		}
 
-		ServiceInstance serviceInstance = new ServiceInstance(serviceInstanceId, serviceDefinitionId,
-				planId, organizationGuid, spaceGuid, parameters, context);
+		ServiceInstance serviceInstance = new ServiceInstance(serviceInstanceId, request.getServiceDefinitionId(),
+                request.getPlanId(), request.getOrganizationGuid(), request.getSpaceGuid(), request.getParameters(), request.getContext());
 
-		Plan plan = serviceDefinitionRepository.getPlan(planId);
+		Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
 		if(platformService == null) {
-			throw new ServiceDefinitionDoesNotExistException(planId);
+			throw new ServiceDefinitionDoesNotExistException(request.getPlanId());
 		}
 		
 		if (platformService.isSyncPossibleOnCreate(plan)) {
-			return new ServiceInstanceResponse(syncCreateInstance(serviceInstance, parameters, plan, platformService), false);
+			return new ServiceInstanceResponse(syncCreateInstance(serviceInstance, request.getParameters(), plan, platformService), false);
 		} else {
 			ServiceInstanceResponse serviceInstanceResponse = new ServiceInstanceResponse(serviceInstance, true);
 
 			serviceInstanceRepository.addServiceInstance(serviceInstance.getId(), serviceInstance);
 
-			asyncDeploymentService.asyncCreateInstance(this, serviceInstance, parameters, plan, platformService);
+			asyncDeploymentService.asyncCreateInstance(this, serviceInstance, request.getParameters(), plan, platformService);
 
 			return serviceInstanceResponse;
 		}
 	}
 
     @Override
+    public void updateServiceInstance(String serviceInstanceId, ServiceInstanceRequest request) throws ServiceBrokerException, ServiceInstanceDoesNotExistException,
+            ServiceDefinitionDoesNotExistException {
+
+        ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+        if (serviceInstance == null){
+            throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
+        }
+
+        Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
+
+        PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
+
+        if(platformService == null) {
+            throw new ServiceDefinitionDoesNotExistException(request.getPlanId());
+        }
+
+        if (platformService.isSyncPossibleOnCreate(plan)) {
+            syncUpdateInstance(serviceInstance, request.getParameters(), plan, platformService);
+        } else {
+            asyncDeploymentService.asyncUpdateInstance(this, serviceInstance, request.getParameters(), plan, platformService);
+        }
+    }
+
+    @Override
     public void deleteServiceInstance(String instanceId)
-            throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
+            throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
 
         if (serviceInstance == null) {
@@ -138,9 +148,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 		try {
             serviceInstance = platformService.createInstance(serviceInstance, plan, parameters);
 		} catch (PlatformException e) {
-			serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
-
-			throw new ServiceBrokerException("Could not create instance due to: ", e);
+            throw new ServiceBrokerException("Could not create instance due to: ", e);
 		}
 
 		try {
@@ -153,6 +161,33 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 		return serviceInstance;
 	}
+
+    public ServiceInstance syncUpdateInstance(ServiceInstance serviceInstance, Map<String, Object> parameters,
+                                              Plan plan, PlatformService platformService) throws ServiceBrokerException {
+
+        // TODO: We need to decide which method we trigger when preCreateInstance fails
+        try {
+            serviceInstance = platformService.preUpdateInstance(serviceInstance, plan);
+        } catch (PlatformException e) {
+            throw new ServiceBrokerException("Error during pre service instance update", e);
+        }
+
+        try {
+            serviceInstance = platformService.updateInstance(serviceInstance, plan, parameters);
+        } catch (PlatformException e) {
+            throw new ServiceBrokerException("Could not update instance due to: ", e);
+        }
+
+        try {
+            serviceInstance = platformService.postUpdateInstance(serviceInstance, plan);
+        } catch (PlatformException e) {
+            throw new ServiceBrokerException("Error during post service instance update", e);
+        }
+
+        serviceInstanceRepository.updateServiceInstance(serviceInstance);
+
+        return serviceInstance;
+    }
 
 	public void syncDeleteInstance(ServiceInstance serviceInstance, Plan plan, PlatformService platformService)
 			throws ServiceBrokerException {

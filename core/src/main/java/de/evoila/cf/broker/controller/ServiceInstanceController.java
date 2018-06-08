@@ -3,33 +3,17 @@ package de.evoila.cf.broker.controller;
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
-import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
 import de.evoila.cf.broker.service.CatalogService;
-import de.evoila.cf.broker.service.DeploymentServiceImpl;
+import de.evoila.cf.broker.service.impl.DeploymentServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import org.springframework.core.MethodParameter;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.lang.reflect.Method;
-import java.rmi.activation.ActivationSystem;
 /**
  * @author Johannes Hiemer.
  * @author Christian Brinker, evoila.
@@ -54,16 +38,12 @@ public class ServiceInstanceController extends BaseController {
 			@PathVariable("instanceId") String serviceInstanceId,
 			@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 			@Valid @RequestBody ServiceInstanceRequest request) throws ServiceDefinitionDoesNotExistException,
-					ServiceInstanceExistsException, ServiceBrokerException, AsyncRequiredException, ParameterNotNullException {
+					ServiceInstanceExistsException, ServiceBrokerException, AsyncRequiredException {
 
 		if (acceptsIncomplete == null || !acceptsIncomplete) {
 			throw new AsyncRequiredException();
 		}
 
-		// currently not dealing with parameters
-		if (request.getParameters() != null && request.getParameters().size() > 0){
-			throw new ParameterNotNullException(request.getParameters());
-		}
 		log.debug("PUT: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
 				+ ", createServiceInstance(), serviceInstanceId = " + serviceInstanceId);
 
@@ -73,9 +53,7 @@ public class ServiceInstanceController extends BaseController {
 			throw new ServiceDefinitionDoesNotExistException(request.getServiceDefinitionId());
 		}
 
-		ServiceInstanceResponse response = deploymentService.createServiceInstance(serviceInstanceId,
-				request.getServiceDefinitionId(), request.getPlanId(), request.getOrganizationGuid(),
-				request.getSpaceGuid(), request.getParameters(), request.getContext());
+		ServiceInstanceResponse response = deploymentService.createServiceInstance(serviceInstanceId, request);
 
 
 		if (DashboardUtils.hasDashboard(svc))
@@ -90,7 +68,7 @@ public class ServiceInstanceController extends BaseController {
 
 	@GetMapping(value = "/service_instances/{instanceId}/last_operation")
 	public ResponseEntity<JobProgressResponse> lastOperation(@PathVariable("instanceId") String serviceInstanceId)
-			throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
+			throws ServiceInstanceDoesNotExistException {
 
 		JobProgressResponse serviceInstanceProcessingResponse = deploymentService.getLastOperation(serviceInstanceId);
 
@@ -100,10 +78,11 @@ public class ServiceInstanceController extends BaseController {
 	@PatchMapping(value= "/service_instances/{instanceId}")
 	public ResponseEntity<String> updateServiceInstance(@PathVariable("instanceId") String serviceInstanceId,
 				@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
-				@RequestBody ServiceInstanceRequest request) throws ServiceBrokerException, ServiceInstanceDoesNotExistException,
-				ParameterNotNullException, AsyncRequiredException, ServiceDefinitionDoesNotExistException {
+				@RequestBody ServiceInstanceRequest request) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
+            ServiceInstanceDoesNotExistException, AsyncRequiredException {
+
 		if (request.getServiceDefinitionId() == null){
-			return new ResponseEntity<String>("Missing required fields: service_id", HttpStatus.BAD_REQUEST );
+			return new ResponseEntity<>("Missing required fields: service_id", HttpStatus.BAD_REQUEST );
 		}
 
 		log.debug("PATCH: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
@@ -113,16 +92,12 @@ public class ServiceInstanceController extends BaseController {
 			throw new AsyncRequiredException();
 		}
 
-		if (request.getParameters() != null && request.getParameters().size() > 0) {
-			throw new ParameterNotNullException(request.getParameters());
-		}
-
 		if (catalogService.getServiceDefinition(request.getServiceDefinitionId()).isUpdateable()){
-			deploymentService.updateServiceInstance(serviceInstanceId, request.getPlanId());
-		}else{
-			return new ResponseEntity<String>("{}", HttpStatus.UNPROCESSABLE_ENTITY);
+			deploymentService.updateServiceInstance(serviceInstanceId, request);
+		} else {
+			return new ResponseEntity<>("{}", HttpStatus.UNPROCESSABLE_ENTITY);
 		}
-		return new ResponseEntity<String>("{}", HttpStatus.ACCEPTED);
+		return new ResponseEntity<>("{}", HttpStatus.ACCEPTED);
 
 	}
 
@@ -130,7 +105,8 @@ public class ServiceInstanceController extends BaseController {
 	public ResponseEntity<String> deleteServiceInstance(@PathVariable("instanceId") String instanceId,
 														@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 														@RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId)
-			throws 	ServiceBrokerException, AsyncRequiredException, ServiceInstanceDoesNotExistException {
+			throws ServiceBrokerException, AsyncRequiredException,
+            ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException {
 
 		log.debug("DELETE: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
 				+ ", deleteServiceInstanceBinding(), serviceInstanceId = " + instanceId + ", serviceId = " + serviceId
@@ -153,11 +129,17 @@ public class ServiceInstanceController extends BaseController {
 		return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
 	}
 
-	@ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, AsyncRequiredException.class })
+	@ExceptionHandler({ AsyncRequiredException.class })
 	@ResponseBody
-	public ResponseEntity<ErrorMessage> handleException(Exception ex, HttpServletResponse response) {
+	public ResponseEntity<ErrorMessage> handleException(AsyncRequiredException ex, HttpServletResponse response) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);	
 	}
+
+    @ExceptionHandler({ ServiceDefinitionDoesNotExistException.class })
+    @ResponseBody
+    public ResponseEntity<ErrorMessage> handleException(ServiceDefinitionDoesNotExistException ex, HttpServletResponse response) {
+        return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 
 	@ExceptionHandler(ServiceInstanceExistsException.class)
 	@ResponseBody

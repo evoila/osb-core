@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 /** @author Yannic Remmet */
 @Configuration
-@ConfigurationProperties(prefix="backup")
-@ConditionalOnProperty(prefix = "backup", name = {"uri", "user", "password", "queue"})
+@ConfigurationProperties(prefix= "backup")
+@ConditionalOnProperty(prefix = "backup", name = {"uri", "user", "password", "queue.exchange", "queue.queue"})
 public class BackupConfiguration {
 
     private String authToken;
@@ -56,7 +56,7 @@ public class BackupConfiguration {
         this.queue = queue;
     }
 
-    public static class Queue{
+    public static class Queue {
         private String exchange;
         private String routingKey;
         private String queue;
