@@ -1,6 +1,7 @@
 package de.evoila.cf.broker.model;
 
 import java.util.List;
+import java.util.Map;
 
 public class InstanceGroupConfig {
 
@@ -11,6 +12,8 @@ public class InstanceGroupConfig {
     protected String vmType;
 
     protected String persistentDiskType;
+
+    protected Map<String, Object> properties;
 
     protected List<NetworkReference> networks;
 
@@ -54,4 +57,11 @@ public class InstanceGroupConfig {
         this.networks = networks;
     }
 
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, Object> properties) {
+        this.properties = properties;
+    }
 }

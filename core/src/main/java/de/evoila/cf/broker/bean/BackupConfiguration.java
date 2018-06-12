@@ -11,9 +11,13 @@ import org.springframework.context.annotation.Configuration;
 public class BackupConfiguration {
 
     private String authToken;
+
     private String uri;
+
     private String password;
+
     private String user;
+
     private Queue queue;
 
     public String getAuthToken() {
