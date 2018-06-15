@@ -47,7 +47,6 @@ public class SchemaProperty {
 
 	@JsonSerialize
 	@JsonInclude(Include.NON_NULL)
-	@JsonAnySetter
 	@JsonProperty(value = "enum", required = false)
 	private List<Object> enums;
 
@@ -127,12 +126,12 @@ public class SchemaProperty {
 	@JsonSerialize
 	@JsonInclude(Include.NON_NULL)
 	@JsonProperty(value = "properties", required = false)
-	private SchemaProperty properties;
+	private Map<String,SchemaProperty> properties;
 
 	@JsonSerialize
 	@JsonInclude(Include.NON_NULL)
 	@JsonProperty(required = false)
-	private SchemaProperty additionalProperties;
+	private Map<String,SchemaProperty> additionalProperties;
 
 	@JsonSerialize
 	@JsonInclude(Include.NON_NULL)
@@ -154,7 +153,6 @@ public class SchemaProperty {
 	@JsonProperty(required = false)
 	private Map<String, SchemaProperty> patternProperties;
 
-	// --------------- Multiple Restrictions ---------------
 
 	public SchemaProperty() {
 
@@ -304,22 +302,6 @@ public class SchemaProperty {
 		this.uniqueItems = uniqueItems;
 	}
 
-	public SchemaProperty getProperties() {
-		return properties;
-	}
-
-	public void setProperties(SchemaProperty properties) {
-		this.properties = properties;
-	}
-
-	public SchemaProperty getAdditionalProperties() {
-		return additionalProperties;
-	}
-
-	public void setAdditionalProperties(SchemaProperty additionalProperties) {
-		this.additionalProperties = additionalProperties;
-	}
-
 	public List<String> getRequired() {
 		return required;
 	}
@@ -350,5 +332,21 @@ public class SchemaProperty {
 
 	public void setPatternProperties(Map<String, SchemaProperty> patternProperties) {
 		this.patternProperties = patternProperties;
+	}
+
+	public Map<String, SchemaProperty> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(Map<String, SchemaProperty> properties) {
+		this.properties = properties;
+	}
+
+	public Map<String, SchemaProperty> getAdditionalProperties() {
+		return additionalProperties;
+	}
+
+	public void setAdditionalProperties(Map<String, SchemaProperty> additionalProperties) {
+		this.additionalProperties = additionalProperties;
 	}
 }
