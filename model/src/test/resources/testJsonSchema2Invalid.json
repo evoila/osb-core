@@ -10,10 +10,6 @@
 	                        "description": "testdescription",
 	                        "type": "string"
 	                    },
-	                    "otherstuff": {
-	                        "description": "otherdescription",
-	                        "type": "string"
-	                    },
 	                    "direction": {
 	                        "type": "string",
 	                        "enum": [ errorhere {
@@ -32,10 +28,6 @@
 	                            270
 	                        ]
 	                    },
-	                    "specials": {
-	                        "type": "array",
-	                        "items": []
-	                    },
 	                    "morespecials": {
 	                        "type": "array",
 	                        "items": [
@@ -52,47 +44,18 @@
 	                    "someObject": {
 	                        "type": "object",
 	                        "properties": {
-	                            "description": "nestedObject",
-	                            "type": "string"
+	                        	"nestedObject": {
+	                        		"description": "This is a nested object",
+	                            	"type": "string"
+	                        	}
+	                            
 	                        }
 	                    }
 	                }
 	            }
 	        },
-	        "update": {
-	            "parameters": {
-	                "$schema": "http://json-schema.org/draft-04/schema#",
-	                "type": "object",
-	                "properties": {
-	                    "billing": {
-	                        "description": "testdescription2",
-	                        "type": "string"
-	                    },
-	                    "otherstuff": {
-	                        "description": "otherdescription2",
-	                        "type": "string"
-	                    }
-	                }
-	            }
-	        }
+	        "update": null
 	    },
-	    "service_binding": {
-	        "create": {
-	            "parameters": {
-	                "$schema": "http://json-schema.org/draft-04/schema#",
-	                "type": "object",
-	                "properties": {
-	                    "billing": {
-	                        "description": "testdescription3",
-	                        "type": "string"
-	                    },
-	                    "otherstuff": {
-	                        "description": "otherdescription3",
-	                        "type": "string"
-	                    }
-	                }
-	            }
-	        }
-	    }
+	    "service_binding": null
 	}
 }
