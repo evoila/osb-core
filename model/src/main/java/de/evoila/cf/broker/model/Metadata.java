@@ -10,7 +10,13 @@ import java.util.Map;
  */
 public class Metadata extends InstanceGroupConfig {
 
-    protected String ingressInstanceGroup;
+    private String bullets;
+
+    private List<Cost> costs;
+
+    private String displayName;
+
+    private String ingressInstanceGroup;
 
     private List<CustomInstanceGroupConfig> instanceGroupConfig= new ArrayList<>();
 
@@ -27,6 +33,30 @@ public class Metadata extends InstanceGroupConfig {
         this.networks = networks;
         this.instanceGroupConfig = instanceGroupConfig;
         this.customParameters = customParameters;
+    }
+
+    public String getBullets() {
+        return bullets;
+    }
+
+    public void setBullets(String bullets) {
+        this.bullets = bullets;
+    }
+
+    public List<Cost> getCosts() {
+        return costs;
+    }
+
+    public void setCosts(List<Cost> costs) {
+        this.costs = costs;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getIngressInstanceGroup() {
