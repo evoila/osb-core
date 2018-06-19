@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class Metadata extends InstanceGroupConfig {
 
-    private String bullets;
+    private List<String> bullets;
 
     private List<Cost> costs;
 
@@ -35,11 +35,11 @@ public class Metadata extends InstanceGroupConfig {
         this.customParameters = customParameters;
     }
 
-    public String getBullets() {
+    public List<String> getBullets() {
         return bullets;
     }
 
-    public void setBullets(String bullets) {
+    public void setBullets(List<String> bullets) {
         this.bullets = bullets;
     }
 
