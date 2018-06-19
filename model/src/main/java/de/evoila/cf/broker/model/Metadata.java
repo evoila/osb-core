@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.Map;
 /**
  * Created by reneschollmeyer, evoila on 16.03.18.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Metadata extends InstanceGroupConfig {
 
     private List<String> bullets;
