@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,7 +57,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 	}
 
 	@Override
-	public ServiceInstanceResponse createServiceInstance(String serviceInstanceId, ServiceInstanceRequest request)
+	public ServiceInstanceResponse createServiceInstance(String serviceInstanceId, ServiceInstanceRequest request, List<Map<String, Object>> extension_apis)
 					throws ServiceInstanceExistsException, ServiceBrokerException,
 					ServiceDefinitionDoesNotExistException {
 
@@ -78,9 +79,9 @@ public class DeploymentServiceImpl implements DeploymentService {
 		}
 		
 		if (platformService.isSyncPossibleOnCreate(plan)) {
-			return new ServiceInstanceResponse(syncCreateInstance(serviceInstance, request.getParameters(), plan, platformService), false);
+			return new ServiceInstanceResponse(syncCreateInstance(serviceInstance, request.getParameters(), plan, platformService), false, extension_apis);
 		} else {
-			ServiceInstanceResponse serviceInstanceResponse = new ServiceInstanceResponse(serviceInstance, true);
+			ServiceInstanceResponse serviceInstanceResponse = new ServiceInstanceResponse(serviceInstance, true, extension_apis);
 
 			serviceInstanceRepository.addServiceInstance(serviceInstance.getId(), serviceInstance);
 

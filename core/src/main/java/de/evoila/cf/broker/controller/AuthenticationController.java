@@ -3,7 +3,7 @@
  */
 package de.evoila.cf.broker.controller;
 
-import de.evoila.cf.broker.bean.GeneralConfiguration;
+import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.broker.controller.utils.DashboardAuthenticationRedirectBuilder;
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
 import de.evoila.cf.broker.model.Dashboard;
@@ -45,17 +45,17 @@ public class AuthenticationController extends BaseController {
 	
 	private CatalogService catalogService;
 
-	private GeneralConfiguration generalConfiguration;
+	private EndpointConfiguration endpointConfiguration;
 
 	public AuthenticationController(ServiceInstanceRepository serviceInstanceRepository, CatalogService catalogService,
-									GeneralConfiguration generalConfiguration) {
+									EndpointConfiguration endpointConfiguration) {
 		Assert.notNull(serviceInstanceRepository, "ServiceInstance may not be null");
 		Assert.notNull(catalogService, "CatalogService may not be null");
-		Assert.notNull(generalConfiguration, "GeneralConfigurationBean may not be null");
+		Assert.notNull(endpointConfiguration, "GeneralConfigurationBean may not be null");
 
 		this.serviceInstanceRepository = serviceInstanceRepository;
 		this.catalogService = catalogService;
-		this.generalConfiguration = generalConfiguration;
+		this.endpointConfiguration = endpointConfiguration;
 	}
 
     @GetMapping(value = "/{serviceInstanceId}")
@@ -111,7 +111,7 @@ public class AuthenticationController extends BaseController {
                 mav.addObject("baseHref", "/v2/authentication/" + serviceInstanceId);
 				mav.addObject("token", TOKEN_PREFIX + token.getAccessToken());
 				mav.addObject("serviceInstanceId", serviceInstanceId);
-				mav.addObject("endpointUrl", generalConfiguration.getEndpointUrl());
+				mav.addObject("endpointUrl", endpointConfiguration.getDefault());
 			} else {
 				log.info("Did not receive a valid token, had to abort authentication...");
 				return this.processErrorResponse("Token could not be processed/or is not valid",
@@ -131,7 +131,7 @@ public class AuthenticationController extends BaseController {
         mav.addObject("baseHref", "/v2/authentication/" + serviceInstanceId + "/test");
         mav.addObject("token", TOKEN_PREFIX + "iojsiofksdfifid");
         mav.addObject("serviceInstanceId", serviceInstanceId);
-        mav.addObject("endpointUrl", generalConfiguration.getEndpointUrl());
+        mav.addObject("endpointUrl", endpointConfiguration.getEndpointUrl());
 
         return mav;
     }

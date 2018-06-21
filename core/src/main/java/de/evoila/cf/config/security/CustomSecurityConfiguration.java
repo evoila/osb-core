@@ -124,6 +124,7 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 					.antMatchers(HttpMethod.GET,"/v2/authentication/{serviceInstanceId}").permitAll()
 					.antMatchers(HttpMethod.GET,"/v2/authentication/{serviceInstanceId}/confirm").permitAll()
 					.antMatchers(HttpMethod.GET, "/v2/manage/**").authenticated()
+						.antMatchers(HttpMethod.GET, "/v2/extensions").authenticated()
 				.and()
 					.anonymous().disable()
 					.exceptionHandling()

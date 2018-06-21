@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.controller;
 
+import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+
 /**
  * @author Johannes Hiemer.
  * @author Christian Brinker, evoila.
@@ -32,6 +34,9 @@ public class ServiceInstanceController extends BaseController {
 
 	@Autowired
 	private CatalogService catalogService;
+
+	@Autowired
+	private EndpointConfiguration endpointConfiguration;
 
 	@PutMapping(value = "/service_instances/{instanceId}")
 	public ResponseEntity<ServiceInstanceResponse> createServiceInstance(
@@ -53,8 +58,9 @@ public class ServiceInstanceController extends BaseController {
 			throw new ServiceDefinitionDoesNotExistException(request.getServiceDefinitionId());
 		}
 
-		ServiceInstanceResponse response = deploymentService.createServiceInstance(serviceInstanceId, request);
+		Extension extension = new Extension(endpointConfiguration.getDefault() + "/v2/extensions", svc.getDashboard().getAuthEndpoint());
 
+		ServiceInstanceResponse response = deploymentService.createServiceInstance(serviceInstanceId, request, extension.getExtensionApis());
 
 		if (DashboardUtils.hasDashboard(svc))
 			response.setDashboardUrl(DashboardUtils.dashboard(svc, serviceInstanceId));

@@ -11,6 +11,9 @@ import de.evoila.cf.broker.model.JobProgressResponse;
 import de.evoila.cf.broker.model.ServiceInstanceRequest;
 import de.evoila.cf.broker.model.ServiceInstanceResponse;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Christian Brinker && Johannes Hiemer, evoila.
  *
@@ -24,7 +27,7 @@ public interface DeploymentService {
 	JobProgressResponse getLastOperation(String serviceInstanceId)
 			throws ServiceInstanceDoesNotExistException, ServiceBrokerException;
 
-	ServiceInstanceResponse createServiceInstance(String serviceInstanceId, ServiceInstanceRequest serviceInstanceRequest00) throws ServiceInstanceExistsException,
+	ServiceInstanceResponse createServiceInstance(String serviceInstanceId, ServiceInstanceRequest serviceInstanceRequest00, List<Map<String, Object>> exentension_apis) throws ServiceInstanceExistsException,
             ServiceBrokerException, ServiceDefinitionDoesNotExistException;
 
     void updateServiceInstance(String serviceInstanceId, ServiceInstanceRequest serviceInstanceRequest) throws ServiceBrokerException,
