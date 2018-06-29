@@ -3,6 +3,7 @@ package de.evoila.cf.broker.service.impl;
 import de.evoila.cf.broker.model.Catalog;
 import de.evoila.cf.broker.model.ServiceDefinition;
 import de.evoila.cf.broker.service.CatalogService;
+import de.evoila.cf.broker.util.GlobalConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,6 @@ import java.util.stream.Collectors;
 public class CatalogServiceImpl implements CatalogService {
 
 	private final Logger logger = LoggerFactory.getLogger(CatalogServiceImpl.class);
-
-	public static final String TEST_PROFILE = "test";
 
 	private Catalog catalog;
 
@@ -62,20 +61,20 @@ public class CatalogServiceImpl implements CatalogService {
 
 	private Catalog prepareCatalogIfTesting(Catalog catalog) {
 		if (Arrays.stream(environment.getActiveProfiles()).anyMatch(
-				env -> (env.equalsIgnoreCase(TEST_PROFILE)))) {
+				env -> (env.equalsIgnoreCase(GlobalConstants.TEST_PROFILE)))) {
 
 			catalog.getServices().stream().map(service -> {
-				if (service.getName().indexOf(TEST_PROFILE) == -1)
-					service.setName(service.getName() + "-" + TEST_PROFILE);
+				if (service.getName().indexOf(GlobalConstants.TEST_PROFILE) == -1)
+					service.setName(service.getName() + "-" + GlobalConstants.TEST_PROFILE);
 
 				service.setId(replaceLastChar(service.getId()));
 				service.getDashboardClient()
 						.setSecret(replaceLastChar(service.getDashboardClient().getSecret()));
 
 
-				if (service.getDashboardClient().getId().indexOf(TEST_PROFILE) == -1)
+				if (service.getDashboardClient().getId().indexOf(GlobalConstants.TEST_PROFILE) == -1)
 					service.getDashboardClient().setId(
-							service.getDashboardClient().getId() + "-" + TEST_PROFILE
+							service.getDashboardClient().getId() + "-" + GlobalConstants.TEST_PROFILE
 					);
 
 				service.getDashboard().setUrl(
@@ -107,9 +106,9 @@ public class CatalogServiceImpl implements CatalogService {
 		try {
 			URL url = new URL(urlStr);
 
-			if (url.getHost().indexOf(TEST_PROFILE) == -1) {
+			if (url.getHost().indexOf(GlobalConstants.TEST_PROFILE) == -1) {
 				URL newURL = new URL(url.getProtocol(),
-						url.getHost().replaceFirst("\\.", "-" + TEST_PROFILE + "."),
+						url.getHost().replaceFirst("\\.", "-" + GlobalConstants.TEST_PROFILE + "."),
 						url.getPort(), url.getFile());
 				urlStr = newURL.toString();
 			}
