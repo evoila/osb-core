@@ -34,6 +34,10 @@ public class Plan {
 	@JsonSerialize
 	@JsonProperty(value="free", required=false)
 	private boolean free = true;
+	
+	@JsonSerialize
+	@JsonProperty("schemas")
+	private Schemas schemas;
 
 	/**
 	 * Please use metadata section for custom mapping information
@@ -174,5 +178,13 @@ public class Plan {
 
 	public void setFree(boolean free) {
 		this.free = free;
+	}
+
+	public Schemas getSchemas() {
+		return schemas;
+	}
+
+	public void setSchemas(Schemas schemas) {
+		this.schemas = schemas;
 	}
 }
