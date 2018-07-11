@@ -28,6 +28,7 @@ public class ServiceInstanceBindingRequest {
 	@JsonProperty("plan_id")
 	private String planId;
 
+	@Deprecated
 	@JsonSerialize
 	@JsonProperty("app_guid")
 	private String appGuid;
