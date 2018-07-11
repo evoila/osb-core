@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +51,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
 			ServiceInstanceBindingRequest serviceInstanceBindingRequest) throws ServiceInstanceBindingExistsException,
 			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException,
-			ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException {
+			ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException, InvalidParametersException {
 
 		validateBindingNotExists(bindingId, instanceId);
 
@@ -59,6 +61,8 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		Plan plan = serviceDefinitionRepository.getPlan(serviceInstanceBindingRequest.getPlanId());
+
+		validateParameters(serviceInstanceBindingRequest, plan);
 
 		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
                 .isEmpty(serviceInstanceBindingRequest.getBindResource().getRoute())) {
@@ -121,6 +125,34 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 	}
 
+	protected void validateParameters(ServiceInstanceBindingRequest serviceInstanceBindingRequest, Plan plan) throws InvalidParametersException{
+
+		HashMap<String, Object> serviceInstanceRequestParams = (HashMap<String, Object>)serviceInstanceBindingRequest.getParameters();
+		if (serviceInstanceRequestParams == null){
+			return;
+		}
+		HashMap<String, SchemaProperty> params;
+		try{
+			params = (HashMap<String, SchemaProperty>)plan.getSchemas().getServiceBinding().getCreate().getParameters().getProperties();
+		}catch (NullPointerException e){
+			throw new InvalidParametersException("No additional parameters are allowed for this request with this plan");
+		}
+
+		boolean flag;
+		for (String requestKey : serviceInstanceRequestParams.keySet()) {
+			flag = false;
+			Iterator<Map.Entry<String, SchemaProperty>> entries = params.entrySet().iterator();
+			while(!(flag) && entries.hasNext()){
+				Map.Entry<String, SchemaProperty> key = entries.next();
+				if(requestKey.equals(key.getKey())){
+					flag = true;
+				}
+			}
+			if(!(flag)){
+				throw new InvalidParametersException(serviceInstanceRequestParams);
+			}
+		}
+	}
 	protected ServiceInstance getBinding(String bindingId) throws ServiceInstanceBindingDoesNotExistsException {
 		if (!bindingRepository.containsInternalBindingId(bindingId)) {
 			throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
@@ -133,7 +165,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                    ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException, ServiceBrokerFeatureIsNotSupportedException {
+                                                    ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException, ServiceBrokerFeatureIsNotSupportedException, InvalidParametersException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalAddresses.get(0));
 
 		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
@@ -143,13 +175,13 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, ServiceInstanceBindingBadRequestException {
+                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, ServiceInstanceBindingBadRequestException, InvalidParametersException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
 
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
 	}
 
 	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                             ServiceInstance serviceInstance, Plan plan, ServerAddress serverAddress) throws ServiceBrokerException;
+                                                             ServiceInstance serviceInstance, Plan plan, ServerAddress serverAddress) throws ServiceBrokerException, InvalidParametersException;
 
 }
