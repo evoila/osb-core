@@ -42,7 +42,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	@Autowired(required = false)
 	protected HAProxyService haProxyService;
 
-	protected abstract void deleteBinding(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
+	protected abstract void unbindService(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
 			throws ServiceBrokerException;
 
 	@Override
@@ -106,7 +106,7 @@ public abstract class BindingServiceImpl implements BindingService {
 
             Plan plan = serviceDefinitionRepository.getPlan(planId);
 
-			deleteBinding(binding, serviceInstance, plan);
+			unbindService(binding, serviceInstance, plan);
 		} catch (ServiceBrokerException e) {
 			log.error("Could not cleanup service binding", e);
 		} finally {
