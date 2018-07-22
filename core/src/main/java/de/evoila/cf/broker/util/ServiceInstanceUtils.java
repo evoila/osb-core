@@ -1,6 +1,7 @@
 package de.evoila.cf.broker.util;
 
 import de.evoila.cf.broker.model.ServerAddress;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,8 +56,13 @@ public class ServiceInstanceUtils {
 
             credentials.put(HOSTS, hosts);
         }
-        credentials.put(USERNAME, username);
-        credentials.put(PASSWORD, password);
+
+        if (!StringUtils.isEmpty(username))
+            credentials.put(USERNAME, username);
+
+        if (!StringUtils.isEmpty(password))
+            credentials.put(PASSWORD, password);
+
         credentials.putAll(additionalConfigs);
 
         return credentials;
