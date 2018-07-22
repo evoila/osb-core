@@ -2,6 +2,7 @@ package de.evoila.cf.broker.util;
 
 import de.evoila.cf.broker.model.ServerAddress;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,12 +10,11 @@ import java.util.stream.Collectors;
 
 public class ServiceInstanceUtils {
 
-    private static String URI = "uri";
     private static String USERNAME = "user";
     private static String PASSWORD = "password";
-    private static String HOST = "host";
+    private static String HOSTNAME = "hostname";
     private static String PORT = "port";
-    private static String DATABASE = "database";
+    private static String HOSTS = "hosts";
 
     public static List<ServerAddress> filteredServerAddress(List<ServerAddress> serverAddresses, String filter) {
         return serverAddresses.stream()
@@ -42,12 +42,21 @@ public class ServiceInstanceUtils {
         Map<String, Object> credentials = new HashMap<>();
 
         if (serverAddresses.size() == 1) {
-            credentials.put(HOST, serverAddresses.get(0).getIp());
+            credentials.put(HOSTNAME, serverAddresses.get(0).getIp());
             credentials.put(PORT, serverAddresses.get(0).getPort());
+        } else {
+            List<Map<String, Object>> hosts = new ArrayList<>();
+            serverAddresses.forEach(serverAddress -> {
+                hosts.add(new HashMap<String, Object>() {{
+                    put(HOSTNAME, serverAddress.getIp());
+                    put(PORT, serverAddress.getPort());
+                }});
+            });
+
+            credentials.put(HOSTS, hosts);
         }
         credentials.put(USERNAME, username);
         credentials.put(PASSWORD, password);
-
         credentials.putAll(additionalConfigs);
 
         return credentials;
