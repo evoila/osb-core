@@ -42,9 +42,6 @@ public abstract class BindingServiceImpl implements BindingService {
 	@Autowired(required = false)
 	protected HAProxyService haProxyService;
 
-	protected abstract void unbindService(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
-			throws ServiceBrokerException;
-
 	@Override
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
 			ServiceInstanceBindingRequest serviceInstanceBindingRequest) throws ServiceInstanceBindingExistsException,
@@ -114,24 +111,6 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 	}
 
-	protected void validateBindingNotExists(String bindingId, String instanceId)
-			throws ServiceInstanceBindingExistsException {
-		if (bindingRepository.containsInternalBindingId(bindingId)) {
-			throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
-		}
-	}
-
-	protected ServiceInstance getBinding(String bindingId) throws ServiceInstanceBindingDoesNotExistsException {
-		if (!bindingRepository.containsInternalBindingId(bindingId)) {
-			throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
-		}
-		String serviceInstanceId = bindingRepository.getInternalBindingId(bindingId);
-		if (serviceInstanceId == null) {
-			throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
-		}
-		return serviceInstanceRepository.getServiceInstance(serviceInstanceId);
-	}
-
 	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                     ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException, ServiceBrokerFeatureIsNotSupportedException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalAddresses.get(0));
@@ -142,6 +121,17 @@ public abstract class BindingServiceImpl implements BindingService {
 		return serviceInstanceBinding;
 	}
 
+    protected ServiceInstance getBinding(String bindingId) throws ServiceInstanceBindingDoesNotExistsException {
+        if (!bindingRepository.containsInternalBindingId(bindingId)) {
+            throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
+        }
+        String serviceInstanceId = bindingRepository.getInternalBindingId(bindingId);
+        if (serviceInstanceId == null) {
+            throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
+        }
+        return serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+    }
+
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                  ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, ServiceInstanceBindingBadRequestException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
@@ -149,7 +139,16 @@ public abstract class BindingServiceImpl implements BindingService {
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
 	}
 
+    protected abstract void unbindService(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
+            throws ServiceBrokerException;
+
 	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                              ServiceInstance serviceInstance, Plan plan, ServerAddress serverAddress) throws ServiceBrokerException;
 
+    protected void validateBindingNotExists(String bindingId, String instanceId)
+            throws ServiceInstanceBindingExistsException {
+        if (bindingRepository.containsInternalBindingId(bindingId)) {
+            throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
+        }
+    }
 }

@@ -17,7 +17,6 @@ public interface BindingService {
      * @param bindingId
      * @param instanceId
      * @param request
-     * @param route
      * @return
      * @throws ServiceInstanceBindingExistsException
      * @throws ServiceBrokerException
