@@ -25,5 +25,4 @@ public class CatalogController extends BaseController {
 		logger.debug("GET: getCatalog()");
 		return service.getCatalog();
 	}
-
 }
