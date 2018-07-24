@@ -24,7 +24,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 /**
  * @author Johannes Hiemer.
  * @author Marco Di Martino.
- * 
+ *
  */
 @Configuration
 @EnableWebSecurity
@@ -38,48 +38,58 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
 	@Autowired
-    protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+	protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		auth
-			.inMemoryAuthentication()
-			.withUser(authentication.getUsername())
-			.password(authentication.getPassword())
-			.roles(authentication.getRole(), "ACTUATOR");
+				.inMemoryAuthentication()
+				.withUser(authentication.getUsername())
+				.password(authentication.getPassword())
+				.roles(authentication.getRole(), "ACTUATOR");
 	}
 
-    @Bean 
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+	@Bean
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-        	.authorizeRequests()
-        		.antMatchers(HttpMethod.GET, Endpoints.V2_ENDPOINT).authenticated()
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		UaaRelyingPartyFilter uaaRelyingPartyFilter = new UaaRelyingPartyFilter(authenticationManager());
+		uaaRelyingPartyFilter.setSuccessHandler(new UaaRelyingPartyAuthenticationSuccessHandler());
+		uaaRelyingPartyFilter.setFailureHandler(new UaaRelyingPartyAuthenticationFailureHandler());
+
+		http.addFilterBefore(uaaRelyingPartyFilter, LogoutFilter.class)
+				.authorizeRequests()
+				.antMatchers(HttpMethod.GET, Endpoints.V2_ENDPOINT).authenticated()
 				.antMatchers(HttpMethod.GET, Endpoints.V2_CATALOG).authenticated()
-                .antMatchers(HttpMethod.GET, Endpoints.V2_CATALOG_EXT).authenticated()
+				.antMatchers(HttpMethod.GET, Endpoints.V2_CATALOG_EXT).authenticated()
 				.antMatchers(Endpoints.V2_SERVICE_INSTANCES).authenticated()
-        		.antMatchers(HttpMethod.GET, Endpoints.INFO).authenticated()
-        		.antMatchers(HttpMethod.GET, Endpoints.HEALTH).authenticated()
+				.antMatchers(HttpMethod.GET, Endpoints.INFO).authenticated()
+				.antMatchers(HttpMethod.GET, Endpoints.HEALTH).authenticated()
 				.antMatchers(HttpMethod.GET, Endpoints._ERROR).authenticated()
 
-			.antMatchers(HttpMethod.GET, Endpoints.ENV).authenticated()
+				.antMatchers(HttpMethod.GET, Endpoints.ENV).authenticated()
 				.antMatchers(HttpMethod.GET, Endpoints.V2_DASHBOARD_SID).permitAll()
 				.antMatchers(HttpMethod.GET, Endpoints.V2_DASHBOARD_SID_CONFIRM).permitAll()
 				.antMatchers(Endpoints.V2_BACKUP+"/**").permitAll()
 				.antMatchers(Endpoints.V2_DASHBOARD_MANAGE+"/**").authenticated()
 				.and()
-        	.httpBasic()
+				.authorizeRequests()
+				.antMatchers(HttpMethod.GET,"/v2/authentication/{serviceInstanceId}").permitAll()
+				.antMatchers(HttpMethod.GET,"/v2/authentication/{serviceInstanceId}/confirm").permitAll()
+				.antMatchers(HttpMethod.GET, "/v2/manage/**").authenticated()
+				.antMatchers(HttpMethod.GET, "/v2/extensions").authenticated()
+				.and()
+				.httpBasic()
 				.and()
 				.anonymous().disable()
 				.exceptionHandling()
 				.authenticationEntryPoint(new org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint("Authorization"))
-        .and()
-        	.csrf().disable();
-    }
+				.and()
+				.csrf().disable();
+	}
 
 
 	@Configuration
@@ -105,27 +115,27 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 			uaaRelyingPartyFilter.setFailureHandler(new UaaRelyingPartyAuthenticationFailureHandler());
 
 
-				http.addFilterBefore(uaaRelyingPartyFilter, LogoutFilter.class)
+			http.addFilterBefore(uaaRelyingPartyFilter, LogoutFilter.class)
 
 
-				.csrf().disable()
+					.csrf().disable()
 
-				.sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+					.sessionManagement()
+					.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
-				.and()
+					.and()
 
-				.exceptionHandling()
+					.exceptionHandling()
 					.authenticationEntryPoint(new CommonCorsAuthenticationEntryPoint())
 
-				.and()
+					.and()
 
-				.authorizeRequests()
+					.authorizeRequests()
 					.antMatchers(HttpMethod.GET,"/v2/authentication/{serviceInstanceId}").permitAll()
 					.antMatchers(HttpMethod.GET,"/v2/authentication/{serviceInstanceId}/confirm").permitAll()
 					.antMatchers(HttpMethod.GET, "/v2/manage/**").authenticated()
-						.antMatchers(HttpMethod.GET, "/v2/extensions").authenticated()
-				.and()
+					.antMatchers(HttpMethod.GET, "/v2/extensions").authenticated()
+					.and()
 					.anonymous().disable()
 					.exceptionHandling()
 					.authenticationEntryPoint(new org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint("headerValue"));

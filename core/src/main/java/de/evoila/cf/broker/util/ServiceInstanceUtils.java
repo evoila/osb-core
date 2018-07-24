@@ -1,6 +1,7 @@
 package de.evoila.cf.broker.util;
 
 import de.evoila.cf.broker.model.ServerAddress;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,12 +19,12 @@ public class ServiceInstanceUtils {
 
     public static List<ServerAddress> filteredServerAddress(List<ServerAddress> serverAddresses, String filter) {
         return serverAddresses.stream()
-                .filter(s -> {
-                    if (s.getName().contains(filter))
-                        return true;
+                    .filter(s -> {
+                        if (s.getName().contains(filter))
+                            return true;
 
-                    return false;
-                }).collect(Collectors.toList());
+                        return false;
+                    }).collect(Collectors.toList());
     }
 
     public static String connectionUrl(List<ServerAddress> serverAddresses) {
@@ -38,7 +39,7 @@ public class ServiceInstanceUtils {
     }
 
     public static Map<String, Object> bindingObject(List<ServerAddress> serverAddresses,
-                                                    String username, String password, Map<String, Object> additionalConfigs) {
+                                             String username, String password, Map<String, Object> additionalConfigs) {
         Map<String, Object> credentials = new HashMap<>();
 
         if (serverAddresses.size() == 1) {
@@ -55,8 +56,13 @@ public class ServiceInstanceUtils {
 
             credentials.put(HOSTS, hosts);
         }
-        credentials.put(USERNAME, username);
-        credentials.put(PASSWORD, password);
+
+        if (!StringUtils.isEmpty(username))
+            credentials.put(USERNAME, username);
+
+        if (!StringUtils.isEmpty(password))
+            credentials.put(PASSWORD, password);
+
         credentials.putAll(additionalConfigs);
 
         return credentials;

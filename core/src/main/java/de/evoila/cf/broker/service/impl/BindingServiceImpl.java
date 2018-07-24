@@ -49,9 +49,6 @@ public abstract class BindingServiceImpl implements BindingService {
 	@Autowired(required = false)
 	protected HAProxyService haProxyService;
 
-	protected abstract void unbindService(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
-			throws ServiceBrokerException;
-
 	@Override
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
 			ServiceInstanceBindingRequest serviceInstanceBindingRequest) throws ServiceInstanceBindingExistsException,
@@ -122,13 +119,6 @@ public abstract class BindingServiceImpl implements BindingService {
 			log.error("Could not cleanup service binding", e);
 		} finally {
 			bindingRepository.unbindService(bindingId);
-		}
-	}
-
-	protected void validateBindingNotExists(String bindingId, String instanceId)
-			throws ServiceInstanceBindingExistsException {
-		if (bindingRepository.containsInternalBindingId(bindingId)) {
-			throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
 		}
 	}
 
@@ -211,7 +201,16 @@ public abstract class BindingServiceImpl implements BindingService {
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
 	}
 
+    protected abstract void unbindService(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
+            throws ServiceBrokerException;
+
 	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                              ServiceInstance serviceInstance, Plan plan, ServerAddress serverAddress) throws ServiceBrokerException, InvalidParametersException;
 
+    protected void validateBindingNotExists(String bindingId, String instanceId)
+            throws ServiceInstanceBindingExistsException {
+        if (bindingRepository.containsInternalBindingId(bindingId)) {
+            throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
+        }
+    }
 }
