@@ -107,7 +107,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
         if(platformService == null) {
-            throw new ServiceDefinitionDoesNotExistException(request.getPlanId());
+            throw new ServiceDefinitionDoesNotExistException(request.getServiceDefinitionId());
         }
 
         if (platformService.isSyncPossibleOnCreate(plan)) {
