@@ -66,7 +66,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		try {
 			validateParameters(serviceInstanceBindingRequest, plan);
 		}catch(ProcessingException e) {
-			throw new ServiceBrokerException("Error while validating parameters");
+			throw new InvalidParametersException("Error while validating parameters");
 		}
 		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
                 .isEmpty(serviceInstanceBindingRequest.getBindResource().getRoute())) {
@@ -122,7 +122,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 	}
 
-	protected void validateParameters(ServiceInstanceBindingRequest serviceInstanceBindingRequest, Plan plan) throws ProcessingException, InvalidParametersException, ServiceBrokerException{
+	protected void validateParameters(ServiceInstanceBindingRequest serviceInstanceBindingRequest, Plan plan) throws ProcessingException, InvalidParametersException {
 
 		/* key validation*/
 		HashMap<String, Object> serviceInstanceRequestParams = (HashMap<String, Object>)serviceInstanceBindingRequest.getParameters();
@@ -162,14 +162,14 @@ public abstract class BindingServiceImpl implements BindingService {
 			jsonSchema = ParameterValidator.getJsonSchema(json);
 			jsonObject = ParameterValidator.getJsonNode(params2);
 		}catch (JsonProcessingException e){
-			throw new ServiceBrokerException("Error while processing json schema");
+			throw new InvalidParametersException("Error while processing json schema");
 		}
 
 		log.info("parameters:  --> "+jsonObject.toString());
 		try {
 			ParameterValidator.validateJson(jsonSchema, jsonObject);
 		}catch (ProcessingException e){
-			throw new ServiceBrokerException("Error while processing json schema");
+			throw new InvalidParametersException("Error while processing json schema");
 	}
 
 	}

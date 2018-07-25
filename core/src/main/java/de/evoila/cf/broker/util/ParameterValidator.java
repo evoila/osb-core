@@ -63,7 +63,7 @@ public class ParameterValidator {
 
     private static JsonSchema _getSchemaNode(JsonNode jsonNode) throws ProcessingException {
         final JsonNode schemaIdentifier = jsonNode.get(JSON_SCHEMA_IDENTIFIER_ELEMENT);
-        if (schemaIdentifier == null){
+        if (schemaIdentifier == null){ //even if null, seems not to go into the if statement
             ((ObjectNode) jsonNode).put(JSON_SCHEMA_IDENTIFIER_ELEMENT, JSON_V4_SCHEMA_IDENTIFIER);
         }
         ((ObjectNode) jsonNode).put(JSON_SCHEMA_IDENTIFIER_ELEMENT, JSON_V4_SCHEMA_IDENTIFIER);
