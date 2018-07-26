@@ -1,3 +1,4 @@
+
 package de.evoila.cf.broker.service;
 
 import de.evoila.cf.broker.exception.*;
@@ -26,7 +27,7 @@ public interface BindingService {
     ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId, ServiceInstanceBindingRequest request)
           throws ServiceInstanceBindingExistsException, ServiceBrokerException,
             ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException,
-            ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException;
+            ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException, InvalidParametersException;
 
     /**
      *

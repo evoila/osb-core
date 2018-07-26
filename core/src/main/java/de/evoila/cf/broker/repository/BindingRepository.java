@@ -20,7 +20,7 @@ public interface BindingRepository {
 	boolean containsInternalBindingId(String bindingId);
 
 	// Bind
-	void deleteBinding(String bindingId);
+	void unbindService(String bindingId);
 
 	ServiceInstanceBinding findOne(String bindingId);
 

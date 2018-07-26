@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -74,8 +76,8 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
-		if(platformService == null) {
-			throw new ServiceDefinitionDoesNotExistException(request.getPlanId());
+		if (platformService == null) {
+			throw new ServiceDefinitionDoesNotExistException(request.getServiceDefinitionId());
 		}
 		
 		if (platformService.isSyncPossibleOnCreate(plan)) {
@@ -105,7 +107,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
         if(platformService == null) {
-            throw new ServiceDefinitionDoesNotExistException(request.getPlanId());
+            throw new ServiceDefinitionDoesNotExistException(request.getServiceDefinitionId());
         }
 
         if (platformService.isSyncPossibleOnCreate(plan)) {
@@ -192,7 +194,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 	public void syncDeleteInstance(ServiceInstance serviceInstance, Plan plan, PlatformService platformService)
 			throws ServiceBrokerException {
-
+ 
         try {
             platformService.preDeleteInstance(serviceInstance);
         } catch (PlatformException e) {
@@ -214,5 +216,4 @@ public class DeploymentServiceImpl implements DeploymentService {
         serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
         jobRepository.deleteJobProgress(serviceInstance.getId());
 	}
-
 }
