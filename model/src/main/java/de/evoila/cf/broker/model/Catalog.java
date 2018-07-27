@@ -15,7 +15,6 @@ import org.springframework.core.env.Environment;
  * @author sgreenberg@gopivotal.com
  * @author Johannes Hiemer.
  */
-@Configuration
 @ConfigurationProperties(prefix = "catalog")
 @ConditionalOnProperty(prefix = "catalog", name = {"name", "services"}, havingValue = "")
 public class Catalog {

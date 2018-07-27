@@ -31,7 +31,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
  */
 @Configuration
 @EnableWebSecurity
-@Order(1)
+@Order(2)
 public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 
 	@Autowired
@@ -97,7 +97,7 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 
 
 	@Configuration
-	@Order(10)
+	@Order(1)
 	public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
 		@Bean
@@ -142,7 +142,7 @@ public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 					.and()
 					.anonymous().disable()
 					.exceptionHandling()
-					.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+			        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
 					//.authenticationEntryPoint(new org.springframework.boot.autoconfigure.security.Http401AuthenticationEntryPoint("headerValue"));
 		}
 	}
