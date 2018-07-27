@@ -1,5 +1,6 @@
-package de.evoila.cf.broker.controller;
+package de.evoila.cf.broker.controller.core;
 
+import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.ErrorMessage;
 import de.evoila.cf.broker.model.ServiceInstanceBindingRequest;
@@ -22,7 +23,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
 	private final Logger log = LoggerFactory.getLogger(ServiceInstanceBindingController.class);
 
-	public static final String SERVICE_INSTANCE_BINDING_BASE_PATH = "/v2/service_instances/{instanceId}/service_bindings";
+	public static final String SERVICE_INSTANCE_BINDING_BASE_PATH = "/core/service_instances/{instanceId}/service_bindings";
 
 	@Autowired
 	private BindingServiceImpl bindingService;

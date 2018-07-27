@@ -1,6 +1,7 @@
-package de.evoila.cf.broker.controller;
+package de.evoila.cf.broker.controller.custom;
 
 import de.evoila.cf.broker.bean.ConditionOnBackupService;
+import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.controller.utils.RestPageImpl;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.service.BackupService;
@@ -19,13 +20,13 @@ import java.util.List;
 
 /** @author Yannic Remmet. */
 @RestController
-@RequestMapping(value = "/v2/manage/backup")
+@RequestMapping(value = "/custom/v2/manage/backup")
 @Conditional(ConditionOnBackupService.class)
-public class BackupController extends BaseController {
+public class CustomBackupController extends BaseController {
 
     private BackupService backupService;
 
-    public BackupController(BackupService backupService) {
+    public CustomBackupController(BackupService backupService) {
         Assert.notNull(backupService, "BackupService can not be null");
         this.backupService = backupService;
     }

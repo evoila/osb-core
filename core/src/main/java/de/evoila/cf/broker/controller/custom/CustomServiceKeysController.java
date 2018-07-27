@@ -1,5 +1,6 @@
-package de.evoila.cf.broker.controller;
+package de.evoila.cf.broker.controller.custom;
 
+import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.ServiceInstanceBinding;
@@ -19,14 +20,14 @@ import java.util.UUID;
 
 /** @author Yannic Remmet. */
 @RestController
-@RequestMapping(value = "/v2/manage/servicekeys/{serviceInstanceId}")
-public class ServiceKeysController extends BaseController {
+@RequestMapping(value = "/custom/v2/manage/servicekeys")
+public class CustomServiceKeysController extends BaseController {
 
     BindingRepository bindingRepository;
     BindingService bindingService;
     ServiceInstanceRepository serviceInstanceRepository;
 
-    public ServiceKeysController(BindingRepository repository, BindingService service, ServiceInstanceRepository serviceInstanceRepository) {
+    public CustomServiceKeysController(BindingRepository repository, BindingService service, ServiceInstanceRepository serviceInstanceRepository) {
         Assert.notNull(repository, "BindingRepository should not be null");
         Assert.notNull(service, "Binding Service should not be null");
         this.bindingRepository = repository;
@@ -34,19 +35,19 @@ public class ServiceKeysController extends BaseController {
         this.serviceInstanceRepository = serviceInstanceRepository;
     }
 
-    @GetMapping(value = "")
+    @GetMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<Page<ServiceInstanceBinding>> getGeneralInformation(@PathVariable String serviceInstanceId) {
         List<ServiceInstanceBinding> bindings = bindingRepository.getBindingsForServiceInstance(serviceInstanceId);
         return new ResponseEntity<>(new PageImpl<>(bindings), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{serviceBindingId}")
+    @GetMapping(value = "/{serviceInstanceId}/{serviceBindingId}")
     public ResponseEntity<ServiceInstanceBinding> getServiceKey(@PathVariable String serviceInstanceId, @PathVariable String serviceBindingId) {
         ServiceInstanceBinding binding = bindingRepository.findOne(serviceBindingId);
         return new ResponseEntity<>(binding, HttpStatus.OK);
     }
 
-    @PostMapping(value = "")
+    @PostMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<ServiceInstanceBinding> createServiceKey(@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException,
             ServiceBrokerException, ServiceInstanceBindingExistsException, ServiceDefinitionDoesNotExistException,
             ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException, InvalidParametersException {
@@ -67,7 +68,7 @@ public class ServiceKeysController extends BaseController {
         return new ResponseEntity<>(binding, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/{serviceBindingId}")
+    @DeleteMapping(value = "/{serviceInstanceId}/{serviceBindingId}")
     public ResponseEntity delete(@PathVariable String serviceInstanceId,
                                  @PathVariable String serviceBindingId)
             throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException,

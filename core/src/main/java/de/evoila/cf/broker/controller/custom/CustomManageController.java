@@ -1,6 +1,6 @@
-package de.evoila.cf.broker.controller;
+package de.evoila.cf.broker.controller.custom;
 
-import de.evoila.cf.broker.exception.ServiceBrokerException;
+import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.Plan;
@@ -10,28 +10,30 @@ import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author  Yannic Remmet & Johannes Hiemer, evoila.
  */
-@RestController
-public class GeneralController extends BaseController {
+@Controller
+@RequestMapping(value = "/custom/v2/manage")
+public class CustomManageController extends BaseController {
 
     ServiceInstanceRepository repository;
     ServiceDefinitionRepository serviceDefinitionRepository;
 
-    GeneralController(ServiceInstanceRepository repository, ServiceDefinitionRepository sdRepository){
+    CustomManageController(ServiceInstanceRepository repository, ServiceDefinitionRepository sdRepository){
         Assert.notNull(repository, "ServiceInstanceRepository is null");
         Assert.notNull(sdRepository, "ServiceDefinitionRepository is null");
         this.repository = repository;
         this.serviceDefinitionRepository = sdRepository;
     }
 
-    @GetMapping(value = "/v2/manage/{serviceInstanceId}")
+    @GetMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<ServiceInstanceView> getGeneralInformation(@PathVariable String serviceInstanceId) throws
             ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
         ServiceInstance serviceInstance = repository.getServiceInstance(serviceInstanceId);

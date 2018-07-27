@@ -39,7 +39,7 @@ public class UaaRelyingPartyFilter extends GenericFilterBean {
     private AuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
 
     public UaaRelyingPartyFilter(AuthenticationManager authenticationManager) {
-        setFilterProcessesUrl("/v2/manage/**");
+        setFilterProcessesUrl("/custom/v2/**");
         this.setAuthenticationManager(authenticationManager);
     }
 

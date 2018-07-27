@@ -1,9 +1,10 @@
 /**
  * 
  */
-package de.evoila.cf.broker.controller;
+package de.evoila.cf.broker.controller.custom;
 
 import de.evoila.cf.broker.bean.EndpointConfiguration;
+import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.controller.utils.DashboardAuthenticationRedirectBuilder;
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
 import de.evoila.cf.broker.model.Dashboard;
@@ -30,8 +31,8 @@ import java.net.URISyntaxException;
 
 /** @author Johannes Hiemer. */
 @Controller
-@RequestMapping(value = "/v2/authentication")
-public class AuthenticationController extends BaseController {
+@RequestMapping(value = "/custom/v2/authentication")
+public class CustomAuthenticationController extends BaseController {
 
 	private static final String CONFIRM = "/confirm";
 
@@ -47,8 +48,8 @@ public class AuthenticationController extends BaseController {
 
 	private EndpointConfiguration endpointConfiguration;
 
-	public AuthenticationController(ServiceInstanceRepository serviceInstanceRepository, CatalogService catalogService,
-									EndpointConfiguration endpointConfiguration) {
+	public CustomAuthenticationController(ServiceInstanceRepository serviceInstanceRepository, CatalogService catalogService,
+                                          EndpointConfiguration endpointConfiguration) {
 		Assert.notNull(serviceInstanceRepository, "ServiceInstance may not be null");
 		Assert.notNull(catalogService, "CatalogService may not be null");
 		Assert.notNull(endpointConfiguration, "GeneralConfigurationBean may not be null");
@@ -108,7 +109,7 @@ public class AuthenticationController extends BaseController {
 					.getAccessAndRefreshToken(dashboard.getAuthEndpoint(), authCode, dashboardClient, redirectUri);
 
 			if (token != null) {
-                mav.addObject("baseHref", "/v2/authentication/" + serviceInstanceId);
+                mav.addObject("baseHref", "/core/authentication/" + serviceInstanceId);
 				mav.addObject("token", TOKEN_PREFIX + token.getAccessToken());
 				mav.addObject("serviceInstanceId", serviceInstanceId);
 				mav.addObject("endpointUrl", endpointConfiguration.getDefault());
@@ -128,7 +129,7 @@ public class AuthenticationController extends BaseController {
     @GetMapping(value = "/{serviceInstanceId}/test")
     public Object test(@PathVariable String serviceInstanceId) throws Exception {
         ModelAndView mav = new ModelAndView("index");
-        mav.addObject("baseHref", "/v2/authentication/" + serviceInstanceId + "/test");
+        mav.addObject("baseHref", "/core/authentication/" + serviceInstanceId + "/test");
         mav.addObject("token", TOKEN_PREFIX + "iojsiofksdfifid");
         mav.addObject("serviceInstanceId", serviceInstanceId);
         mav.addObject("endpointUrl", endpointConfiguration.getEndpointUrl());

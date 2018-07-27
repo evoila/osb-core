@@ -1,8 +1,5 @@
 package de.evoila.cf.broker.util;
 
-import java.io.IOException;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,13 +11,14 @@ import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import de.evoila.cf.broker.model.SchemaParameters;
-import de.evoila.cf.broker.model.SchemaProperty;
+
+import java.io.IOException;
+import java.util.Map;
 
 public class ParameterValidator {
+
     public static final String JSON_V4_SCHEMA_IDENTIFIER = "http://json-schema.org/draft-04/schema#";
     public static final String JSON_SCHEMA_IDENTIFIER_ELEMENT = "$schema";
-
-
 
     public static JsonNode getJsonNode(Map<String, Object> properties) throws ProcessingException, JsonProcessingException {
        String json = new ObjectMapper().writeValueAsString(properties);

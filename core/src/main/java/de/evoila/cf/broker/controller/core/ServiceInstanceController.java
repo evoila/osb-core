@@ -1,6 +1,7 @@
-package de.evoila.cf.broker.controller;
+package de.evoila.cf.broker.controller.core;
 
 import de.evoila.cf.broker.bean.EndpointConfiguration;
+import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
@@ -13,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 /**
@@ -22,12 +22,12 @@ import javax.validation.Valid;
  * @author Marco Di Martino.
  */
 @RestController
-@RequestMapping(value = "/v2")
+@RequestMapping(value = "/v2/service_instances")
 public class ServiceInstanceController extends BaseController {
 
 	private final Logger log = LoggerFactory.getLogger(ServiceInstanceController.class);
 
-	public static final String SERVICE_INSTANCE_BASE_PATH = "/v2/service_instances";
+	public static final String SERVICE_INSTANCE_BASE_PATH = "/core/service_instances";
 
 	@Autowired
 	private DeploymentServiceImpl deploymentService;
@@ -38,7 +38,7 @@ public class ServiceInstanceController extends BaseController {
 	@Autowired
     private CatalogService catalogService;
 
-	@PutMapping(value = "/service_instances/{instanceId}")
+	@PutMapping(value = "/{instanceId}")
 	public ResponseEntity<ServiceInstanceResponse> createServiceInstance(
 			@PathVariable("instanceId") String serviceInstanceId,
 			@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
@@ -58,7 +58,7 @@ public class ServiceInstanceController extends BaseController {
 			throw new ServiceDefinitionDoesNotExistException(request.getServiceDefinitionId());
 		}
 
-		Extension extension = new Extension(endpointConfiguration.getDefault() + "/v2/extensions", svc.getDashboard().getAuthEndpoint());
+		Extension extension = new Extension(endpointConfiguration.getDefault() + "/core/extensions", svc.getDashboard().getAuthEndpoint());
 
 		ServiceInstanceResponse response = deploymentService.createServiceInstance(serviceInstanceId, request, extension.getExtensionApis());
 
@@ -72,7 +72,7 @@ public class ServiceInstanceController extends BaseController {
 			return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
-	@GetMapping(value = "/service_instances/{instanceId}/last_operation")
+	@GetMapping(value = "/{instanceId}/last_operation")
 	public ResponseEntity<JobProgressResponse> lastOperation(@PathVariable("instanceId") String serviceInstanceId)
 			throws ServiceInstanceDoesNotExistException {
 
@@ -81,7 +81,7 @@ public class ServiceInstanceController extends BaseController {
 		return new ResponseEntity<>(serviceInstanceProcessingResponse, HttpStatus.OK);
 	}
 
-	@PatchMapping(value= "/service_instances/{instanceId}")
+	@PatchMapping(value= "/{instanceId}")
 	public ResponseEntity<String> updateServiceInstance(@PathVariable("instanceId") String serviceInstanceId,
 				@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 				@RequestBody ServiceInstanceRequest request) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
@@ -107,7 +107,7 @@ public class ServiceInstanceController extends BaseController {
 
 	}
 
-	@DeleteMapping(value = "/service_instances/{instanceId}")
+	@DeleteMapping(value = "/{instanceId}")
 	public ResponseEntity<String> deleteServiceInstance(@PathVariable("instanceId") String instanceId,
 														@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 														@RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId)
@@ -131,19 +131,19 @@ public class ServiceInstanceController extends BaseController {
 
 	@ExceptionHandler(ParameterNotNullException.class)
 	@ResponseBody
-	public ResponseEntity<ErrorMessage> handleException(ParameterNotNullException ex, HttpServletResponse response){
+	public ResponseEntity<ErrorMessage> handleException(ParameterNotNullException ex){
 		return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler({ AsyncRequiredException.class })
 	@ResponseBody
-	public ResponseEntity<ErrorMessage> handleException(AsyncRequiredException ex, HttpServletResponse response) {
+	public ResponseEntity<ErrorMessage> handleException(AsyncRequiredException ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);	
 	}
 
     @ExceptionHandler({ ServiceDefinitionDoesNotExistException.class })
     @ResponseBody
-    public ResponseEntity<ErrorMessage> handleException(ServiceDefinitionDoesNotExistException ex, HttpServletResponse response) {
+    public ResponseEntity<ErrorMessage> handleException(ServiceDefinitionDoesNotExistException ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

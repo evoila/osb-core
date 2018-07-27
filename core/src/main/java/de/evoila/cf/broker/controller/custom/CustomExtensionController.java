@@ -1,6 +1,7 @@
-package de.evoila.cf.broker.controller;
+package de.evoila.cf.broker.controller.custom;
 
 import de.evoila.cf.broker.bean.EndpointConfiguration;
+import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.model.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +21,10 @@ import java.util.Map;
  * Created by reneschollmeyer, evoila on 21.06.18.
  */
 @RestController
-@RequestMapping(value = "/v2")
-public class ExtensionController extends BaseController {
+@RequestMapping(value = "/custom/v2/extensions")
+public class CustomExtensionController extends BaseController {
 
-    private final Logger log = LoggerFactory.getLogger(ExtensionController.class);
+    private final Logger log = LoggerFactory.getLogger(CustomExtensionController.class);
 
     private Map<String, List<Server>> servers;
 
@@ -38,7 +39,7 @@ public class ExtensionController extends BaseController {
         }
     }
 
-    @GetMapping(value = "/extensions")
+    @GetMapping(value = { "/", "" })
     public ResponseEntity<Map<String, List<Server>>> getExtensions() {
         return new ResponseEntity<>(servers, HttpStatus.OK);
     }

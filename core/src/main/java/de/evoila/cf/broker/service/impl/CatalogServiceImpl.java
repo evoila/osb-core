@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -33,20 +31,11 @@ public class CatalogServiceImpl implements CatalogService {
 
 	private Environment environment;
 
-	private Map<String, ServiceDefinition> serviceDefs = new ConcurrentHashMap<String, ServiceDefinition>();
-
 	@Autowired
 	public CatalogServiceImpl(Catalog catalog, Environment environment) {
 		this.catalog = catalog;
 		this.environment = environment;
 		prepareCatalogIfTesting(catalog);
-		initializeMap();
-	}
-
-	private void initializeMap() {
-		for (ServiceDefinition def : catalog.getServices()) {
-			serviceDefs.put(def.getId(), def);
-		}
 	}
 
 	@Override
@@ -56,7 +45,13 @@ public class CatalogServiceImpl implements CatalogService {
 
 	@Override
 	public ServiceDefinition getServiceDefinition(String serviceId) {
-		return serviceDefs.get(serviceId);
+		return catalog.getServices().stream()
+                .filter(serviceDefinition -> {
+                    if (serviceDefinition.getId().equals(serviceId))
+                        return true;
+                    else
+                        return false;
+                }).findFirst().get();
 	}
 
 	private Catalog prepareCatalogIfTesting(Catalog catalog) {

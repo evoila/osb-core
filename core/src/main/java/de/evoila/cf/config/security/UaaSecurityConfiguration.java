@@ -5,7 +5,6 @@ import de.evoila.cf.config.security.uaa.handler.CommonCorsAuthenticationEntryPoi
 import de.evoila.cf.config.security.uaa.handler.UaaRelyingPartyAuthenticationFailureHandler;
 import de.evoila.cf.config.security.uaa.handler.UaaRelyingPartyAuthenticationSuccessHandler;
 import de.evoila.cf.config.security.uaa.provider.UaaRelyingPartyAuthenticationProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -18,7 +17,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
-@Order(1)
+@Order(2)
 public class UaaSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
@@ -26,8 +25,8 @@ public class UaaSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new UaaRelyingPartyAuthenticationProvider();
     }
 
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) {
+    @Override
+    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
         authenticationManagerBuilder
                 .authenticationProvider(openIDRelyingPartyAuthenticationProvider());
     }
@@ -38,16 +37,15 @@ public class UaaSecurityConfiguration extends WebSecurityConfigurerAdapter {
         uaaRelyingPartyFilter.setSuccessHandler(new UaaRelyingPartyAuthenticationSuccessHandler());
         uaaRelyingPartyFilter.setFailureHandler(new UaaRelyingPartyAuthenticationFailureHandler());
 
-
         http.addFilterBefore(uaaRelyingPartyFilter, LogoutFilter.class)
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .antMatcher("/custom/v2/**")
                 .authorizeRequests()
-                .antMatchers(HttpMethod.GET,"/v2/authentication/{serviceInstanceId}").permitAll()
-                .antMatchers(HttpMethod.GET,"/v2/authentication/{serviceInstanceId}/confirm").permitAll()
-                .antMatchers(HttpMethod.GET, "/v2/manage/**").authenticated()
-                .antMatchers(HttpMethod.GET, "/v2/extensions").authenticated()
+                .antMatchers(HttpMethod.GET,"/custom/v2/authentication/{serviceInstanceId}").permitAll()
+                .antMatchers(HttpMethod.GET,"/custom/v2/authentication/{serviceInstanceId}/confirm").permitAll()
+                .antMatchers(HttpMethod.GET, "/custom/v2/**").authenticated()
                 .and()
                 .anonymous().disable()
                 .exceptionHandling()
@@ -60,7 +58,7 @@ public class UaaSecurityConfiguration extends WebSecurityConfigurerAdapter {
     public AuthenticationEntryPoint authenticationEntryPoint() {
         CommonCorsAuthenticationEntryPoint entryPoint =
                 new CommonCorsAuthenticationEntryPoint();
-        entryPoint.setRealmName("defaultEndpointRealm");
+        entryPoint.setRealmName("uaaEndpointRealm");
         return entryPoint;
     }
 }
