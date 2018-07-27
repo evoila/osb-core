@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.Map;
  * @author Johannes Hiemer.
  * @author Marco Di Martino.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ServiceDefinition {
 
 	private String id;

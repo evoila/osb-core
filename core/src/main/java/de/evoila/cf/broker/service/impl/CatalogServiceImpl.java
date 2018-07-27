@@ -51,7 +51,7 @@ public class CatalogServiceImpl implements CatalogService {
                         return true;
                     else
                         return false;
-                }).findFirst().get();
+                }).findFirst().orElse(null);
 	}
 
 	private Catalog prepareCatalogIfTesting(Catalog catalog) {

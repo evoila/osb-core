@@ -29,7 +29,7 @@ public class CatalogController extends BaseController {
         Catalog catalog = new Catalog();
         catalog.setServices(catalogService.getCatalog().getServices());
 
-        return new ResponseEntity<>(catalog, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(catalog, HttpStatus.OK);
     }
 
 }

@@ -58,7 +58,7 @@ public class ServiceInstanceController extends BaseController {
 			throw new ServiceDefinitionDoesNotExistException(request.getServiceDefinitionId());
 		}
 
-		Extension extension = new Extension(endpointConfiguration.getDefault() + "/core/extensions", svc.getDashboard().getAuthEndpoint());
+		Extension extension = new Extension(endpointConfiguration.getDefault() + "/custom/v2/extensions", svc.getDashboard().getAuthEndpoint());
 
 		ServiceInstanceResponse response = deploymentService.createServiceInstance(serviceInstanceId, request, extension.getExtensionApis());
 

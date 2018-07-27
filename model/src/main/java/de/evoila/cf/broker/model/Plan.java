@@ -1,6 +1,7 @@
 package de.evoila.cf.broker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * A service plan available for a ServiceDefinition
@@ -8,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author sgreenberg@gopivotal.com
  * @author Johannes Hiemer.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Plan {
 
 	private String id;
@@ -16,60 +18,18 @@ public class Plan {
 
 	private String description;
 
-	private Metadata metadata  = new Metadata();
+	private Metadata metadata = new Metadata();
 
 	private boolean free = true;
 
 	private Schemas schemas;
 
-	/**
-	 * Please use metadata section for custom mapping information
-	 */
-	@Deprecated
-	private int volumeSize;
-
-	/**
-	 * Please use metadata section for custom mapping information
-	 */
-	@Deprecated
-	private VolumeUnit volumeUnit;
+	public Plan() {}
 
 	/**
 	 * Please use metadata section for custom mapping information
 	 */
 	private Platform platform;
-
-	/**
-	 * Please use metadata section for custom mapping information
-	 */
-	@Deprecated
-	private String flavorId;
-
-	/**
-	 * Please use metadata section for custom mapping information
-	 */
-	@Deprecated
-	private int connections;
-
-	public Plan() {
-		super();
-	}
-
-	public int getVolumeSize() {
-		return volumeSize;
-	}
-
-	public void setVolumeSize(int volumeSize) {
-		this.volumeSize = volumeSize;
-	}
-
-	public VolumeUnit getVolumeUnit() {
-		return volumeUnit;
-	}
-
-	public void setVolumeUnit(VolumeUnit volumeUnit) {
-		this.volumeUnit = volumeUnit;
-	}
 
 	public Platform getPlatform() {
 		return platform;
@@ -84,38 +44,18 @@ public class Plan {
 		this.platform = Platform.valueOf(platform);
 	}
 
-	public String getFlavorId() {
-		return flavorId;
-	}
-
-	public void setFlavorId(String flavorId) {
-		this.flavorId = flavorId;
-	}
-
-	public int getConnections() {
-		return connections;
-	}
-
-	public void setConnections(int connections) {
-		this.connections = connections;
-	}
-
-	public Plan(String id, String name, String description, Platform platform, int volumeSize, VolumeUnit volumeUnit,
-			String flavorId, boolean free, int connections) {
+	public Plan(String id, String name, String description, Platform platform, boolean free) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.platform = platform;
-		this.volumeSize = volumeSize;
-		this.flavorId = flavorId;
-		this.connections = connections;
-		this.volumeUnit = volumeUnit;
+		this.free = free;
 		this.metadata = new Metadata();
 	}
 
 	public Plan(String id, String name, String description, Metadata metadata, Platform platform,
-			int volumeSize, VolumeUnit volumeUnit, String flavor, boolean free, int connections) {
-		this(id, name, description, platform, volumeSize, volumeUnit, flavor, free, connections);
+			boolean free) {
+		this(id, name, description, platform, free);
 		this.metadata = metadata;
 	}
 
