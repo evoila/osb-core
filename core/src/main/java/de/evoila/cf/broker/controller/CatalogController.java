@@ -17,12 +17,13 @@ public class CatalogController extends BaseController {
 
     private final Logger logger = LoggerFactory.getLogger(CatalogController.class);
 
-	@Autowired
-	private CatalogService service;
+    @Autowired
+    private CatalogService service;
 
-	@GetMapping(value = { "/", "" })
-	public @ResponseBody Catalog getCatalog(){
-		logger.debug("GET: getCatalog()");
-		return service.getCatalog();
-	}
+    @GetMapping(value = { "/", "" })
+    public @ResponseBody Catalog getCatalog(){
+        logger.debug("GET: getCatalog()");
+        return service.getCatalog();
+    }
+
 }

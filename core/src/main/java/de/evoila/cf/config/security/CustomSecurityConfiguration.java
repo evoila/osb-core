@@ -1,6 +1,7 @@
 package de.evoila.cf.config.security;
 
-import de.evoila.cf.broker.bean.AuthenticationPropertiesConfiguration;
+import de.evoila.cf.broker.bean.AuthenticationConfiguration;
+import de.evoila.cf.broker.bean.BaseAuthenticationConfiguration;
 import de.evoila.cf.config.security.uaa.UaaRelyingPartyFilter;
 import de.evoila.cf.config.security.uaa.handler.CommonCorsAuthenticationEntryPoint;
 import de.evoila.cf.config.security.uaa.handler.UaaRelyingPartyAuthenticationFailureHandler;
@@ -32,7 +33,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 public class CustomSecurityConfiguration extends WebSecurityConfigurerAdapter  {
 
 	@Autowired
-	private AuthenticationPropertiesConfiguration authentication;
+	private BaseAuthenticationConfiguration authentication;
 
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {

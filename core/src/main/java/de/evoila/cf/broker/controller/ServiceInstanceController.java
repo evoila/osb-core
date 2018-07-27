@@ -33,10 +33,10 @@ public class ServiceInstanceController extends BaseController {
 	private DeploymentServiceImpl deploymentService;
 
 	@Autowired
-	private CatalogService catalogService;
+	private EndpointConfiguration endpointConfiguration;
 
 	@Autowired
-	private EndpointConfiguration endpointConfiguration;
+    private CatalogService catalogService;
 
 	@PutMapping(value = "/service_instances/{instanceId}")
 	public ResponseEntity<ServiceInstanceResponse> createServiceInstance(

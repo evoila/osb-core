@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
 
-@Configuration
 @ConfigurationProperties(prefix = "site")
 @Conditional(SiteConfigurationCondition.class)
 public class SiteConfiguration {

@@ -3,7 +3,11 @@ package de.evoila.cf.broker.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 /**
  * The catalog of services offered by this broker.
@@ -11,26 +15,32 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author sgreenberg@gopivotal.com
  * @author Johannes Hiemer.
  */
-@ConfigurationProperties("catalog")
+@Configuration
+@ConfigurationProperties(prefix = "catalog")
+@ConditionalOnProperty(prefix = "catalog", name = {"name", "services"}, havingValue = "")
 public class Catalog {
 
-	private List<ServiceDefinition> services = new ArrayList<ServiceDefinition>();
-	
-	public Catalog() {}
-	
-	public Catalog(List<ServiceDefinition> services) {
-		this.setServices(services); 
-	}
-	
+    public Catalog() {
+        System.out.println("oidjsvosvijsvio");
+    }
+
+    private String name;
+
+	private List<ServiceDefinition> services = new ArrayList<>();
+
 	public List<ServiceDefinition> getServices() {
 		return services;
 	}
 
-	private void setServices(List<ServiceDefinition> services) {
-		if (services == null) {
-			this.services = new ArrayList<>();
-		} else {
-			this.services= services;
-		} 
+	public void setServices(List<ServiceDefinition> services) {
+		this.services = services;
 	}
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
