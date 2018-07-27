@@ -1,14 +1,11 @@
 package de.evoila.cf.broker.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * A service offered by this broker.
@@ -17,53 +14,31 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * @author Johannes Hiemer.
  * @author Marco Di Martino.
  */
-@JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class ServiceDefinition {
 
-	@JsonSerialize
-	@JsonProperty("id")
 	private String id;
 
-	@JsonSerialize
-	@JsonProperty("name")
 	private String name;
 
-	@JsonSerialize
-	@JsonProperty("description")
 	private String description;
 
-	@JsonSerialize
-	@JsonProperty("bindable")
 	private boolean bindable;
 
-	@JsonSerialize
-	@JsonProperty("plans")
-	private List<Plan> plans = new ArrayList<Plan>();
+	private List<Plan> plans = new ArrayList<>();
 
-	@JsonSerialize
-	@JsonProperty("tags")
-	private List<String> tags = new ArrayList<String>();
+	private List<String> tags = new ArrayList<>();
 
-	@JsonSerialize
-	@JsonProperty("metadata")
-	private Map<String, Object> metadata = new HashMap<String, Object>();
+	private Map<String, Object> metadata = new HashMap<>();
 
-	@JsonSerialize
-	@JsonProperty("requires")
-	private List<String> requires = new ArrayList<String>();
-	
-	@JsonSerialize
-	@JsonProperty("dashboard")
+	private List<String> requires = new ArrayList<>();
+
 	private Dashboard dashboard;
-	
-	@JsonSerialize
+
 	@JsonProperty("dashboard_client")
 	private DashboardClient dashboardClient;
 
-	@JsonSerialize
 	@JsonProperty("plan_updateable") // misspelling of attribute kept, do not change it
 	private boolean updateable;
-
 
 	public ServiceDefinition() {
 		super();

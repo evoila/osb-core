@@ -3,9 +3,7 @@
  */
 package de.evoila.config.web;
 
-import de.evoila.cf.broker.model.Catalog;
 import de.evoila.cf.config.security.uaa.utils.HeaderCheckFilter;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +18,6 @@ import org.springframework.web.filter.CorsFilter;
  */
 @Configuration
 @EnableWebSecurity
-@EnableConfigurationProperties(Catalog.class)
 public class BaseConfiguration {
 
     @Bean

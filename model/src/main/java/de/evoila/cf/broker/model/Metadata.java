@@ -21,7 +21,7 @@ public class Metadata extends InstanceGroupConfig {
 
     private String ingressInstanceGroup;
 
-    private List<CustomInstanceGroupConfig> instanceGroupConfig= new ArrayList<>();
+    private List<CustomInstanceGroupConfig> instanceGroupConfig = new ArrayList<>();
 
     private Map<String, Object> customParameters = new HashMap<>();
 

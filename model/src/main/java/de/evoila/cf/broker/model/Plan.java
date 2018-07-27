@@ -1,10 +1,6 @@
 package de.evoila.cf.broker.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * A service plan available for a ServiceDefinition
@@ -12,31 +8,18 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * @author sgreenberg@gopivotal.com
  * @author Johannes Hiemer.
  */
-@JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class Plan {
 
-	@JsonSerialize
-	@JsonProperty("id")
 	private String id;
 
-	@JsonSerialize
-	@JsonProperty("name")
 	private String name;
 
-	@JsonSerialize
-	@JsonProperty("description")
 	private String description;
 
-	@JsonSerialize
-	@JsonProperty("metadata")
 	private Metadata metadata  = new Metadata();
-	
-	@JsonSerialize
-	@JsonProperty(value="free", required=false)
+
 	private boolean free = true;
-	
-	@JsonSerialize
-	@JsonProperty("schemas")
+
 	private Schemas schemas;
 
 	/**

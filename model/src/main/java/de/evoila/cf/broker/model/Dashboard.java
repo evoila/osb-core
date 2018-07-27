@@ -4,18 +4,15 @@
 package de.evoila.cf.broker.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * @author Johannes Hiemer
  */
 public class Dashboard {
 
-	@JsonSerialize
 	@JsonProperty("url")
 	private String url;
 	
-	@JsonSerialize
 	@JsonProperty("auth_endpoint")
 	private String authEndpoint;
 
