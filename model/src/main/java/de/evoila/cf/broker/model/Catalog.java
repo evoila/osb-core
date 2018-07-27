@@ -23,8 +23,6 @@ public class Catalog {
         System.out.println("oidjsvosvijsvio");
     }
 
-    private String name;
-
 	private List<ServiceDefinition> services = new ArrayList<>();
 
 	public List<ServiceDefinition> getServices() {
@@ -34,12 +32,4 @@ public class Catalog {
 	public void setServices(List<ServiceDefinition> services) {
 		this.services = services;
 	}
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }
