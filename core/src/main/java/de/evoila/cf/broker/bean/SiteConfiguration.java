@@ -1,14 +1,15 @@
 package de.evoila.cf.broker.bean;
 
-import de.evoila.cf.broker.bean.utils.SiteConfigurationCondition;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
 
 @ConfigurationProperties(prefix = "site")
-@Conditional(SiteConfigurationCondition.class)
+@ConditionalOnProperty(prefix = "site", name = "properties", havingValue = "")
 public class SiteConfiguration {
 
     Map<String, Object> properties;
