@@ -13,8 +13,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class SchemaParameters {
 
-	public static final String JSON_V4_SCHEMA_IDENTIFIER = "http://json-schema.org/draft-04/schema#";
-
 	@JsonSerialize
 	@JsonProperty("$schema")
 	private String schema;
@@ -34,11 +32,10 @@ public class SchemaParameters {
 
 
 	public SchemaParameters() {
-		this.schema = JSON_V4_SCHEMA_IDENTIFIER;
 	}
 
 	public SchemaParameters(String schema, String type) {
-		this.schema = JSON_V4_SCHEMA_IDENTIFIER;
+		this.schema = schema;
 		this.type = type;
 	}
 
