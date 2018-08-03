@@ -1,0 +1,40 @@
+{
+  "jti": "325006d1-143c-41fc-8948-f7bb2368a7dc",
+  "exp": 1483884062,
+  "nbf": 0,
+  "iat": 1483876862,
+  "iss": "https://idp.msh.host/auth/realms/meshfed",
+  "aud": "keystone-openid",
+  "sub": "ffd45214-6fb1-48e8-b97e-551758a81e54",
+  "typ": "Bearer",
+  "azp": "keystone-openid",
+  "nonce": "nMwPvlL6c9LXNxdR",
+  "auth_time": 1483876862,
+  "session_state": "7223fe19-c90a-4f75-93d2-41a25387f51c",
+  "acr": "1",
+  "client_session": "f3c74f09-619e-4573-ba02-0dd85ef1fc0f",
+  "allowed-origins": [
+    ""
+  ],
+  "realm_access": {
+    "roles": [
+      "domain_admin",
+      "uma_authorization"
+    ]
+  },
+  "resource_access": {
+    "account": {
+      "roles": [
+        "manage-account",
+        "view-profile"
+      ]
+    }
+  },
+  "name": "Johannes Hiemer",
+  "MC_ENTITLED_GROUPS": "[\"joe2-inc-mp-noadmin\",\"joe2-inc-iorioerioerioer-noadmin\"]",
+  "preferred_username": "jvhiemer@gmail.com",
+  "given_name": "Johannes",
+  "family_name": "Hiemer",
+  "email": "jvhiemer@gmail.com",
+  "customer_domain": "joe2-inc"
+}
