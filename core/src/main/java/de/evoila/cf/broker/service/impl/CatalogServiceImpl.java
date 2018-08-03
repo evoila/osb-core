@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.service.impl;
 
+import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.broker.model.Catalog;
 import de.evoila.cf.broker.model.ServiceDefinition;
 import de.evoila.cf.broker.service.CatalogService;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  * An implementation of the CatalogService that gets the catalog injected (ie
  * configure in spring config)
  *
- * @author sgreenberg@gopivotal.com
+ * @author Johannes Hiemer.
  * @author Christian Brinker, evoila.
  */
 @Service
@@ -31,10 +32,13 @@ public class CatalogServiceImpl implements CatalogService {
 
 	private Environment environment;
 
+	private EndpointConfiguration endpointConfiguration;
+
 	@Autowired
-	public CatalogServiceImpl(Catalog catalog, Environment environment) {
+	public CatalogServiceImpl(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration) {
 		this.catalog = catalog;
 		this.environment = environment;
+		this.endpointConfiguration = endpointConfiguration;
 		prepareCatalogIfTesting(catalog);
 	}
 
@@ -86,6 +90,10 @@ public class CatalogServiceImpl implements CatalogService {
 				}).collect(Collectors.toList());
 				return service;
 			}).collect(Collectors.toList());
+
+			endpointConfiguration.setDefault(
+			        replaceUrl(endpointConfiguration.getDefault())
+            );
 		}
 		return catalog;
 	}

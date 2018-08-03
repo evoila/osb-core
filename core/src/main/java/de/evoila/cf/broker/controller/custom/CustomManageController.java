@@ -26,7 +26,7 @@ public class CustomManageController extends BaseController {
     ServiceInstanceRepository repository;
     ServiceDefinitionRepository serviceDefinitionRepository;
 
-    CustomManageController(ServiceInstanceRepository repository, ServiceDefinitionRepository sdRepository){
+    CustomManageController(ServiceInstanceRepository repository, ServiceDefinitionRepository sdRepository) {
         Assert.notNull(repository, "ServiceInstanceRepository is null");
         Assert.notNull(sdRepository, "ServiceDefinitionRepository is null");
         this.repository = repository;
@@ -38,7 +38,7 @@ public class CustomManageController extends BaseController {
             ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
         ServiceInstance serviceInstance = repository.getServiceInstance(serviceInstanceId);
 
-        if(serviceInstance == null){
+        if (serviceInstance == null) {
             throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
         }
 
