@@ -2,7 +2,10 @@
     "id": "d75b3b6a-bcd5-4101-96b4-42d5957f8505",
     "name": "s",
     "description": "The minimal test plan",
-    "metadata": null,
+    "metadata" : {
+    "instanceGroupConfig" : [ ],
+    "customParameters" : { }
+    },
     "free": false,
     "schemas": {
         "service_instance": {

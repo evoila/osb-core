@@ -2,7 +2,10 @@
     "id": "5cf4a198-259d-4a3b-bc3b-9958ac4f8f7a",
     "name": "s",
     "description": "A complex test plan",
-    "metadata": null,
+    "metadata" : {
+    "instanceGroupConfig" : [ ],
+    "customParameters" : { }
+    },
     "free": false,
     "schemas": {
         "service_instance": {

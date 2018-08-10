@@ -2,7 +2,10 @@
     "id": "96334063-16aa-44c6-8b71-c36e1aa956de",
     "name": "s",
     "description": "The standard test plan",
-    "metadata": null,
+    "metadata" : {
+    "instanceGroupConfig" : [ ],
+    "customParameters" : { }
+    },
     "free": false,
     "schemas": {
         "service_instance": {
