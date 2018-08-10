@@ -78,7 +78,8 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		ServiceInstanceBinding binding;
-		if (haProxyService != null && serviceInstanceBindingRequest.getAppGuid() == null && serviceInstanceBindingRequest.getBindResource().getAppGuid() == null) {
+		if (haProxyService != null && (serviceInstanceBindingRequest.getAppGuid() == null ||
+                (serviceInstanceBindingRequest.getBindResource() != null && serviceInstanceBindingRequest.getBindResource().getAppGuid() == null))) {
 			List<ServerAddress> externalServerAddresses = haProxyService.appendAgent(serviceInstance.getHosts(), bindingId, instanceId);
 
 			binding = bindServiceKey(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalServerAddresses);

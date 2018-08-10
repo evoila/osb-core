@@ -85,8 +85,7 @@ public abstract class HAProxyService {
 		try {
 			HABackendResponse response = restTemplate.exchange(haProxy, HttpMethod.PUT, entity, HABackendResponse.class)
 					.getBody();
-			
-			
+
 			log.info("Called: " + haProxy);
 			log.info("Response is: " + response);
 			
