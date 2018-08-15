@@ -63,11 +63,13 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		Plan plan = serviceDefinitionRepository.getPlan(serviceInstanceBindingRequest.getPlanId());
+
 		try {
 			validateParameters(serviceInstanceBindingRequest, plan);
-		}catch(ProcessingException e) {
+		} catch(ProcessingException e) {
 			throw new InvalidParametersException("Error while validating parameters");
 		}
+
 		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
                 .isEmpty(serviceInstanceBindingRequest.getBindResource().getRoute())) {
 
