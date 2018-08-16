@@ -17,6 +17,8 @@ public class InstanceGroupConfig {
 
     protected List<NetworkReference> networks;
 
+    protected List<String> azs;
+
     public Integer getConnections() {
         return connections;
     }
@@ -63,5 +65,13 @@ public class InstanceGroupConfig {
 
     public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
+    }
+
+    public List<String> getAzs() {
+        return azs;
+    }
+
+    public void setAzs(List<String> azs) {
+        this.azs = azs;
     }
 }
