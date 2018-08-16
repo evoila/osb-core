@@ -3,6 +3,7 @@
  */
 package de.evoila.cf.broker.service.impl;
 
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.repository.JobRepository;
@@ -12,6 +13,7 @@ import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.AsyncDeploymentService;
 import de.evoila.cf.broker.service.DeploymentService;
 import de.evoila.cf.broker.service.PlatformService;
+import de.evoila.cf.broker.util.ParameterValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +61,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 	@Override
 	public ServiceInstanceResponse createServiceInstance(String serviceInstanceId, ServiceInstanceRequest request, List<Map<String, Object>> extension_apis)
 					throws ServiceInstanceExistsException, ServiceBrokerException,
-					ServiceDefinitionDoesNotExistException {
+					ServiceDefinitionDoesNotExistException, InvalidParametersException {
 
 		serviceDefinitionRepository.validateServiceId(request.getServiceDefinitionId());
 
@@ -72,6 +74,13 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 		Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
+		if (request.getParameters() != null && request.getParameters().size() > 0){
+		    try{
+                ParameterValidator.validateParameters(request, plan);
+            }catch(ProcessingException e){
+		        throw new InvalidParametersException("Error while validating parameters");
+            }
+        }
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
 		if (platformService == null) {
@@ -93,7 +102,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     @Override
     public void updateServiceInstance(String serviceInstanceId, ServiceInstanceRequest request) throws ServiceBrokerException, ServiceInstanceDoesNotExistException,
-            ServiceDefinitionDoesNotExistException {
+            ServiceDefinitionDoesNotExistException, InvalidParametersException {
 
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
         if (serviceInstance == null){
@@ -101,6 +110,14 @@ public class DeploymentServiceImpl implements DeploymentService {
         }
 
         Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
+
+        if (request.getParameters() != null && request.getParameters().size() > 0){
+            try{
+                ParameterValidator.validateParameters(request, plan);
+            }catch(ProcessingException e){
+                throw new InvalidParametersException("Error while validating parameters");
+            }
+        }
 
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 

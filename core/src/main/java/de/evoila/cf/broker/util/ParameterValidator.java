@@ -10,9 +10,12 @@ import com.github.fge.jsonschema.core.report.ProcessingMessage;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
-import de.evoila.cf.broker.model.SchemaParameters;
+import de.evoila.cf.broker.exception.InvalidParametersException;
+import de.evoila.cf.broker.model.*;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class ParameterValidator {
@@ -20,7 +23,7 @@ public class ParameterValidator {
     public static final String JSON_V4_SCHEMA_IDENTIFIER = "http://json-schema.org/draft-04/schema#";
     public static final String JSON_SCHEMA_IDENTIFIER_ELEMENT = "$schema";
 
-    public static JsonNode getJsonNode(Map<String, Object> properties) throws ProcessingException, JsonProcessingException {
+    private static JsonNode getJsonNode(Map<String, Object> properties) throws ProcessingException, JsonProcessingException {
        String json = new ObjectMapper().writeValueAsString(properties);
        JsonNode node = null;
        try{
@@ -30,7 +33,7 @@ public class ParameterValidator {
        return node;
     }
 
-    public static JsonSchema getJsonSchema(SchemaParameters schema) throws ProcessingException, JsonProcessingException {
+    private static JsonSchema getJsonSchema(SchemaParameters schema) throws ProcessingException, JsonProcessingException {
         String json = new ObjectMapper().writeValueAsString(schema);
         JsonSchema jsonSchema = null;
         try{
@@ -40,17 +43,107 @@ public class ParameterValidator {
         return jsonSchema;
     }
 
-    public static JsonNode getJsonNode(String jsonText) throws IOException {
+    private static JsonNode getJsonNode(String jsonText) throws IOException {
         return JsonLoader.fromString(jsonText);
     }
 
-    public static JsonSchema getSchemaNode(String schemaText) throws IOException, ProcessingException {
+    private static JsonSchema getSchemaNode(String schemaText) throws IOException, ProcessingException {
         final JsonNode schemaNode = getJsonNode(schemaText);
         return _getSchemaNode(schemaNode);
     }
 
+    public static void validateParameters(ServiceInstanceBindingRequest serviceInstanceBindingRequest, Plan plan) throws InvalidParametersException , ProcessingException{
 
-    public static void validateJson(JsonSchema jsonSchemaNode, JsonNode jsonNode) throws ProcessingException {
+        /* key validation*/
+        HashMap<String, Object> serviceInstanceRequestParams = (HashMap<String, Object>)serviceInstanceBindingRequest.getParameters();
+
+        HashMap<String, SchemaProperty> params = null;
+        try{
+            params = (HashMap<String, SchemaProperty>)plan.getSchemas().getServiceBinding().getCreate().getParameters().getProperties();
+        }catch (NullPointerException e){
+            throw new InvalidParametersException("No additional parameters are allowed for this request with this plan");
+        }
+        boolean flag;
+        for (String requestKey : serviceInstanceRequestParams.keySet()) {
+            flag = false;
+            Iterator<Map.Entry<String, SchemaProperty>> entries = params.entrySet().iterator();
+            while(!(flag) && entries.hasNext()){
+                Map.Entry<String, SchemaProperty> key = entries.next();
+                if(requestKey.equals(key.getKey())){
+                    flag = true;
+                }
+            }
+            if(!(flag)){
+                throw new InvalidParametersException(serviceInstanceRequestParams);
+            }
+        }
+
+        /* value validation */
+        SchemaParameters json = plan.getSchemas().getServiceBinding().getCreate().getParameters();
+        HashMap<String, Object> params2;
+        params2 = (HashMap<String, Object>)serviceInstanceBindingRequest.getParameters();
+
+        JsonSchema jsonSchema = null;
+        JsonNode jsonObject = null;
+        try {
+            jsonSchema = getJsonSchema(json);
+            jsonObject = getJsonNode(params2);
+        }catch (JsonProcessingException e){
+            throw new InvalidParametersException("Error while processing json schema");
+        }
+        try {
+            validateJson(jsonSchema, jsonObject);
+        }catch (ProcessingException e){
+            throw new InvalidParametersException("Error while processing json schema. Values not allowed");
+        }
+    }
+    public static void validateParameters(ServiceInstanceRequest serviceInstanceRequest, Plan plan) throws InvalidParametersException, ProcessingException{
+
+        /* key validation*/
+        HashMap<String, Object> serviceInstanceRequestParams = (HashMap<String, Object>)serviceInstanceRequest.getParameters();
+
+        HashMap<String, SchemaProperty> params = null;
+        try{
+            params = (HashMap<String, SchemaProperty>)plan.getSchemas().getServiceInstance().getCreate().getParameters().getProperties();
+        }catch (NullPointerException e){
+            throw new InvalidParametersException("No additional parameters are allowed for this request with this plan");
+        }
+        boolean flag;
+        for (String requestKey : serviceInstanceRequestParams.keySet()) {
+            flag = false;
+            Iterator<Map.Entry<String, SchemaProperty>> entries = params.entrySet().iterator();
+            while(!(flag) && entries.hasNext()){
+                Map.Entry<String, SchemaProperty> key = entries.next();
+                if(requestKey.equals(key.getKey())){
+                    flag = true;
+                }
+            }
+            if(!(flag)){
+                throw new InvalidParametersException(serviceInstanceRequestParams);
+            }
+        }
+
+        /* schema validation */
+        SchemaParameters json = plan.getSchemas().getServiceInstance().getCreate().getParameters();
+        HashMap<String, Object> params2;
+        params2 = (HashMap<String, Object>)serviceInstanceRequest.getParameters();
+
+        JsonSchema jsonSchema = null;
+        JsonNode jsonObject = null;
+        try {
+            jsonSchema = getJsonSchema(json);
+            jsonObject = getJsonNode(params2);
+        }catch (JsonProcessingException e){
+            throw new InvalidParametersException("Error while processing json schema");
+        }
+        try {
+            validateJson(jsonSchema, jsonObject);
+        }catch (ProcessingException e){
+            throw new InvalidParametersException("Error while processing json schema. Values not allowed");
+        }
+    }
+
+    private static void validateJson(JsonSchema jsonSchemaNode, JsonNode jsonNode) throws ProcessingException {
         ProcessingReport report = jsonSchemaNode.validate(jsonNode);
         if (!report.isSuccess()) {
             for (ProcessingMessage processingMessage : report) {

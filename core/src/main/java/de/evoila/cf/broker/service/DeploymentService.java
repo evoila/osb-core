@@ -3,10 +3,8 @@
  */
 package de.evoila.cf.broker.service;
 
-import de.evoila.cf.broker.exception.ServiceBrokerException;
-import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceExistsException;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.JobProgressResponse;
 import de.evoila.cf.broker.model.ServiceInstanceRequest;
 import de.evoila.cf.broker.model.ServiceInstanceResponse;
@@ -28,12 +26,11 @@ public interface DeploymentService {
 			throws ServiceInstanceDoesNotExistException, ServiceBrokerException;
 
 	ServiceInstanceResponse createServiceInstance(String serviceInstanceId, ServiceInstanceRequest serviceInstanceRequest00, List<Map<String, Object>> exentension_apis) throws ServiceInstanceExistsException,
-            ServiceBrokerException, ServiceDefinitionDoesNotExistException;
+            ServiceBrokerException, ServiceDefinitionDoesNotExistException, ProcessingException, InvalidParametersException;
 
     void updateServiceInstance(String serviceInstanceId, ServiceInstanceRequest serviceInstanceRequest) throws ServiceBrokerException,
-            ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException;
+            ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException;
 
 	void deleteServiceInstance(String instanceId) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
             ServiceInstanceDoesNotExistException;
-
 }

@@ -43,7 +43,7 @@ public class ServiceInstanceController extends BaseController {
 			@PathVariable("instanceId") String serviceInstanceId,
 			@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 			@Valid @RequestBody ServiceInstanceRequest request) throws ServiceDefinitionDoesNotExistException,
-					ServiceInstanceExistsException, ServiceBrokerException, AsyncRequiredException {
+					ServiceInstanceExistsException, ServiceBrokerException, AsyncRequiredException, InvalidParametersException {
 
 		if (acceptsIncomplete == null || !acceptsIncomplete) {
 			throw new AsyncRequiredException();
@@ -85,7 +85,7 @@ public class ServiceInstanceController extends BaseController {
 	public ResponseEntity<String> updateServiceInstance(@PathVariable("instanceId") String serviceInstanceId,
 				@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 				@RequestBody ServiceInstanceRequest request) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
-            ServiceInstanceDoesNotExistException, AsyncRequiredException {
+            ServiceInstanceDoesNotExistException, AsyncRequiredException, InvalidParametersException{
 
 		if (request.getServiceDefinitionId() == null){
 			return new ResponseEntity<>("Missing required fields: service_id", HttpStatus.BAD_REQUEST );
@@ -94,7 +94,7 @@ public class ServiceInstanceController extends BaseController {
 		log.debug("PATCH: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
 				+ ", updateServiceInstance(), serviceInstanceId = " + serviceInstanceId);
 
-		if (acceptsIncomplete==null || !acceptsIncomplete){
+		if (acceptsIncomplete == null || !acceptsIncomplete){
 			throw new AsyncRequiredException();
 		}
 
@@ -129,19 +129,13 @@ public class ServiceInstanceController extends BaseController {
 	    return new ResponseEntity<>("{}", HttpStatus.ACCEPTED);
 	}
 
-	@ExceptionHandler(ParameterNotNullException.class)
-	@ResponseBody
-	public ResponseEntity<ErrorMessage> handleException(ParameterNotNullException ex){
-		return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
-	}
-
 	@ExceptionHandler({ AsyncRequiredException.class })
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(AsyncRequiredException ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);	
 	}
 
-    @ExceptionHandler({ ServiceDefinitionDoesNotExistException.class })
+    @ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, InvalidParametersException.class })
     @ResponseBody
     public ResponseEntity<ErrorMessage> handleException(ServiceDefinitionDoesNotExistException ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

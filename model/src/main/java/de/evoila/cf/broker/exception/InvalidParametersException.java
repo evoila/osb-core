@@ -7,24 +7,23 @@ public class InvalidParametersException extends Exception{
 
     private Map<String, Object> parameters;
 
-    private String errorMesssage;
+    private String errorMessage;
 
     public InvalidParametersException(String errorMessage){
-        this.errorMesssage = errorMessage;
+        this.errorMessage = errorMessage;
     }
 
     public InvalidParametersException(Map<String, Object> parameters){
-
         this.parameters = parameters;
     }
 
     @Override
     public String getMessage()
     {
-        if (errorMesssage == null){
-            return "The specified parameters are invalid ";
+        if (errorMessage == null){
+            return "The specified parameters are invalid";
         }else{
-            return this.errorMesssage;
+            return this.errorMessage;
         }
     }
 }

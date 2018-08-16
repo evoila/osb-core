@@ -52,8 +52,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	@Override
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
 			ServiceInstanceBindingRequest serviceInstanceBindingRequest) throws ServiceInstanceBindingExistsException,
-			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException,
-			ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException, InvalidParametersException {
+			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException, InvalidParametersException {
 
 		validateBindingNotExists(bindingId, instanceId);
 
@@ -63,11 +62,12 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		Plan plan = serviceDefinitionRepository.getPlan(serviceInstanceBindingRequest.getPlanId());
-
-		try {
-			validateParameters(serviceInstanceBindingRequest, plan);
-		} catch(ProcessingException e) {
+		if (serviceInstanceBindingRequest.getParameters() != null && serviceInstanceBindingRequest.getParameters().size() > 0){
+			try {
+				ParameterValidator.validateParameters(serviceInstanceBindingRequest, plan);
+			}catch(ProcessingException e) {
 			throw new InvalidParametersException("Error while validating parameters");
+			}
 		}
 
 		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
@@ -125,57 +125,6 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 	}
 
-	protected void validateParameters(ServiceInstanceBindingRequest serviceInstanceBindingRequest, Plan plan) throws ProcessingException, InvalidParametersException {
-
-		/* key validation*/
-		HashMap<String, Object> serviceInstanceRequestParams = (HashMap<String, Object>)serviceInstanceBindingRequest.getParameters();
-		if (serviceInstanceRequestParams == null){
-			return;
-		}
-		HashMap<String, SchemaProperty> params = null;
-		try{
-			params = (HashMap<String, SchemaProperty>)plan.getSchemas().getServiceBinding().getCreate().getParameters().getProperties();
-		}catch (NullPointerException e){
-			throw new InvalidParametersException("No additional parameters are allowed for this request with this plan");
-		}
-
-		boolean flag;
-		for (String requestKey : serviceInstanceRequestParams.keySet()) {
-			flag = false;
-			Iterator<Map.Entry<String, SchemaProperty>> entries = params.entrySet().iterator();
-			while(!(flag) && entries.hasNext()){
-				Map.Entry<String, SchemaProperty> key = entries.next();
-				if(requestKey.equals(key.getKey())){
-					flag = true;
-				}
-			}
-			if(!(flag)){
-				throw new InvalidParametersException(serviceInstanceRequestParams);
-			}
-		}
-
-		/* schema validation */
-		SchemaParameters json = plan.getSchemas().getServiceBinding().getCreate().getParameters();
-		HashMap<String, Object> params2;
-		params2 = (HashMap<String, Object>)serviceInstanceBindingRequest.getParameters();
-
-		JsonSchema jsonSchema = null;
-		JsonNode jsonObject = null;
-		try {
-			jsonSchema = ParameterValidator.getJsonSchema(json);
-			jsonObject = ParameterValidator.getJsonNode(params2);
-		}catch (JsonProcessingException e){
-			throw new InvalidParametersException("Error while processing json schema");
-		}
-
-		log.info("parameters:  --> "+jsonObject.toString());
-		try {
-			ParameterValidator.validateJson(jsonSchema, jsonObject);
-		}catch (ProcessingException e){
-			throw new InvalidParametersException("Error while processing json schema");
-	}
-
-	}
 	protected ServiceInstance getBinding(String bindingId) throws ServiceInstanceBindingDoesNotExistsException {
 		if (!bindingRepository.containsInternalBindingId(bindingId)) {
 			throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
@@ -188,7 +137,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                    ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException, ServiceBrokerFeatureIsNotSupportedException, InvalidParametersException {
+                                                    ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException, InvalidParametersException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalAddresses.get(0));
 
 		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
@@ -198,7 +147,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, ServiceInstanceBindingBadRequestException, InvalidParametersException {
+                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
 
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
