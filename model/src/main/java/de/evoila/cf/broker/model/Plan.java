@@ -1,10 +1,7 @@
 package de.evoila.cf.broker.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * A service plan available for a ServiceDefinition
@@ -12,77 +9,27 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * @author sgreenberg@gopivotal.com
  * @author Johannes Hiemer.
  */
-@JsonAutoDetect(getterVisibility = Visibility.NONE)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Plan {
 
-	@JsonSerialize
-	@JsonProperty("id")
 	private String id;
 
-	@JsonSerialize
-	@JsonProperty("name")
 	private String name;
 
-	@JsonSerialize
-	@JsonProperty("description")
 	private String description;
 
-	@JsonSerialize
-	@JsonProperty("metadata")
-	private Metadata metadata  = new Metadata();
-	
-	@JsonSerialize
-	@JsonProperty(value="free", required=false)
+	private Metadata metadata = new Metadata();
+
 	private boolean free = true;
 
-	/**
-	 * Please use metadata section for custom mapping information
-	 */
-	@Deprecated
-	private int volumeSize;
+	private Schemas schemas;
 
-	/**
-	 * Please use metadata section for custom mapping information
-	 */
-	@Deprecated
-	private VolumeUnit volumeUnit;
+	public Plan() {}
 
 	/**
 	 * Please use metadata section for custom mapping information
 	 */
 	private Platform platform;
-
-	/**
-	 * Please use metadata section for custom mapping information
-	 */
-	@Deprecated
-	private String flavorId;
-
-	/**
-	 * Please use metadata section for custom mapping information
-	 */
-	@Deprecated
-	private int connections;
-
-	public Plan() {
-		super();
-	}
-
-	public int getVolumeSize() {
-		return volumeSize;
-	}
-
-	public void setVolumeSize(int volumeSize) {
-		this.volumeSize = volumeSize;
-	}
-
-	public VolumeUnit getVolumeUnit() {
-		return volumeUnit;
-	}
-
-	public void setVolumeUnit(VolumeUnit volumeUnit) {
-		this.volumeUnit = volumeUnit;
-	}
 
 	public Platform getPlatform() {
 		return platform;
@@ -97,38 +44,18 @@ public class Plan {
 		this.platform = Platform.valueOf(platform);
 	}
 
-	public String getFlavorId() {
-		return flavorId;
-	}
-
-	public void setFlavorId(String flavorId) {
-		this.flavorId = flavorId;
-	}
-
-	public int getConnections() {
-		return connections;
-	}
-
-	public void setConnections(int connections) {
-		this.connections = connections;
-	}
-
-	public Plan(String id, String name, String description, Platform platform, int volumeSize, VolumeUnit volumeUnit,
-			String flavorId, boolean free, int connections) {
+	public Plan(String id, String name, String description, Platform platform, boolean free) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.platform = platform;
-		this.volumeSize = volumeSize;
-		this.flavorId = flavorId;
-		this.connections = connections;
-		this.volumeUnit = volumeUnit;
+		this.free = free;
 		this.metadata = new Metadata();
 	}
 
 	public Plan(String id, String name, String description, Metadata metadata, Platform platform,
-			int volumeSize, VolumeUnit volumeUnit, String flavor, boolean free, int connections) {
-		this(id, name, description, platform, volumeSize, volumeUnit, flavor, free, connections);
+			boolean free) {
+		this(id, name, description, platform, free);
 		this.metadata = metadata;
 	}
 
@@ -174,5 +101,13 @@ public class Plan {
 
 	public void setFree(boolean free) {
 		this.free = free;
+	}
+
+	public Schemas getSchemas() {
+		return schemas;
+	}
+
+	public void setSchemas(Schemas schemas) {
+		this.schemas = schemas;
 	}
 }

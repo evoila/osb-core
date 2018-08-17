@@ -1,5 +1,8 @@
 package de.evoila.cf.broker.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CustomInstanceGroupConfig extends InstanceGroupConfig {
 
     protected String name;

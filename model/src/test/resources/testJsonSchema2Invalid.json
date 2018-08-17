@@ -1,0 +1,61 @@
+{
+	"schemas": {
+	    "service_instance": {
+	        "create": {
+	            "parameters": { 
+	                "$schema": "http://json-schema.org/draft-04/schema#",
+	                "type": "object",
+	                "properties": {
+	                    "billing": {
+	                        "description": "testdescription",
+	                        "type": "string"
+	                    },
+	                    "direction": {
+	                        "type": "string",
+	                        "enum": [ errorhere {
+	                            "N",
+	                            "E",
+	                            "S",
+	                            "W"
+	                        ]
+	                    },
+	                    "angle": {
+	                        "type": "integer",
+	                        "enum": [
+	                            0,
+	                            90,
+	                            180,
+	                            270
+	                        ]
+	                    },
+	                    "morespecials": {
+	                        "type": "array",
+	                        "items": [
+	                            {
+	                                "description": "extraspecial_number_description",
+	                                "type": "number"
+	                            },
+	                            {
+	                                "description": "extraspecial_string_description",
+	                                "type": "string"
+	                            }
+	                        ]
+	                    },
+	                    "someObject": {
+	                        "type": "object",
+	                        "properties": {
+	                        	"nestedObject": {
+	                        		"description": "This is a nested object",
+	                            	"type": "string"
+	                        	}
+	                            
+	                        }
+	                    }
+	                }
+	            }
+	        },
+	        "update": null
+	    },
+	    "service_binding": null
+	}
+}

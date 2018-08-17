@@ -3,6 +3,10 @@
  */
 package de.evoila.cf.broker.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.github.fge.jsonschema.main.JsonSchema;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.repository.BindingRepository;
@@ -11,11 +15,14 @@ import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.BindingService;
 import de.evoila.cf.broker.service.HAProxyService;
+import de.evoila.cf.broker.util.ParameterValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,14 +49,10 @@ public abstract class BindingServiceImpl implements BindingService {
 	@Autowired(required = false)
 	protected HAProxyService haProxyService;
 
-	protected abstract void deleteBinding(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
-			throws ServiceBrokerException;
-
 	@Override
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
 			ServiceInstanceBindingRequest serviceInstanceBindingRequest) throws ServiceInstanceBindingExistsException,
-			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException,
-			ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException {
+			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException, InvalidParametersException {
 
 		validateBindingNotExists(bindingId, instanceId);
 
@@ -59,6 +62,13 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		Plan plan = serviceDefinitionRepository.getPlan(serviceInstanceBindingRequest.getPlanId());
+		if (serviceInstanceBindingRequest.getParameters() != null && serviceInstanceBindingRequest.getParameters().size() > 0){
+			try {
+				ParameterValidator.validateParameters(serviceInstanceBindingRequest, plan);
+			}catch(ProcessingException e) {
+			throw new InvalidParametersException("Error while validating parameters");
+			}
+		}
 
 		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
                 .isEmpty(serviceInstanceBindingRequest.getBindResource().getRoute())) {
@@ -70,7 +80,8 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		ServiceInstanceBinding binding;
-		if (haProxyService != null && serviceInstanceBindingRequest.getAppGuid() == null) {
+		if (haProxyService != null && (serviceInstanceBindingRequest.getAppGuid() == null ||
+                (serviceInstanceBindingRequest.getBindResource() != null && serviceInstanceBindingRequest.getBindResource().getAppGuid() == null))) {
 			List<ServerAddress> externalServerAddresses = haProxyService.appendAgent(serviceInstance.getHosts(), bindingId, instanceId);
 
 			binding = bindServiceKey(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalServerAddresses);
@@ -106,18 +117,11 @@ public abstract class BindingServiceImpl implements BindingService {
 
             Plan plan = serviceDefinitionRepository.getPlan(planId);
 
-			deleteBinding(binding, serviceInstance, plan);
+			unbindService(binding, serviceInstance, plan);
 		} catch (ServiceBrokerException e) {
 			log.error("Could not cleanup service binding", e);
 		} finally {
-			bindingRepository.deleteBinding(bindingId);
-		}
-	}
-
-	protected void validateBindingNotExists(String bindingId, String instanceId)
-			throws ServiceInstanceBindingExistsException {
-		if (bindingRepository.containsInternalBindingId(bindingId)) {
-			throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
+			bindingRepository.unbindService(bindingId);
 		}
 	}
 
@@ -133,7 +137,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                    ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException, ServiceBrokerFeatureIsNotSupportedException {
+                                                    ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException, InvalidParametersException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalAddresses.get(0));
 
 		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
@@ -143,13 +147,22 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, ServiceInstanceBindingBadRequestException {
+                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
 
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
 	}
 
-	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                             ServiceInstance serviceInstance, Plan plan, ServerAddress serverAddress) throws ServiceBrokerException;
+    protected abstract void unbindService(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
+            throws ServiceBrokerException;
 
+	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
+                                                             ServiceInstance serviceInstance, Plan plan, ServerAddress serverAddress) throws ServiceBrokerException, InvalidParametersException;
+
+    protected void validateBindingNotExists(String bindingId, String instanceId)
+            throws ServiceInstanceBindingExistsException {
+        if (bindingRepository.containsInternalBindingId(bindingId)) {
+            throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
+        }
+    }
 }

@@ -45,7 +45,7 @@ public abstract class HAProxyService {
 	
 	private String haProxy;
 	
-	private String authToken;
+	private String token;
 
 	private RestTemplate restTemplate = new RestTemplate();
 
@@ -54,8 +54,8 @@ public abstract class HAProxyService {
 	@PostConstruct
 	private void initHeaders() {
 		haProxy = haProxyConfiguration.getUri();
-		authToken = haProxyConfiguration.getAuthToken();
-		headers.add(X_AUTH_TOKEN_HEADER, authToken);
+		token = haProxyConfiguration.getToken();
+		headers.add(X_AUTH_TOKEN_HEADER, token);
 		headers.add(CONTENT_TYPE, APPLICATION_JSON);
 		
 	}
@@ -85,8 +85,7 @@ public abstract class HAProxyService {
 		try {
 			HABackendResponse response = restTemplate.exchange(haProxy, HttpMethod.PUT, entity, HABackendResponse.class)
 					.getBody();
-			
-			
+
 			log.info("Called: " + haProxy);
 			log.info("Response is: " + response);
 			

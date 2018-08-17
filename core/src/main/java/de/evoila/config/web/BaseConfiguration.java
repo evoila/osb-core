@@ -4,23 +4,20 @@
 package de.evoila.config.web;
 
 import de.evoila.cf.config.security.uaa.utils.HeaderCheckFilter;
-import de.evoila.cf.broker.model.Catalog;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
 /**
  * @author Johannes Hiemer.
  * @author Marco Di Martino
  */
-@Order(50)
 @Configuration
-@EnableConfigurationProperties(Catalog.class)
+@EnableWebSecurity
 public class BaseConfiguration {
 
     @Bean

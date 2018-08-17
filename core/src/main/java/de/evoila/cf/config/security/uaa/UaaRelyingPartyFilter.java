@@ -14,9 +14,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.util.Assert;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -39,7 +37,6 @@ public class UaaRelyingPartyFilter extends GenericFilterBean {
     private AuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
 
     public UaaRelyingPartyFilter(AuthenticationManager authenticationManager) {
-        setFilterProcessesUrl("/v2/manage/**");
         this.setAuthenticationManager(authenticationManager);
     }
 
@@ -63,20 +60,6 @@ public class UaaRelyingPartyFilter extends GenericFilterBean {
         this.authenticationManager = authenticationManager;
     }
 
-    public void setFilterProcessesUrl(String filterProcessesUrl) {
-        setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(filterProcessesUrl));
-    }
-
-    public final void setRequiresAuthenticationRequestMatcher(RequestMatcher requestMatcher) {
-        Assert.notNull(requestMatcher, "requestMatcher cannot be null");
-        this.requiresAuthenticationRequestMatcher = requestMatcher;
-    }
-
-    protected boolean requiresAuthentication(
-            HttpServletRequest request, HttpServletResponse response) {
-        return requiresAuthenticationRequestMatcher.matches(request);
-    }
-
     @Override
     public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
             throws IOException, ServletException {
@@ -84,7 +67,7 @@ public class UaaRelyingPartyFilter extends GenericFilterBean {
         HttpServletResponse response = (HttpServletResponse) res;
 
         boolean isOption = request.getMethod().equals(HttpMethod.OPTIONS.toString());
-        if (isOption || !requiresAuthentication(request, response)) {
+        if (isOption) {
             chain.doFilter(request, response);
             return;
         }

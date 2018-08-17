@@ -4,7 +4,6 @@
 package de.evoila.cf.broker.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * @author Johannes Hiemer.
@@ -12,15 +11,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 public class DashboardClient {
 
-	@JsonSerialize
-	@JsonProperty("id")
 	private String id;
-	
-	@JsonSerialize
-	@JsonProperty("secret")
+
 	private String secret;
 	
-	@JsonSerialize
 	@JsonProperty("redirect_uri")
 	private String redirectUri;
 	

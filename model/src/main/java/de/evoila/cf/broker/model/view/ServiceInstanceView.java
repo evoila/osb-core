@@ -25,10 +25,6 @@ public class ServiceInstanceView {
         return serviceInstance.getId();
     }
 
-    public String getFlavour(){
-        return plan.getFlavorId();
-    }
-
     public String getDashboarUrl(){
         return serviceInstance.getDashboardUrl();
     }
