@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A service offered by this broker.
@@ -30,7 +28,7 @@ public class ServiceDefinition {
 
 	private List<String> tags = new ArrayList<>();
 
-	private Map<String, Object> metadata = new HashMap<>();
+	private ServiceMetadata metadata;
 
 	private List<String> requires = new ArrayList<>();
 
@@ -66,7 +64,7 @@ public class ServiceDefinition {
 	}
 
 	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans, boolean updatable,
-			List<String> tags, Map<String, Object> metadata, List<String> requires) {
+			List<String> tags, ServiceMetadata metadata, List<String> requires) {
 		this(id, name, description, bindable, plans, updatable);
 		setTags(tags);
 		setMetadata(metadata);
@@ -122,12 +120,7 @@ public class ServiceDefinition {
 	}
 
 	public void setPlans(List<Plan> plans) {
-		if (plans == null) {
-			// ensure serialization as an empty array and not null
-			this.plans = new ArrayList<>();
-		} else {
-			this.plans = plans;
-		}
+		this.plans = plans;
 	}
 
 	public List<String> getTags() {
@@ -135,11 +128,7 @@ public class ServiceDefinition {
 	}
 
 	public void setTags(List<String> tags) {
-		if (tags == null) {
-			this.tags = new ArrayList<>();
-		} else {
-			this.tags = tags;
-		}
+		this.tags = tags;
 	}
 
 	public List<String> getRequires() {
@@ -147,23 +136,15 @@ public class ServiceDefinition {
 	}
 
 	public void setRequires(List<String> requires) {
-		if (requires == null) {
-			this.requires = new ArrayList<>();
-		} else {
-			this.requires = requires;
-		}
+		this.requires = requires;
 	}
 
-	public Map<String, Object> getMetadata() {
+	public ServiceMetadata getMetadata() {
 		return metadata;
 	}
 
-	public void setMetadata(Map<String, Object> metadata) {
-		if (metadata == null) {
-			this.metadata = new HashMap<>();
-		} else {
-			this.metadata = metadata;
-		}
+	public void setMetadata(ServiceMetadata metadata) {
+	    this.metadata = metadata;
 	}
 	
 	public Dashboard getDashboard() {
