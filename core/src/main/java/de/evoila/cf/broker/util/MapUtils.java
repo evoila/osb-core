@@ -19,7 +19,7 @@ public class MapUtils {
     }
 
     public static void deepInsert(Map<String, Object> map, String key, Object value) {
-        List<String> keyElements = Arrays.asList(key.split("."));
+        List<String> keyElements = Arrays.asList(key.split("\\."));
 
         Map<String, Object> actualMap = map;
         for (int i = 0; i < keyElements.size(); i++) {
@@ -28,8 +28,8 @@ public class MapUtils {
             if (i == (keyElements.size()-1) ) {
                 actualMap.put(keyElement, value);
             } else {
-                if (map.containsKey(keyElement)) {
-                    Object tmp = map.get(keyElement);
+                if (actualMap.containsKey(keyElement)) {
+                    Object tmp = actualMap.get(keyElement);
                     if (tmp instanceof Map) {
                         actualMap = (Map<String, Object>) tmp;
                     } else {
