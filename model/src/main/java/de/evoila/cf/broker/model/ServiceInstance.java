@@ -86,7 +86,7 @@ public class ServiceInstance implements BaseEntity<String> {
     private String usergroup;
 
     @JsonIgnore
-	private List<User> users;
+	private List<User> users = new ArrayList<>();
 
 	@SuppressWarnings("unused")
 	private ServiceInstance() {
