@@ -69,7 +69,7 @@ public class CustomAuthenticationController extends BaseController {
     			Dashboard dashboard = serviceDefinition.getDashboard();
     			DashboardClient dashboardClient = serviceDefinition.getDashboardClient();
 
-				String redirectUri =  DashboardUtils.redirectUri(dashboardClient, serviceInstanceId, "/confirm");
+				String redirectUri =  DashboardUtils.redirectUri(dashboardClient, serviceInstanceId, CONFIRM);
     			DashboardAuthenticationRedirectBuilder dashboardAuthenticationRedirectBuilder 
     				= new DashboardAuthenticationRedirectBuilder(dashboard,
     						dashboardClient, redirectUri, REQUIRED_SCOPES);
