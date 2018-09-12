@@ -3,12 +3,10 @@
  */
 package de.evoila.cf.broker.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import de.evoila.cf.broker.model.JobProgress;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.repository.JobRepository;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Christian Brinker, evoila.
@@ -17,8 +15,11 @@ import de.evoila.cf.broker.repository.JobRepository;
 @Service
 public class JobProgressService  {
 
-	@Autowired
 	private JobRepository jobRepository;
+
+	public JobProgressService(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
+	}
 
 	public JobProgress getProgress(String serviceInstanceId) {
 		return jobRepository.getJobProgress(serviceInstanceId);

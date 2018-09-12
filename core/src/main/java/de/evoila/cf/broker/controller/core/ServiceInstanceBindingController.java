@@ -8,7 +8,6 @@ import de.evoila.cf.broker.model.ServiceInstanceBindingResponse;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,8 +24,11 @@ public class ServiceInstanceBindingController extends BaseController {
 
 	public static final String SERVICE_INSTANCE_BINDING_BASE_PATH = "/core/service_instances/{instanceId}/service_bindings";
 
-	@Autowired
 	private BindingServiceImpl bindingService;
+
+	public ServiceInstanceBindingController(BindingServiceImpl bindingService) {
+		this.bindingService = bindingService;
+	}
 
 	@PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
 	public ResponseEntity<ServiceInstanceBindingResponse> bindServiceInstance(@PathVariable("instanceId") String instanceId,

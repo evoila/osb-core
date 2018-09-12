@@ -40,7 +40,6 @@ public abstract class HAProxyService {
 	
 	private Logger log = LoggerFactory.getLogger(getClass());
 
-	@Autowired
 	private HAProxyConfiguration haProxyConfiguration;
 	
 	private String haProxy;
@@ -50,6 +49,10 @@ public abstract class HAProxyService {
 	private RestTemplate restTemplate = new RestTemplate();
 
 	private HttpHeaders headers = new HttpHeaders();
+
+	public HAProxyService(HAProxyConfiguration haProxyConfiguration) {
+		this.haProxyConfiguration = haProxyConfiguration;
+	}
 
 	@PostConstruct
 	private void initHeaders() {
