@@ -9,7 +9,6 @@ import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.DeploymentServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,14 +28,18 @@ public class ServiceInstanceController extends BaseController {
 
 	public static final String SERVICE_INSTANCE_BASE_PATH = "/core/service_instances";
 
-	@Autowired
 	private DeploymentServiceImpl deploymentService;
 
-	@Autowired
 	private EndpointConfiguration endpointConfiguration;
 
-	@Autowired
     private CatalogService catalogService;
+
+    public ServiceInstanceController(DeploymentServiceImpl deploymentService, EndpointConfiguration endpointConfiguration,
+									  CatalogService catalogService) {
+    	this.deploymentService = deploymentService;
+    	this.endpointConfiguration = endpointConfiguration;
+    	this.catalogService = catalogService;
+	}
 
 	@PutMapping(value = "/{instanceId}")
 	public ResponseEntity<ServiceInstanceResponse> createServiceInstance(

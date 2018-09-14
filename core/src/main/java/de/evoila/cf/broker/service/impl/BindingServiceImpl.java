@@ -3,10 +3,7 @@
  */
 package de.evoila.cf.broker.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.github.fge.jsonschema.main.JsonSchema;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.repository.BindingRepository;
@@ -18,11 +15,8 @@ import de.evoila.cf.broker.service.HAProxyService;
 import de.evoila.cf.broker.util.ParameterValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -34,20 +28,25 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	private final Logger log = LoggerFactory.getLogger(BindingServiceImpl.class);
 
-	@Autowired
 	protected BindingRepository bindingRepository;
 
-	@Autowired
 	protected ServiceDefinitionRepository serviceDefinitionRepository;
 
-	@Autowired
 	protected ServiceInstanceRepository serviceInstanceRepository;
 
-	@Autowired
 	protected RouteBindingRepository routeBindingRepository;
 
-	@Autowired(required = false)
 	protected HAProxyService haProxyService;
+
+	public BindingServiceImpl(BindingRepository bindingRepository, ServiceDefinitionRepository serviceDefinitionRepository,
+							  ServiceInstanceRepository serviceInstanceRepository, RouteBindingRepository routeBindingRepository,
+							  HAProxyService haProxyService) {
+		this.bindingRepository = bindingRepository;
+		this.serviceDefinitionRepository = serviceDefinitionRepository;
+		this.serviceInstanceRepository = serviceInstanceRepository;
+		this.routeBindingRepository = routeBindingRepository;
+		this.haProxyService = haProxyService;
+	}
 
 	@Override
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,

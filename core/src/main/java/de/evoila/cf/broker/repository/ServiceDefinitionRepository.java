@@ -1,11 +1,10 @@
 package de.evoila.cf.broker.repository;
 
-import java.util.List;
-
-import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.model.Plan;
 import de.evoila.cf.broker.model.ServiceDefinition;
+
+import java.util.List;
 
 /**
  * @author Christian Brinker & Johannes Hiemer, evoila.

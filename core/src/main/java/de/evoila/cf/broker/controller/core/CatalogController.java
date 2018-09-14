@@ -5,7 +5,6 @@ import de.evoila.cf.broker.model.Catalog;
 import de.evoila.cf.broker.service.CatalogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,8 +18,11 @@ public class CatalogController extends BaseController {
 
     private final Logger logger = LoggerFactory.getLogger(CatalogController.class);
 
-    @Autowired
     private CatalogService catalogService;
+
+    public CatalogController(CatalogService catalogService) {
+        this.catalogService = catalogService;
+    }
 
     @GetMapping(value = { "/", "" })
     public ResponseEntity<Catalog> getCatalog() {
