@@ -38,7 +38,7 @@ public class CustomAuthenticationController extends BaseController {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	private final static String REQUIRED_SCOPES = "cloud_controller_service_permissions.read openid";
+	private final static String REQUIRED_SCOPES = "cloud_controller_service_permissions.read openid cloud_controller.read";
 
 	private static final String TOKEN_PREFIX = "Bearer ";
 
