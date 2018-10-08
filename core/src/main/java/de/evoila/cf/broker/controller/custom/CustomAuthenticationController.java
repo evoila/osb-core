@@ -109,7 +109,7 @@ public class CustomAuthenticationController extends BaseController {
 					.getAccessAndRefreshToken(dashboard.getAuthEndpoint(), authCode, dashboardClient, redirectUri);
 
 			if (token != null) {
-                mav.addObject("baseHref", "/core/authentication/" + serviceInstanceId);
+                mav.addObject("baseHref", "/custom/v2/authentication/" + serviceInstanceId);
 				mav.addObject("token", TOKEN_PREFIX + token.getAccessToken());
 				mav.addObject("serviceInstanceId", serviceInstanceId);
 				mav.addObject("endpointUrl", endpointConfiguration.getDefault());
