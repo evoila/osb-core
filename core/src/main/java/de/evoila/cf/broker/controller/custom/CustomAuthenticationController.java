@@ -28,6 +28,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 /** @author Johannes Hiemer. */
 @Controller
@@ -110,6 +112,11 @@ public class CustomAuthenticationController extends BaseController {
 
 			if (token != null) {
                 mav.addObject("baseHref", "/core/authentication/" + serviceInstanceId);
+                Map servers = new HashMap<>();
+                if(endpointConfiguration.getCustom() != null) {
+                    servers.put("servers", endpointConfiguration.getCustom());
+                }
+                mav.addObject("customEndpoints", servers);
 				mav.addObject("token", TOKEN_PREFIX + token.getAccessToken());
 				mav.addObject("serviceInstanceId", serviceInstanceId);
 				mav.addObject("endpointUrl", endpointConfiguration.getDefault());

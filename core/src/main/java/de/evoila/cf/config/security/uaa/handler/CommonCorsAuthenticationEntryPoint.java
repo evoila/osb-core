@@ -28,7 +28,9 @@ public class CommonCorsAuthenticationEntryPoint implements AuthenticationEntryPo
     public void commence(HttpServletRequest request, HttpServletResponse response,
 						 AuthenticationException exception) throws IOException {
 
-		response.addHeader(DefaultCorsHeader.ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+        response.addHeader(DefaultCorsHeader.WWW_AUTHENTICATE, "MeshFed realm="
+                + DefaultCorsHeader.getBaseUrl(request)
+                + "/federated-auth/login");
         response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
 	}
 
