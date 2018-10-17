@@ -1,6 +1,6 @@
 package de.evoila.cf.broker.exception;
 
-public class ServiceInstanceBindingBadRequestException extends Exception {
+public class ServiceInstanceBindingBadRequestException extends ServiceBrokerException {
 
 	private static final long serialVersionUID = 2169152862699358470L;
 	

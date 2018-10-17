@@ -1,14 +1,13 @@
 package de.evoila.cf.broker.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.hibernate.validator.constraints.NotEmpty;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A request sent by the cloud controller to create a new instance

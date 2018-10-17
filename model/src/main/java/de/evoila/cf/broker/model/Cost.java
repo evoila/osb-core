@@ -4,15 +4,15 @@ import java.util.Map;
 
 public class Cost {
 
-    private Map<String, Object> amount;
+    private Map<String, Float> amount;
 
     private String unit;
 
-    public Map<String, Object> getAmount() {
+    public Map<String, Float> getAmount() {
         return amount;
     }
 
-    public void setAmount(Map<String, Object> amount) {
+    public void setAmount(Map<String, Float> amount) {
         this.amount = amount;
     }
 

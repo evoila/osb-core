@@ -2,6 +2,8 @@ package de.evoila.cf.broker.repository;
 
 import de.evoila.cf.broker.model.ServiceInstance;
 
+import java.util.List;
+
 /**
  * @author Christian Brinker, evoila.
  * @author Marco Di Martino, evoila.
@@ -9,6 +11,8 @@ import de.evoila.cf.broker.model.ServiceInstance;
 public interface ServiceInstanceRepository {
 
 	ServiceInstance getServiceInstance(String instanceId);
+
+	List<ServiceInstance> getServiceInstancesByServiceDefinitionId(String serviceDefinitionId);
 
 	boolean containsServiceInstanceId(String serviceInstanceId);
 

@@ -16,7 +16,6 @@ import de.evoila.cf.broker.service.PlatformService;
 import de.evoila.cf.broker.util.ParameterValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,20 +30,24 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     Logger log = LoggerFactory.getLogger(getClass());
 
-	@Autowired
 	private PlatformRepository platformRepository;
 
-	@Autowired
     private ServiceDefinitionRepository serviceDefinitionRepository;
 
-	@Autowired
 	private ServiceInstanceRepository serviceInstanceRepository;
 	
-	@Autowired
 	private JobRepository jobRepository;
 
-	@Autowired(required = false)
 	private AsyncDeploymentService asyncDeploymentService;
+
+	public DeploymentServiceImpl(PlatformRepository platformRepository, ServiceDefinitionRepository serviceDefinitionRepository,
+                                 ServiceInstanceRepository serviceInstanceRepository, JobRepository jobRepository, AsyncDeploymentService asyncDeploymentService) {
+	    this.platformRepository = platformRepository;
+	    this.serviceDefinitionRepository = serviceDefinitionRepository;
+	    this.serviceInstanceRepository = serviceInstanceRepository;
+	    this.jobRepository = jobRepository;
+	    this.asyncDeploymentService = asyncDeploymentService;
+    }
 
 	@Override
 	public JobProgressResponse getLastOperation(String serviceInstanceId)
