@@ -49,6 +49,8 @@ public class UaaSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.requestMatchers()
                 .antMatchers("/custom/**")
                 .and()
+                .cors()
+                .and()
                 .addFilterBefore(uaaRelyingPartyFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .anyRequest()

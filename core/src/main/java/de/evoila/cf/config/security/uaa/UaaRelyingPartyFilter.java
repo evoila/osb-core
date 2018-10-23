@@ -66,8 +66,7 @@ public class UaaRelyingPartyFilter extends GenericFilterBean {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        boolean isOption = request.getMethod().equals(HttpMethod.OPTIONS.toString());
-        if (isOption) {
+        if (request.getMethod().equals(HttpMethod.OPTIONS.toString())) {
             chain.doFilter(request, response);
             return;
         }

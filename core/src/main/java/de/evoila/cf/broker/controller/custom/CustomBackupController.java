@@ -46,7 +46,7 @@ public class CustomBackupController extends BaseController {
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
     }
 
-    @PatchMapping(value = "/{serviceInstanceId}/restore//{planId}")
+    @PatchMapping(value = "/{serviceInstanceId}/restore/{planId}")
     public ResponseEntity<HashMap> restoreNow(@PathVariable String serviceInstanceId,
                                               @PathVariable String planId, @RequestBody RestoreRequest restoreRequest)
             throws ServiceInstanceDoesNotExistException {
