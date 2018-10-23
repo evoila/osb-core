@@ -28,7 +28,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /** @author Johannes Hiemer. */
@@ -112,11 +114,9 @@ public class CustomAuthenticationController extends BaseController {
 
 			if (token != null) {
                 mav.addObject("baseHref", "/custom/v2/authentication/" + serviceInstanceId);
-				Map servers = new HashMap<>();
 				if(endpointConfiguration.getCustom() != null) {
-					servers.put("servers", endpointConfiguration.getCustom());
+					mav.addObject("customEndpoints", endpointConfiguration.getCustom());
 				}
-				mav.addObject("customEndpoints", servers);
 				mav.addObject("token", TOKEN_PREFIX + token.getAccessToken());
 				mav.addObject("serviceInstanceId", serviceInstanceId);
 				mav.addObject("endpointUrl", endpointConfiguration.getDefault());
@@ -132,17 +132,21 @@ public class CustomAuthenticationController extends BaseController {
 		return mav;
 	}
 
-	/**
+
     @GetMapping(value = "/{serviceInstanceId}/test")
     public Object test(@PathVariable String serviceInstanceId) throws Exception {
         ModelAndView mav = new ModelAndView("index");
+		Map servers = new HashMap<>();
+		if(endpointConfiguration.getCustom() != null) {
+			servers.put("servers", endpointConfiguration.getCustom());
+		}
+		mav.addObject("customEndpoints", servers);
         mav.addObject("baseHref", "/core/authentication/" + serviceInstanceId + "/test");
         mav.addObject("token", TOKEN_PREFIX + "iojsiofksdfifid");
         mav.addObject("serviceInstanceId", serviceInstanceId);
-        mav.addObject("endpointUrl", endpointConfiguration.getEndpointUrl());
+        mav.addObject("endpointUrl", endpointConfiguration.getDefault());
 
         return mav;
     }
-    **/
 
 }
