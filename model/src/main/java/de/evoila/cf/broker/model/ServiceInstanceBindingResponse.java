@@ -1,8 +1,5 @@
 package de.evoila.cf.broker.model;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -11,6 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.evoila.cf.broker.model.volume.VolumeMount;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * The response sent to the cloud controller when a bind request is successful.

@@ -7,7 +7,6 @@ import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.util.GlobalConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +33,6 @@ public class CatalogServiceImpl implements CatalogService {
 
 	private EndpointConfiguration endpointConfiguration;
 
-	@Autowired
 	public CatalogServiceImpl(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration) {
 		this.catalog = catalog;
 		this.environment = environment;

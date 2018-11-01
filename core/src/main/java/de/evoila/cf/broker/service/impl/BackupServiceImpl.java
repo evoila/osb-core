@@ -6,11 +6,15 @@ import de.evoila.cf.broker.controller.utils.RestPageImpl;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.service.BackupCustomService;
 import de.evoila.cf.broker.service.BackupService;
+import de.evoila.cf.config.security.AcceptSelfSignedClientHttpRequestFactory;
 import de.evoila.cf.model.*;
+import de.evoila.cf.model.enums.DestinationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Pageable;
@@ -50,6 +54,12 @@ public class BackupServiceImpl implements BackupService {
         this.restTemplate = new RestTemplate();
         this.rabbitTemplate = rabbitTemplate;
         this.rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
+    }
+
+    @ConditionalOnBean(AcceptSelfSignedClientHttpRequestFactory.class)
+    @Autowired(required = false)
+    private void selfSignedRestTemplate(AcceptSelfSignedClientHttpRequestFactory requestFactory) {
+        restTemplate.setRequestFactory(requestFactory);
     }
 
     @PostConstruct
@@ -228,6 +238,7 @@ public class BackupServiceImpl implements BackupService {
     public ResponseEntity<FileDestination> postDestination(String serviceInstanceId, FileDestination fileDestination) {
         HttpEntity entity = new HttpEntity(fileDestination, headers);
         fileDestination.setInstanceId(serviceInstanceId);
+        fileDestination.setType(DestinationType.SWIFT);
         ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/destinations",
                                                 HttpMethod.POST, entity, FileDestination.class
         );
@@ -238,6 +249,7 @@ public class BackupServiceImpl implements BackupService {
     public ResponseEntity<FileDestination> updateDestination(String serviceInstanceId, String destinationId, FileDestination fileDestination)  {
         HttpEntity entity = new HttpEntity(fileDestination, headers);
         fileDestination.setInstanceId(serviceInstanceId);
+        fileDestination.setType(DestinationType.SWIFT);
         ResponseEntity response = restTemplate.exchange(backupConfiguration.getUri() + "/destinations/" + destinationId,
                                                 HttpMethod.PUT, entity, FileDestination.class
         );

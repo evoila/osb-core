@@ -25,7 +25,6 @@ public abstract class BaseController {
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-
 	public ResponseEntity<ErrorMessage> handleException(MethodArgumentNotValidException ex,
 														HttpServletResponse response) {
 	    BindingResult result = ex.getBindingResult();

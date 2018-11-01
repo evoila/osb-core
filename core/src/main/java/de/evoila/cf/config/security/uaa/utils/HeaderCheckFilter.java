@@ -24,6 +24,7 @@ public class HeaderCheckFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         if (req.getHeader(X_BROKER_API_VERSION) == null) {
+
             HttpServletResponse httpResponse = (HttpServletResponse) response;
             httpResponse.setContentType("application/json");
             httpResponse.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
@@ -35,7 +36,6 @@ public class HeaderCheckFilter extends GenericFilterBean {
             httpResponse.setContentType("application/json");
             httpResponse.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Expected API-version: " + VERSION + "/" +
                     PRE_VERSION + " but found API-version:" + req.getHeader("x-broker-api-version"));
-            return;
         }
 
         chain.doFilter(request, response);

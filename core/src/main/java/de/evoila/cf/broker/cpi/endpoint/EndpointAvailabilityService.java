@@ -3,14 +3,13 @@
  */
 package de.evoila.cf.broker.cpi.endpoint;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import de.evoila.cf.broker.model.cpi.AvailabilityState;
+import de.evoila.cf.broker.model.cpi.EndpointServiceState;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import de.evoila.cf.broker.model.cpi.AvailabilityState;
-import de.evoila.cf.broker.model.cpi.EndpointServiceState;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Johannes Hiemer.

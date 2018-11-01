@@ -52,11 +52,11 @@ public class BackupConfiguration {
         this.user = user;
     }
 
-    public Queue getQueue () {
+    public Queue getQueue() {
         return queue;
     }
 
-    public void setQueue (Queue queue) {
+    public void setQueue(Queue queue) {
         this.queue = queue;
     }
 
@@ -65,27 +65,27 @@ public class BackupConfiguration {
         private String routingKey;
         private String queue;
 
-        public String getExchange () {
+        public String getExchange() {
             return exchange;
         }
 
-        public void setExchange (String exchange) {
+        public void setExchange(String exchange) {
             this.exchange = exchange;
         }
 
-        public String getRoutingKey () {
+        public String getRoutingKey() {
             return routingKey;
         }
 
-        public void setRoutingKey (String routingKey) {
+        public void setRoutingKey(String routingKey) {
             this.routingKey = routingKey;
         }
 
-        public String getQueue () {
+        public String getQueue() {
             return queue;
         }
 
-        public void setQueue (String queue) {
+        public void setQueue(String queue) {
             this.queue = queue;
         }
     }

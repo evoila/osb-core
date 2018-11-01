@@ -12,6 +12,8 @@ public class ServiceBrokerException extends Exception {
 	private static final long serialVersionUID = -5544859893499349135L;
 	private String message;
 
+	public ServiceBrokerException() { }
+
 	public ServiceBrokerException(String message) {
 		this.message = message;
 	}

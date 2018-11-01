@@ -28,6 +28,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /** @author Johannes Hiemer. */
 @Controller
@@ -38,7 +42,7 @@ public class CustomAuthenticationController extends BaseController {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	private final static String REQUIRED_SCOPES = "cloud_controller_service_permissions.read openid";
+	private final static String REQUIRED_SCOPES = "cloud_controller_service_permissions.read openid cloud_controller.read";
 
 	private static final String TOKEN_PREFIX = "Bearer ";
 
@@ -69,7 +73,7 @@ public class CustomAuthenticationController extends BaseController {
     			Dashboard dashboard = serviceDefinition.getDashboard();
     			DashboardClient dashboardClient = serviceDefinition.getDashboardClient();
 
-				String redirectUri =  DashboardUtils.redirectUri(dashboardClient, serviceInstanceId, "/confirm");
+				String redirectUri =  DashboardUtils.redirectUri(dashboardClient, serviceInstanceId, CONFIRM);
     			DashboardAuthenticationRedirectBuilder dashboardAuthenticationRedirectBuilder 
     				= new DashboardAuthenticationRedirectBuilder(dashboard,
     						dashboardClient, redirectUri, REQUIRED_SCOPES);
@@ -109,7 +113,10 @@ public class CustomAuthenticationController extends BaseController {
 					.getAccessAndRefreshToken(dashboard.getAuthEndpoint(), authCode, dashboardClient, redirectUri);
 
 			if (token != null) {
-                mav.addObject("baseHref", "/core/authentication/" + serviceInstanceId);
+                mav.addObject("baseHref", "/custom/v2/authentication/" + serviceInstanceId);
+				if(endpointConfiguration.getCustom() != null) {
+					mav.addObject("customEndpoints", endpointConfiguration.getCustom());
+				}
 				mav.addObject("token", TOKEN_PREFIX + token.getAccessToken());
 				mav.addObject("serviceInstanceId", serviceInstanceId);
 				mav.addObject("endpointUrl", endpointConfiguration.getDefault());
@@ -125,17 +132,21 @@ public class CustomAuthenticationController extends BaseController {
 		return mav;
 	}
 
-	/**
+
     @GetMapping(value = "/{serviceInstanceId}/test")
     public Object test(@PathVariable String serviceInstanceId) throws Exception {
         ModelAndView mav = new ModelAndView("index");
+		Map servers = new HashMap<>();
+		if(endpointConfiguration.getCustom() != null) {
+			servers.put("servers", endpointConfiguration.getCustom());
+		}
+		mav.addObject("customEndpoints", servers);
         mav.addObject("baseHref", "/core/authentication/" + serviceInstanceId + "/test");
         mav.addObject("token", TOKEN_PREFIX + "iojsiofksdfifid");
         mav.addObject("serviceInstanceId", serviceInstanceId);
-        mav.addObject("endpointUrl", endpointConfiguration.getEndpointUrl());
+        mav.addObject("endpointUrl", endpointConfiguration.getDefault());
 
         return mav;
     }
-    **/
 
 }

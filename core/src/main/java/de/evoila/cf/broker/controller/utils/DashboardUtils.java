@@ -33,7 +33,7 @@ public class DashboardUtils {
 
 		return url;
 	}
-	
+
 	public static boolean isURL(String url) {
 	    try {
 	        new URL(url);
@@ -47,8 +47,11 @@ public class DashboardUtils {
 		if (path == null || path.isEmpty()) 
 			return "/" + segment;
 
-		if (path.charAt(path.length() - 1) == '/') 
+		if (path.charAt(path.length() - 1) == '/' ^ segment.charAt(0) == '/')
 			return path + segment;
+
+		if(path.charAt(path.length() - 1) == '/' && segment.charAt(0) == '/')
+			return path + segment.replaceAll("/", "");
 
 		return path + "/" + segment;
 	}
