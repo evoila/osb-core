@@ -31,7 +31,7 @@ public class HeaderCheckFilter extends GenericFilterBean {
         } else if (!(req.getHeader(X_BROKER_API_VERSION).equals(VERSION))) {
             HttpServletResponse httpResponse = (HttpServletResponse) response;
             httpResponse.setContentType("application/json");
-            httpResponse.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Expected API-version: 2.13, but found API-version:"+req.getHeader("x-broker-api-version"));
+            httpResponse.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Expected API-version: "+ VERSION + ", but found API-version:"+req.getHeader("x-broker-api-version"));
             return;
         }
 
