@@ -17,7 +17,7 @@ import java.io.IOException;
 public class HeaderCheckFilter extends GenericFilterBean {
 
     private static final String X_BROKER_API_VERSION = "x-broker-api-version";
-    private static final String VERSION = "2.13";
+    private static final String VERSION = "2.14";
 
 
     @Override
