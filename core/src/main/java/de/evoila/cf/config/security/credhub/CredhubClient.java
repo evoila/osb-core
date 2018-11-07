@@ -4,8 +4,9 @@ import de.evoila.cf.broker.bean.CredhubBean;
 import de.evoila.cf.config.security.AcceptSelfSignedClientHttpRequestFactory;
 import org.springframework.credhub.core.CredHubTemplate;
 import org.springframework.credhub.core.OAuth2CredHubTemplate;
-import org.springframework.credhub.support.CredentialDetails;
 import org.springframework.credhub.support.SimpleCredentialName;
+import org.springframework.credhub.support.certificate.CertificateParameters;
+import org.springframework.credhub.support.certificate.CertificateParametersRequest;
 import org.springframework.credhub.support.json.JsonCredential;
 import org.springframework.credhub.support.json.JsonCredentialRequest;
 import org.springframework.credhub.support.password.PasswordParameters;
@@ -54,10 +55,14 @@ public class CredhubClient {
         return resource;
     }
 
+
     public void createUser(String instanceId, String valueName, String username) {
         createUser(instanceId, valueName, username, 40);
     }
 
+    /**
+     * The deployment manifest can access the user credentials via ((valueName.username)) and ((valueName.password))
+     */
     public void createUser(String instanceId, String valueName, String username, int passwordLength) {
         UserParametersRequest request = UserParametersRequest.builder()
                 .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName))
@@ -78,6 +83,9 @@ public class CredhubClient {
         createPassword(instanceId, valueName, 40);
     }
 
+    /**
+     * The deployment manifest can access the password credentials via ((valueName))
+     */
     public void createPassword(String instanceId, String valueName, int passwordLength) {
         PasswordParametersRequest request = PasswordParametersRequest.builder()
                 .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName))
@@ -93,6 +101,9 @@ public class CredhubClient {
         credHubTemplate.credentials().generate(request);
     }
 
+    /**
+     * The deployment manifest can access the every value in the json credentials via ((valueName.<value>))
+     */
     public void createJson(String intanceId, String valueName, Map<String, Object> values) {
         JsonCredentialRequest request = JsonCredentialRequest.builder()
                 .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + intanceId, valueName))
@@ -106,11 +117,16 @@ public class CredhubClient {
         credHubTemplate.credentials().deleteByName(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName));
     }
 
-    public void createCertificate() {
-        
+    public void createCertificate(String instanceId, String valueName, CertificateParameters.CertificateParametersBuilder certificateBuilder) {
+        CertificateParametersRequest request = CertificateParametersRequest.builder()
+                .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName))
+                .parameters(certificateBuilder.build())
+                .build();
+
+        credHubTemplate.credentials().generate(request);
     }
 
-    public void deleteCertificate() {
-
+    public void deleteCertificate(String instanceId, String valueName) {
+        deleteCredentials(instanceId, valueName);
     }
 }
