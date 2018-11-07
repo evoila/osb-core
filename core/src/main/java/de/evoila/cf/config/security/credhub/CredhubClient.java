@@ -8,6 +8,9 @@ import org.springframework.credhub.support.CredentialDetails;
 import org.springframework.credhub.support.SimpleCredentialName;
 import org.springframework.credhub.support.json.JsonCredential;
 import org.springframework.credhub.support.json.JsonCredentialRequest;
+import org.springframework.credhub.support.password.PasswordParameters;
+import org.springframework.credhub.support.password.PasswordParametersRequest;
+import org.springframework.credhub.support.user.UserParametersRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
@@ -25,6 +28,10 @@ public class CredhubClient {
     private CredhubBean credhubBean;
 
     private CredHubTemplate credHubTemplate;
+
+    private static final String BOSH_DIRECTOR = "bosh-1";
+
+    private static final String SERVICE_BROKER_PREFIX = "sb-";
 
     public CredhubClient(CredhubBean credhubBean) {
         this.credhubBean = credhubBean;
@@ -47,13 +54,63 @@ public class CredhubClient {
         return resource;
     }
 
+    public void createUser(String instanceId, String valueName, String username) {
+        createUser(instanceId, valueName, username, 40);
+    }
 
-    public CredentialDetails writeCredentials(String intanceId, String valueName, Map<String, Object> values) {
+    public void createUser(String instanceId, String valueName, String username, int passwordLength) {
+        UserParametersRequest request = UserParametersRequest.builder()
+                .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName))
+                .username(username)
+                .parameters(PasswordParameters.builder()
+                    .length(passwordLength)
+                    .excludeUpper(false)
+                    .excludeNumber(false)
+                    .excludeLower(false)
+                    .includeSpecial(false)
+                    .build())
+                .build();
+
+        credHubTemplate.credentials().generate(request);
+    }
+
+    public void createPassword(String instanceId, String valueName) {
+        createPassword(instanceId, valueName, 40);
+    }
+
+    public void createPassword(String instanceId, String valueName, int passwordLength) {
+        PasswordParametersRequest request = PasswordParametersRequest.builder()
+                .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName))
+                .parameters(PasswordParameters.builder()
+                        .length(passwordLength)
+                        .excludeUpper(false)
+                        .excludeNumber(false)
+                        .excludeLower(false)
+                        .includeSpecial(false)
+                        .build())
+                .build();
+
+        credHubTemplate.credentials().generate(request);
+    }
+
+    public void createJson(String intanceId, String valueName, Map<String, Object> values) {
         JsonCredentialRequest request = JsonCredentialRequest.builder()
-                .name(new SimpleCredentialName("bosh-1", "sb-" + intanceId, valueName))
+                .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + intanceId, valueName))
                 .value(new JsonCredential(values))
                 .build();
 
-        return credHubTemplate.credentials().write(request);
+        credHubTemplate.credentials().write(request);
+    }
+
+    public void deleteCredentials(String instanceId, String valueName) {
+        credHubTemplate.credentials().deleteByName(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName));
+    }
+
+    public void createCertificate() {
+        
+    }
+
+    public void deleteCertificate() {
+
     }
 }
