@@ -2,6 +2,9 @@ package de.evoila.cf.config.security.credhub;
 
 import de.evoila.cf.broker.bean.CredhubBean;
 import de.evoila.cf.config.security.AcceptSelfSignedClientHttpRequestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.credhub.core.CredHubTemplate;
 import org.springframework.credhub.core.OAuth2CredHubTemplate;
 import org.springframework.credhub.support.CredentialDetails;
@@ -28,7 +31,10 @@ import java.util.Map;
  * Created by reneschollmeyer, evoila on 24.10.18.
  */
 @Service
+@ConditionalOnBean(CredhubBean.class)
 public class CredhubClient {
+
+    private static final Logger log = LoggerFactory.getLogger(CredhubClient.class);
 
     private CredhubBean credhubBean;
 
@@ -42,6 +48,7 @@ public class CredhubClient {
         this.credhubBean = credhubBean;
         ClientHttpRequestFactory clientHttpRequestFactory = new AcceptSelfSignedClientHttpRequestFactory();
         this.credHubTemplate = new OAuth2CredHubTemplate(resource(), credhubBean.getUrl(), clientHttpRequestFactory);
+        log.info("Successfully establihsed a connection to Credhub.");
     }
 
     public OAuth2ProtectedResourceDetails resource() {
@@ -80,6 +87,8 @@ public class CredhubClient {
                     .build())
                 .build();
 
+        log.info("Creating user credentials for instance with id = " + instanceId);
+
         credHubTemplate.credentials().generate(request);
     }
 
@@ -112,6 +121,8 @@ public class CredhubClient {
                         .build())
                 .build();
 
+        log.info("Creating password credentials for instance with id = " + instanceId);
+
         credHubTemplate.credentials().generate(request);
     }
 
@@ -123,11 +134,13 @@ public class CredhubClient {
     /**
      * The deployment manifest can access the every value in the json credentials via ((valueName.<value>))
      */
-    public void createJson(String intanceId, String valueName, Map<String, Object> values) {
+    public void createJson(String instanceId, String valueName, Map<String, Object> values) {
         JsonCredentialRequest request = JsonCredentialRequest.builder()
-                .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + intanceId, valueName))
+                .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName))
                 .value(new JsonCredential(values))
                 .build();
+
+        log.info("Creating json credentials for instance with id = " + instanceId);
 
         credHubTemplate.credentials().write(request);
     }
@@ -146,6 +159,8 @@ public class CredhubClient {
                 .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName))
                 .parameters(certificateParameters)
                 .build();
+
+        log.info("Creating certificate for instance with id = " + instanceId);
 
         credHubTemplate.credentials().generate(request);
     }
