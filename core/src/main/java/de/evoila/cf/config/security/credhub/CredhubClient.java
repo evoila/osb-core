@@ -5,6 +5,7 @@ import de.evoila.cf.config.security.AcceptSelfSignedClientHttpRequestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.core.env.Environment;
 import org.springframework.credhub.core.CredHubTemplate;
 import org.springframework.credhub.core.OAuth2CredHubTemplate;
 import org.springframework.credhub.support.CredentialDetails;
@@ -25,6 +26,7 @@ import org.springframework.security.oauth2.client.token.grant.client.ClientCrede
 import org.springframework.security.oauth2.common.AuthenticationScheme;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -40,12 +42,20 @@ public class CredhubClient {
 
     private CredHubTemplate credHubTemplate;
 
+    private Environment environment;
+
     private static final String BOSH_DIRECTOR = "bosh-1";
 
-    private static final String SERVICE_BROKER_PREFIX = "sb-";
+    private static String SERVICE_BROKER_PREFIX = "sb-";
 
-    public CredhubClient(CredhubBean credhubBean) {
+    public CredhubClient(CredhubBean credhubBean, Environment environment) {
         this.credhubBean = credhubBean;
+        this.environment = environment;
+
+        if(Arrays.asList(environment.getActiveProfiles()).contains("test")) {
+            SERVICE_BROKER_PREFIX += "test-";
+        }
+
         ClientHttpRequestFactory clientHttpRequestFactory = new AcceptSelfSignedClientHttpRequestFactory();
         this.credHubTemplate = new OAuth2CredHubTemplate(resource(), credhubBean.getUrl(), clientHttpRequestFactory);
         log.info("Successfully establihsed a connection to Credhub.");
