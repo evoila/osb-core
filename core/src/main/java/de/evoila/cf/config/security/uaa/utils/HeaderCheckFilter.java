@@ -17,7 +17,8 @@ import java.io.IOException;
 public class HeaderCheckFilter extends GenericFilterBean {
 
     private static final String X_BROKER_API_VERSION = "x-broker-api-version";
-    private static final String VERSION = "2.13";
+    private static final String VERSION = "2.14";
+    private static final String PRE_VERSION = "2.13";
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -29,15 +30,12 @@ public class HeaderCheckFilter extends GenericFilterBean {
             httpResponse.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
                     "Requests to Service Broker must contain header that declares API-version");
             return;
-
-        } else if (!(req.getHeader(X_BROKER_API_VERSION).equals(VERSION))) {
-
+        } else if (!(req.getHeader(X_BROKER_API_VERSION).equals(VERSION)) &&
+                !(req.getHeader(X_BROKER_API_VERSION).equals(PRE_VERSION))) {
             HttpServletResponse httpResponse = (HttpServletResponse) response;
             httpResponse.setContentType("application/json");
-            httpResponse.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
-                    "Expected API-version: 2.13, but found API-version:" + req.getHeader("x-broker-api-version"));
-            return;
-
+            httpResponse.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, "Expected API-version: " + VERSION + "/" +
+                    PRE_VERSION + " but found API-version:" + req.getHeader("x-broker-api-version"));
         }
 
         chain.doFilter(request, response);
