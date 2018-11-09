@@ -6,7 +6,8 @@ package de.evoila.cf.broker.model;
 public class Server {
 
     private String url;
-    private String description;
+
+    private String identifier;
 
     public String getUrl() {
         return url;
@@ -16,11 +17,11 @@ public class Server {
         this.url = url;
     }
 
-    public String getDescription() {
-        return description;
+    public String getIdentifier() {
+        return identifier;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 }

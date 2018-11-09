@@ -34,7 +34,7 @@ public class CustomManageController extends BaseController {
     }
 
     @GetMapping(value = "/{serviceInstanceId}")
-    public ResponseEntity<ServiceInstanceView> getGeneralInformation(@PathVariable String serviceInstanceId) throws
+    public ResponseEntity<ServiceInstance> get(@PathVariable String serviceInstanceId) throws
             ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
         ServiceInstance serviceInstance = repository.getServiceInstance(serviceInstanceId);
 
@@ -46,7 +46,7 @@ public class CustomManageController extends BaseController {
 
         ServiceInstanceView serviceInstanceView = new ServiceInstanceView(serviceInstance, plan);
 
-        return new ResponseEntity<>(serviceInstanceView, HttpStatus.OK);
+        return new ResponseEntity<>(serviceInstance, HttpStatus.OK);
     }
 
 

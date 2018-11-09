@@ -5,6 +5,7 @@ import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
+import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.DeploymentServiceImpl;
 import org.slf4j.Logger;
@@ -34,15 +35,20 @@ public class ServiceInstanceController extends BaseController {
 
     private CatalogService catalogService;
 
-    public ServiceInstanceController(DeploymentServiceImpl deploymentService, EndpointConfiguration endpointConfiguration,
-									  CatalogService catalogService) {
+    private ServiceInstanceRepository serviceInstanceRepository;
+
+    public ServiceInstanceController(DeploymentServiceImpl deploymentService,
+                                     EndpointConfiguration endpointConfiguration,
+									 CatalogService catalogService,
+                                     ServiceInstanceRepository serviceInstanceRepository) {
     	this.deploymentService = deploymentService;
     	this.endpointConfiguration = endpointConfiguration;
     	this.catalogService = catalogService;
+    	this.serviceInstanceRepository = serviceInstanceRepository;
 	}
 
 	@PutMapping(value = "/{instanceId}")
-	public ResponseEntity<ServiceInstanceResponse> createServiceInstance(
+	public ResponseEntity<ServiceInstanceResponse> create(
 			@PathVariable("instanceId") String serviceInstanceId,
 			@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 			@Valid @RequestBody ServiceInstanceRequest request) throws ServiceDefinitionDoesNotExistException,
@@ -85,7 +91,7 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@PatchMapping(value= "/{instanceId}")
-	public ResponseEntity<String> updateServiceInstance(@PathVariable("instanceId") String serviceInstanceId,
+	public ResponseEntity<String> update(@PathVariable("instanceId") String serviceInstanceId,
 				@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 				@RequestBody ServiceInstanceRequest request) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
             ServiceInstanceDoesNotExistException, AsyncRequiredException, InvalidParametersException{
@@ -111,7 +117,7 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@DeleteMapping(value = "/{instanceId}")
-	public ResponseEntity<String> deleteServiceInstance(@PathVariable("instanceId") String instanceId,
+	public ResponseEntity<String> delete(@PathVariable("instanceId") String instanceId,
 														@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 														@RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId)
 			throws ServiceBrokerException, AsyncRequiredException,
