@@ -92,6 +92,10 @@ public class CatalogServiceImpl implements CatalogService {
 			endpointConfiguration.setDefault(
 			        replaceUrl(endpointConfiguration.getDefault())
             );
+
+			endpointConfiguration.getCustom().forEach(s -> {
+			    s.setUrl(replaceUrl(s.getUrl()));
+            });
 		}
 		return catalog;
 	}
