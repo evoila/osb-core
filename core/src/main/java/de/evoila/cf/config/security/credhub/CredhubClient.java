@@ -52,13 +52,18 @@ public class CredhubClient {
         this.credhubBean = credhubBean;
         this.environment = environment;
 
-        if(Arrays.asList(environment.getActiveProfiles()).contains("test")) {
+        if(Arrays.asList(this.environment.getActiveProfiles()).contains("test")) {
             SERVICE_BROKER_PREFIX += "test-";
         }
 
+        log.info("Saving credhub credentials to /" + BOSH_DIRECTOR + "/" + SERVICE_BROKER_PREFIX + "{instanceId}/{valueName}");
+
         ClientHttpRequestFactory clientHttpRequestFactory = new AcceptSelfSignedClientHttpRequestFactory();
         this.credHubTemplate = new OAuth2CredHubTemplate(resource(), credhubBean.getUrl(), clientHttpRequestFactory);
-        log.info("Successfully establihsed a connection to Credhub.");
+
+        if(this.credHubTemplate != null) {
+            log.info("Successfully establihsed connection to Credhub.");
+        }
     }
 
     public OAuth2ProtectedResourceDetails resource() {
