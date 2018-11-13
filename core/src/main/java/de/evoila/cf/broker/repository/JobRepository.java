@@ -20,7 +20,17 @@ public interface JobRepository {
 	 * de.evoila.cf.broker.repository.BindingRepository#addInternalBinding(java.
 	 * lang.String, java.lang.String)
 	 */
-	void saveOrUpdateJobProgress(String serviceInstanceId, String progress);
+	void saveJobProgress(String serviceInstanceId, String progress, String description, String operation);
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * de.evoila.cf.broker.repository.BindingRepository#addInternalBinding(java.
+	 * lang.String, java.lang.String)
+	 */
+
+	void updateJobProgress(String serviceInstanceId, String progress, String description);
 
 	/*
 	 * (non-Javadoc)

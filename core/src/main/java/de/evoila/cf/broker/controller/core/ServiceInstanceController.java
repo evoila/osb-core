@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import java.lang.UnsupportedOperationException;
 /**
  * @author Johannes Hiemer.
  * @author Christian Brinker, evoila.
@@ -69,6 +70,7 @@ public class ServiceInstanceController extends BaseController {
 			response.setDashboardUrl(DashboardUtils.dashboard(svc, serviceInstanceId));
 		log.debug("ServiceInstance Created: " + serviceInstanceId);
 
+
 		if (response.isAsync())
 			return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
 		else
@@ -76,7 +78,8 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@GetMapping(value = "/{instanceId}/last_operation")
-	public ResponseEntity<JobProgressResponse> lastOperation(@PathVariable("instanceId") String serviceInstanceId)
+	public ResponseEntity<JobProgressResponse> lastOperation(
+			@PathVariable("instanceId") String serviceInstanceId)
 			throws ServiceInstanceDoesNotExistException {
 
 		JobProgressResponse serviceInstanceProcessingResponse = deploymentService.getLastOperation(serviceInstanceId);
@@ -111,10 +114,10 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@DeleteMapping(value = "/{instanceId}")
-	public ResponseEntity<String> deleteServiceInstance(@PathVariable("instanceId") String instanceId,
-														@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
-														@RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId)
-			throws ServiceBrokerException, AsyncRequiredException,
+	public ResponseEntity<String> deleteServiceInstance(
+			@PathVariable("instanceId") String instanceId,
+			@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
+			@RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId) throws ServiceBrokerException, AsyncRequiredException,
             ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException {
 
 		log.debug("DELETE: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
@@ -132,15 +135,38 @@ public class ServiceInstanceController extends BaseController {
 	    return new ResponseEntity<>("{}", HttpStatus.ACCEPTED);
 	}
 
+	@GetMapping(value = "/{instanceId}")
+	public ResponseEntity<ServiceInstanceResponse> fetchServiceInstance(
+			@RequestHeader("X-Broker-API-Version") String apiHeader,
+			@PathVariable("instanceId") String instanceId) throws ServiceInstanceDoesNotExistException, UnsupportedOperationException,
+			ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceNotFoundException{
+
+    	/*if (!(apiHeader.equals("2.14"))){
+    		throw new UnsupportedOperationException("Fetching an instance is not supported with your API-Version");
+		}*/
+		ServiceInstance serviceInstance = deploymentService.fetchServiceInstance(instanceId);
+
+		if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isInstancesRetrievable())){
+			throw new ServiceBrokerException("The Service Instance could not be retrievable. You should not attempt to call this endpoint");
+		}
+		ServiceInstanceResponse serviceInstanceResponse = new ServiceInstanceResponse(serviceInstance);
+		return new ResponseEntity<>(serviceInstanceResponse, HttpStatus.OK);
+	}
+
 	@ExceptionHandler({ AsyncRequiredException.class })
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(AsyncRequiredException ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);	
 	}
 
-    @ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, InvalidParametersException.class })
+	@ExceptionHandler({ ConcurrencyErrorException.class })
+	public ResponseEntity<ErrorMessage> handleException(ConcurrencyErrorException ex) {
+		return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+	}
+
+	@ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, InvalidParametersException.class })
     @ResponseBody
-    public ResponseEntity<ErrorMessage> handleException(ServiceDefinitionDoesNotExistException ex) {
+    public ResponseEntity<ErrorMessage> handleException(Exception ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
@@ -154,5 +180,11 @@ public class ServiceInstanceController extends BaseController {
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceDoesNotExistException ex) {
 		return processErrorResponse("{}", HttpStatus.GONE);
+	}
+
+	@ExceptionHandler(ServiceInstanceNotFoundException.class)
+	@ResponseBody
+	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceNotFoundException ex){
+    	return processErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
 	}
 }

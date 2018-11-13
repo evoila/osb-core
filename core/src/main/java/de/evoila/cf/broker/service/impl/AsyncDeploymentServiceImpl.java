@@ -28,7 +28,7 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
 	@Override
 	public void asyncCreateInstance(DeploymentServiceImpl deploymentService, ServiceInstance serviceInstance,
                                     Map<String, Object> parameters, Plan plan, PlatformService platformService) {
-		progressService.startJob(serviceInstance);
+		progressService.startJob(serviceInstance, "Start creating service..", JobProgress.PROVISION);
 
 		try {
             deploymentService.syncCreateInstance(serviceInstance, parameters, plan, platformService);
@@ -39,14 +39,14 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
 			log.error("Exception during Instance creation", e);
 			return;
 		}
-		progressService.succeedProgress(serviceInstance);
+		progressService.succeedProgress(serviceInstance, "Instance successfully created");
 	}
 
     @Async
     @Override
     public void asyncUpdateInstance(DeploymentServiceImpl deploymentService, ServiceInstance serviceInstance,
                                     Map<String, Object> parameters, Plan plan, PlatformService platformService) {
-        progressService.startJob(serviceInstance);
+        progressService.startJob(serviceInstance, "Start updating service..", JobProgress.UPDATE);
 
         try {
             deploymentService.syncUpdateInstance(serviceInstance, parameters, plan, platformService);
@@ -57,14 +57,14 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
             log.error("Exception during Instance creation", e);
             return;
         }
-        progressService.succeedProgress(serviceInstance);
+        progressService.succeedProgress(serviceInstance, "Instance successfully updated");
     }
 
 	@Async
 	@Override
 	public void asyncDeleteInstance(DeploymentServiceImpl deploymentService,
 			ServiceInstance serviceInstance, Plan plan, PlatformService platformService) {
-		progressService.startJob(serviceInstance);
+		progressService.startJob(serviceInstance, "Start updating service..", JobProgress.DELETE);
 
 		try {
             deploymentService.syncDeleteInstance(serviceInstance, plan, platformService);
@@ -76,7 +76,7 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
 			log.error("Exception during Instance deletion", e);
 			return;
 		}
-		progressService.succeedProgress(serviceInstance);
+		progressService.succeedProgress(serviceInstance, "Instance successfully deleted");
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
 			return progressService.getProgress(serviceInstanceId);
 		} catch (Exception e) {
 			log.error("Error during job progress retrieval", e);
-			return new JobProgress(JobProgress.UNKNOWN, "Error during job progress retrieval");
+			return new JobProgress(JobProgress.UNKNOWN, JobProgress.UNKNOWN, "Error during job progress retrieval");
 		}
 	}
 

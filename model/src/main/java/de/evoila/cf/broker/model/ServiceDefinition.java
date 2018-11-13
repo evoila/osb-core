@@ -34,6 +34,12 @@ public class ServiceDefinition {
 
 	private Dashboard dashboard;
 
+	@JsonProperty("instances_retrievable")
+	private boolean instancesRetrievable;
+
+	@JsonProperty("bindings_retrievable")
+	private boolean bindingsRetrievable;
+
 	@JsonProperty("dashboard_client")
 	private DashboardClient dashboardClient;
 
@@ -64,15 +70,25 @@ public class ServiceDefinition {
 	}
 
 	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans, boolean updatable,
-			List<String> tags, ServiceMetadata metadata, List<String> requires) {
+			List<String> tags, ServiceMetadata metadata, List<String> requires, boolean instancesRetrievable, boolean bindingsRetrievable) {
 		this(id, name, description, bindable, plans, updatable);
 		setTags(tags);
 		setMetadata(metadata);
 		setRequires(requires);
+		setInstancesRetrievable(instancesRetrievable);
+		setBindingsRetrievable(bindingsRetrievable);
 	}
 
 	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans) {
 		this(id, name, description, bindable, plans, false);
+	}
+
+	public boolean isBindingsRetrievable() {
+		return bindingsRetrievable;
+	}
+
+	public void setBindingsRetrievable(boolean bindingsRetrievable) {
+		this.bindingsRetrievable = bindingsRetrievable;
 	}
 
 	public String getId() {
@@ -163,4 +179,11 @@ public class ServiceDefinition {
 		this.dashboardClient = dashboardClient;
 	}
 
+	public boolean isInstancesRetrievable() {
+		return instancesRetrievable;
+	}
+
+	public void setInstancesRetrievable(boolean instancesRetrievable) {
+		this.instancesRetrievable = instancesRetrievable;
+	}
 }

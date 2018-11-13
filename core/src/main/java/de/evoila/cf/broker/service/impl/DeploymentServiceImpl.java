@@ -14,8 +14,10 @@ import de.evoila.cf.broker.service.AsyncDeploymentService;
 import de.evoila.cf.broker.service.DeploymentService;
 import de.evoila.cf.broker.service.PlatformService;
 import de.evoila.cf.broker.util.ParameterValidator;
+import org.aspectj.weaver.tools.UnsupportedPointcutPrimitiveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -138,12 +140,12 @@ public class DeploymentServiceImpl implements DeploymentService {
     @Override
     public void deleteServiceInstance(String instanceId)
             throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
-        ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-
-        if (serviceInstance == null) {
+        ServiceInstance serviceInstance;
+        try {
+            serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+        }catch (Exception e){
             throw new ServiceInstanceDoesNotExistException(instanceId);
         }
-
         Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
 
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
@@ -154,6 +156,30 @@ public class DeploymentServiceImpl implements DeploymentService {
         } else {
             asyncDeploymentService.asyncDeleteInstance(this, serviceInstance, plan, platformService);
         }
+    }
+
+    @Override
+    public ServiceInstance fetchServiceInstance(String instanceId) throws UnsupportedOperationException, ConcurrencyErrorException, ServiceInstanceNotFoundException {
+
+	    ServiceInstance serviceInstance;
+        try {
+            serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+        }catch (Exception e){
+            throw new ServiceInstanceNotFoundException();
+        }
+
+        if (jobRepository.containsJobProgress(instanceId)) {
+            JobProgress job = jobRepository.getJobProgress(instanceId);
+            if (job.getOperation().equals(JobProgress.PROVISION) &&
+                    job.getState().equals(JobProgress.IN_PROGRESS)){
+                throw new ServiceInstanceNotFoundException();
+            } else if (job.getOperation().equals(JobProgress.UPDATE) &&
+                    job.getState().equals(JobProgress.IN_PROGRESS)){
+                throw new ConcurrencyErrorException();
+            }
+        }
+        return serviceInstance;
+
     }
 
 	public ServiceInstance syncCreateInstance(ServiceInstance serviceInstance, Map<String, Object> parameters,
@@ -234,4 +260,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
         jobRepository.deleteJobProgress(serviceInstance.getId());
 	}
+	public void updateInstanceInfo(ServiceInstance serviceInstance){
+	    serviceInstanceRepository.updateServiceInstance(serviceInstance);
+    }
 }
