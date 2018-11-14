@@ -73,7 +73,7 @@ public class CustomServiceKeysController extends BaseController {
     public ResponseEntity delete(@PathVariable String serviceInstanceId,
                                  @PathVariable String serviceBindingId)
             throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException,
-            ServiceInstanceBindingDoesNotExistsException, ServiceBrokerException {
+            ServiceInstanceBindingDoesNotExistsException, AsyncRequiredException, ServiceBrokerException {
 
         ServiceInstance instance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
 
@@ -81,7 +81,7 @@ public class CustomServiceKeysController extends BaseController {
             throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
         }
 
-        bindingService.deleteServiceInstanceBinding(serviceBindingId, instance.getPlanId());
+        bindingService.deleteServiceInstanceBinding(serviceBindingId, instance.getPlanId(), false);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

@@ -47,8 +47,8 @@ public interface BindingService {
      * @throws ServiceInstanceBindingDoesNotExistsException
      * @throws ServiceDefinitionDoesNotExistException
      */
-    void deleteServiceInstanceBinding(String bindingId, String planId)
-          throws ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException;
+    void deleteServiceInstanceBinding(String bindingId, String planId, boolean async)
+          throws ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceInstanceBindingBadRequestException;
 
 
     JobProgressResponse getLastOperation(String bindingId) throws ServiceInstanceBindingDoesNotExistsException;

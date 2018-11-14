@@ -108,25 +108,23 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	@Override
-	public void deleteServiceInstanceBinding(String bindingId, String planId)
-			throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException {
+	public void deleteServiceInstanceBinding(String bindingId, String planId, boolean async)
+			throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceInstanceBindingBadRequestException {
 		ServiceInstance serviceInstance = getBinding(bindingId);
+		Plan plan = serviceDefinitionRepository.getPlan(planId);
+		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
-		try {
-			ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
-			List<ServerAddress> externalServerAddresses = binding.getExternalServerAddresses();
-			if (externalServerAddresses != null && haProxyService != null) {
-				haProxyService.removeAgent(serviceInstance.getHosts(), bindingId);
-			}
-
-            Plan plan = serviceDefinitionRepository.getPlan(planId);
-
-			unbindService(binding, serviceInstance, plan);
-		} catch (ServiceBrokerException e) {
-			log.error("Could not cleanup service binding", e);
-		} finally {
-			bindingRepository.unbindService(bindingId);
+		if (!platformService.isSyncPossibleOnUnbind() && !async) {
+			throw new AsyncRequiredException();
 		}
+
+		if (platformService.isSyncPossibleOnUnbind() && !async) {
+			syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
+		}else if (async){
+			asyncBindingService.asyncDeleteServiceInstanceBinding(this, bindingId, serviceInstance, plan);
+		}else
+			throw new ServiceInstanceBindingBadRequestException(bindingId);
+
 	}
 
 	@Override
@@ -190,6 +188,23 @@ public abstract class BindingServiceImpl implements BindingService {
 		bindingRepository.addInternalBinding(binding);
 
 		return new ServiceInstanceBindingResponse(binding, async);
+	}
+
+	public void syncDeleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance, Plan plan){
+		try {
+			ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
+			List<ServerAddress> externalServerAddresses = binding.getExternalServerAddresses();
+			if (externalServerAddresses != null && haProxyService != null) {
+				haProxyService.removeAgent(serviceInstance.getHosts(), bindingId);
+			}
+
+			unbindService(binding, serviceInstance, plan);
+		} catch (ServiceBrokerException e) {
+			log.error("Could not cleanup service binding", e);
+		} finally {
+			bindingRepository.unbindService(bindingId);
+			jobRepository.deleteJobProgress(bindingId);
+		}
 	}
 
 	protected ServiceInstance getBinding(String bindingId) throws ServiceInstanceBindingDoesNotExistsException {

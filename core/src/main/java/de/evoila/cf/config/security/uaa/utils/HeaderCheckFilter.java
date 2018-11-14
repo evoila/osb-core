@@ -19,6 +19,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.text.StyledEditorKit;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,11 +88,11 @@ public class HeaderCheckFilter extends GenericFilterBean {
             }else if (controller.equals(BINDING_CONTROLLER)) {
                 switch (method) {
                     case "GET":
-                        versions = ServiceInstanceBindingController.class.getMethod("fetchServiceInstanceBinding", String.class, String.class, String.class).getAnnotation(ApiVersion.class).value();break;
+                        versions = ServiceInstanceBindingController.class.getMethod("fetchServiceInstanceBinding", String.class, String.class).getAnnotation(ApiVersion.class).value();break;
                     case "PUT":
                         versions = ServiceInstanceBindingController.class.getMethod("bindServiceInstance", String.class, String.class, String.class, Boolean.class, ServiceInstanceBindingRequest.class).getAnnotation(ApiVersion.class).value();break;
                     case "DELETE":
-                        versions = ServiceInstanceBindingController.class.getMethod("deleteServiceInstanceBinding", String.class, String.class, String.class, String.class).getAnnotation(ApiVersion.class).value();break;
+                        versions = ServiceInstanceBindingController.class.getMethod("deleteServiceInstanceBinding", String.class, String.class, String.class, String.class, Boolean.class, String.class).getAnnotation(ApiVersion.class).value();break;
                 }
             }else if (controller.equals(CATALOG_CONTROLLER)) {
                 versions = CatalogController.class.getMethod("getCatalog").getAnnotation(ApiVersion.class).value();

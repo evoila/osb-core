@@ -18,10 +18,9 @@ public interface AsyncBindingService {
     ServiceInstanceBindingResponse asyncCreateServiceInstanceBinding(BindingServiceImpl bindingService, String bindingId, ServiceInstance serviceInstance,
                                                                      ServiceInstanceBindingRequest serviceInstanceBindingRequest, Plan plan, boolean async);
 
-    /*void asyncDeleteServiceInstanceBinding(BindingServiceImpl bindingServiceImpl,
-                             ServiceInstance serviceInstance, Plan plan, PlatformService platformService)
-            throws ServiceInstanceDoesNotExistException;
-*/
+    void asyncDeleteServiceInstanceBinding(BindingServiceImpl bindingServiceImpl, String bindingId,
+                             ServiceInstance serviceInstance, Plan plan);
+
     JobProgress getProgress(String serviceInstanceId);
 
 }

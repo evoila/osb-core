@@ -25,6 +25,7 @@ import java.util.Map;
 
 /**
  * @author Christian Brinker.
+ * @author Marco Di Martino
  *
  */
 @Service

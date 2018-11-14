@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-/** @author Johannes Hiemer. */
+/** @author Johannes Hiemer.
+ *  @author Marco Di Martino
+ * */
+
 @Controller
 @RequestMapping(value = "/v2/service_instances")
 public class ServiceInstanceBindingController extends BaseController {
@@ -75,21 +78,32 @@ public class ServiceInstanceBindingController extends BaseController {
 	@ApiVersion({"2.13", "2.14"})
 	public ResponseEntity<String> deleteServiceInstanceBinding(@PathVariable("instanceId") String instanceId,
 			@PathVariable("bindingId") String bindingId, @RequestParam("service_id") String serviceId,
-			@RequestParam("plan_id") String planId) throws ServiceBrokerException {
+			@RequestParam("plan_id") String planId, @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,
+			@RequestHeader("X-Broker-API-Version") String apiHeader) throws ServiceBrokerException, AsyncRequiredException{
 
 		log.debug("DELETE: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
 				+ ", deleteServiceInstanceBinding(),  serviceInstance.id = " + instanceId + ", bindingId = " + bindingId
 				+ ", serviceId = " + serviceId + ", planId = " + planId);
 
+		if (acceptsIncomplete == null){
+			acceptsIncomplete = false;
+		}
+		if (acceptsIncomplete && apiHeader.equals("2.13")){
+			throw new ServiceInstanceBindingBadRequestException(bindingId);
+		}
 		try {
-			bindingService.deleteServiceInstanceBinding(bindingId, planId);
+			bindingService.deleteServiceInstanceBinding(bindingId, planId, acceptsIncomplete);
 		} catch (ServiceInstanceBindingDoesNotExistsException | ServiceDefinitionDoesNotExistException e) {
 			return new ResponseEntity<>("{}", HttpStatus.GONE);
 		}
 
 		log.debug("ServiceInstanceBinding Deleted: " + bindingId);
 
-		return new ResponseEntity<>("{}", HttpStatus.OK);
+		if (acceptsIncomplete){
+			return new ResponseEntity<>("{\"Unbind in progress\"}", HttpStatus.ACCEPTED);
+		}else{
+			return new ResponseEntity<>("{}", HttpStatus.OK);
+		}
 	}
 
 	@GetMapping(value = "/{instanceId}/service_bindings/{bindingId}/last_operation")
@@ -109,8 +123,7 @@ public class ServiceInstanceBindingController extends BaseController {
 	@GetMapping(value = "/{instanceId}/service_bindings/{bindingId}")
 	@ApiVersion("2.14")
 	public ResponseEntity<ServiceInstanceBindingResponse> fetchServiceInstanceBinding(@PathVariable("instanceId") String instanceId,
-																					  @PathVariable("bindingId") String bindingId,
-																					  @RequestHeader("X-Broker-API-Version") String apiHeader
+																					  @PathVariable("bindingId") String bindingId
 																					  ) throws ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceInstanceDoesNotExistException{
 
 		ServiceInstance serviceInstance = bindingService.getServiceInstance(instanceId);
