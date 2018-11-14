@@ -47,6 +47,7 @@ public class AcceptSelfSignedClientHttpRequestFactory extends SimpleClientHttpRe
             SSLContext sslContext = SSLContext.getInstance("SSL");
             sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
 			SSLContext.setDefault(sslContext);
+			HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
