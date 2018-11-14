@@ -23,6 +23,6 @@ public class ServiceInstanceBindingBadRequestException extends ServiceBrokerExce
 		return "ServiceInstanceBinding is a bad request: serviceInstanceBinding.id = " + bindingId
 				 + ", requestBody = " + requestBody;
 		}else
-			return "Such binding request can not be performed by the Platform" + bindingId;
+			return "Such binding request can not be performed by the Platform: id = " + bindingId;
 		}
 }

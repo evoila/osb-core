@@ -33,6 +33,7 @@ public class ServiceInstanceBindingController extends BaseController {
 	}
 
 	@PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
+	@ApiVersion({"2.13", "2.14"})
 	public ResponseEntity<ServiceInstanceBindingResponse> bindServiceInstance(@PathVariable("instanceId") String instanceId,
             @PathVariable("bindingId") String bindingId,
 			@RequestHeader("X-Broker-API-Version") String apiHeader,
@@ -56,7 +57,7 @@ public class ServiceInstanceBindingController extends BaseController {
 			acceptsIncomplete = false;
 		}
 		if (acceptsIncomplete && apiHeader.equals("2.13")){
-			throw new UnsupportedOperationException();
+			throw new ServiceInstanceBindingBadRequestException(bindingId);
 		}
 
 		ServiceInstanceBindingResponse response = bindingService.createServiceInstanceBinding(bindingId, instanceId, request, acceptsIncomplete);
@@ -71,6 +72,7 @@ public class ServiceInstanceBindingController extends BaseController {
 	}
 
 	@DeleteMapping(value = "/{instanceId}/service_bindings/{bindingId}")
+	@ApiVersion({"2.13", "2.14"})
 	public ResponseEntity<String> deleteServiceInstanceBinding(@PathVariable("instanceId") String instanceId,
 			@PathVariable("bindingId") String bindingId, @RequestParam("service_id") String serviceId,
 			@RequestParam("plan_id") String planId) throws ServiceBrokerException {
@@ -91,6 +93,7 @@ public class ServiceInstanceBindingController extends BaseController {
 	}
 
 	@GetMapping(value = "/{instanceId}/service_bindings/{bindingId}/last_operation")
+	@ApiVersion("2.14")
 	public ResponseEntity<JobProgressResponse> lastOperation(@PathVariable("instanceId") String instanceId,
 																		@PathVariable("bindingId") String bindingId,
 																		@RequestParam(value = "service_id", required = false) String serivceId,
@@ -104,6 +107,7 @@ public class ServiceInstanceBindingController extends BaseController {
 	}
 
 	@GetMapping(value = "/{instanceId}/service_bindings/{bindingId}")
+	@ApiVersion("2.14")
 	public ResponseEntity<ServiceInstanceBindingResponse> fetchServiceInstanceBinding(@PathVariable("instanceId") String instanceId,
 																					  @PathVariable("bindingId") String bindingId,
 																					  @RequestHeader("X-Broker-API-Version") String apiHeader

@@ -33,7 +33,6 @@ public class AsyncBindingServiceImpl implements AsyncBindingService {
         jobProgressService.startJob(bindingId, "Start creating binding..", JobProgress.BIND);
         ServiceInstanceBindingResponse response;
         try {
-            Thread.sleep(50000);
             response = bindingService.syncCreateBinding(bindingId, serviceInstance, serviceInstanceBindingRequest, plan, async);
         } catch (Exception e) {
             jobProgressService.failJob(bindingId,

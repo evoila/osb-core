@@ -150,8 +150,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
-        if (platformService.isSyncPossibleOnDelete(serviceInstance)
-                && platformService.isSyncPossibleOnDelete(serviceInstance)) {
+        if (platformService.isSyncPossibleOnDelete(serviceInstance)) {
             syncDeleteInstance(serviceInstance, plan, platformService);
         } else {
             asyncDeploymentService.asyncDeleteInstance(this, serviceInstance, plan, platformService);

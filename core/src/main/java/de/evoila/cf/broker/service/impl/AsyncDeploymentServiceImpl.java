@@ -64,7 +64,7 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
 	@Override
 	public void asyncDeleteInstance(DeploymentServiceImpl deploymentService,
 			ServiceInstance serviceInstance, Plan plan, PlatformService platformService) {
-		progressService.startJob(serviceInstance, "Start updating service..", JobProgress.DELETE);
+		progressService.startJob(serviceInstance, "Start deleting service..", JobProgress.DELETE);
 
 		try {
             deploymentService.syncDeleteInstance(serviceInstance, plan, platformService);

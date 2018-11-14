@@ -43,6 +43,7 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@PutMapping(value = "/{instanceId}")
+	@ApiVersion({"2.13", "2.14"})
 	public ResponseEntity<ServiceInstanceResponse> createServiceInstance(
 			@PathVariable("instanceId") String serviceInstanceId,
 			@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
@@ -78,6 +79,7 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@GetMapping(value = "/{instanceId}/last_operation")
+	@ApiVersion({"2.13", "2.14"})
 	public ResponseEntity<JobProgressResponse> lastOperation(
 			@PathVariable("instanceId") String serviceInstanceId)
 			throws ServiceInstanceDoesNotExistException {
@@ -88,6 +90,7 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@PatchMapping(value= "/{instanceId}")
+	@ApiVersion({"2.13", "2.14"})
 	public ResponseEntity<String> updateServiceInstance(@PathVariable("instanceId") String serviceInstanceId,
 				@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 				@RequestBody ServiceInstanceRequest request) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
@@ -114,6 +117,7 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@DeleteMapping(value = "/{instanceId}")
+	@ApiVersion({"2.13", "2.14"})
 	public ResponseEntity<String> deleteServiceInstance(
 			@PathVariable("instanceId") String instanceId,
 			@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
@@ -136,6 +140,7 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@GetMapping(value = "/{instanceId}")
+	@ApiVersion("2.14")
 	public ResponseEntity<ServiceInstanceResponse> fetchServiceInstance(
 			@RequestHeader("X-Broker-API-Version") String apiHeader,
 			@PathVariable("instanceId") String instanceId) throws ServiceInstanceDoesNotExistException, UnsupportedOperationException,
