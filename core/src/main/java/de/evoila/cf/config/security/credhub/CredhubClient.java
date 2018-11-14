@@ -44,7 +44,7 @@ public class CredhubClient {
 
     private Environment environment;
 
-    private static final String BOSH_DIRECTOR = "bosh-1";
+    private static final String BOSH_DIRECTOR = "vbox";
 
     private static String SERVICE_BROKER_PREFIX = "sb-";
 
