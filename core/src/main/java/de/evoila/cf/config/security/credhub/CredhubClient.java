@@ -44,7 +44,7 @@ public class CredhubClient {
 
     private Environment environment;
 
-    private static final String BOSH_DIRECTOR = "vbox";
+    private static final String BOSH_DIRECTOR = "bosh-1";
 
     private static String SERVICE_BROKER_PREFIX = "sb-";
 
@@ -78,6 +78,7 @@ public class CredhubClient {
         resource.setAccessTokenUri(credhubBean.getOauth2().getAccessTokenUri());
         resource.setClientId(credhubBean.getOauth2().getClientId());
         resource.setClientSecret(credhubBean.getOauth2().getClientSecret());
+        resource.setGrantType("client_credentials");
         return resource;
     }
 
