@@ -51,7 +51,7 @@ public class AsyncBindingServiceImpl implements AsyncBindingService {
     @Override
     public void asyncDeleteServiceInstanceBinding(BindingServiceImpl bindingServiceImpl, String bindingId,
                                                   ServiceInstance serviceInstance, Plan plan) {
-        jobProgressService.startJob(serviceInstance, "Start deleting binding..", JobProgress.DELETE);
+        jobProgressService.startJob(serviceInstance, "Start deleting binding..", JobProgress.UNBIND);
 
         try {
             bindingServiceImpl.syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);

@@ -146,9 +146,7 @@ public class ServiceInstanceController extends BaseController {
 			@PathVariable("instanceId") String instanceId) throws ServiceInstanceDoesNotExistException, UnsupportedOperationException,
 			ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceNotFoundException{
 
-    	/*if (!(apiHeader.equals("2.14"))){
-    		throw new UnsupportedOperationException("Fetching an instance is not supported with your API-Version");
-		}*/
+
 		ServiceInstance serviceInstance = deploymentService.fetchServiceInstance(instanceId);
 
 		if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isInstancesRetrievable())){
