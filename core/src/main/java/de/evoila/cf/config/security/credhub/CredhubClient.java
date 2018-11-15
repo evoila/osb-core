@@ -2,20 +2,12 @@ package de.evoila.cf.config.security.credhub;
 
 import de.evoila.cf.broker.bean.CredhubBean;
 import de.evoila.cf.config.security.AcceptSelfSignedClientHttpRequestFactory;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.env.Environment;
+import org.springframework.credhub.core.CredHubClient;
 import org.springframework.credhub.core.CredHubTemplate;
-import org.springframework.credhub.core.OAuth2CredHubTemplate;
 import org.springframework.credhub.support.CredentialDetails;
 import org.springframework.credhub.support.SimpleCredentialName;
 import org.springframework.credhub.support.certificate.CertificateCredential;
@@ -29,14 +21,17 @@ import org.springframework.credhub.support.password.PasswordParametersRequest;
 import org.springframework.credhub.support.user.UserCredential;
 import org.springframework.credhub.support.user.UserParametersRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
+import org.springframework.security.oauth2.client.token.AccessTokenProviderChain;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsAccessTokenProvider;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
+import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider;
+import org.springframework.security.oauth2.client.token.grant.implicit.ImplicitAccessTokenProvider;
+import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordAccessTokenProvider;
 import org.springframework.security.oauth2.common.AuthenticationScheme;
 import org.springframework.stereotype.Service;
 
-import javax.net.ssl.SSLContext;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -70,28 +65,29 @@ public class CredhubClient {
         log.info("Saving credhub credentials to /" + BOSH_DIRECTOR + "/" + SERVICE_BROKER_PREFIX + "{instanceId}/{valueName}");
 
         ClientHttpRequestFactory clientHttpRequestFactory = new AcceptSelfSignedClientHttpRequestFactory();
-        this.credHubTemplate = new OAuth2CredHubTemplate(resource(), credhubBean.getUrl(), new AcceptSelfSignedClientHttpRequestFactory());;
+
+        OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(resource());
+
+        AuthorizationCodeAccessTokenProvider authorizationCodeAccessTokenProvider = new AuthorizationCodeAccessTokenProvider();
+        authorizationCodeAccessTokenProvider.setRequestFactory(clientHttpRequestFactory);
+
+        ImplicitAccessTokenProvider implicitAccessTokenProvider = new ImplicitAccessTokenProvider();
+        implicitAccessTokenProvider.setRequestFactory(clientHttpRequestFactory);
+
+        ResourceOwnerPasswordAccessTokenProvider resourceOwnerPasswordAccessTokenProvider = new ResourceOwnerPasswordAccessTokenProvider();
+        resourceOwnerPasswordAccessTokenProvider.setRequestFactory(clientHttpRequestFactory);
+
+        ClientCredentialsAccessTokenProvider clientCredentialsAccessTokenProvider = new ClientCredentialsAccessTokenProvider();
+        clientCredentialsAccessTokenProvider.setRequestFactory(clientHttpRequestFactory);
+
+        restTemplate.setAccessTokenProvider(new AccessTokenProviderChain(Arrays.asList(authorizationCodeAccessTokenProvider, implicitAccessTokenProvider, resourceOwnerPasswordAccessTokenProvider, clientCredentialsAccessTokenProvider)));
+        CredHubClient.configureRestTemplate(restTemplate, credhubBean.getUrl(), clientHttpRequestFactory);
+
+        this.credHubTemplate = new CredHubTemplate(restTemplate);
 
         if(this.credHubTemplate.info() != null) {
             log.info("Successfully establihsed connection to Credhub.");
         }
-    }
-
-    private CredHubTemplate createCredhubTemplate() {
-        SSLContext sslContext = null;
-
-        try {
-            sslContext = SSLContext.getInstance("SSL");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-
-        SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(new AuthScope(credhubBean.getOauth2().getAccessTokenUri(), 8443), new UsernamePasswordCredentials(credhubBean.getOauth2().getClientId(), credhubBean.getOauth2().getClientSecret()));
-        CloseableHttpClient httpClient = HttpClientBuilder.create().disableRedirectHandling().setDefaultCredentialsProvider(credentialsProvider).setSSLSocketFactory(connectionSocketFactory).build();
-
-        return new OAuth2CredHubTemplate(resource(), credhubBean.getUrl(), new HttpComponentsClientHttpRequestFactory(httpClient));
     }
 
     public OAuth2ProtectedResourceDetails resource() {
