@@ -76,7 +76,7 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
 			log.error("Exception during Instance deletion", e);
 			return;
 		}
-		progressService.succeedProgress(serviceInstance, "Instance successfully deleted");
+		//progressService.succeedProgress(serviceInstance, "Instance successfully deleted");
 	}
 
 	@Override

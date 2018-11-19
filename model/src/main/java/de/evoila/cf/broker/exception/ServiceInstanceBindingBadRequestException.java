@@ -20,9 +20,9 @@ public class ServiceInstanceBindingBadRequestException extends ServiceBrokerExce
 	@Override
 	public String getMessage() {
 		if (requestBody != null){
-		return "ServiceInstanceBinding is a bad request: serviceInstanceBinding.id = " + bindingId
+			return "ServiceInstanceBinding is a bad request: serviceInstanceBinding.id = " + bindingId
 				 + ", requestBody = " + requestBody;
 		}else
 			return "Such binding request can not be performed by the Platform: id = " + bindingId;
-		}
+	}
 }

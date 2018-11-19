@@ -150,13 +150,13 @@ public class ServiceInstanceController extends BaseController {
 		ServiceInstance serviceInstance = deploymentService.fetchServiceInstance(instanceId);
 
 		if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isInstancesRetrievable())){
-			throw new ServiceBrokerException("The Service Instance could not be retrievable. You should not attempt to call this endpoint");
+			throw new ServiceInstanceNotRetrievableException("The Service Instance could not be retrievable. You should not attempt to call this endpoint");
 		}
 		ServiceInstanceResponse serviceInstanceResponse = new ServiceInstanceResponse(serviceInstance);
 		return new ResponseEntity<>(serviceInstanceResponse, HttpStatus.OK);
 	}
 
-	@ExceptionHandler({ AsyncRequiredException.class })
+	@ExceptionHandler({ AsyncRequiredException.class})
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(AsyncRequiredException ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);	
@@ -167,7 +167,7 @@ public class ServiceInstanceController extends BaseController {
 		return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
-	@ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, InvalidParametersException.class })
+	@ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, InvalidParametersException.class, ServiceInstanceNotRetrievableException.class })
     @ResponseBody
     public ResponseEntity<ErrorMessage> handleException(Exception ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);

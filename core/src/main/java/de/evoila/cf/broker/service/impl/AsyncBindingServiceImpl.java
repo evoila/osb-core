@@ -63,7 +63,7 @@ public class AsyncBindingServiceImpl implements AsyncBindingService {
             log.error("Exception during binding deletion", e);
             return;
         }
-        jobProgressService.succeedProgress(serviceInstance, "Instance Binding successfully deleted");
+    //    jobProgressService.succeedProgress(serviceInstance, "Instance Binding successfully deleted");
     }
 
 

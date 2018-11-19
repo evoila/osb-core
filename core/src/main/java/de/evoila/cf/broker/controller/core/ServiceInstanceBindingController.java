@@ -125,11 +125,11 @@ public class ServiceInstanceBindingController extends BaseController {
 	public ResponseEntity<ServiceInstanceBindingResponse> fetchServiceInstanceBinding(@PathVariable("instanceId") String instanceId,
 																					  @PathVariable("bindingId") String bindingId
 																					  ) throws ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceInstanceDoesNotExistException{
-
 		ServiceInstance serviceInstance = bindingService.getServiceInstance(instanceId);
 		if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isBindingsRetrievable())){
-			throw new ServiceBrokerException("The Service Binding could not be retrievable. You should not attempt to call this endpoint");
+			throw new ServiceInstanceBindingNotRetrievableException("The Service Binding could not be retrievable. You should not attempt to call this endpoint");
 		}
+
 		ServiceInstanceBinding binding =  bindingService.fetchServiceInstanceBinding(bindingId, instanceId);
 		ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(binding);
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -154,9 +154,9 @@ public class ServiceInstanceBindingController extends BaseController {
 		return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
 	}
 	
-	@ExceptionHandler(ServiceInstanceBindingBadRequestException.class)
+	@ExceptionHandler({ServiceInstanceBindingBadRequestException.class, ServiceInstanceBindingNotRetrievableException.class})
 	@ResponseBody
-	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceBindingBadRequestException ex) {
+	public ResponseEntity<ErrorMessage> handleException(Exception ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
 	}
 
