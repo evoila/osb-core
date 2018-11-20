@@ -3,7 +3,7 @@
  */
 package de.evoila.config.web;
 
-import de.evoila.cf.config.security.uaa.utils.HeaderCheckFilter;
+import de.evoila.cf.security.uaa.utils.HeaderCheckFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

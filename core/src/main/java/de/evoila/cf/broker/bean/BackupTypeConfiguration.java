@@ -1,22 +1,20 @@
 package de.evoila.cf.broker.bean;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /** @author Yannic Remmet */
 @Configuration
-@ConfigurationProperties(prefix= "backup")
-@ConditionalOnProperty(prefix = "backup", name = {"type"})
+@ConditionalOnProperty(prefix = "backup", name = {"enabled"})
 public class BackupTypeConfiguration {
 
-    private String type;
+    private boolean enabled;
 
-    public String getType() {
-        return type;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

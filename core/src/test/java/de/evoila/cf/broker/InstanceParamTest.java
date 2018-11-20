@@ -2,6 +2,7 @@ package de.evoila.cf.broker;
 
 import de.evoila.cf.broker.exception.InvalidParametersException;
 import de.evoila.cf.broker.model.*;
+import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.util.ParameterValidator;
 import org.junit.Test;
 import org.slf4j.Logger;

@@ -5,6 +5,7 @@ import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
+import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.DeploymentServiceImpl;
