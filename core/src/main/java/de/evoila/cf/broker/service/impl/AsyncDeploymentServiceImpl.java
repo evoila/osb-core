@@ -1,7 +1,7 @@
 package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.model.JobProgress;
-import de.evoila.cf.broker.model.Plan;
+import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.service.AsyncDeploymentService;
 import de.evoila.cf.broker.service.JobProgressService;

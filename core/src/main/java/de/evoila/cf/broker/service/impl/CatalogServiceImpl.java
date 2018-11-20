@@ -1,16 +1,18 @@
 package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.bean.EndpointConfiguration;
-import de.evoila.cf.broker.model.Catalog;
-import de.evoila.cf.broker.model.ServiceDefinition;
+import de.evoila.cf.broker.model.catalog.Catalog;
+import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.service.CatalogService;
-import de.evoila.cf.broker.util.EnvironmentUtils;
 import de.evoila.cf.broker.util.GlobalConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
@@ -23,7 +25,7 @@ import java.util.stream.Collectors;
 @Service
 public class CatalogServiceImpl implements CatalogService {
 
-    private final Logger logger = LoggerFactory.getLogger(CatalogServiceImpl.class);
+	private final Logger logger = LoggerFactory.getLogger(CatalogServiceImpl.class);
 
 	private Catalog catalog;
 
@@ -55,16 +57,16 @@ public class CatalogServiceImpl implements CatalogService {
 	}
 
 	private Catalog prepareCatalogIfTesting(Catalog catalog) {
-	    boolean isTestEnvironment = EnvironmentUtils.isTestEnvironment(environment);
-		if (isTestEnvironment) {
+		if (Arrays.stream(environment.getActiveProfiles()).anyMatch(
+				env -> (env.equalsIgnoreCase(GlobalConstants.TEST_PROFILE)))) {
 
 			catalog.getServices().stream().map(service -> {
 				if (service.getName().indexOf(GlobalConstants.TEST_PROFILE) == -1)
 					service.setName(service.getName() + "-" + GlobalConstants.TEST_PROFILE);
 
-				service.setId(EnvironmentUtils.replaceLastChar(service.getId()));
+				service.setId(replaceLastChar(service.getId()));
 				service.getDashboardClient()
-						.setSecret(EnvironmentUtils.replaceLastChar(service.getDashboardClient().getSecret()));
+						.setSecret(replaceLastChar(service.getDashboardClient().getSecret()));
 
 
 				if (service.getDashboardClient().getId().indexOf(GlobalConstants.TEST_PROFILE) == -1)
@@ -73,14 +75,14 @@ public class CatalogServiceImpl implements CatalogService {
 					);
 
 				service.getDashboard().setUrl(
-                        EnvironmentUtils.replaceUrl(service.getDashboard().getUrl())
+						replaceUrl(service.getDashboard().getUrl())
 				);
 				service.getDashboardClient().setRedirectUri(
-                        EnvironmentUtils.replaceUrl(service.getDashboardClient().getRedirectUri())
+						replaceUrl(service.getDashboardClient().getRedirectUri())
 				);
 
 				service.getPlans().stream().map(plan -> {
-					plan.setId(EnvironmentUtils.replaceLastChar(plan.getId()));
+					plan.setId(replaceLastChar(plan.getId()));
 
 					return plan;
 				}).collect(Collectors.toList());
@@ -88,13 +90,38 @@ public class CatalogServiceImpl implements CatalogService {
 			}).collect(Collectors.toList());
 
 			endpointConfiguration.setDefault(
-                    EnvironmentUtils.replaceUrl(endpointConfiguration.getDefault())
+			        replaceUrl(endpointConfiguration.getDefault())
             );
 
 			endpointConfiguration.getCustom().forEach(s -> {
-			    s.setUrl(EnvironmentUtils.replaceUrl(s.getUrl()));
+			    s.setUrl(replaceUrl(s.getUrl()));
             });
 		}
 		return catalog;
 	}
+
+	private String replaceLastChar(String value) {
+		if (value != null && value.length() > 1)
+			return value.substring(0, value.length() - 1).concat("T");
+
+		return value;
+	}
+
+	private String replaceUrl(String urlStr) {
+		try {
+			URL url = new URL(urlStr);
+
+			if (url.getHost().indexOf(GlobalConstants.TEST_PROFILE) == -1) {
+				URL newURL = new URL(url.getProtocol(),
+						url.getHost().replaceFirst("\\.", "-" + GlobalConstants.TEST_PROFILE + "."),
+						url.getPort(), url.getFile());
+				urlStr = newURL.toString();
+			}
+		} catch(MalformedURLException ex) {
+			logger.info("Exception replacing URL", ex);
+		}
+
+		return urlStr;
+	}
+
 }

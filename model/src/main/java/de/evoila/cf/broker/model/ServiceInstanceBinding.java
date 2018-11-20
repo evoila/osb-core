@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.model;
 
+import de.evoila.cf.broker.model.catalog.ServerAddress;
 import de.evoila.cf.broker.model.volume.VolumeMount;
 
 import java.util.HashMap;

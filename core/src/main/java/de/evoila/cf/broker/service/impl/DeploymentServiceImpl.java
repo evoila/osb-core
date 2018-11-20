@@ -6,6 +6,7 @@ package de.evoila.cf.broker.service.impl;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
+import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.repository.JobRepository;
 import de.evoila.cf.broker.repository.PlatformRepository;
 import de.evoila.cf.broker.repository.ServiceDefinitionRepository;

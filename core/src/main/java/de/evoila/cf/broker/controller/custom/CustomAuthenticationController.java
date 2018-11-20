@@ -3,18 +3,18 @@
  */
 package de.evoila.cf.broker.controller.custom;
 
-import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.controller.utils.DashboardAuthenticationRedirectBuilder;
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
-import de.evoila.cf.broker.model.Dashboard;
 import de.evoila.cf.broker.model.DashboardClient;
-import de.evoila.cf.broker.model.ServiceDefinition;
 import de.evoila.cf.broker.model.ServiceInstance;
-import de.evoila.cf.broker.model.oauth.CompositeAccessToken;
+import de.evoila.cf.broker.model.catalog.Dashboard;
+import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.CatalogService;
-import de.evoila.cf.config.security.openid.OpenIdAuthenticationUtils;
+import de.evoila.cf.broker.bean.EndpointConfiguration;
+import de.evoila.cf.security.model.CompositeAccessToken;
+import de.evoila.cf.security.openid.OpenIdAuthenticationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -28,9 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /** @author Johannes Hiemer. */
@@ -109,7 +107,7 @@ public class CustomAuthenticationController extends BaseController {
 
 			String redirectUri =  DashboardUtils.redirectUri(dashboardClient, serviceInstanceId, CONFIRM);
 
-			CompositeAccessToken  token = OpenIdAuthenticationUtils
+			CompositeAccessToken token = OpenIdAuthenticationUtils
 					.getAccessAndRefreshToken(dashboard.getAuthEndpoint(), authCode, dashboardClient, redirectUri);
 
 			if (token != null) {

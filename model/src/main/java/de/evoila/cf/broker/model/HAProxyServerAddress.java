@@ -3,6 +3,8 @@
  */
 package de.evoila.cf.broker.model;
 
+import de.evoila.cf.broker.model.catalog.ServerAddress;
+
 import java.util.List;
 
 /**

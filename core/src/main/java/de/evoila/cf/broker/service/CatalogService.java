@@ -1,7 +1,7 @@
 package de.evoila.cf.broker.service;
 
-import de.evoila.cf.broker.model.Catalog;
-import de.evoila.cf.broker.model.ServiceDefinition;
+import de.evoila.cf.broker.model.catalog.Catalog;
+import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 
 
 /**

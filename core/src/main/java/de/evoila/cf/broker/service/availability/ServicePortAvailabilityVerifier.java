@@ -4,7 +4,7 @@
 package de.evoila.cf.broker.service.availability;
 
 import de.evoila.cf.broker.exception.PlatformException;
-import de.evoila.cf.broker.model.ServerAddress;
+import de.evoila.cf.broker.model.catalog.ServerAddress;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.service.ServiceInstanceAvailabilityVerifier;
 import org.slf4j.Logger;
