@@ -19,7 +19,6 @@ import javax.validation.Valid;
 import java.lang.UnsupportedOperationException;
 
 /** @author Johannes Hiemer, Christian Brinker, Marco Di Martino. */
-
 @RestController
 @RequestMapping(value = "/v2/service_instances")
 public class ServiceInstanceController extends BaseController {

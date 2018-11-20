@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 /** @author Christian Brinker, Marco Di Martino */
-
 @Service
 public class DeploymentServiceImpl implements DeploymentService {
 
@@ -77,10 +76,10 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 		Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
-		if (request.getParameters() != null && request.getParameters().size() > 0){
-		    try{
+		if (request.getParameters() != null && request.getParameters().size() > 0) {
+		    try {
                 ParameterValidator.validateParameters(request, plan);
-            }catch(ProcessingException e){
+            } catch(ProcessingException e) {
 		        throw new InvalidParametersException("Error while validating parameters");
             }
         }
@@ -108,16 +107,16 @@ public class DeploymentServiceImpl implements DeploymentService {
             ServiceDefinitionDoesNotExistException, InvalidParametersException {
 
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
-        if (serviceInstance == null){
+        if (serviceInstance == null) {
             throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
         }
 
         Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
-        if (request.getParameters() != null && request.getParameters().size() > 0){
+        if (request.getParameters() != null && request.getParameters().size() > 0) {
             try {
                 ParameterValidator.validateParameters(request, plan);
-            } catch(ProcessingException e){
+            } catch(ProcessingException e) {
                 throw new InvalidParametersException("Error while validating parameters");
             }
         }
@@ -141,7 +140,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         ServiceInstance serviceInstance;
         try {
             serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new ServiceInstanceDoesNotExistException(instanceId);
         }
         Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
@@ -161,17 +160,17 @@ public class DeploymentServiceImpl implements DeploymentService {
 	    ServiceInstance serviceInstance;
         try {
             serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new ServiceInstanceNotFoundException();
         }
 
         if (jobRepository.containsJobProgress(instanceId)) {
             JobProgress job = jobRepository.getJobProgress(instanceId);
             if (job.getOperation().equals(JobProgress.PROVISION) &&
-                    job.getState().equals(JobProgress.IN_PROGRESS)){
+                    job.getState().equals(JobProgress.IN_PROGRESS)) {
                 throw new ServiceInstanceNotFoundException();
             } else if (job.getOperation().equals(JobProgress.UPDATE) &&
-                    job.getState().equals(JobProgress.IN_PROGRESS)){
+                    job.getState().equals(JobProgress.IN_PROGRESS)) {
                 throw new ConcurrencyErrorException();
             }
         }
@@ -257,7 +256,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
         jobRepository.deleteJobProgress(serviceInstance.getId());
 	}
-	public void updateInstanceInfo(ServiceInstance serviceInstance){
+	public void updateInstanceInfo(ServiceInstance serviceInstance) {
 	    serviceInstanceRepository.updateServiceInstance(serviceInstance);
     }
 }

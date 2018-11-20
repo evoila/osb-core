@@ -9,7 +9,6 @@ import de.evoila.cf.broker.service.impl.DeploymentServiceImpl;
 import java.util.Map;
 
 /** @author Dennis Mueller, evoila GmbH, Sep 9, 2015 */
-
 public interface AsyncDeploymentService {
 
 	void asyncCreateInstance(DeploymentServiceImpl deploymentService, ServiceInstance serviceInstance,

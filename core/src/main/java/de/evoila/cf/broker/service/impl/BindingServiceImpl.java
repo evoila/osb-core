@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 /** @author Johannes Hiemer, Marco Di Martino. */
-
 @Service
 public abstract class BindingServiceImpl implements BindingService {
 
@@ -130,7 +129,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		ServiceInstanceBinding serviceInstanceBinding;
 		try {
 			serviceInstanceBinding = bindingRepository.findOne(bindingId);
-		} catch(Exception e){
+		} catch(Exception e) {
 			throw new ServiceInstanceBindingNotFoundException();
 		}
 
