@@ -19,8 +19,7 @@ import java.util.stream.Collectors;
  * An implementation of the CatalogService that gets the catalog injected (ie
  * configure in spring config)
  *
- * @author Johannes Hiemer.
- * @author Christian Brinker, evoila.
+ * @author Johannes Hiemer, Christian Brinker, evoila.
  */
 @Service
 public class CatalogServiceImpl implements CatalogService {

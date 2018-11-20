@@ -20,11 +20,8 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Johannes Hiemer.
- * @author Marco Di Martino.
- *
- */
+/** @author Johannes Hiemer, Marco Di Martino. */
+
 @Service
 public abstract class BindingServiceImpl implements BindingService {
 
@@ -131,9 +128,9 @@ public abstract class BindingServiceImpl implements BindingService {
 	public ServiceInstanceBinding fetchServiceInstanceBinding(String bindingId, String instanceId) throws ServiceInstanceBindingNotFoundException {
 
 		ServiceInstanceBinding serviceInstanceBinding;
-		try{
+		try {
 			serviceInstanceBinding = bindingRepository.findOne(bindingId);
-		}catch(Exception e){
+		} catch(Exception e){
 			throw new ServiceInstanceBindingNotFoundException();
 		}
 
@@ -176,8 +173,7 @@ public abstract class BindingServiceImpl implements BindingService {
 
 		ServiceInstanceBinding binding;
 		if (haProxyService != null && serviceInstanceBindingRequest.getAppGuid() == null &&
-					(serviceInstanceBindingRequest.getBindResource() != null && serviceInstanceBindingRequest.getBindResource().getAppGuid() == null))
-		{
+					(serviceInstanceBindingRequest.getBindResource() != null && serviceInstanceBindingRequest.getBindResource().getAppGuid() == null)) {
 			List<ServerAddress> externalServerAddresses = haProxyService.appendAgent(serviceInstance.getHosts(), bindingId, instanceId);
 
 			binding = bindServiceKey(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalServerAddresses);

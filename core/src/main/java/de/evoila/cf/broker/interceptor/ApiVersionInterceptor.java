@@ -1,25 +1,28 @@
 package de.evoila.cf.broker.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.evoila.cf.broker.model.ApiVersion;
-import de.evoila.cf.broker.model.ErrorMessage;
+import de.evoila.cf.broker.model.annotations.ApiVersion;
 import de.evoila.cf.broker.service.impl.AsyncBindingServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/** @author Marco Di Martino
+ *
+ * This class is used to intercept every request before it is sent to
+ * the corresponding handler (controller). It checks whether the handling method
+ * has an API-Version annotation that denote the values under which the method can be called.
+ * If the request does not provide one of these values in the header, the handler will not be called
+ * and the request will be rejected with a <i> Precondition Failed</i>
+ *
+ * */
 public class ApiVersionInterceptor implements HandlerInterceptor {
 
     private static final String XBrokerAPIVersion = "X-Broker-API-Version";

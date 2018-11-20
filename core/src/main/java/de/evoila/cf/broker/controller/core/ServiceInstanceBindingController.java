@@ -3,6 +3,7 @@ package de.evoila.cf.broker.controller.core;
 import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
+import de.evoila.cf.broker.model.annotations.ApiVersion;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
 import org.slf4j.Logger;
@@ -14,9 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-/** @author Johannes Hiemer.
- *  @author Marco Di Martino
- * */
+/**  @author Marco Di Martino, Johannes Hiemer */
 
 @Controller
 @RequestMapping(value = "/v2/service_instances")
@@ -36,7 +35,7 @@ public class ServiceInstanceBindingController extends BaseController {
 	}
 
 	@PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-	@ApiVersion({"2.13", "2.14"})
+	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
 	public ResponseEntity<ServiceInstanceBindingResponse> bindServiceInstance(@PathVariable("instanceId") String instanceId,
             @PathVariable("bindingId") String bindingId,
 			@RequestHeader("X-Broker-API-Version") String apiHeader,
@@ -75,7 +74,7 @@ public class ServiceInstanceBindingController extends BaseController {
 	}
 
 	@DeleteMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-	@ApiVersion({"2.13", "2.14"})
+	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
 	public ResponseEntity<String> deleteServiceInstanceBinding(@PathVariable("instanceId") String instanceId,
 			@PathVariable("bindingId") String bindingId, @RequestParam("service_id") String serviceId,
 			@RequestParam("plan_id") String planId, @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,
@@ -107,7 +106,7 @@ public class ServiceInstanceBindingController extends BaseController {
 	}
 
 	@GetMapping(value = "/{instanceId}/service_bindings/{bindingId}/last_operation")
-	@ApiVersion("2.14")
+	@ApiVersion(ApiVersions.API_214)
 	public ResponseEntity<JobProgressResponse> lastOperation(@PathVariable("instanceId") String instanceId,
 																		@PathVariable("bindingId") String bindingId,
 																		@RequestParam(value = "service_id", required = false) String serivceId,
@@ -121,7 +120,7 @@ public class ServiceInstanceBindingController extends BaseController {
 	}
 
 	@GetMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-	@ApiVersion("2.14")
+	@ApiVersion(ApiVersions.API_214)
 	public ResponseEntity<ServiceInstanceBindingResponse> fetchServiceInstanceBinding(@PathVariable("instanceId") String instanceId,
 																					  @PathVariable("bindingId") String bindingId
 																					  ) throws ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceInstanceDoesNotExistException{

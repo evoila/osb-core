@@ -5,6 +5,7 @@ import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
+import de.evoila.cf.broker.model.annotations.ApiVersion;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.DeploymentServiceImpl;
 import org.slf4j.Logger;
@@ -16,11 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 import java.lang.UnsupportedOperationException;
-/**
- * @author Johannes Hiemer.
- * @author Christian Brinker, evoila.
- * @author Marco Di Martino.
- */
+
+/** @author Johannes Hiemer, Christian Brinker, Marco Di Martino. */
+
 @RestController
 @RequestMapping(value = "/v2/service_instances")
 public class ServiceInstanceController extends BaseController {
@@ -43,7 +42,7 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@PutMapping(value = "/{instanceId}")
-	@ApiVersion({"2.13", "2.14"})
+	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
 	public ResponseEntity<ServiceInstanceResponse> createServiceInstance(
 			@PathVariable("instanceId") String serviceInstanceId,
 			@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
@@ -79,7 +78,7 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@GetMapping(value = "/{instanceId}/last_operation")
-	@ApiVersion({"2.13", "2.14"})
+	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
 	public ResponseEntity<JobProgressResponse> lastOperation(
 			@PathVariable("instanceId") String serviceInstanceId)
 			throws ServiceInstanceDoesNotExistException {
@@ -90,7 +89,7 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@PatchMapping(value= "/{instanceId}")
-	@ApiVersion({"2.13", "2.14"})
+	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
 	public ResponseEntity<String> updateServiceInstance(@PathVariable("instanceId") String serviceInstanceId,
 				@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
 				@RequestBody ServiceInstanceRequest request) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
@@ -117,7 +116,7 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@DeleteMapping(value = "/{instanceId}")
-	@ApiVersion({"2.13", "2.14"})
+	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
 	public ResponseEntity<String> deleteServiceInstance(
 			@PathVariable("instanceId") String instanceId,
 			@RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
@@ -140,7 +139,7 @@ public class ServiceInstanceController extends BaseController {
 	}
 
 	@GetMapping(value = "/{instanceId}")
-	@ApiVersion("2.14")
+	@ApiVersion(ApiVersions.API_214)
 	public ResponseEntity<ServiceInstanceResponse> fetchServiceInstance(
 			@RequestHeader("X-Broker-API-Version") String apiHeader,
 			@PathVariable("instanceId") String instanceId) throws ServiceInstanceDoesNotExistException, UnsupportedOperationException,

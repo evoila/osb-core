@@ -23,11 +23,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Christian Brinker.
- * @author Marco Di Martino
- *
- */
+/** @author Christian Brinker, Marco Di Martino */
+
 @Service
 public class DeploymentServiceImpl implements DeploymentService {
 
@@ -118,16 +115,16 @@ public class DeploymentServiceImpl implements DeploymentService {
         Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
         if (request.getParameters() != null && request.getParameters().size() > 0){
-            try{
+            try {
                 ParameterValidator.validateParameters(request, plan);
-            }catch(ProcessingException e){
+            } catch(ProcessingException e){
                 throw new InvalidParametersException("Error while validating parameters");
             }
         }
 
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
-        if(platformService == null) {
+        if (platformService == null) {
             throw new ServiceDefinitionDoesNotExistException(request.getServiceDefinitionId());
         }
 
@@ -144,7 +141,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         ServiceInstance serviceInstance;
         try {
             serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-        }catch (Exception e){
+        } catch (Exception e){
             throw new ServiceInstanceDoesNotExistException(instanceId);
         }
         Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());

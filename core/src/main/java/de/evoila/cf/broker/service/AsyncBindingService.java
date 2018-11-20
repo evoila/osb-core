@@ -9,10 +9,7 @@ import de.evoila.cf.broker.service.impl.DeploymentServiceImpl;
 
 import java.util.Map;
 
-/**
- * @author Marco Di Martino
- */
-
+/** @author Marco Di Martino */
 public interface AsyncBindingService {
 
     ServiceInstanceBindingResponse asyncCreateServiceInstanceBinding(BindingServiceImpl bindingService, String bindingId, ServiceInstance serviceInstance,
