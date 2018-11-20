@@ -2,6 +2,7 @@
 package de.evoila.cf.broker.service;
 
 import de.evoila.cf.broker.exception.*;
+import de.evoila.cf.broker.model.JobProgressResponse;
 import de.evoila.cf.broker.model.ServiceInstanceBinding;
 import de.evoila.cf.broker.model.ServiceInstanceBindingRequest;
 import de.evoila.cf.broker.model.ServiceInstanceBindingResponse;
@@ -24,17 +25,19 @@ public interface BindingService {
      * @throws ServiceInstanceDoesNotExistException
      * @throws ServiceDefinitionDoesNotExistException
      */
-    ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId, ServiceInstanceBindingRequest request)
+    ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId, ServiceInstanceBindingRequest request, boolean async)
           throws ServiceInstanceBindingExistsException, ServiceBrokerException,
             ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException,
-            ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException, InvalidParametersException;
+            ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException,
+            InvalidParametersException, AsyncRequiredException;
 
     /**
      *
-     * @param id
+     * @param bindingId
+     * @param instanceId
      * @return
      */
-    ServiceInstanceBinding getServiceInstanceBinding(String id);
+    ServiceInstanceBinding fetchServiceInstanceBinding(String bindingId, String instanceId) throws ServiceInstanceBindingNotFoundException;
 
     /**
      *
@@ -44,6 +47,10 @@ public interface BindingService {
      * @throws ServiceInstanceBindingDoesNotExistsException
      * @throws ServiceDefinitionDoesNotExistException
      */
-    void deleteServiceInstanceBinding(String bindingId, String planId)
-          throws ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException;
+    void deleteServiceInstanceBinding(String bindingId, String planId, boolean async)
+          throws ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceInstanceBindingBadRequestException;
+
+
+    JobProgressResponse getLastOperation(String bindingId) throws ServiceInstanceBindingDoesNotExistsException;
+
 }

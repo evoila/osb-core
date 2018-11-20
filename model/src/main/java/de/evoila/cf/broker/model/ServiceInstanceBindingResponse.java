@@ -2,6 +2,7 @@ package de.evoila.cf.broker.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -27,13 +28,17 @@ public class ServiceInstanceBindingResponse {
 
 	private List<VolumeMount> volumeMounts;
 
+	@JsonIgnore
+	private boolean isAsync;
+
 	public ServiceInstanceBindingResponse(Map<String, Object> credentials, String syslogDrainUrl) {
 		this.credentials = credentials;
 		this.syslogDrainUrl = syslogDrainUrl;
 	}
 
-	public ServiceInstanceBindingResponse(String routeServiceUrl) {
+	public ServiceInstanceBindingResponse(String routeServiceUrl, boolean isAsync) {
 		this.setRouteServiceUrl(routeServiceUrl);
+		this.isAsync = isAsync;
 	}
 
 	public ServiceInstanceBindingResponse(ServiceInstanceBinding binding) {
@@ -42,6 +47,20 @@ public class ServiceInstanceBindingResponse {
 		if (binding.getVolumeMounts() != null && binding.getVolumeMounts().size() > 0) {
 			this.volumeMounts = binding.getVolumeMounts();
 		}
+	}
+
+	public ServiceInstanceBindingResponse(ServiceInstanceBinding binding, boolean isAsync) {
+		this(binding);
+		this.isAsync = isAsync;
+	}
+
+	public ServiceInstanceBindingResponse(boolean isAsync) {
+		this.isAsync = isAsync;
+	}
+
+	@JsonIgnore
+	public boolean isAsync() {
+		return isAsync;
 	}
 
 	@JsonSerialize

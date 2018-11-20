@@ -3,9 +3,7 @@
  */
 package de.evoila.config.web;
 
-import de.evoila.cf.security.uaa.utils.HeaderCheckFilter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
+import de.evoila.cf.broker.interceptor.ApiVersionInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -37,18 +35,8 @@ public class BaseConfiguration implements WebMvcConfigurer {
 
     }
 
-    @Bean
-    public FilterRegistrationBean headerCheck() {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
-        registration.setFilter(new HeaderCheckFilter());
-        registration.addUrlPatterns(
-                "/v2/catalog",
-                "/v2/catalog/",
-                "/v2/service_instances/*",
-                "/v2/service_instances/*/last_operation",
-                "/v2/service_instances/*/service_bindings/*"
-        );
-        return registration;
+    @Override
+    public void addInterceptors(org.springframework.web.servlet.config.annotation.InterceptorRegistry registry) {
+        registry.addInterceptor(new ApiVersionInterceptor());
     }
-
 }

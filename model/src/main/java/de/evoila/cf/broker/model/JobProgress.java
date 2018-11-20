@@ -20,7 +20,17 @@ public class JobProgress implements BaseEntity<String> {
 	public static final String IN_PROGRESS = "in progress";
 	
 	public static final String UNKNOWN = "unknown";
-	
+
+	public static final String PROVISION = "provision";
+
+	public static final String UPDATE = "update";
+
+	public static final String DELETE = "delete";
+
+	public static final String BIND = "bind";
+
+	public static final String UNBIND = "unbind";
+
 	private String id;
 
 	private String state;
@@ -28,17 +38,28 @@ public class JobProgress implements BaseEntity<String> {
 	private Date date;
 	
 	private String description;
-	
+
+	private String operation;
+
 	public JobProgress() {
 		super();
 	}
 
-	public JobProgress(String serviceInstanceId, String progress) {
+	public JobProgress(String serviceInstanceId, String progress, String description, String operation) {
 		super();
 		this.id = serviceInstanceId;
 		this.state = progress;
 		this.date = new Date();
-		this.description = "Creating service..."; // got error if empty
+		this.description = description;
+		this.operation = operation;
+	}
+
+	public JobProgress(String serviceInstanceId, String progress, String description) {
+		super();
+		this.id = serviceInstanceId;
+		this.state = progress;
+		this.date = new Date();
+		this.description = description;
 	}
 
 	@Override
@@ -73,5 +94,12 @@ public class JobProgress implements BaseEntity<String> {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
+	public String getOperation() {
+		return operation;
+	}
+
+	public void setOperation(String operation) {
+		this.operation = operation;
+	}
 }

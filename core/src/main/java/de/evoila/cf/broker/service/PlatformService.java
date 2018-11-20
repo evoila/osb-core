@@ -34,6 +34,11 @@ public interface PlatformService {
 	 */
 	boolean isSyncPossibleOnDelete(ServiceInstance serviceInstance);
 
+
+	boolean isSyncPossibleOnBind();
+
+	boolean isSyncPossibleOnUnbind();
+
 	/**
 	 * @param serviceInstance, plan
 	 * @return

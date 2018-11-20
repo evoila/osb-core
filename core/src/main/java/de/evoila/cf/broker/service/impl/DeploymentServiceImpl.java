@@ -22,10 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Christian Brinker.
- *
- */
+/** @author Christian Brinker, Marco Di Martino */
 @Service
 public class DeploymentServiceImpl implements DeploymentService {
 
@@ -78,10 +75,10 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 		Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
-		if (request.getParameters() != null && request.getParameters().size() > 0){
-		    try{
+		if (request.getParameters() != null && request.getParameters().size() > 0) {
+		    try {
                 ParameterValidator.validateParameters(request, plan);
-            }catch(ProcessingException e){
+            } catch(ProcessingException e) {
 		        throw new InvalidParametersException("Error while validating parameters");
             }
         }
@@ -109,23 +106,23 @@ public class DeploymentServiceImpl implements DeploymentService {
             ServiceDefinitionDoesNotExistException, InvalidParametersException {
 
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
-        if (serviceInstance == null){
+        if (serviceInstance == null) {
             throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
         }
 
         Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
-        if (request.getParameters() != null && request.getParameters().size() > 0){
-            try{
+        if (request.getParameters() != null && request.getParameters().size() > 0) {
+            try {
                 ParameterValidator.validateParameters(request, plan);
-            }catch(ProcessingException e){
+            } catch(ProcessingException e) {
                 throw new InvalidParametersException("Error while validating parameters");
             }
         }
 
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
-        if(platformService == null) {
+        if (platformService == null) {
             throw new ServiceDefinitionDoesNotExistException(request.getServiceDefinitionId());
         }
 
@@ -139,22 +136,45 @@ public class DeploymentServiceImpl implements DeploymentService {
     @Override
     public void deleteServiceInstance(String instanceId)
             throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
-        ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-
-        if (serviceInstance == null) {
+        ServiceInstance serviceInstance;
+        try {
+            serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+        } catch (Exception e) {
             throw new ServiceInstanceDoesNotExistException(instanceId);
         }
-
         Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
 
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
-        if (platformService.isSyncPossibleOnDelete(serviceInstance)
-                && platformService.isSyncPossibleOnDelete(serviceInstance)) {
+        if (platformService.isSyncPossibleOnDelete(serviceInstance)) {
             syncDeleteInstance(serviceInstance, plan, platformService);
         } else {
             asyncDeploymentService.asyncDeleteInstance(this, serviceInstance, plan, platformService);
         }
+    }
+
+    @Override
+    public ServiceInstance fetchServiceInstance(String instanceId) throws UnsupportedOperationException, ConcurrencyErrorException, ServiceInstanceNotFoundException {
+
+	    ServiceInstance serviceInstance;
+        try {
+            serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+        } catch (Exception e) {
+            throw new ServiceInstanceNotFoundException();
+        }
+
+        if (jobRepository.containsJobProgress(instanceId)) {
+            JobProgress job = jobRepository.getJobProgress(instanceId);
+            if (job.getOperation().equals(JobProgress.PROVISION) &&
+                    job.getState().equals(JobProgress.IN_PROGRESS)) {
+                throw new ServiceInstanceNotFoundException();
+            } else if (job.getOperation().equals(JobProgress.UPDATE) &&
+                    job.getState().equals(JobProgress.IN_PROGRESS)) {
+                throw new ConcurrencyErrorException();
+            }
+        }
+        return serviceInstance;
+
     }
 
 	public ServiceInstance syncCreateInstance(ServiceInstance serviceInstance, Map<String, Object> parameters,
@@ -235,4 +255,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
         jobRepository.deleteJobProgress(serviceInstance.getId());
 	}
+	public void updateInstanceInfo(ServiceInstance serviceInstance) {
+	    serviceInstanceRepository.updateServiceInstance(serviceInstance);
+    }
 }
