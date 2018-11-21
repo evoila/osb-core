@@ -1,12 +1,20 @@
 package de.evoila.cf.security.credhub;
 
 import de.evoila.cf.broker.bean.CredhubBean;
+import de.evoila.cf.security.keystore.KeyStoreHandler;
 import de.evoila.cf.security.utils.AcceptSelfSignedClientHttpRequestFactory;
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.credhub.core.CredHubClient;
 import org.springframework.credhub.core.CredHubTemplate;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
@@ -16,6 +24,11 @@ import org.springframework.security.oauth2.client.token.grant.client.ClientCrede
 import org.springframework.security.oauth2.common.AuthenticationScheme;
 import org.springframework.stereotype.Service;
 
+import javax.naming.ConfigurationException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.util.Arrays;
 
 /**
@@ -28,23 +41,37 @@ public class CredhubConnection {
 
     private CredhubBean credhubBean;
 
-    private ClientHttpRequestFactory clientHttpRequestFactory;
+    private KeyStoreHandler keyStoreHandler;
 
-    public CredhubConnection(CredhubBean credhubBean) {
+    //private ClientHttpRequestFactory clientHttpRequestFactory;
+
+    public CredhubConnection(CredhubBean credhubBean, KeyStoreHandler keyStoreHandler) {
         this.credhubBean = credhubBean;
+        this.keyStoreHandler = keyStoreHandler;
     }
 
-    @ConditionalOnBean(AcceptSelfSignedClientHttpRequestFactory.class)
+    /*@ConditionalOnBean(AcceptSelfSignedClientHttpRequestFactory.class)
     @Autowired(required = false)
     private void selfSignedRestTemplate(AcceptSelfSignedClientHttpRequestFactory requestFactory) {
         clientHttpRequestFactory = requestFactory;
-    }
+    }*/
 
-    public CredHubTemplate createCredhubTemplate() {
+    public CredHubTemplate createCredhubTemplate() throws KeyStoreException, NoSuchAlgorithmException, ConfigurationException, UnrecoverableKeyException, KeyManagementException {
 
-        if (clientHttpRequestFactory == null) {
+        /*if (clientHttpRequestFactory == null) {
             clientHttpRequestFactory = new SimpleClientHttpRequestFactory();
-        }
+        }*/
+
+        SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(
+                new SSLContextBuilder()
+                    .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+                    .loadKeyMaterial(keyStoreHandler.getKeyStore(), KeyStoreHandler.TEMPORARY_KEY_PASSWORD.toCharArray())
+                    .build(),
+                NoopHostnameVerifier.INSTANCE);
+
+        HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
+
+        ClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
         OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(resource());
 

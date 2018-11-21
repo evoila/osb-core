@@ -18,6 +18,8 @@ public class CredhubBean {
 
     private Oauth2 oauth2;
 
+    private Certificate certificate;
+
     public String getUrl() {
         return url;
     }
@@ -71,6 +73,46 @@ public class CredhubBean {
 
         public void setAccessTokenUri(String accessTokenUri) {
             this.accessTokenUri = accessTokenUri;
+        }
+    }
+
+    public Certificate getCertificate() {
+        return certificate;
+    }
+
+    public void setCertificate(Certificate certificate) {
+        this.certificate = certificate;
+    }
+
+    public static class Certificate {
+        private String ca;
+
+        private String cert;
+
+        private String privateKey;
+
+        public String getCa() {
+            return ca;
+        }
+
+        public void setCa(String ca) {
+            this.ca = ca;
+        }
+
+        public String getCert() {
+            return cert;
+        }
+
+        public void setCert(String cert) {
+            this.cert = cert;
+        }
+
+        public String getPrivateKey() {
+            return privateKey;
+        }
+
+        public void setPrivateKey(String privateKey) {
+            this.privateKey = privateKey;
         }
     }
 }
