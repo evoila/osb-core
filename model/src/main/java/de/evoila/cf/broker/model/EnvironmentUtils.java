@@ -1,4 +1,4 @@
-package de.evoila.cf.broker.util;
+package de.evoila.cf.broker.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

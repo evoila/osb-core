@@ -1,4 +1,4 @@
-package de.evoila.cf.broker.util;
+package de.evoila.cf.broker.model;
 
 public class GlobalConstants {
 

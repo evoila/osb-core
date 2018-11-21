@@ -2,7 +2,7 @@ package de.evoila.cf.security.credhub;
 
 
 import de.evoila.cf.broker.bean.CredhubBean;
-import de.evoila.cf.broker.util.EnvironmentUtils;
+import de.evoila.cf.broker.model.EnvironmentUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
