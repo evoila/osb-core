@@ -45,11 +45,13 @@ public class CredhubClient {
 
     private Environment environment;
 
+    private CredhubConnection credhubConnection;
+
     private static final String BOSH_DIRECTOR = "bosh-1";
 
     private static String SERVICE_BROKER_PREFIX = "sb-";
 
-    public CredhubClient(CredhubBean credhubBean, Environment environment) {
+    public CredhubClient(CredhubBean credhubBean, Environment environment, CredhubConnection credhubConnection) {
         this.credhubBean = credhubBean;
         this.environment = environment;
 
@@ -57,24 +59,11 @@ public class CredhubClient {
             SERVICE_BROKER_PREFIX += "test-";
         }
 
-        ClientHttpRequestFactory clientHttpRequestFactory = new AcceptSelfSignedClientHttpRequestFactory();
-        this.credHubTemplate = new OAuth2CredHubTemplate(resource(), credhubBean.getUrl(), clientHttpRequestFactory);
-        log.info("Successfully establihsed a connection to Credhub.");
-    }
+        this.credHubTemplate = credhubConnection.createCredhubTemplate();
 
-    public OAuth2ProtectedResourceDetails resource() {
-        ClientCredentialsResourceDetails resource = new ClientCredentialsResourceDetails() {
-            @Override
-            public boolean isClientOnly() {
-                return true;
-            }
-        };
-        resource.setAuthenticationScheme(AuthenticationScheme.form);
-        resource.setClientAuthenticationScheme(AuthenticationScheme.header);
-        resource.setAccessTokenUri(credhubBean.getOauth2().getAccessTokenUri());
-        resource.setClientId(credhubBean.getOauth2().getClientId());
-        resource.setClientSecret(credhubBean.getOauth2().getClientSecret());
-        return resource;
+        if(this.credHubTemplate != null) {
+            log.info("Successfully establihsed a connection to Credhub.");
+        }
     }
 
 

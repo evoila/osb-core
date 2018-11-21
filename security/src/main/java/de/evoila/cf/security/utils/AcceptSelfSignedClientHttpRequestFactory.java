@@ -1,5 +1,6 @@
 package de.evoila.cf.security.utils;
 
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -7,63 +8,61 @@ import org.springframework.stereotype.Service;
 import javax.net.ssl.*;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.security.cert.CertificateException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
 @Service
 @ConditionalOnProperty(name = "spring.ssl.acceptselfsigned", havingValue = "true", matchIfMissing = false)
 public class AcceptSelfSignedClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
 
-	private final HostnameVerifier verifier;
+	private final HostnameVerifier noopHostnameVerifier;
 
 	public AcceptSelfSignedClientHttpRequestFactory() {
-		this.verifier = new NullHostnameVerifier();
+		this.noopHostnameVerifier = new NoopHostnameVerifier();
 		trustSelfSignedSSL();
 	}
 
 	public AcceptSelfSignedClientHttpRequestFactory(HostnameVerifier verifier) {
-		this.verifier = verifier;
+		this.noopHostnameVerifier = verifier;
 		trustSelfSignedSSL();
 	}
 
 	public static void trustSelfSignedSSL() {
 		try {
-			SSLContext ctx = SSLContext.getInstance("TLS");
-			X509TrustManager tm = new X509TrustManager() {
+			TrustManager[] trustAllCerts = new X509TrustManager[] {
+					new X509TrustManager() {
+						@Override
+						public void checkClientTrusted(X509Certificate[] xcs, String string) {}
 
-				@Override
-				public void checkClientTrusted(X509Certificate[] xcs, String string) throws CertificateException {
-				}
+						@Override
+						public void checkServerTrusted(X509Certificate[] xcs, String string) {}
 
-				@Override
-				public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
-				}
+						@Override
+						public X509Certificate[] getAcceptedIssuers() {
+							return new X509Certificate[0];
+						}
+					}
 
-				@Override
-				public X509Certificate[] getAcceptedIssuers() {
-					return null;
-				}
 			};
-			ctx.init(null, new TrustManager[] { tm }, null);
-			SSLContext.setDefault(ctx);
+			SSLContext sslContext = SSLContext.getInstance("SSL");
+			sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+			SSLContext.setDefault(sslContext);
 		} catch (Exception ex) {
 			ex.printStackTrace();
-		}
-	}
-
-	public class NullHostnameVerifier implements HostnameVerifier {
-		@Override
-		public boolean verify(String hostname, SSLSession session) {
-			return true;
 		}
 	}
 
 	@Override
 	protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
 		if (connection instanceof HttpsURLConnection) {
-			((HttpsURLConnection) connection).setHostnameVerifier(verifier);
+			try {
+				((HttpsURLConnection) connection).setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
+			} catch (NoSuchAlgorithmException ex) {
+				throw new IOException("Could not set Default SSL context", ex);
+			}
+
+			((HttpsURLConnection) connection).setHostnameVerifier(noopHostnameVerifier);
 		}
 		super.prepareConnection(connection, httpMethod);
 	}
-
 }
