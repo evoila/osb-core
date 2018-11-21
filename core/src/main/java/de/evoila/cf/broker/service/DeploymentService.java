@@ -6,6 +6,7 @@ package de.evoila.cf.broker.service;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.JobProgressResponse;
+import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.ServiceInstanceRequest;
 import de.evoila.cf.broker.model.ServiceInstanceResponse;
 
@@ -33,4 +34,6 @@ public interface DeploymentService {
 
 	void deleteServiceInstance(String instanceId) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
             ServiceInstanceDoesNotExistException;
+
+	ServiceInstance fetchServiceInstance(String instanceId) throws UnsupportedOperationException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceNotFoundException;
 }

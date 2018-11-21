@@ -31,6 +31,18 @@ public class ServiceInstanceResponse {
 	@JsonProperty("extension_apis")
 	private List<Map<String, Object>> extension_apis;
 
+	@JsonSerialize
+	@JsonProperty("service_id")
+	private String serviceId;
+
+	@JsonSerialize
+	@JsonProperty("plan_id")
+	private String planId;
+
+	@JsonSerialize
+	@JsonProperty("parameters")
+	private Map<String, Object> parameters;
+
 	public ServiceInstanceResponse() {
 	}
 
@@ -38,6 +50,17 @@ public class ServiceInstanceResponse {
 		this.dashboardUrl = serviceInstance.getDashboardUrl();
 		this.isAsync = true;
 		this.extension_apis = extension_apis;
+		this.parameters = serviceInstance.getParameters();
+		this.planId = serviceInstance.getPlanId();
+		this.serviceId = serviceInstance.getServiceDefinitionId();
+	}
+
+	public ServiceInstanceResponse(ServiceInstance serviceInstance){
+		this.serviceId = serviceInstance.getServiceDefinitionId();
+		this.planId = serviceInstance.getPlanId();
+		this.parameters = serviceInstance.getParameters();
+		this.dashboardUrl = serviceInstance.getDashboardUrl();
+
 	}
 
 	public ServiceInstanceResponse(String dashboardUrl) {

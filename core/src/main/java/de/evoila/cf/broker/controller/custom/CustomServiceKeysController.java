@@ -50,7 +50,8 @@ public class CustomServiceKeysController extends BaseController {
     @PostMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<ServiceInstanceBinding> createServiceKey(@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException,
             ServiceBrokerException, ServiceInstanceBindingExistsException, ServiceDefinitionDoesNotExistException,
-            ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException, InvalidParametersException {
+            ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException,
+            InvalidParametersException, AsyncRequiredException {
         ServiceInstance instance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
 
         if(instance == null){
@@ -63,7 +64,7 @@ public class CustomServiceKeysController extends BaseController {
         );
 
         String bindingId = UUID.randomUUID().toString();
-        bindingService.createServiceInstanceBinding(bindingId, serviceInstanceId, serviceInstanceBindingRequest);
+        bindingService.createServiceInstanceBinding(bindingId, serviceInstanceId, serviceInstanceBindingRequest, false);
         ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
         return new ResponseEntity<>(binding, HttpStatus.OK);
     }
@@ -72,7 +73,7 @@ public class CustomServiceKeysController extends BaseController {
     public ResponseEntity delete(@PathVariable String serviceInstanceId,
                                  @PathVariable String serviceBindingId)
             throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException,
-            ServiceInstanceBindingDoesNotExistsException, ServiceBrokerException {
+            ServiceInstanceBindingDoesNotExistsException, AsyncRequiredException, ServiceBrokerException {
 
         ServiceInstance instance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
 
@@ -80,7 +81,7 @@ public class CustomServiceKeysController extends BaseController {
             throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
         }
 
-        bindingService.deleteServiceInstanceBinding(serviceBindingId, instance.getPlanId());
+        bindingService.deleteServiceInstanceBinding(serviceBindingId, instance.getPlanId(), false);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

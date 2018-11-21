@@ -6,7 +6,7 @@ package de.evoila.cf.broker.service;
 import de.evoila.cf.broker.exception.PlatformException;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
-import de.evoila.cf.broker.model.Plan;
+import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.model.ServiceInstance;
 
 import java.util.Map;
@@ -33,6 +33,11 @@ public interface PlatformService {
 	 * @return
 	 */
 	boolean isSyncPossibleOnDelete(ServiceInstance serviceInstance);
+
+
+	boolean isSyncPossibleOnBind();
+
+	boolean isSyncPossibleOnUnbind();
 
 	/**
 	 * @param serviceInstance, plan

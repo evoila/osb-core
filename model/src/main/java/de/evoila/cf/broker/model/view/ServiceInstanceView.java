@@ -1,7 +1,7 @@
 package de.evoila.cf.broker.model.view;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.evoila.cf.broker.model.Plan;
+import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.model.ServiceInstance;
 import org.springframework.util.Assert;
 

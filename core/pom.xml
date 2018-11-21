@@ -52,21 +52,10 @@
             <optional>true</optional>
         </dependency>
 
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-jwt</artifactId>
-			<version>1.0.9.RELEASE</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -128,22 +117,23 @@
 			<version>${parent.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>de.evoila.cf.broker</groupId>
-			<artifactId>backup-model</artifactId>
-			<version>${parent.version}</version>
-		</dependency>
-
+        <dependency>
+            <groupId>de.evoila.cf.broker</groupId>
+            <artifactId>security</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.evoila.cf.broker</groupId>
+            <artifactId>security</artifactId>
+            <type>test-jar</type>
+            <version>${parent.version}</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Test -->
         <dependency>
             <groupId>com.greghaskins</groupId>
             <artifactId>spectrum</artifactId>
             <version>1.2.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

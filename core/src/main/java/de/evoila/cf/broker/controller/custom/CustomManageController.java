@@ -3,7 +3,7 @@ package de.evoila.cf.broker.controller.custom;
 import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
-import de.evoila.cf.broker.model.Plan;
+import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.view.ServiceInstanceView;
 import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
@@ -34,7 +34,7 @@ public class CustomManageController extends BaseController {
     }
 
     @GetMapping(value = "/{serviceInstanceId}")
-    public ResponseEntity<ServiceInstanceView> getGeneralInformation(@PathVariable String serviceInstanceId) throws
+    public ResponseEntity<ServiceInstance> get(@PathVariable String serviceInstanceId) throws
             ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
         ServiceInstance serviceInstance = repository.getServiceInstance(serviceInstanceId);
 
@@ -46,7 +46,7 @@ public class CustomManageController extends BaseController {
 
         ServiceInstanceView serviceInstanceView = new ServiceInstanceView(serviceInstance, plan);
 
-        return new ResponseEntity<>(serviceInstanceView, HttpStatus.OK);
+        return new ResponseEntity<>(serviceInstance, HttpStatus.OK);
     }
 
 

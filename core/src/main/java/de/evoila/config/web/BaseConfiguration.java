@@ -3,14 +3,11 @@
  */
 package de.evoila.config.web;
 
-import de.evoila.cf.config.security.uaa.utils.HeaderCheckFilter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
+import de.evoila.cf.broker.interceptor.ApiVersionInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * @author Johannes Hiemer.
@@ -18,45 +15,28 @@ import org.springframework.web.filter.CorsFilter;
  */
 @Configuration
 @EnableWebSecurity
-public class BaseConfiguration {
+public class BaseConfiguration implements WebMvcConfigurer {
 
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
 
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedHeaders("*")
+                .exposedHeaders("WWW-Authenticate",
+                        "Access-Control-Allow-Origin",
+                        "Access-Control-Allow-Headers"
+                )
+                .allowedMethods("OPTIONS", "HEAD",
+                        "GET", "POST",
+                        "PUT", "PATCH",
+                        "DELETE", "HEAD")
+                .allowCredentials(true);
 
-        config.addExposedHeader("WWW-Authenticate");
-        config.addExposedHeader("Access-Control-Allow-Origin");
-        config.addExposedHeader("Access-Control-Allow-Headers");
-
-        config.addAllowedMethod("OPTIONS");
-        config.addAllowedMethod("HEAD");
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("DELETE");
-        config.addAllowedMethod("PATCH");
-        source.registerCorsConfiguration("/**", config);
-
-        return new CorsFilter(source);
     }
 
-    @Bean
-    public FilterRegistrationBean headerCheck() {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
-        registration.setFilter(new HeaderCheckFilter());
-        registration.addUrlPatterns(
-                "/v2/catalog",
-                "/v2/catalog/",
-                "/v2/service_instances/*",
-                "/v2/service_instances/*/last_operation",
-                "/v2/service_instances/*/service_bindings/*"
-        );
-        return registration;
+    @Override
+    public void addInterceptors(org.springframework.web.servlet.config.annotation.InterceptorRegistry registry) {
+        registry.addInterceptor(new ApiVersionInterceptor());
     }
-
 }

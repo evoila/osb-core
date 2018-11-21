@@ -1,6 +1,6 @@
 package de.evoila.cf.broker.util;
 
-import de.evoila.cf.broker.model.ServerAddress;
+import de.evoila.cf.broker.model.catalog.ServerAddress;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;

@@ -4,7 +4,7 @@
 package de.evoila.cf.broker.controller.utils;
 
 import de.evoila.cf.broker.model.DashboardClient;
-import de.evoila.cf.broker.model.ServiceDefinition;
+import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 
 import java.net.URL;
 

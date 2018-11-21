@@ -2,18 +2,13 @@ package de.evoila.cf.broker.service;
 
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.JobProgress;
-import de.evoila.cf.broker.model.Plan;
+import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.service.impl.DeploymentServiceImpl;
 
 import java.util.Map;
 
-/**
- * 
- * @author Dennis Mueller, evoila GmbH, Sep 9, 2015
- *
- */
-
+/** @author Dennis Mueller, evoila GmbH, Sep 9, 2015 */
 public interface AsyncDeploymentService {
 
 	void asyncCreateInstance(DeploymentServiceImpl deploymentService, ServiceInstance serviceInstance,

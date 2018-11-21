@@ -12,6 +12,9 @@ import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import de.evoila.cf.broker.exception.InvalidParametersException;
 import de.evoila.cf.broker.model.*;
+import de.evoila.cf.broker.model.catalog.plan.Plan;
+import de.evoila.cf.broker.model.catalog.plan.SchemaParameters;
+import de.evoila.cf.broker.model.catalog.plan.SchemaProperty;
 
 import java.io.IOException;
 import java.util.HashMap;

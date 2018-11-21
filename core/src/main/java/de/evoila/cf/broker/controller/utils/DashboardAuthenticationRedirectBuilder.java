@@ -3,7 +3,7 @@
  */
 package de.evoila.cf.broker.controller.utils;
 
-import de.evoila.cf.broker.model.Dashboard;
+import de.evoila.cf.broker.model.catalog.Dashboard;
 import de.evoila.cf.broker.model.DashboardClient;
 import org.apache.http.client.utils.URIBuilder;
 

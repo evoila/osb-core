@@ -1,7 +1,9 @@
 package de.evoila.cf.broker.controller.core;
 
 import de.evoila.cf.broker.controller.BaseController;
-import de.evoila.cf.broker.model.Catalog;
+import de.evoila.cf.broker.model.catalog.Catalog;
+import de.evoila.cf.broker.model.ApiVersions;
+import  de.evoila.cf.broker.model.annotations.ApiVersion;
 import de.evoila.cf.broker.service.CatalogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ public class CatalogController extends BaseController {
     }
 
     @GetMapping(value = { "/", "" })
+    @ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
     public ResponseEntity<Catalog> getCatalog() {
         logger.debug("GET: getCatalog()");
 
@@ -33,5 +36,4 @@ public class CatalogController extends BaseController {
 
         return new ResponseEntity<>(catalog, HttpStatus.OK);
     }
-
 }
