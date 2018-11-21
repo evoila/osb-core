@@ -2,9 +2,12 @@ package de.evoila.cf.security.credhub;
 
 import de.evoila.cf.broker.bean.CredhubBean;
 import de.evoila.cf.security.utils.AcceptSelfSignedClientHttpRequestFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.credhub.core.CredHubClient;
 import org.springframework.credhub.core.CredHubTemplate;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.AccessTokenProviderChain;
@@ -25,13 +28,23 @@ public class CredhubConnection {
 
     private CredhubBean credhubBean;
 
+    private ClientHttpRequestFactory clientHttpRequestFactory;
+
     public CredhubConnection(CredhubBean credhubBean) {
         this.credhubBean = credhubBean;
     }
 
+    @ConditionalOnBean(AcceptSelfSignedClientHttpRequestFactory.class)
+    @Autowired(required = false)
+    private void selfSignedRestTemplate(AcceptSelfSignedClientHttpRequestFactory requestFactory) {
+        clientHttpRequestFactory = requestFactory;
+    }
+
     public CredHubTemplate createCredhubTemplate() {
 
-        ClientHttpRequestFactory clientHttpRequestFactory = new AcceptSelfSignedClientHttpRequestFactory();
+        if (clientHttpRequestFactory == null) {
+            clientHttpRequestFactory = new SimpleClientHttpRequestFactory();
+        }
 
         OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(resource());
 

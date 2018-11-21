@@ -75,6 +75,12 @@
             <version>${parent.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>de.evoila.cf.broker</groupId>
+            <artifactId>core</artifactId>
+            <version>1.2.0</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 

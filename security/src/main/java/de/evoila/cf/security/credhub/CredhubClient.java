@@ -2,13 +2,12 @@ package de.evoila.cf.security.credhub;
 
 
 import de.evoila.cf.broker.bean.CredhubBean;
-import de.evoila.cf.security.utils.AcceptSelfSignedClientHttpRequestFactory;
+import de.evoila.cf.broker.util.EnvironmentUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.env.Environment;
 import org.springframework.credhub.core.CredHubTemplate;
-import org.springframework.credhub.core.OAuth2CredHubTemplate;
 import org.springframework.credhub.support.CredentialDetails;
 import org.springframework.credhub.support.SimpleCredentialName;
 import org.springframework.credhub.support.certificate.CertificateCredential;
@@ -21,13 +20,8 @@ import org.springframework.credhub.support.password.PasswordParameters;
 import org.springframework.credhub.support.password.PasswordParametersRequest;
 import org.springframework.credhub.support.user.UserCredential;
 import org.springframework.credhub.support.user.UserParametersRequest;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
-import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
-import org.springframework.security.oauth2.common.AuthenticationScheme;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -55,7 +49,7 @@ public class CredhubClient {
         this.credhubBean = credhubBean;
         this.environment = environment;
 
-        if(Arrays.asList(environment.getActiveProfiles()).contains("test")) {
+        if(EnvironmentUtils.isTestEnvironment(environment)) {
             SERVICE_BROKER_PREFIX += "test-";
         }
 
@@ -65,7 +59,6 @@ public class CredhubClient {
             log.info("Successfully establihsed a connection to Credhub.");
         }
     }
-
 
     public void createUser(String instanceId, String valueName, String username) {
         createUser(instanceId, valueName, username, 40);
