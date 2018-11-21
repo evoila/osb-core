@@ -19,7 +19,12 @@ public class DashboardClient {
 	private String redirectUri;
 	
 	public DashboardClient() {
-		super();
+	}
+
+	public DashboardClient(String id, String secret, String redirectUri) {
+		this.id = id;
+		this.secret = secret;
+		this.redirectUri = redirectUri;
 	}
 
 	public String getId() {

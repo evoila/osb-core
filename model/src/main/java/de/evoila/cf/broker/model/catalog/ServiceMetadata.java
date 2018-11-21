@@ -22,6 +22,18 @@ public class ServiceMetadata {
     @JsonProperty("supportUrl")
     private String supportUrl;
 
+    public ServiceMetadata() {
+    }
+
+    public ServiceMetadata(String displayName, String imageUrl, String longDescription, String providerDisplayName, String documentationUrl, String supportUrl) {
+        this.displayName = displayName;
+        this.imageUrl = imageUrl;
+        this.longDescription = longDescription;
+        this.providerDisplayName = providerDisplayName;
+        this.documentationUrl = documentationUrl;
+        this.supportUrl = supportUrl;
+    }
+
     public String getDisplayName() {
         return displayName;
     }

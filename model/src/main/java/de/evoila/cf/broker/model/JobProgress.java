@@ -42,24 +42,18 @@ public class JobProgress implements BaseEntity<String> {
 	private String operation;
 
 	public JobProgress() {
-		super();
+	}
+
+	public JobProgress(String serviceInstanceId, String progress, String description) {
+		this(serviceInstanceId, progress, description, null);
 	}
 
 	public JobProgress(String serviceInstanceId, String progress, String description, String operation) {
-		super();
 		this.id = serviceInstanceId;
 		this.state = progress;
 		this.date = new Date();
 		this.description = description;
 		this.operation = operation;
-	}
-
-	public JobProgress(String serviceInstanceId, String progress, String description) {
-		super();
-		this.id = serviceInstanceId;
-		this.state = progress;
-		this.date = new Date();
-		this.description = description;
 	}
 
 	@Override

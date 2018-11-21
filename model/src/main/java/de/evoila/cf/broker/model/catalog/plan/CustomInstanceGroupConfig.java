@@ -7,6 +7,13 @@ public class CustomInstanceGroupConfig extends InstanceGroupConfig {
 
     protected String name;
 
+    public CustomInstanceGroupConfig() {
+    }
+
+    public CustomInstanceGroupConfig(String name) {
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }

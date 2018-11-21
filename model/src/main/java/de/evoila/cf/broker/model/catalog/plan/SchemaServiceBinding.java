@@ -7,6 +7,13 @@ public class SchemaServiceBinding {
 	@JsonProperty(value="create", required=false)
 	private SchemaServiceCreate create;
 
+	public SchemaServiceBinding() {
+	}
+
+	public SchemaServiceBinding(SchemaServiceCreate create) {
+		this.create = create;
+	}
+
 	public SchemaServiceCreate getCreate() {
 		return create;
 	}
