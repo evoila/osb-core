@@ -18,22 +18,18 @@ public class EndpointServiceState {
 	private AvailabilityState state;
 	
 	private String information;
-	
+
+	public EndpointServiceState(String identifier, AvailabilityState state) {
+		this(identifier, state, null);
+	}
+
 	public EndpointServiceState(String identifier, AvailabilityState state, String information) {
-		super();
 		this.identifier = identifier;
 		this.date = new Date();
 		this.state = state;
 		this.information = information;
 	}
 	
-	public EndpointServiceState(String identifier, AvailabilityState state) {
-		super();
-		this.identifier = identifier;
-		this.date = new Date();
-		this.state = state;
-	}
-
 	public String getIdentifier() {
 		return identifier;
 	}

@@ -3,7 +3,8 @@ package de.evoila.cf.broker.exception;
 import java.util.Map;
 
 public class InvalidParametersException extends Exception{
-    private static final long serialVersionUID = 2L;
+
+    private static final long serialVersionUID = 858570104362828780L;
 
     private Map<String, Object> parameters;
 
@@ -18,11 +19,10 @@ public class InvalidParametersException extends Exception{
     }
 
     @Override
-    public String getMessage()
-    {
+    public String getMessage() {
         if (errorMessage == null){
             return "The specified parameters are invalid";
-        }else{
+        } else {
             return this.errorMessage;
         }
     }

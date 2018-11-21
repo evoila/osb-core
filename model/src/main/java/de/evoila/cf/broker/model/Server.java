@@ -9,6 +9,14 @@ public class Server {
 
     private String identifier;
 
+    public Server() {
+    }
+
+    public Server(String url, String identifier) {
+        this.url = url;
+        this.identifier = identifier;
+    }
+
     public String getUrl() {
         return url;
     }

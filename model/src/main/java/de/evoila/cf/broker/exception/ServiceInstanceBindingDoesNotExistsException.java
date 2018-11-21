@@ -8,6 +8,7 @@ package de.evoila.cf.broker.exception;
  *
  */
 public class ServiceInstanceBindingDoesNotExistsException extends Exception {
+
 	private static final long serialVersionUID = -1879753092397657116L;
 
 	private String bindingId;

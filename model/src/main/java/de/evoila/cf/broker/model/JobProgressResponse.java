@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public class JobProgressResponse {
 
 	/**
-	 * Allowed values are: "in progress" "succeeded" "failed"
+	 * Allowed values are: "in progress", "succeeded", "failed"
 	 */
 	@JsonSerialize
 	@JsonProperty("state")
@@ -27,17 +27,13 @@ public class JobProgressResponse {
 	private String description;
 
 	public JobProgressResponse() {
-		super();
 	}
 	
 	public JobProgressResponse(JobProgress jobProgress) {
-		super();
-		this.state = jobProgress.getState();
-		this.description = jobProgress.getDescription();
+		this(jobProgress.getState(), jobProgress.getDescription());
 	}
 
 	public JobProgressResponse(String state, String description) {
-		super();
 		this.state = state;
 		this.description = description;
 	}
