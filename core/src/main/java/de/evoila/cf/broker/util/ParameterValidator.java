@@ -77,7 +77,7 @@ public class ParameterValidator {
                 }
             }
             if(!(flag)){
-                throw new InvalidParametersException(serviceInstanceRequestParams);
+                throw new InvalidParametersException("Error while validating parameters keys");
             }
         }
 
@@ -122,7 +122,7 @@ public class ParameterValidator {
                 }
             }
             if(!(flag)){
-                throw new InvalidParametersException(serviceInstanceRequestParams);
+                throw new InvalidParametersException("Error while validating parameters keys");
             }
         }
 
