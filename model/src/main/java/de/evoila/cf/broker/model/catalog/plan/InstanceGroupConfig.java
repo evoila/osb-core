@@ -19,6 +19,19 @@ public class InstanceGroupConfig {
 
     protected List<String> azs;
 
+    public InstanceGroupConfig() {
+    }
+
+    public InstanceGroupConfig(Integer connections, Integer nodes, String vmType, String persistentDiskType, Map<String, Object> properties, List<NetworkReference> networks, List<String> azs) {
+        this.connections = connections;
+        this.nodes = nodes;
+        this.vmType = vmType;
+        this.persistentDiskType = persistentDiskType;
+        this.properties = properties;
+        this.networks = networks;
+        this.azs = azs;
+    }
+
     public Integer getConnections() {
         return connections;
     }

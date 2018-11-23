@@ -7,10 +7,10 @@ import org.springframework.http.HttpStatus;
  */
 public class ServiceInstanceBindingException extends Exception {
 
-    String instanceId;
-    String bindingId;
-    HttpStatus httpStatus;
-    String errorMessage;
+    private String instanceId;
+    private String bindingId;
+    private HttpStatus httpStatus;
+    private String errorMessage;
 
     public ServiceInstanceBindingException(String instanceId, String bindingId,
                                            HttpStatus httpStatus, String errorMessage) {

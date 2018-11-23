@@ -9,10 +9,12 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConfigurationProperties(prefix = "spring.credhub")
-@ConditionalOnProperty(prefix = "spring.credhub", name = {"url", "oauth2.client-id", "oauth2.client-secret", "oauth2.access-token-uri"})
+@ConditionalOnProperty(prefix = "spring.credhub", name = {"url", "bosh-director", "oauth2.client-id", "oauth2.client-secret", "oauth2.access-token-uri"})
 public class CredhubBean {
 
     private String url;
+
+    private String boshDirector;
 
     private Oauth2 oauth2;
 
@@ -22,6 +24,14 @@ public class CredhubBean {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getBoshDirector() {
+        return boshDirector;
+    }
+
+    public void setBoshDirector(String boshDirector) {
+        this.boshDirector = boshDirector;
     }
 
     public Oauth2 getOauth2() {

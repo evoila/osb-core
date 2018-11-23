@@ -6,19 +6,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-@JsonIgnoreProperties(
-      ignoreUnknown = true
-)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NetworkReference {
 
-    String name;
+    private String name;
 
     @JsonProperty("static_ips")
-    List<String> staticIps;
+    private List<String> staticIps;
 
-    List<String> defaultNetwork;
+    private List<String> defaultNetwork;
 
-    public NetworkReference() { }
+    public NetworkReference() {
+    }
 
     public NetworkReference(String network, List<String> staticIps, List<String> defaultNetwork) {
         this.name = network;
@@ -35,7 +34,7 @@ public class NetworkReference {
     }
 
     public List<String> getStaticIps() {
-        if(staticIps == null)
+        if (staticIps == null)
             staticIps = new ArrayList<>();
         return staticIps;
     }

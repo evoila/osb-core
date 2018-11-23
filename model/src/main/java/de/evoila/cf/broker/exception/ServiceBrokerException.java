@@ -10,6 +10,7 @@ package de.evoila.cf.broker.exception;
 public class ServiceBrokerException extends Exception {
 
 	private static final long serialVersionUID = -5544859893499349135L;
+
 	private String message;
 
 	public ServiceBrokerException() { }

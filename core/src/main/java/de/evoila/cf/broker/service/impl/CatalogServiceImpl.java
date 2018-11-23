@@ -4,7 +4,7 @@ import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.broker.model.catalog.Catalog;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.service.CatalogService;
-import de.evoila.cf.broker.util.GlobalConstants;
+import de.evoila.cf.broker.model.GlobalConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;

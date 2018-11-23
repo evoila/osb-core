@@ -49,7 +49,6 @@ public class ServiceDefinition {
 	private boolean updateable;
 
 	public ServiceDefinition() {
-		super();
 	}
 
 	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans, boolean updatable) {
