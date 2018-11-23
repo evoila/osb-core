@@ -195,4 +195,10 @@ public class ServiceInstanceController extends BaseController {
 	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceNotFoundException ex){
     	return processErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
 	}
+
+	@ExceptionHandler(InvalidParametersException.class)
+	@ResponseBody
+	public ResponseEntity<ErrorMessage> handleException(InvalidParametersException ex) {
+		return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+	}
 }

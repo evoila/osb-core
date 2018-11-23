@@ -163,4 +163,10 @@ public class ServiceInstanceBindingController extends BaseController {
 	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceBindingNotFoundException ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
 	}
+
+	@ExceptionHandler(InvalidParametersException.class)
+	@ResponseBody
+	public ResponseEntity<ErrorMessage> handleException(InvalidParametersException ex) {
+		return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+	}
 }
