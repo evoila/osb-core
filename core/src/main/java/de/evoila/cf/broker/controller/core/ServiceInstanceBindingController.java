@@ -162,4 +162,10 @@ public class ServiceInstanceBindingController extends BaseController {
 	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceBindingNotFoundException ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
 	}
+
+	@ExceptionHandler(ServiceInstanceBindingDoesNotExistsException.class)
+	@ResponseBody
+	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceBindingDoesNotExistsException ex) {
+		return processErrorResponse(ex.getMessage(), HttpStatus.GONE);
+	}
 }

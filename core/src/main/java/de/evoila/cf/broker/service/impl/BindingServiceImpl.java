@@ -159,7 +159,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		JobProgress progress = asyncBindingService.getProgress(bindingId);
 
 		if (progress == null || !bindingRepository.containsInternalBindingId(bindingId)) {
-			throw new ServiceInstanceBindingDoesNotExistsException("Instance binding not found: " + bindingId);
+			throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
 		}
 
 		return new JobProgressResponse(progress);
