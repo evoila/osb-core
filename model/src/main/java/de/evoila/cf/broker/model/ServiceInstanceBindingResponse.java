@@ -31,6 +31,10 @@ public class ServiceInstanceBindingResponse {
 	@JsonIgnore
 	private boolean isAsync;
 
+	public ServiceInstanceBindingResponse() {
+
+	}
+
 	public ServiceInstanceBindingResponse(Map<String, Object> credentials, String syslogDrainUrl) {
 		this.credentials = credentials;
 		this.syslogDrainUrl = syslogDrainUrl;
