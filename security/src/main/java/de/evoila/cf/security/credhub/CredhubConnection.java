@@ -43,29 +43,17 @@ public class CredhubConnection {
 
     private KeyStoreHandler keyStoreHandler;
 
-    //private ClientHttpRequestFactory clientHttpRequestFactory;
-
     public CredhubConnection(CredhubBean credhubBean, KeyStoreHandler keyStoreHandler) {
         this.credhubBean = credhubBean;
         this.keyStoreHandler = keyStoreHandler;
     }
 
-    /*@ConditionalOnBean(AcceptSelfSignedClientHttpRequestFactory.class)
-    @Autowired(required = false)
-    private void selfSignedRestTemplate(AcceptSelfSignedClientHttpRequestFactory requestFactory) {
-        clientHttpRequestFactory = requestFactory;
-    }*/
-
     public CredHubTemplate createCredhubTemplate() throws KeyStoreException, NoSuchAlgorithmException, ConfigurationException, UnrecoverableKeyException, KeyManagementException {
-
-        /*if (clientHttpRequestFactory == null) {
-            clientHttpRequestFactory = new SimpleClientHttpRequestFactory();
-        }*/
 
         SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(
                 new SSLContextBuilder()
                     .loadTrustMaterial(null, new TrustSelfSignedStrategy())
-                    .loadKeyMaterial(keyStoreHandler.getKeyStore(), KeyStoreHandler.TEMPORARY_KEY_PASSWORD.toCharArray())
+                    .loadKeyMaterial(keyStoreHandler.getKeyStore(), credhubBean.getKeystorePassword().toCharArray())
                     .build(),
                 NoopHostnameVerifier.INSTANCE);
 

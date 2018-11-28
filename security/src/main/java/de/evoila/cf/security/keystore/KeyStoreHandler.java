@@ -28,8 +28,6 @@ import java.util.Base64;
 @Service
 public class KeyStoreHandler {
 
-    public static final String TEMPORARY_KEY_PASSWORD = "changeit";
-
     private CredhubBean credhubBean;
 
     public KeyStoreHandler(CredhubBean credhubBean) {
@@ -46,7 +44,7 @@ public class KeyStoreHandler {
             keyStore.load(null, null);
             keyStore.setCertificateEntry("ca-cert", caCertificate);
             keyStore.setCertificateEntry("client-cert", clientCertificate);
-            keyStore.setKeyEntry("client-key", privateKey, TEMPORARY_KEY_PASSWORD.toCharArray(), new Certificate[]{clientCertificate});
+            keyStore.setKeyEntry("client-key", privateKey, credhubBean.getKeystorePassword().toCharArray(), new Certificate[]{clientCertificate});
             return keyStore;
         } catch (GeneralSecurityException | IOException e) {
             throw new ConfigurationException(e.getMessage());
