@@ -26,6 +26,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /** @author Johannes Hiemer, Marco Di Martino. */
 @Service
@@ -73,17 +74,17 @@ public abstract class BindingServiceImpl implements BindingService {
 		validateBindingNotExists(bindingId, instanceId);
 
 		ServiceInstance serviceInstance;
-		try{
+		try {
 			serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
 		} catch(Exception e) {
 			throw new ServiceInstanceDoesNotExistException(instanceId);
 		}
 
 		Plan plan = serviceDefinitionRepository.getPlan(serviceInstanceBindingRequest.getPlanId());
-		if (serviceInstanceBindingRequest.getParameters() != null && serviceInstanceBindingRequest.getParameters().size() > 0){
+		if (serviceInstanceBindingRequest.getParameters() != null && serviceInstanceBindingRequest.getParameters().size() > 0) {
 			try {
 				ParameterValidator.validateParameters(serviceInstanceBindingRequest, plan);
-			}catch(ProcessingException e) {
+			} catch(ProcessingException e) {
 			throw new InvalidParametersException("Error while validating parameters");
 			}
 		}
@@ -123,9 +124,9 @@ public abstract class BindingServiceImpl implements BindingService {
 
 		if (platformService.isSyncPossibleOnUnbind() && !async) {
 			syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
-		}else if (async){
+		} else if (async) {
 			asyncBindingService.asyncDeleteServiceInstanceBinding(this, bindingId, serviceInstance, plan);
-		}else
+		} else
 			throw new ServiceInstanceBindingBadRequestException(bindingId);
 
 	}
@@ -245,16 +246,27 @@ public abstract class BindingServiceImpl implements BindingService {
 
     protected void validateBindingNotExists(String bindingId, String instanceId)
             throws ServiceInstanceBindingExistsException {
-        if (bindingRepository.containsInternalBindingId(bindingId)) {
-            throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
+
+    	boolean bindCreation;
+		boolean isBindingInProgress;
+
+		if (bindingRepository.containsInternalBindingId(bindingId)) {
+    		try {
+    			bindCreation = jobRepository.getJobProgress(bindingId).getOperation().equals(JobProgress.BIND);
+    			isBindingInProgress = jobRepository.getJobProgress(bindingId).getDescription().equals(JobProgress.IN_PROGRESS);
+			 } catch (NoSuchElementException e) {
+    			return;
+			}
+    		if (bindCreation && !isBindingInProgress)
+            	throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
         }
     }
 
     public ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException{
     	ServiceInstance serviceInstance;
-    	try{
+    	try {
     		serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-		}catch(Exception e){
+		} catch(Exception e) {
     		throw new ServiceInstanceDoesNotExistException(instanceId);
 		}
 		return serviceInstance;

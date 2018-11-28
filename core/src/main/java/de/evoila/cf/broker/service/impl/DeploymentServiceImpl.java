@@ -139,7 +139,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         ServiceInstance serviceInstance;
         try {
             serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-        } catch (Exception e) {
+        } catch(Exception e) {
             throw new ServiceInstanceDoesNotExistException(instanceId);
         }
         Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
