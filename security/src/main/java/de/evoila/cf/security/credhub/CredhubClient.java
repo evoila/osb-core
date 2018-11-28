@@ -47,13 +47,13 @@ public class CredhubClient {
         this.credhubBean = credhubBean;
         this.environment = environment;
 
-        if(EnvironmentUtils.isTestEnvironment(environment)) {
+        if (EnvironmentUtils.isTestEnvironment(environment)) {
             SERVICE_BROKER_PREFIX += "test-";
         }
 
         this.credHubTemplate = credhubConnection.createCredhubTemplate();
 
-        if(this.credHubTemplate != null) {
+        if (this.credHubTemplate != null) {
             log.info("Successfully establihsed a connection to Credhub.");
         }
     }

@@ -29,7 +29,6 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
 	public void asyncCreateInstance(DeploymentServiceImpl deploymentService, ServiceInstance serviceInstance,
                                     Map<String, Object> parameters, Plan plan, PlatformService platformService) {
 		progressService.startJob(serviceInstance, "Start creating service..", JobProgress.PROVISION);
-
 		try {
             deploymentService.syncCreateInstance(serviceInstance, parameters, plan, platformService);
 		} catch (Exception e) {
@@ -47,7 +46,6 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
     public void asyncUpdateInstance(DeploymentServiceImpl deploymentService, ServiceInstance serviceInstance,
                                     Map<String, Object> parameters, Plan plan, PlatformService platformService) {
         progressService.startJob(serviceInstance, "Start updating service..", JobProgress.UPDATE);
-
         try {
             deploymentService.syncUpdateInstance(serviceInstance, parameters, plan, platformService);
         } catch (Exception e) {
@@ -65,18 +63,16 @@ public class AsyncDeploymentServiceImpl implements AsyncDeploymentService {
 	public void asyncDeleteInstance(DeploymentServiceImpl deploymentService,
 			ServiceInstance serviceInstance, Plan plan, PlatformService platformService) {
 		progressService.startJob(serviceInstance, "Start deleting service..", JobProgress.DELETE);
-
 		try {
             deploymentService.syncDeleteInstance(serviceInstance, plan, platformService);
 
-		} catch (Exception e) {
+		} catch(Exception e) {
 			progressService.failJob(serviceInstance,
 					"Internal error during Instance deletion, please contact our support.");
 
 			log.error("Exception during Instance deletion", e);
 			return;
 		}
-		//progressService.succeedProgress(serviceInstance, "Instance successfully deleted");
 	}
 
 	@Override

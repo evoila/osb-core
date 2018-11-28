@@ -101,18 +101,18 @@ public class ServiceInstanceController extends BaseController {
 				@RequestBody ServiceInstanceRequest request) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
             ServiceInstanceDoesNotExistException, AsyncRequiredException, InvalidParametersException{
 
-		if (request.getServiceDefinitionId() == null){
+		if (request.getServiceDefinitionId() == null) {
 			return new ResponseEntity<>("Missing required fields: service_id", HttpStatus.BAD_REQUEST );
 		}
 
 		log.debug("PATCH: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
 				+ ", updateServiceInstance(), serviceInstanceId = " + serviceInstanceId);
 
-		if (acceptsIncomplete == null || !acceptsIncomplete){
+		if (acceptsIncomplete == null || !acceptsIncomplete) {
 			throw new AsyncRequiredException();
 		}
 
-		if (catalogService.getServiceDefinition(request.getServiceDefinitionId()).isUpdateable()){
+		if (catalogService.getServiceDefinition(request.getServiceDefinitionId()).isUpdateable()) {
 			deploymentService.updateServiceInstance(serviceInstanceId, request);
 		} else {
 			return new ResponseEntity<>("{}", HttpStatus.UNPROCESSABLE_ENTITY);
@@ -133,7 +133,7 @@ public class ServiceInstanceController extends BaseController {
 				+ ", deleteServiceInstanceBinding(), serviceInstanceId = " + instanceId + ", serviceId = " + serviceId
 				+ ", planId = "+planId);
 
-		if (acceptsIncomplete==null || !acceptsIncomplete){
+		if (acceptsIncomplete==null || !acceptsIncomplete) {
 			throw new AsyncRequiredException();
 		}
 
@@ -154,7 +154,7 @@ public class ServiceInstanceController extends BaseController {
 
 		ServiceInstance serviceInstance = deploymentService.fetchServiceInstance(instanceId);
 
-		if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isInstancesRetrievable())){
+		if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isInstancesRetrievable())) {
 			throw new ServiceInstanceNotRetrievableException("The Service Instance could not be retrievable. You should not attempt to call this endpoint");
 		}
 		ServiceInstanceResponse serviceInstanceResponse = new ServiceInstanceResponse(serviceInstance);
@@ -181,7 +181,7 @@ public class ServiceInstanceController extends BaseController {
 	@ExceptionHandler(ServiceInstanceExistsException.class)
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceExistsException ex) {
-	return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
+		return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
 	}
 
 	@ExceptionHandler(ServiceInstanceDoesNotExistException.class)
@@ -194,11 +194,5 @@ public class ServiceInstanceController extends BaseController {
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceNotFoundException ex){
     	return processErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
-	}
-
-	@ExceptionHandler(InvalidParametersException.class)
-	@ResponseBody
-	public ResponseEntity<ErrorMessage> handleException(InvalidParametersException ex) {
-		return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
 	}
 }
