@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "spring.credhub")
 @ConditionalOnProperty(prefix = "spring.credhub", name = {"url", "bosh-director", "oauth2.client-id", "oauth2.client-secret", "oauth2.access-token-uri",
-                                                          "keystore-password", "certificate.ca", "certificate.cert", "certificate.private-key"})
+                                                          "certificate.ca", "certificate.cert", "certificate.private-key"})
 public class CredhubBean {
 
     private String url;
@@ -21,7 +21,7 @@ public class CredhubBean {
 
     private Certificate certificate;
 
-    private String keystorePassword;
+    private String keystorePassword = "";
 
     public String getUrl() {
         return url;

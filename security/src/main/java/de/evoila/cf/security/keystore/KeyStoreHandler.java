@@ -2,7 +2,6 @@ package de.evoila.cf.security.keystore;
 
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
-import org.springframework.stereotype.Service;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 
@@ -24,7 +23,6 @@ import java.util.Base64;
 /**
  * Created by reneschollmeyer, evoila on 21.11.18.
  */
-@Service
 public class KeyStoreHandler {
 
     public KeyStore getKeyStore(String unformattedClientCertificate, String unformattedPrivateKey, String unformattedCaCertificate, String keyStorePassword) throws ConfigurationException {

@@ -36,15 +36,15 @@ import java.util.Arrays;
 @ConditionalOnBean(CredhubBean.class)
 public class CredhubConnection {
 
-    private static final String GRANT_TYPE="client_credentials";
+    private static final String GRANT_TYPE = "client_credentials";
 
     private CredhubBean credhubBean;
 
     private KeyStoreHandler keyStoreHandler;
 
-    public CredhubConnection(CredhubBean credhubBean, KeyStoreHandler keyStoreHandler) {
+    public CredhubConnection(CredhubBean credhubBean) {
         this.credhubBean = credhubBean;
-        this.keyStoreHandler = keyStoreHandler;
+        this.keyStoreHandler = new KeyStoreHandler();
     }
 
     public CredHubTemplate createCredhubTemplate() throws KeyStoreException, NoSuchAlgorithmException, ConfigurationException, UnrecoverableKeyException, KeyManagementException {
