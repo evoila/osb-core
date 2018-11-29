@@ -1,6 +1,5 @@
 package de.evoila.cf.security.keystore;
 
-import de.evoila.cf.broker.bean.CredhubBean;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.springframework.stereotype.Service;
@@ -28,23 +27,17 @@ import java.util.Base64;
 @Service
 public class KeyStoreHandler {
 
-    private CredhubBean credhubBean;
-
-    public KeyStoreHandler(CredhubBean credhubBean) {
-        this.credhubBean = credhubBean;
-    }
-
-    public KeyStore getKeyStore() throws ConfigurationException {
+    public KeyStore getKeyStore(String unformattedClientCertificate, String unformattedPrivateKey, String unformattedCaCertificate, String keyStorePassword) throws ConfigurationException {
         try {
-            Certificate clientCertificate = loadCertificate(credhubBean.getCertificate().getCert());
-            PrivateKey privateKey = loadPrivateKey(credhubBean.getCertificate().getPrivateKey());
-            Certificate caCertificate = loadCertificate(credhubBean.getCertificate().getCa());
+            Certificate clientCertificate = loadCertificate(unformattedClientCertificate);
+            PrivateKey privateKey = loadPrivateKey(unformattedPrivateKey);
+            Certificate caCertificate = loadCertificate(unformattedCaCertificate);
 
             KeyStore keyStore = KeyStore.getInstance("JKS");
             keyStore.load(null, null);
             keyStore.setCertificateEntry("ca-cert", caCertificate);
             keyStore.setCertificateEntry("client-cert", clientCertificate);
-            keyStore.setKeyEntry("client-key", privateKey, credhubBean.getKeystorePassword().toCharArray(), new Certificate[]{clientCertificate});
+            keyStore.setKeyEntry("client-key", privateKey, keyStorePassword.toCharArray(), new Certificate[]{clientCertificate});
             return keyStore;
         } catch (GeneralSecurityException | IOException e) {
             throw new ConfigurationException(e.getMessage());
@@ -70,8 +63,7 @@ public class KeyStoreHandler {
         return content;
     }
 
-    private static PrivateKey pemLoadPrivateKeyPkcs1OrPkcs8Encoded(
-            String privateKeyPem) throws GeneralSecurityException, IOException {
+    private static PrivateKey pemLoadPrivateKeyPkcs1OrPkcs8Encoded(String privateKeyPem) throws GeneralSecurityException, IOException {
         // PKCS#8 format
         final String PEM_PRIVATE_START = "-----BEGIN PRIVATE KEY-----";
         final String PEM_PRIVATE_END = "-----END PRIVATE KEY-----";

@@ -59,7 +59,7 @@ public class CredhubClient {
         try {
             this.credHubTemplate = credhubConnection.createCredhubTemplate();
         } catch (KeyStoreException | NoSuchAlgorithmException | ConfigurationException | UnrecoverableKeyException | KeyManagementException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
 
         if(this.credHubTemplate != null) {
