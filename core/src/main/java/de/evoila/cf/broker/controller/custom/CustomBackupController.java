@@ -6,6 +6,7 @@ import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.backup.BackupItem;
+import de.evoila.cf.broker.model.backup.CreateItem;
 import de.evoila.cf.broker.service.BackupCustomService;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.data.domain.Page;
@@ -13,10 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -45,6 +43,16 @@ public class CustomBackupController extends BaseController {
                 .collect(Collectors.toList());
 
         return new ResponseEntity(new PageImpl<>(backupItems), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/{serviceInstanceId}/items")
+    public ResponseEntity<CreateItem> item(@PathVariable String serviceInstanceId, @RequestBody CreateItem createItem) {
+        try {
+            backupCustomService.createItem(serviceInstanceId, createItem.getName(), createItem.getParameters());
+        } catch (Exception ex) {
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity(createItem, HttpStatus.CREATED);
     }
 
 }
