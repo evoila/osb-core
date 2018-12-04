@@ -54,10 +54,10 @@ public class ServiceInstanceBindingController extends BaseController {
 		if (request.getAppGuid() != null && request.getAppGuid().isEmpty())
             return new ResponseEntity("{}", HttpStatus.BAD_REQUEST);
 
-		if (acceptsIncomplete == null){
+		if (acceptsIncomplete == null) {
 			acceptsIncomplete = false;
 		}
-		if (acceptsIncomplete && apiHeader.equals("2.13")){
+		if (acceptsIncomplete && apiHeader.equals("2.13")) {
 			throw new ServiceInstanceBindingBadRequestException(bindingId);
 		}
 
@@ -83,10 +83,10 @@ public class ServiceInstanceBindingController extends BaseController {
 				+ ", deleteServiceInstanceBinding(),  serviceInstance.id = " + instanceId + ", bindingId = " + bindingId
 				+ ", serviceId = " + serviceId + ", planId = " + planId);
 
-		if (acceptsIncomplete == null){
+		if (acceptsIncomplete == null) {
 			acceptsIncomplete = false;
 		}
-		if (acceptsIncomplete && apiHeader.equals("2.13")){
+		if (acceptsIncomplete && apiHeader.equals("2.13")) {
 			throw new ServiceInstanceBindingBadRequestException(bindingId);
 		}
 		try {

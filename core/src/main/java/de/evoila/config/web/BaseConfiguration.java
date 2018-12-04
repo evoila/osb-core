@@ -37,6 +37,6 @@ public class BaseConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(org.springframework.web.servlet.config.annotation.InterceptorRegistry registry) {
-        registry.addInterceptor(new ApiVersionInterceptor());
+        registry.addInterceptor(new ApiVersionInterceptor()).addPathPatterns("/**").excludePathPatterns("/resources/**");
     }
 }
