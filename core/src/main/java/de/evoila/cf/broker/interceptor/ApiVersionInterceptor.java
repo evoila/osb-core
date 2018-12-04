@@ -2,11 +2,11 @@ package de.evoila.cf.broker.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.evoila.cf.broker.model.annotations.ApiVersion;
-import de.evoila.cf.broker.service.impl.AsyncBindingServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,30 +26,33 @@ import java.util.Arrays;
 public class ApiVersionInterceptor implements HandlerInterceptor {
 
     private static final String XBrokerAPIVersion = "X-Broker-API-Version";
-    Logger log = LoggerFactory.getLogger(AsyncBindingServiceImpl.class);
+    Logger log = LoggerFactory.getLogger(ApiVersionInterceptor.class);
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
 
-        HandlerMethod method = (HandlerMethod) handler;
-        String [] api ;
-        boolean doesApiMatch = true;
-        log.info("Intercepting on method "+method.getMethod().getName());
+        if (!(handler instanceof ResourceHttpRequestHandler)) {
+            HandlerMethod method = (HandlerMethod) handler;
+            String[] api;
+            boolean doesApiMatch = true;
+            log.info("Intercepting on method " + method.getMethod().getName());
 
-        if (method.hasMethodAnnotation(ApiVersion.class)){
-            api = method.getMethodAnnotation(ApiVersion.class).value();
+            if (method.hasMethodAnnotation(ApiVersion.class)) {
+                api = method.getMethodAnnotation(ApiVersion.class).value();
 
-            ArrayList<String> apiVersions = null;
-            if (api != null) {
-                apiVersions = new ArrayList<>(Arrays.asList(api));
-                log.info("Intercepted request: " + request.getRequestURI());
+                ArrayList<String> apiVersions = null;
+                if (api != null) {
+                    apiVersions = new ArrayList<>(Arrays.asList(api));
+                    log.info("Intercepted request: " + request.getRequestURI());
+                }
+                try {
+                    doesApiMatch = checkApiVersion(apiVersions, request, response);
+                } catch (Exception e) {
+                    throw new IOException();
+                }
             }
-            try{
-                doesApiMatch = checkApiVersion(apiVersions, request, response);
-            }catch(Exception e){
-                throw new IOException();
-            }
+            return doesApiMatch;
         }
-        return doesApiMatch;
+        return true;
     }
 
     private boolean checkApiVersion(ArrayList<String> apis, HttpServletRequest request, HttpServletResponse response) throws IOException {
