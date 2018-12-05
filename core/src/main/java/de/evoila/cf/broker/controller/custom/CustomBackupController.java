@@ -1,6 +1,7 @@
 package de.evoila.cf.broker.controller.custom;
 
-import de.evoila.cf.broker.bean.ConditionOnBackupService;
+import de.evoila.cf.broker.bean.BackupConfiguration;
+import de.evoila.cf.broker.bean.HAProxyConfiguration;
 import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
@@ -8,6 +9,7 @@ import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.backup.BackupItem;
 import de.evoila.cf.broker.model.backup.CreateItem;
 import de.evoila.cf.broker.service.BackupCustomService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,7 +28,7 @@ import java.util.stream.Collectors;
 /** @author Yannic Remmet. */
 @RestController
 @RequestMapping(value = "/custom/v2/manage/backup")
-@Conditional(ConditionOnBackupService.class)
+@ConditionalOnBean(BackupConfiguration.class)
 public class CustomBackupController extends BaseController {
 
     private BackupCustomService backupCustomService;
