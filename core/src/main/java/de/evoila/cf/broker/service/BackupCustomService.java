@@ -17,4 +17,7 @@ public interface BackupCustomService {
      */
     Map<String, String> getItems(String serviceInstanceId) throws ServiceInstanceDoesNotExistException,
             ServiceDefinitionDoesNotExistException, ServiceBrokerException;
+
+    void createItem(String serviceInstanceId, String name, Map<String, Object> parameters) throws ServiceInstanceDoesNotExistException,
+            ServiceDefinitionDoesNotExistException, ServiceBrokerException;
 }

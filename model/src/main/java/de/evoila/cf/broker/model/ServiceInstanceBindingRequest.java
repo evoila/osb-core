@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,7 +36,7 @@ public class ServiceInstanceBindingRequest {
 
 	@JsonSerialize
 	@JsonProperty("parameters")
-	private Map<String, Object> parameters;
+	private Map<String, Object> parameters = new HashMap<>();
 
 	@JsonSerialize
 	@JsonProperty("bind_resource")
