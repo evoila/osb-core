@@ -11,6 +11,9 @@ import de.evoila.cf.broker.service.BackupCustomService;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
@@ -34,7 +37,8 @@ public class CustomBackupController extends BaseController {
     }
 
     @GetMapping(value = "/{serviceInstanceId}/items")
-    public ResponseEntity<Page<BackupItem>> items(@PathVariable String serviceInstanceId) throws ServiceDefinitionDoesNotExistException,
+    public ResponseEntity<Page<BackupItem>> items(@PathVariable String serviceInstanceId, @PageableDefault(size = 10,sort = {"name"},
+            direction = Sort.Direction.DESC) Pageable pageable) throws ServiceDefinitionDoesNotExistException,
             ServiceBrokerException, ServiceInstanceDoesNotExistException {
         Map<String, String> responses = backupCustomService.getItems(serviceInstanceId);
 
