@@ -4,6 +4,7 @@ import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.annotations.ApiVersion;
+import de.evoila.cf.broker.model.annotations.ResponseAdvice;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
 	@PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
 	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
+	@ResponseAdvice
 	public ResponseEntity<ServiceInstanceBindingResponse> bindServiceInstance(@PathVariable("instanceId") String instanceId,
             @PathVariable("bindingId") String bindingId,
 			@RequestHeader("X-Broker-API-Version") String apiHeader,

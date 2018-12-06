@@ -28,6 +28,8 @@ public class ServiceInstanceBindingResponse {
 
 	private List<VolumeMount> volumeMounts;
 
+	private String originatingUser;
+
 	@JsonIgnore
 	private boolean isAsync;
 
@@ -109,4 +111,15 @@ public class ServiceInstanceBindingResponse {
     public void setVolumeMounts(List<VolumeMount> volumeMounts) {
         this.volumeMounts = volumeMounts;
     }
+
+	@JsonSerialize
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@JsonProperty("user_id")
+	public String getOriginatingUser() {
+		return originatingUser;
+	}
+
+	public void setOriginatingUser(String originatingUser) {
+		this.originatingUser = originatingUser;
+	}
 }

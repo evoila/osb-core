@@ -48,6 +48,8 @@ public class ServiceDefinition {
 	@JsonProperty("plan_updateable") // misspelling of attribute kept, do not change it
 	private boolean updateable;
 
+	private boolean sensitive;
+
 	public ServiceDefinition() {
 	}
 
@@ -71,13 +73,14 @@ public class ServiceDefinition {
 	}
 
 	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans, boolean updatable,
-			List<String> tags, ServiceMetadata metadata, List<String> requires, boolean instancesRetrievable, boolean bindingsRetrievable) {
+			List<String> tags, ServiceMetadata metadata, List<String> requires, boolean instancesRetrievable, boolean bindingsRetrievable, boolean sensitive) {
 		this(id, name, description, bindable, plans, updatable);
 		setTags(tags);
 		setMetadata(metadata);
 		setRequires(requires);
 		setInstancesRetrievable(instancesRetrievable);
 		setBindingsRetrievable(bindingsRetrievable);
+		setSensitive(sensitive);
 	}
 
 	public ServiceDefinition(String id, String name, String description, boolean bindable, List<Plan> plans) {
@@ -186,5 +189,13 @@ public class ServiceDefinition {
 
 	public void setInstancesRetrievable(boolean instancesRetrievable) {
 		this.instancesRetrievable = instancesRetrievable;
+	}
+
+	public boolean isSensitive() {
+		return sensitive;
+	}
+
+	public void setSensitive(boolean sensitive) {
+		this.sensitive = sensitive;
 	}
 }
