@@ -42,7 +42,7 @@ public class ServiceInstanceBindingController extends BaseController {
 			@Valid @RequestBody ServiceInstanceBindingRequest request)
 					throws ServiceInstanceDoesNotExistException, ServiceInstanceBindingExistsException,
 					ServiceBrokerException, ServiceDefinitionDoesNotExistException,
-					ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException,
+					ServiceBrokerFeatureIsNotSupportedException, PlatformException,
 					InvalidParametersException, AsyncRequiredException, UnsupportedOperationException {
 
 		log.debug("PUT: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"

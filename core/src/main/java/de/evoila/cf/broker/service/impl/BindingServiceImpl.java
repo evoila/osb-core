@@ -69,7 +69,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
 			ServiceInstanceBindingRequest serviceInstanceBindingRequest, boolean async) throws ServiceInstanceBindingExistsException,
 			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException,
-			InvalidParametersException, AsyncRequiredException{
+			InvalidParametersException, AsyncRequiredException, PlatformException {
 
 		validateBindingNotExists(bindingId, instanceId);
 
@@ -166,7 +166,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	public ServiceInstanceBindingResponse syncCreateBinding(String bindingId, ServiceInstance serviceInstance, ServiceInstanceBindingRequest serviceInstanceBindingRequest, Plan plan, boolean async)
-			throws ServiceBrokerException, InvalidParametersException {
+			throws ServiceBrokerException, InvalidParametersException, PlatformException {
 		String instanceId = serviceInstance.getId();
 
 		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
@@ -193,7 +193,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		return new ServiceInstanceBindingResponse(binding, async);
 	}
 
-	public void syncDeleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance, Plan plan){
+	public void syncDeleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance, Plan plan) {
 		try {
 			ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
 			List<ServerAddress> externalServerAddresses = binding.getExternalServerAddresses();
@@ -202,7 +202,7 @@ public abstract class BindingServiceImpl implements BindingService {
 			}
 
 			unbindService(binding, serviceInstance, plan);
-		} catch (ServiceBrokerException e) {
+		} catch (ServiceBrokerException | PlatformException e) {
 			log.error("Could not cleanup service binding", e);
 		} finally {
 			bindingRepository.unbindService(bindingId);
@@ -222,7 +222,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                    ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException, InvalidParametersException {
+                                                    ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException, InvalidParametersException, PlatformException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalAddresses.get(0));
 
 		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
@@ -232,17 +232,17 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException {
+                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException, PlatformException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
 
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
 	}
 
     protected abstract void unbindService(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
-            throws ServiceBrokerException;
+            throws ServiceBrokerException, PlatformException;
 
 	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                             ServiceInstance serviceInstance, Plan plan, ServerAddress serverAddress) throws ServiceBrokerException, InvalidParametersException;
+                                                             ServiceInstance serviceInstance, Plan plan, ServerAddress serverAddress) throws ServiceBrokerException, InvalidParametersException, PlatformException;
 
     protected void validateBindingNotExists(String bindingId, String instanceId)
             throws ServiceInstanceBindingExistsException {
