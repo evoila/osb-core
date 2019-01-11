@@ -21,6 +21,13 @@ public class CustomInstanceGroupConfig extends InstanceGroupConfig {
 
     public void setConsumes(Map<String, Object> consumes) { this.consumes = consumes; }
 
+    public CustomInstanceGroupConfig() {
+    }
+
+    public CustomInstanceGroupConfig(String name) {
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }

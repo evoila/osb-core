@@ -17,29 +17,21 @@ public class ServerAddress {
 	private boolean backup;
 
 	public ServerAddress() {
-		super();
 	}
 
 	public ServerAddress(String name) {
-		super();
-		this.name = name;
+		this(name, null);
 	}
 
 	public ServerAddress(String name, String ip) {
-		super();
-		this.name = name;
-		this.ip = ip;
+		this(name, ip, 0);
 	}
 
 	public ServerAddress(String name, String ip, int port) {
-		super();
-		this.name = name;
-		this.ip = ip;
-		this.port = port;
+		this(name, ip, port, false);
 	}
 
 	public ServerAddress(String name, String ip, int port, boolean backup) {
-        super();
         this.name = name;
         this.ip = ip;
         this.port = port;
@@ -47,10 +39,7 @@ public class ServerAddress {
     }
 
 	public ServerAddress(ServerAddress address) {
-		super();
-		this.name = address.name;
-		this.ip = address.ip;
-		this.port = address.port;
+	    this(address.getName(), address.getIp(), address.getPort());
 	}
 
     public String getName() {

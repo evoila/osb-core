@@ -2,13 +2,12 @@ package de.evoila.cf.security.credhub;
 
 
 import de.evoila.cf.broker.bean.CredhubBean;
-import de.evoila.cf.security.utils.AcceptSelfSignedClientHttpRequestFactory;
+import de.evoila.cf.broker.model.EnvironmentUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.env.Environment;
 import org.springframework.credhub.core.CredHubTemplate;
-import org.springframework.credhub.core.OAuth2CredHubTemplate;
 import org.springframework.credhub.support.CredentialDetails;
 import org.springframework.credhub.support.SimpleCredentialName;
 import org.springframework.credhub.support.certificate.CertificateCredential;
@@ -21,13 +20,13 @@ import org.springframework.credhub.support.password.PasswordParameters;
 import org.springframework.credhub.support.password.PasswordParametersRequest;
 import org.springframework.credhub.support.user.UserCredential;
 import org.springframework.credhub.support.user.UserParametersRequest;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
-import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
-import org.springframework.security.oauth2.common.AuthenticationScheme;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import javax.naming.ConfigurationException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.util.Map;
 
 /**
@@ -45,38 +44,28 @@ public class CredhubClient {
 
     private Environment environment;
 
-    private static final String BOSH_DIRECTOR = "bosh-1";
+    private CredhubConnection credhubConnection;
 
     private static String SERVICE_BROKER_PREFIX = "sb-";
 
-    public CredhubClient(CredhubBean credhubBean, Environment environment) {
+    public CredhubClient(CredhubBean credhubBean, Environment environment, CredhubConnection credhubConnection) {
         this.credhubBean = credhubBean;
         this.environment = environment;
 
-        if(Arrays.asList(environment.getActiveProfiles()).contains("test")) {
+        if (EnvironmentUtils.isTestEnvironment(environment)) {
             SERVICE_BROKER_PREFIX += "test-";
         }
 
-        ClientHttpRequestFactory clientHttpRequestFactory = new AcceptSelfSignedClientHttpRequestFactory();
-        this.credHubTemplate = new OAuth2CredHubTemplate(resource(), credhubBean.getUrl(), clientHttpRequestFactory);
-        log.info("Successfully establihsed a connection to Credhub.");
-    }
+        try {
+            this.credHubTemplate = credhubConnection.createCredhubTemplate();
+        } catch (KeyStoreException | NoSuchAlgorithmException | ConfigurationException | UnrecoverableKeyException | KeyManagementException e) {
+            log.error(e.getMessage());
+        }
 
-    public OAuth2ProtectedResourceDetails resource() {
-        ClientCredentialsResourceDetails resource = new ClientCredentialsResourceDetails() {
-            @Override
-            public boolean isClientOnly() {
-                return true;
-            }
-        };
-        resource.setAuthenticationScheme(AuthenticationScheme.form);
-        resource.setClientAuthenticationScheme(AuthenticationScheme.header);
-        resource.setAccessTokenUri(credhubBean.getOauth2().getAccessTokenUri());
-        resource.setClientId(credhubBean.getOauth2().getClientId());
-        resource.setClientSecret(credhubBean.getOauth2().getClientSecret());
-        return resource;
+        if (this.credHubTemplate != null) {
+            log.info("Successfully establihsed a connection to Credhub.");
+        }
     }
-
 
     public void createUser(String instanceId, String valueName, String username) {
         createUser(instanceId, valueName, username, 40);
@@ -87,7 +76,7 @@ public class CredhubClient {
      */
     public void createUser(String instanceId, String valueName, String username, int passwordLength) {
         UserParametersRequest request = UserParametersRequest.builder()
-                .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName))
+                .name(new SimpleCredentialName(credhubBean.getBoshDirector(), SERVICE_BROKER_PREFIX + instanceId, valueName))
                 .username(username)
                 .parameters(PasswordParameters.builder()
                     .length(passwordLength)
@@ -104,12 +93,12 @@ public class CredhubClient {
     }
 
     public String getUserName(String instanceId, String valueName) {
-        CredentialDetails<UserCredential> user = credHubTemplate.credentials().getByName(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName), UserCredential.class);
+        CredentialDetails<UserCredential> user = credHubTemplate.credentials().getByName(new SimpleCredentialName(credhubBean.getBoshDirector(), SERVICE_BROKER_PREFIX + instanceId, valueName), UserCredential.class);
         return user.getValue().getUsername();
     }
 
     public String getUserPassword(String instanceId, String valueName) {
-        CredentialDetails<UserCredential> user = credHubTemplate.credentials().getByName(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName), UserCredential.class);
+        CredentialDetails<UserCredential> user = credHubTemplate.credentials().getByName(new SimpleCredentialName(credhubBean.getBoshDirector(), SERVICE_BROKER_PREFIX + instanceId, valueName), UserCredential.class);
         return user.getValue().getPassword();
     }
 
@@ -122,7 +111,7 @@ public class CredhubClient {
      */
     public void createPassword(String instanceId, String valueName, int passwordLength) {
         PasswordParametersRequest request = PasswordParametersRequest.builder()
-                .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName))
+                .name(new SimpleCredentialName(credhubBean.getBoshDirector(), SERVICE_BROKER_PREFIX + instanceId, valueName))
                 .parameters(PasswordParameters.builder()
                         .length(passwordLength)
                         .excludeUpper(false)
@@ -138,7 +127,7 @@ public class CredhubClient {
     }
 
     public String getPassword(String instanceId, String valueName) {
-        CredentialDetails<PasswordCredential> password = credHubTemplate.credentials().getByName(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName), PasswordCredential.class);
+        CredentialDetails<PasswordCredential> password = credHubTemplate.credentials().getByName(new SimpleCredentialName(credhubBean.getBoshDirector(), SERVICE_BROKER_PREFIX + instanceId, valueName), PasswordCredential.class);
         return password.getValue().getPassword();
     }
 
@@ -147,7 +136,7 @@ public class CredhubClient {
      */
     public void createJson(String instanceId, String valueName, Map<String, Object> values) {
         JsonCredentialRequest request = JsonCredentialRequest.builder()
-                .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName))
+                .name(new SimpleCredentialName(credhubBean.getBoshDirector(), SERVICE_BROKER_PREFIX + instanceId, valueName))
                 .value(new JsonCredential(values))
                 .build();
 
@@ -157,17 +146,17 @@ public class CredhubClient {
     }
 
     public Object getJson(String instanceId, String valueName, String key) {
-        CredentialDetails<JsonCredential> json = credHubTemplate.credentials().getByName(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName), JsonCredential.class);
+        CredentialDetails<JsonCredential> json = credHubTemplate.credentials().getByName(new SimpleCredentialName(credhubBean.getBoshDirector(), SERVICE_BROKER_PREFIX + instanceId, valueName), JsonCredential.class);
         return json.getValue().get(key);
     }
 
     public void deleteCredentials(String instanceId, String valueName) {
-        credHubTemplate.credentials().deleteByName(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName));
+        credHubTemplate.credentials().deleteByName(new SimpleCredentialName(credhubBean.getBoshDirector(), SERVICE_BROKER_PREFIX + instanceId, valueName));
     }
 
     public void createCertificate(String instanceId, String valueName, CertificateParameters certificateParameters) {
         CertificateParametersRequest request = CertificateParametersRequest.builder()
-                .name(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName))
+                .name(new SimpleCredentialName(credhubBean.getBoshDirector(), SERVICE_BROKER_PREFIX + instanceId, valueName))
                 .parameters(certificateParameters)
                 .build();
 
@@ -181,17 +170,17 @@ public class CredhubClient {
     }
 
     public String getCertificate(String instanceId, String valueName) {
-        CredentialDetails<CertificateCredential> certificate = credHubTemplate.credentials().getByName(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName), CertificateCredential.class);
+        CredentialDetails<CertificateCredential> certificate = credHubTemplate.credentials().getByName(new SimpleCredentialName(credhubBean.getBoshDirector(), SERVICE_BROKER_PREFIX + instanceId, valueName), CertificateCredential.class);
         return certificate.getValue().getCertificate();
     }
 
     public String getCertificateAuthority(String instanceId, String valueName) {
-        CredentialDetails<CertificateCredential> certificate = credHubTemplate.credentials().getByName(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName), CertificateCredential.class);
+        CredentialDetails<CertificateCredential> certificate = credHubTemplate.credentials().getByName(new SimpleCredentialName(credhubBean.getBoshDirector(), SERVICE_BROKER_PREFIX + instanceId, valueName), CertificateCredential.class);
         return certificate.getValue().getCertificateAuthority();
     }
 
     public String getPrivateKey(String instanceId, String valueName) {
-        CredentialDetails<CertificateCredential> certificate = credHubTemplate.credentials().getByName(new SimpleCredentialName(BOSH_DIRECTOR, SERVICE_BROKER_PREFIX + instanceId, valueName), CertificateCredential.class);
+        CredentialDetails<CertificateCredential> certificate = credHubTemplate.credentials().getByName(new SimpleCredentialName(credhubBean.getBoshDirector(), SERVICE_BROKER_PREFIX + instanceId, valueName), CertificateCredential.class);
         return certificate.getValue().getPrivateKey();
     }
 }

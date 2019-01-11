@@ -32,13 +32,10 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 	private List<VolumeMount> volumeMounts;
 
 	public ServiceInstanceBinding() {
-		super();
 	}
 
     public ServiceInstanceBinding(String id, String serviceInstanceId, Map<String, Object> credentials) {
-        this.id = id;
-        this.serviceInstanceId = serviceInstanceId;
-        setCredentials(credentials);
+		this(id, serviceInstanceId, credentials, null);
     }
 
 	public ServiceInstanceBinding(String id, String serviceInstanceId, Map<String, Object> credentials,

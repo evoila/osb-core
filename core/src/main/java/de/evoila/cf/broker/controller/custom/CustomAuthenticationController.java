@@ -130,21 +130,4 @@ public class CustomAuthenticationController extends BaseController {
 		return mav;
 	}
 
-
-    @GetMapping(value = "/{serviceInstanceId}/test")
-    public Object test(@PathVariable String serviceInstanceId) throws Exception {
-        ModelAndView mav = new ModelAndView("index");
-		Map servers = new HashMap<>();
-		if(endpointConfiguration.getCustom() != null) {
-			servers.put("servers", endpointConfiguration.getCustom());
-		}
-		mav.addObject("customEndpoints", servers);
-        mav.addObject("baseHref", "/core/authentication/" + serviceInstanceId + "/test");
-        mav.addObject("token", TOKEN_PREFIX + "iojsiofksdfifid");
-        mav.addObject("serviceInstanceId", serviceInstanceId);
-        mav.addObject("endpointUrl", endpointConfiguration.getDefault());
-
-        return mav;
-    }
-
 }

@@ -53,7 +53,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 		JobProgress progress = asyncDeploymentService.getProgress(serviceInstanceId);
 
 		if (progress == null || !serviceInstanceRepository.containsServiceInstanceId(serviceInstanceId)) {
-			throw new ServiceInstanceDoesNotExistException("Service instance not found " + serviceInstanceId);
+			throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
 		}
 
 		return new JobProgressResponse(progress);
@@ -139,7 +139,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         ServiceInstance serviceInstance;
         try {
             serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-        } catch (Exception e) {
+        } catch(Exception e) {
             throw new ServiceInstanceDoesNotExistException(instanceId);
         }
         Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());

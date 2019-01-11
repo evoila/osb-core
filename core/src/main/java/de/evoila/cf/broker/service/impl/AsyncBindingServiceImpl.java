@@ -1,14 +1,12 @@
 package de.evoila.cf.broker.service.impl;
 
-import de.evoila.cf.broker.exception.InvalidParametersException;
-import de.evoila.cf.broker.exception.ServiceBrokerException;
-import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
-import de.evoila.cf.broker.model.*;
+import de.evoila.cf.broker.model.JobProgress;
+import de.evoila.cf.broker.model.ServiceInstance;
+import de.evoila.cf.broker.model.ServiceInstanceBindingRequest;
+import de.evoila.cf.broker.model.ServiceInstanceBindingResponse;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.service.AsyncBindingService;
-import de.evoila.cf.broker.service.BindingService;
 import de.evoila.cf.broker.service.JobProgressService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -49,8 +47,7 @@ public class AsyncBindingServiceImpl implements AsyncBindingService {
     @Override
     public void asyncDeleteServiceInstanceBinding(BindingServiceImpl bindingServiceImpl, String bindingId,
                                                   ServiceInstance serviceInstance, Plan plan) {
-        jobProgressService.startJob(serviceInstance, "Start deleting binding..", JobProgress.UNBIND);
-
+        jobProgressService.startJob(bindingId, "Start deleting binding..", JobProgress.UNBIND);
         try {
             bindingServiceImpl.syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
 
@@ -61,10 +58,8 @@ public class AsyncBindingServiceImpl implements AsyncBindingService {
             log.error("Exception during binding deletion", e);
             return;
         }
-    //    jobProgressService.succeedProgress(serviceInstance, "Instance Binding successfully deleted");
     }
-
-
+    
     public JobProgress getProgress(String bindingId){
         try {
             return jobProgressService.getProgress(bindingId);

@@ -16,13 +16,13 @@ public class SchemaProperty {
 	/*
 	 * Written at the 25.05.2018 using the formal specification from
 	 * https://cswr.github.io/JsonSchema/spec/grammar/
-	 * 
-	 * Missing due to Java incompatibly - allow a List of values and a single
-	 * value for type at the same time - allow a List of items and a single
-	 * value for items at the same time - allow a Boolean and a Schema object
-	 * for additionalItems at the same time - allow a Boolean and a Schema
-	 * object for additionalProperties at the same time - dependencies in
-	 * objects
+	 *
+	 * Missing due to Java incompatibly
+	 * - allow a List of values and a single value for type at the same time
+	 * - allow a List of items and a single value for items at the same time
+	 * - allow a Boolean and a Schema object for additionalItems at the same time
+	 * - allow a Boolean and a Schema object for additionalProperties at the same time
+	 * - dependencies in objects
 	 */
 
 	@JsonSerialize

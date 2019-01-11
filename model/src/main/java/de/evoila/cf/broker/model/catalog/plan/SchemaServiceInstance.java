@@ -10,6 +10,14 @@ public class SchemaServiceInstance {
 	@JsonProperty(value="update", required=false)
 	private SchemaServiceUpdate update;
 
+	public SchemaServiceInstance() {
+	}
+
+	public SchemaServiceInstance(SchemaServiceCreate create, SchemaServiceUpdate update) {
+		this.create = create;
+		this.update = update;
+	}
+
 	public SchemaServiceCreate getCreate() {
 		return create;
 	}

@@ -50,7 +50,7 @@ public class CustomServiceKeysController extends BaseController {
     @PostMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<ServiceInstanceBinding> createServiceKey(@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException,
             ServiceBrokerException, ServiceInstanceBindingExistsException, ServiceDefinitionDoesNotExistException,
-            ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException,
+            ServiceBrokerFeatureIsNotSupportedException, PlatformException,
             InvalidParametersException, AsyncRequiredException {
         ServiceInstance instance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
 

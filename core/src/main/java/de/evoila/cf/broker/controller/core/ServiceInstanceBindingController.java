@@ -42,7 +42,7 @@ public class ServiceInstanceBindingController extends BaseController {
 			@Valid @RequestBody ServiceInstanceBindingRequest request)
 					throws ServiceInstanceDoesNotExistException, ServiceInstanceBindingExistsException,
 					ServiceBrokerException, ServiceDefinitionDoesNotExistException,
-					ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException,
+					ServiceBrokerFeatureIsNotSupportedException, PlatformException,
 					InvalidParametersException, AsyncRequiredException, UnsupportedOperationException {
 
 		log.debug("PUT: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
@@ -54,10 +54,10 @@ public class ServiceInstanceBindingController extends BaseController {
 		if (request.getAppGuid() != null && request.getAppGuid().isEmpty())
             return new ResponseEntity("{}", HttpStatus.BAD_REQUEST);
 
-		if (acceptsIncomplete == null){
+		if (acceptsIncomplete == null) {
 			acceptsIncomplete = false;
 		}
-		if (acceptsIncomplete && apiHeader.equals("2.13")){
+		if (acceptsIncomplete && apiHeader.equals("2.13")) {
 			throw new ServiceInstanceBindingBadRequestException(bindingId);
 		}
 
@@ -83,23 +83,23 @@ public class ServiceInstanceBindingController extends BaseController {
 				+ ", deleteServiceInstanceBinding(),  serviceInstance.id = " + instanceId + ", bindingId = " + bindingId
 				+ ", serviceId = " + serviceId + ", planId = " + planId);
 
-		if (acceptsIncomplete == null){
+		if (acceptsIncomplete == null) {
 			acceptsIncomplete = false;
 		}
-		if (acceptsIncomplete && apiHeader.equals("2.13")){
+		if (acceptsIncomplete && apiHeader.equals("2.13")) {
 			throw new ServiceInstanceBindingBadRequestException(bindingId);
 		}
 		try {
 			bindingService.deleteServiceInstanceBinding(bindingId, planId, acceptsIncomplete);
-		} catch (ServiceInstanceBindingDoesNotExistsException | ServiceDefinitionDoesNotExistException e) {
+		} catch(ServiceInstanceBindingDoesNotExistsException | ServiceDefinitionDoesNotExistException e) {
 			return new ResponseEntity<>("{}", HttpStatus.GONE);
 		}
 
 		log.debug("ServiceInstanceBinding Deleted: " + bindingId);
 
-		if (acceptsIncomplete){
+		if (acceptsIncomplete) {
 			return new ResponseEntity<>("{\"Unbind in progress\"}", HttpStatus.ACCEPTED);
-		}else{
+		} else {
 			return new ResponseEntity<>("{}", HttpStatus.OK);
 		}
 	}
@@ -124,14 +124,13 @@ public class ServiceInstanceBindingController extends BaseController {
 																					  @PathVariable("bindingId") String bindingId
 																					  ) throws ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceInstanceDoesNotExistException{
 		ServiceInstance serviceInstance = bindingService.getServiceInstance(instanceId);
-		if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isBindingsRetrievable())){
+		if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isBindingsRetrievable())) {
 			throw new ServiceInstanceBindingNotRetrievableException("The Service Binding could not be retrievable. You should not attempt to call this endpoint");
 		}
 
 		ServiceInstanceBinding binding =  bindingService.fetchServiceInstanceBinding(bindingId, instanceId);
 		ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(binding);
 		return new ResponseEntity<>(response, HttpStatus.OK);
-
 	}
 
 	@ExceptionHandler(ServiceInstanceDoesNotExistException.class)
@@ -152,7 +151,7 @@ public class ServiceInstanceBindingController extends BaseController {
 		return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
 	}
 	
-	@ExceptionHandler({ServiceInstanceBindingBadRequestException.class, ServiceInstanceBindingNotRetrievableException.class})
+	@ExceptionHandler({ServiceInstanceBindingBadRequestException.class, ServiceInstanceBindingNotRetrievableException.class, InvalidParametersException.class})
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(Exception ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -162,5 +161,11 @@ public class ServiceInstanceBindingController extends BaseController {
 	@ResponseBody
 	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceBindingNotFoundException ex) {
 		return processErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(ServiceInstanceBindingDoesNotExistsException.class)
+	@ResponseBody
+	public ResponseEntity<ErrorMessage> handleException(ServiceInstanceBindingDoesNotExistsException ex) {
+		return processErrorResponse(ex.getMessage(), HttpStatus.GONE);
 	}
 }
