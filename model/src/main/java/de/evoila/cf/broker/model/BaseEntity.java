@@ -11,5 +11,5 @@ import java.io.Serializable;
  */
 public interface BaseEntity<ID extends Serializable> {
 	
-	public ID getId();
+	ID getId();
 }

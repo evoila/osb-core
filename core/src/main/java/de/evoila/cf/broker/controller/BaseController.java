@@ -1,41 +1,68 @@
 package de.evoila.cf.broker.controller;
 
-import de.evoila.cf.broker.model.ErrorMessage;
+import de.evoila.cf.broker.exception.*;
+import de.evoila.cf.broker.model.ResponseMessage;
+import org.everit.json.schema.ValidationException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletResponse;
-
-/** @author Johannes Hiemer.
- *  @author Marco Di Martino */
+/**
+ * @author Johannes Hiemer, Marco Di Martino.
+ **/
 public abstract class BaseController {
 
 	private final Logger log = LoggerFactory.getLogger(BaseController.class);
 
-	@ExceptionHandler(HttpMessageNotReadableException.class)
-	public ResponseEntity<ErrorMessage> handleException(HttpMessageNotReadableException ex, HttpServletResponse response) {
-	    return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-	}
-	
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ErrorMessage> handleException(MethodArgumentNotValidException ex,
-														HttpServletResponse response) {
-	    BindingResult result = ex.getBindingResult();
-	    String message = "Missing required fields:";
-	    for (FieldError error: result.getFieldErrors()) {
-	    	message += " " + error.getField();
-	    }
-		return processErrorResponse(message, HttpStatus.BAD_REQUEST);
+    protected ResponseEntity processErrorResponse(HttpStatus status) {
+        return new ResponseEntity(status);
+    }
+
+	protected ResponseEntity processErrorResponse(String message, HttpStatus status) {
+		return new ResponseEntity(new ResponseMessage(message), status);
 	}
 
-	protected ResponseEntity<ErrorMessage> processErrorResponse(String message, HttpStatus status) {
-		return new ResponseEntity<>(new ErrorMessage(message), status);
-	}
+    protected ResponseEntity processErrorResponse(JSONObject message, HttpStatus status) {
+        return new ResponseEntity(message, status);
+    }
+
+    @ExceptionHandler({ ValidationException.class })
+    @ResponseBody
+    public ResponseEntity<ResponseMessage> handleException(ValidationException ex) {
+        return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ ConcurrencyErrorException.class })
+    public ResponseEntity<ResponseMessage> handleException(ConcurrencyErrorException ex) {
+        return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ResponseBody
+    @ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, ServiceInstanceNotRetrievableException.class })
+    public ResponseEntity<ResponseMessage> handleException(Exception ex) {
+        return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(ServiceInstanceExistsException.class)
+    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceExistsException ex) {
+        return processErrorResponse(HttpStatus.CONFLICT);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(ServiceInstanceDoesNotExistException.class)
+    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceDoesNotExistException ex) {
+        return processErrorResponse(HttpStatus.GONE);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(ServiceInstanceNotFoundException.class)
+    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceNotFoundException ex){
+        return processErrorResponse(HttpStatus.NOT_FOUND);
+    }
+
 }

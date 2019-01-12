@@ -2,16 +2,18 @@ package de.evoila.cf.broker.model.catalog.plan;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * @author Marco Di Martino.
+ */
 public class SchemaServiceInstance {
 
-	@JsonProperty(value="create", required=false)
+	@JsonProperty(value = "create", required = false)
 	private SchemaServiceCreate create;
 
-	@JsonProperty(value="update", required=false)
+	@JsonProperty(value = "update", required = false)
 	private SchemaServiceUpdate update;
 
-	public SchemaServiceInstance() {
-	}
+	public SchemaServiceInstance() {}
 
 	public SchemaServiceInstance(SchemaServiceCreate create, SchemaServiceUpdate update) {
 		this.create = create;

@@ -6,10 +6,7 @@ package de.evoila.cf.broker.model;
 import java.util.Date;
 
 /**
- * 
- * @author Johannes Hiemer.
- * @author Marco Di Martino
- *
+ * @author Johannes Hiemer, Marco Di Martino
  */
 public class JobProgress implements BaseEntity<String> {
 
@@ -41,15 +38,18 @@ public class JobProgress implements BaseEntity<String> {
 
 	private String operation;
 
+	private String referenceId;
+
 	public JobProgress() {
 	}
 
-	public JobProgress(String serviceInstanceId, String progress, String description) {
-		this(serviceInstanceId, progress, description, null);
+	public JobProgress(String id, String referenceId, String progress, String description) {
+		this(id, referenceId, progress, description, null);
 	}
 
-	public JobProgress(String serviceInstanceId, String progress, String description, String operation) {
-		this.id = serviceInstanceId;
+	public JobProgress(String id, String referenceId, String progress, String description, String operation) {
+	    this.id = id;
+		this.referenceId = referenceId;
 		this.state = progress;
 		this.date = new Date();
 		this.description = description;
@@ -96,4 +96,12 @@ public class JobProgress implements BaseEntity<String> {
 	public void setOperation(String operation) {
 		this.operation = operation;
 	}
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
 }

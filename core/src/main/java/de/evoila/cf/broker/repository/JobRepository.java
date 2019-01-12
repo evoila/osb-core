@@ -2,51 +2,50 @@ package de.evoila.cf.broker.repository;
 
 import de.evoila.cf.broker.model.JobProgress;
 
+/**
+ * @author Johannes Hiemer.
+ */
 public interface JobRepository {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.evoila.cf.broker.repository.BindingRepository#getInternalBindingId(
-	 * java.lang.String)
-	 */
-	JobProgress getJobProgress(String id);
+    /**
+     * @param id
+     * @return
+     */
+	JobProgress getJobProgressById(String id);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.evoila.cf.broker.repository.BindingRepository#addInternalBinding(java.
-	 * lang.String, java.lang.String)
-	 */
-	void saveJobProgress(String id, String progress, String description, String operation);
+    /**
+     * @param referenceId
+     * @return
+     */
+    JobProgress getJobProgressByReferenceId(String referenceId);
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * de.evoila.cf.broker.repository.BindingRepository#addInternalBinding(java.
-	 * lang.String, java.lang.String)
-	 */
+    /**
+     * @param id
+     * @param referenceId
+     * @param progress
+     * @param description
+     * @param operation
+     * @return
+     */
+    JobProgress saveJobProgress(String id, String referenceId, String progress, String description, String operation);
 
-	void updateJobProgress(String id, String progress, String description);
+    /**
+     * @param id
+     * @param progress
+     * @param description
+     * @return
+     */
+    JobProgress updateJobProgress(String id, String progress, String description);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.evoila.cf.broker.repository.BindingRepository#
-	 * containsInternalBindingId(java.lang.String)
-	 */
+    /**
+     * @param id
+     * @return
+     */
 	boolean containsJobProgress(String id);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.evoila.cf.broker.repository.BindingRepository#deleteBinding(java.lang.
-	 * String)
-	 */
-	void deleteJobProgress(String id);
+    /**
+     * @param id
+     */
+    void deleteJobProgress(String id);
 
 }

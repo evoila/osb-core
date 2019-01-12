@@ -5,21 +5,17 @@ import de.evoila.cf.broker.model.ServiceInstanceBinding;
 import java.util.List;
 
 /**
- * @author Christian Brinker, evoila.
+ * @author Christian Brinker, Johannes Hiemer.
  *
  */
 public interface BindingRepository {
 
-	// Bind
 	String getInternalBindingId(String bindingId);
 
-	// Bind
 	void addInternalBinding(ServiceInstanceBinding binding);
 
-	// Bind
 	boolean containsInternalBindingId(String bindingId);
 
-	// Bind
 	void unbindService(String bindingId);
 
 	ServiceInstanceBinding findOne(String bindingId);
