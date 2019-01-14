@@ -50,7 +50,7 @@ public abstract class BaseController {
     @ResponseBody
     @ExceptionHandler(ServiceInstanceExistsException.class)
     public ResponseEntity<ResponseMessage> handleException(ServiceInstanceExistsException ex) {
-        return processErrorResponse(HttpStatus.CONFLICT);
+        return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ResponseBody
