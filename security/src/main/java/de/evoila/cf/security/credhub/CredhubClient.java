@@ -22,6 +22,11 @@ import org.springframework.credhub.support.user.UserCredential;
 import org.springframework.credhub.support.user.UserParametersRequest;
 import org.springframework.stereotype.Service;
 
+import javax.naming.ConfigurationException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.util.Map;
 
 /**
@@ -51,7 +56,11 @@ public class CredhubClient {
             SERVICE_BROKER_PREFIX += "test-";
         }
 
-        this.credHubTemplate = credhubConnection.createCredhubTemplate();
+        try {
+            this.credHubTemplate = credhubConnection.createCredhubTemplate();
+        } catch (KeyStoreException | NoSuchAlgorithmException | ConfigurationException | UnrecoverableKeyException | KeyManagementException e) {
+            log.error(e.getMessage());
+        }
 
         if (this.credHubTemplate != null) {
             log.info("Successfully establihsed a connection to Credhub.");

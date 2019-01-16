@@ -29,7 +29,7 @@ public interface BindingService {
           throws ServiceInstanceBindingExistsException, ServiceBrokerException,
             ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException,
             ServiceInstanceBindingBadRequestException, ServiceBrokerFeatureIsNotSupportedException,
-            InvalidParametersException, AsyncRequiredException;
+            InvalidParametersException, AsyncRequiredException, PlatformException;
 
     /**
      *
