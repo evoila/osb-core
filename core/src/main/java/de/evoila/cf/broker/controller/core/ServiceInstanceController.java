@@ -121,7 +121,7 @@ public class ServiceInstanceController extends BaseController {
 				+ ", deleteServiceInstanceBinding(), serviceInstanceId = " + serviceInstanceId + ", serviceId = " + serviceId
 				+ ", planId = "+planId);
 
-		if (acceptsIncomplete==null || !acceptsIncomplete) {
+		if (acceptsIncomplete == null || !acceptsIncomplete) {
 			throw new AsyncRequiredException();
 		}
 
@@ -155,10 +155,16 @@ public class ServiceInstanceController extends BaseController {
 
 		ServiceInstance serviceInstance = deploymentService.fetchServiceInstance(serviceInstanceId);
 
-		if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isInstancesRetrievable())) {
+        ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId());
+
+		if (!(serviceDefinition.isInstancesRetrievable())) {
 			throw new ServiceInstanceNotRetrievableException("The Service Instance could not be retrievable. You should not attempt to call this endpoint");
 		}
 		ServiceInstanceResponse serviceInstanceResponse = new ServiceInstanceResponse(serviceInstance);
+
+        if (DashboardUtils.hasDashboard(serviceDefinition))
+            serviceInstanceResponse.setDashboardUrl(DashboardUtils.dashboard(serviceDefinition, serviceInstanceId));
+
 		return new ResponseEntity<>(serviceInstanceResponse, HttpStatus.OK);
 	}
 

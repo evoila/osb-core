@@ -9,7 +9,7 @@ import java.util.List;
 
 /** @author Johannes Hiemer. */
 @Configuration
-@ConfigurationProperties(prefix="endpoints")
+@ConfigurationProperties(prefix = "endpoints")
 public class EndpointConfiguration {
 
     @JsonProperty(value = "default")

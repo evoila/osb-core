@@ -3,9 +3,11 @@ package de.evoila.cf.broker.bean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 
-/** @author Yannic Remmet */
+/**
+ * @author Yannic Remmet
+ **/
 @Configuration
-@ConditionalOnProperty(prefix = "backup", name = {"enabled"})
+@ConditionalOnProperty(prefix = "backup", name = { "enabled" })
 public class BackupConfiguration {
 
     private boolean enabled;

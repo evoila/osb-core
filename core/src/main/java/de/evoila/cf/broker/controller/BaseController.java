@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author Johannes Hiemer, Marco Di Martino.
@@ -31,7 +30,6 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler({ ValidationException.class })
-    @ResponseBody
     public ResponseEntity<ResponseMessage> handleException(ValidationException ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
@@ -41,25 +39,26 @@ public abstract class BaseController {
         return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    @ResponseBody
+    @ExceptionHandler({ AsyncRequiredException.class })
+    public ResponseEntity<ResponseMessage> handleException(AsyncRequiredException ex) {
+        return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
     @ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, ServiceInstanceNotRetrievableException.class })
     public ResponseEntity<ResponseMessage> handleException(Exception ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ResponseBody
     @ExceptionHandler(ServiceInstanceExistsException.class)
     public ResponseEntity<ResponseMessage> handleException(ServiceInstanceExistsException ex) {
-        return processErrorResponse(HttpStatus.CONFLICT);
+        return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
-    @ResponseBody
     @ExceptionHandler(ServiceInstanceDoesNotExistException.class)
     public ResponseEntity<ResponseMessage> handleException(ServiceInstanceDoesNotExistException ex) {
         return processErrorResponse(HttpStatus.GONE);
     }
 
-    @ResponseBody
     @ExceptionHandler(ServiceInstanceNotFoundException.class)
     public ResponseEntity<ResponseMessage> handleException(ServiceInstanceNotFoundException ex){
         return processErrorResponse(HttpStatus.NOT_FOUND);
