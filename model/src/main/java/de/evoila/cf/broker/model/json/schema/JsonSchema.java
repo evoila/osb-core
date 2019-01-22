@@ -142,6 +142,12 @@ public class JsonSchema {
     protected String title;
 
     /**
+     * This attribute is an object, which contains a possible default value;
+     */
+    @JsonProperty(value = "default", required = false)
+    private Object defaultValue;
+
+    /**
      * This attribute is a string that provides a links related to description of the
      * instance property.
      */
@@ -406,6 +412,14 @@ public class JsonSchema {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Object getDefault() {
+        return defaultValue;
+    }
+
+    public void setDefault(Object defaultValue) {
+        this.defaultValue = defaultValue;
     }
 
     public LinkDescriptionObject[] getLinks() {
