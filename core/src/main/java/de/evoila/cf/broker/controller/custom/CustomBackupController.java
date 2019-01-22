@@ -51,14 +51,4 @@ public class CustomBackupController extends BaseController {
         return new ResponseEntity(new PageImpl<>(backupItems), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/{serviceInstanceId}/items")
-    public ResponseEntity<CreateItem> item(@PathVariable String serviceInstanceId, @RequestBody CreateItem createItem) {
-        try {
-            backupCustomService.createItem(serviceInstanceId, createItem.getName(), createItem.getParameters());
-        } catch (Exception ex) {
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity(createItem, HttpStatus.CREATED);
-    }
-
 }
