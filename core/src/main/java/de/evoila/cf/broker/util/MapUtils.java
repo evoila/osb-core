@@ -1,10 +1,14 @@
 package de.evoila.cf.broker.util;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
+import java.util.*;
 
+/**
+ * @author Johannes Hiemer-
+ */
 public class MapUtils {
 
     public static void deepMerge(Map<String, Object> map1, Map<String, Object> map2) {
@@ -47,5 +51,16 @@ public class MapUtils {
             list.add(element.getValue());
 
         return list;
+    }
+
+    public static Map<String, Object> introspect(Object obj) throws Exception {
+        Map<String, Object> result = new HashMap<String, Object>();
+        BeanInfo info = Introspector.getBeanInfo(obj.getClass());
+        for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
+            Method reader = pd.getReadMethod();
+            if (reader != null)
+                result.put(pd.getName(), reader.invoke(obj));
+        }
+        return result;
     }
 }

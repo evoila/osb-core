@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * @author Johannes Hiemer-
+ */
 public class ServiceInstanceUtils {
 
     private static String USERNAME = "user";

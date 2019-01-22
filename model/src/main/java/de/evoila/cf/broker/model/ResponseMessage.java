@@ -9,20 +9,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Johannes Hiemer.
  *
  */
-public class ErrorMessage {
+public class ResponseMessage<T> {
 
 	@JsonProperty("message")
-	private String message;
+	private T message;
 
-	public ErrorMessage(String message) {
+	public ResponseMessage(T message) {
 		this.message = message;
 	}
 
-	public String getMessage() {
+	public T getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
+	public void setMessage(T message) {
 		this.message = message;
 	}
 	

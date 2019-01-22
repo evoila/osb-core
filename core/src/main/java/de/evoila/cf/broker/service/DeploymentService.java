@@ -3,37 +3,29 @@
  */
 package de.evoila.cf.broker.service;
 
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import de.evoila.cf.broker.exception.*;
-import de.evoila.cf.broker.model.JobProgressResponse;
-import de.evoila.cf.broker.model.ServiceInstance;
-import de.evoila.cf.broker.model.ServiceInstanceRequest;
-import de.evoila.cf.broker.model.ServiceInstanceResponse;
-
-import java.util.List;
-import java.util.Map;
+import de.evoila.cf.broker.model.*;
 
 /**
- * @author Christian Brinker && Johannes Hiemer, evoila.
- *
+ * @author Christian Brinker, Johannes Hiemer.
  */
 public interface DeploymentService {
 
-	// List<ServiceInstance> getAllServiceInstances();
+	JobProgressResponse getLastOperationByReferenceId(String referenceId)
+			throws ServiceInstanceDoesNotExistException;
 
-	// ServiceInstance getServiceInstance(String id);
+	JobProgressResponse getLastOperationById(String referenceId, String jobProgressId) throws ServiceInstanceDoesNotExistException;
 
-	JobProgressResponse getLastOperation(String serviceInstanceId)
-			throws ServiceInstanceDoesNotExistException, ServiceBrokerException;
+    ServiceInstanceOperationResponse createServiceInstance(String serviceInstanceId, ServiceInstanceRequest serviceInstanceRequest)
+            throws ServiceInstanceExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException;
 
-	ServiceInstanceResponse createServiceInstance(String serviceInstanceId, ServiceInstanceRequest serviceInstanceRequest00, List<Map<String, Object>> exentension_apis) throws ServiceInstanceExistsException,
-            ServiceBrokerException, ServiceDefinitionDoesNotExistException, ProcessingException, InvalidParametersException;
+    ServiceInstanceOperationResponse updateServiceInstance(String serviceInstanceId, ServiceInstanceUpdateRequest serviceInstanceUpdateRequest)
+            throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException;
 
-    void updateServiceInstance(String serviceInstanceId, ServiceInstanceRequest serviceInstanceRequest) throws ServiceBrokerException,
-            ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException;
-
-	void deleteServiceInstance(String instanceId) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
+    ServiceInstanceOperationResponse deleteServiceInstance(String instanceId) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
             ServiceInstanceDoesNotExistException;
 
-	ServiceInstance fetchServiceInstance(String instanceId) throws UnsupportedOperationException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceNotFoundException;
+	ServiceInstance fetchServiceInstance(String instanceId) throws UnsupportedOperationException, ServiceBrokerException,
+            ConcurrencyErrorException, ServiceInstanceNotFoundException;
+
 }

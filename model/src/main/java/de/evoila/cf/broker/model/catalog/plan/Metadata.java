@@ -28,6 +28,8 @@ public class Metadata extends InstanceGroupConfig {
 
     private Map<String, Object> customParameters = new HashMap<>();
 
+    private String endpointName;
+
     public Metadata() {}
 
     public Metadata(int connections, int nodes, String vmType, String persistentDiskType, List<NetworkReference> networks,
@@ -95,5 +97,13 @@ public class Metadata extends InstanceGroupConfig {
 
     public void setCustomParameters(Map<String, Object> customParameters) {
         this.customParameters = customParameters;
+    }
+
+    public String getEndpointName() {
+        return endpointName;
+    }
+
+    public void setEndpointName(String endpointName) {
+        this.endpointName = endpointName;
     }
 }

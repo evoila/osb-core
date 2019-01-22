@@ -16,14 +16,17 @@ public class EnvironmentUtils {
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentUtils.class);
 
     public static boolean isTestEnvironment(Environment environment) {
-        boolean isTestEnvironment = false;
+        return isEnvironment(GlobalConstants.TEST_PROFILE, environment);
+    }
 
+    public static boolean isEnvironment(String configuredEnvironment, Environment environment) {
+        boolean isConfiguredEnvironment = false;
         if (Arrays.stream(environment.getActiveProfiles()).anyMatch(
-                env -> (env.equalsIgnoreCase(GlobalConstants.TEST_PROFILE)))) {
-            isTestEnvironment = true;
+                env -> (env.equalsIgnoreCase(configuredEnvironment)))) {
+            isConfiguredEnvironment = true;
         }
 
-        return isTestEnvironment;
+        return isConfiguredEnvironment;
     }
 
     public static String replaceLastChar(String value) {

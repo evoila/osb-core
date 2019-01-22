@@ -3,7 +3,6 @@
  */
 package de.evoila.cf.broker.service.impl;
 
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
@@ -15,14 +14,17 @@ import de.evoila.cf.broker.service.AsyncDeploymentService;
 import de.evoila.cf.broker.service.DeploymentService;
 import de.evoila.cf.broker.service.PlatformService;
 import de.evoila.cf.broker.util.ParameterValidator;
+import de.evoila.cf.broker.util.RandomString;
+import org.everit.json.schema.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
-/** @author Christian Brinker, Marco Di Martino */
+/**
+ * @author Christian Brinker, Marco Di Martino, Johannes Hiemer.
+ **/
 @Service
 public class DeploymentServiceImpl implements DeploymentService {
 
@@ -38,8 +40,11 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 	private AsyncDeploymentService asyncDeploymentService;
 
+	private RandomString randomString = new RandomString();
+
 	public DeploymentServiceImpl(PlatformRepository platformRepository, ServiceDefinitionRepository serviceDefinitionRepository,
-                                 ServiceInstanceRepository serviceInstanceRepository, JobRepository jobRepository, AsyncDeploymentService asyncDeploymentService) {
+                                 ServiceInstanceRepository serviceInstanceRepository,
+                                 JobRepository jobRepository, AsyncDeploymentService asyncDeploymentService) {
 	    this.platformRepository = platformRepository;
 	    this.serviceDefinitionRepository = serviceDefinitionRepository;
 	    this.serviceInstanceRepository = serviceInstanceRepository;
@@ -48,21 +53,31 @@ public class DeploymentServiceImpl implements DeploymentService {
     }
 
 	@Override
-	public JobProgressResponse getLastOperation(String serviceInstanceId)
+	public JobProgressResponse getLastOperationByReferenceId(String referenceId)
 			throws ServiceInstanceDoesNotExistException {
-		JobProgress progress = asyncDeploymentService.getProgress(serviceInstanceId);
+		JobProgress progress = asyncDeploymentService.getProgressByReferenceId(referenceId);
 
-		if (progress == null || !serviceInstanceRepository.containsServiceInstanceId(serviceInstanceId)) {
-			throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
+		if (progress == null || !serviceInstanceRepository.containsServiceInstanceId(referenceId)) {
+			throw new ServiceInstanceDoesNotExistException(referenceId);
 		}
 
 		return new JobProgressResponse(progress);
 	}
 
-	@Override
-	public ServiceInstanceResponse createServiceInstance(String serviceInstanceId, ServiceInstanceRequest request, List<Map<String, Object>> extension_apis)
-					throws ServiceInstanceExistsException, ServiceBrokerException,
-					ServiceDefinitionDoesNotExistException, InvalidParametersException {
+    @Override
+    public JobProgressResponse getLastOperationById(String serviceInstanceId, String jobProgressId) throws ServiceInstanceDoesNotExistException {
+        JobProgress progress = asyncDeploymentService.getProgressById(jobProgressId);
+
+        if (progress == null || !serviceInstanceRepository.containsServiceInstanceId(serviceInstanceId)) {
+            throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
+        }
+
+        return new JobProgressResponse(progress);
+    }
+
+    @Override
+	public ServiceInstanceOperationResponse createServiceInstance(String serviceInstanceId, ServiceInstanceRequest request) throws ServiceInstanceExistsException,
+            ServiceBrokerException, ServiceDefinitionDoesNotExistException, ValidationException {
 
 		serviceDefinitionRepository.validateServiceId(request.getServiceDefinitionId());
 
@@ -76,34 +91,34 @@ public class DeploymentServiceImpl implements DeploymentService {
 		Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
 		if (request.getParameters() != null && request.getParameters().size() > 0) {
-		    try {
-                ParameterValidator.validateParameters(request, plan);
-            } catch(ProcessingException e) {
-		        throw new InvalidParametersException("Error while validating parameters");
-            }
+		    ParameterValidator.validateParameters(request, plan, false);
         }
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
 		if (platformService == null) {
 			throw new ServiceBrokerException("Not Platform configured for " + plan.getPlatform());
 		}
-		
-		if (platformService.isSyncPossibleOnCreate(plan)) {
-			return new ServiceInstanceResponse(syncCreateInstance(serviceInstance, request.getParameters(), plan, platformService), false, extension_apis);
-		} else {
-			ServiceInstanceResponse serviceInstanceResponse = new ServiceInstanceResponse(serviceInstance, true, extension_apis);
 
+        ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
+		if (platformService.isSyncPossibleOnCreate(plan)) {
+		    return serviceInstanceOperationResponse;
+		} else {
 			serviceInstanceRepository.addServiceInstance(serviceInstance.getId(), serviceInstance);
 
-			asyncDeploymentService.asyncCreateInstance(this, serviceInstance, request.getParameters(), plan, platformService);
+			String jobProgressId = randomString.nextString();
+            asyncDeploymentService.asyncCreateInstance(this, serviceInstance, request.getParameters(),
+                    plan, platformService, jobProgressId);
 
-			return serviceInstanceResponse;
+            serviceInstanceOperationResponse.setOperation(jobProgressId);
+            serviceInstanceOperationResponse.setAsync(true);
+
+            return serviceInstanceOperationResponse;
 		}
 	}
 
     @Override
-    public void updateServiceInstance(String serviceInstanceId, ServiceInstanceRequest request) throws ServiceBrokerException, ServiceInstanceDoesNotExistException,
-            ServiceDefinitionDoesNotExistException, InvalidParametersException {
+    public ServiceInstanceOperationResponse updateServiceInstance(String serviceInstanceId, ServiceInstanceUpdateRequest request) throws ServiceBrokerException,
+            ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ValidationException {
 
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
         if (serviceInstance == null) {
@@ -113,11 +128,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
         if (request.getParameters() != null && request.getParameters().size() > 0) {
-            try {
-                ParameterValidator.validateParameters(request, plan);
-            } catch(ProcessingException e) {
-                throw new InvalidParametersException("Error while validating parameters");
-            }
+                ParameterValidator.validateParameters(request, plan, true);
         }
 
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
@@ -126,15 +137,25 @@ public class DeploymentServiceImpl implements DeploymentService {
             throw new ServiceDefinitionDoesNotExistException(request.getServiceDefinitionId());
         }
 
+        ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
         if (platformService.isSyncPossibleOnCreate(plan)) {
             syncUpdateInstance(serviceInstance, request.getParameters(), plan, platformService);
         } else {
-            asyncDeploymentService.asyncUpdateInstance(this, serviceInstance, request.getParameters(), plan, platformService);
+            String jobProgressId = randomString.nextString();
+            asyncDeploymentService.asyncUpdateInstance(this, serviceInstance,
+                    request.getParameters(), plan, platformService, jobProgressId);
+
+            serviceInstanceOperationResponse.setOperation(jobProgressId);
+            serviceInstanceOperationResponse.setAsync(true);
+
+            return serviceInstanceOperationResponse;
         }
+
+        return serviceInstanceOperationResponse;
     }
 
     @Override
-    public void deleteServiceInstance(String instanceId)
+    public ServiceInstanceOperationResponse deleteServiceInstance(String instanceId)
             throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
         ServiceInstance serviceInstance;
         try {
@@ -142,29 +163,43 @@ public class DeploymentServiceImpl implements DeploymentService {
         } catch(Exception e) {
             throw new ServiceInstanceDoesNotExistException(instanceId);
         }
+
         Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
 
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
+
+        ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
         if (platformService.isSyncPossibleOnDelete(serviceInstance)) {
             syncDeleteInstance(serviceInstance, plan, platformService);
         } else {
-            asyncDeploymentService.asyncDeleteInstance(this, serviceInstance, plan, platformService);
+            String jobProgressId = randomString.nextString();
+            asyncDeploymentService.asyncDeleteInstance(this, serviceInstance, plan, platformService, jobProgressId);
+            serviceInstanceOperationResponse.setOperation(jobProgressId);
         }
+
+        return serviceInstanceOperationResponse;
     }
 
     @Override
-    public ServiceInstance fetchServiceInstance(String instanceId) throws UnsupportedOperationException, ConcurrencyErrorException, ServiceInstanceNotFoundException {
+    public ServiceInstance fetchServiceInstance(String instanceId) throws UnsupportedOperationException,
+            ConcurrencyErrorException, ServiceInstanceNotFoundException {
 
 	    ServiceInstance serviceInstance;
         try {
             serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+
+            Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
+
+            PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
+
+            platformService.getInstance(serviceInstance, plan);
         } catch (Exception e) {
             throw new ServiceInstanceNotFoundException();
         }
 
         if (jobRepository.containsJobProgress(instanceId)) {
-            JobProgress job = jobRepository.getJobProgress(instanceId);
+            JobProgress job = jobRepository.getJobProgressByReferenceId(instanceId);
             if (job.getOperation().equals(JobProgress.PROVISION) &&
                     job.getState().equals(JobProgress.IN_PROGRESS)) {
                 throw new ServiceInstanceNotFoundException();
@@ -255,6 +290,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
         jobRepository.deleteJobProgress(serviceInstance.getId());
 	}
+
 	public void updateInstanceInfo(ServiceInstance serviceInstance) {
 	    serviceInstanceRepository.updateServiceInstance(serviceInstance);
     }

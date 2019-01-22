@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConfigurationProperties(prefix = "spring.credhub")
-@ConditionalOnProperty(prefix = "spring.credhub", name = {"url", "bosh-director", "oauth2.client-id", "oauth2.client-secret", "oauth2.access-token-uri"})
+@ConditionalOnProperty(prefix = "spring.credhub", name = {"url", "bosh-director", "oauth2.client-id", "oauth2.client-secret", "oauth2.access-token-uri",
+                                                          "certificate.ca", "certificate.cert", "certificate.private-key"})
 public class CredhubBean {
 
     private String url;
@@ -17,6 +18,10 @@ public class CredhubBean {
     private String boshDirector;
 
     private Oauth2 oauth2;
+
+    private Certificate certificate;
+
+    private String keystorePassword = "";
 
     public String getUrl() {
         return url;
@@ -72,5 +77,53 @@ public class CredhubBean {
         public void setAccessTokenUri(String accessTokenUri) {
             this.accessTokenUri = accessTokenUri;
         }
+    }
+
+    public Certificate getCertificate() {
+        return certificate;
+    }
+
+    public void setCertificate(Certificate certificate) {
+        this.certificate = certificate;
+    }
+
+    public static class Certificate {
+        private String ca;
+
+        private String cert;
+
+        private String privateKey;
+
+        public String getCa() {
+            return ca;
+        }
+
+        public void setCa(String ca) {
+            this.ca = ca;
+        }
+
+        public String getCert() {
+            return cert;
+        }
+
+        public void setCert(String cert) {
+            this.cert = cert;
+        }
+
+        public String getPrivateKey() {
+            return privateKey;
+        }
+
+        public void setPrivateKey(String privateKey) {
+            this.privateKey = privateKey;
+        }
+    }
+
+    public String getKeystorePassword() {
+        return keystorePassword;
+    }
+
+    public void setKeystorePassword(String keystorePassword) {
+        this.keystorePassword = keystorePassword;
     }
 }

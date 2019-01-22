@@ -12,60 +12,57 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-/** @author Marco Di Martino */
+/**
+ * @author Marco Di Martino, Johannes Hiemer.
+ **/
 @Service
-public class AsyncBindingServiceImpl implements AsyncBindingService {
+public class AsyncBindingServiceImpl extends AsyncOperationServiceImpl implements AsyncBindingService {
 
     Logger log = LoggerFactory.getLogger(AsyncBindingServiceImpl.class);
 
     private JobProgressService jobProgressService;
 
     public AsyncBindingServiceImpl(JobProgressService jobProgressService) {
+        super(jobProgressService);
         this.jobProgressService= jobProgressService;
     }
 
     @Async
     @Override
-    public ServiceInstanceBindingResponse asyncCreateServiceInstanceBinding(BindingServiceImpl bindingService, String bindingId, ServiceInstance serviceInstance,
-                                                                            ServiceInstanceBindingRequest serviceInstanceBindingRequest, Plan plan, boolean async)  {
-        jobProgressService.startJob(bindingId, "Start creating binding..", JobProgress.BIND);
+    public void asyncCreateServiceInstanceBinding(BindingServiceImpl bindingService, String bindingId,
+                    ServiceInstance serviceInstance, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
+                    Plan plan, boolean async, String jobProgressId)  {
+        JobProgress jobProgress = jobProgressService.startJob(jobProgressId, bindingId,
+                "Creating binding..", JobProgress.BIND);
         ServiceInstanceBindingResponse response;
         try {
-            response = bindingService.syncCreateBinding(bindingId, serviceInstance, serviceInstanceBindingRequest, plan, async);
+            response = bindingService.syncCreateBinding(bindingId, serviceInstance, serviceInstanceBindingRequest, plan);
         } catch (Exception e) {
-            jobProgressService.failJob(bindingId,
+            jobProgressService.failJob(jobProgress.getId(),
                     "Internal error during binding creation, please contact our support.");
 
             log.error("Exception during Binding creation", e);
-            return null;
+            return;
         }
-        jobProgressService.succeedProgress(bindingId, "Instance Binding successfully created");
-        return response;
+        jobProgressService.succeedProgress(jobProgress.getId(), "Instance Binding successfully created");
     }
 
     @Async
     @Override
     public void asyncDeleteServiceInstanceBinding(BindingServiceImpl bindingServiceImpl, String bindingId,
-                                                  ServiceInstance serviceInstance, Plan plan) {
-        jobProgressService.startJob(bindingId, "Start deleting binding..", JobProgress.UNBIND);
+                                                  ServiceInstance serviceInstance, Plan plan, String jobProgressId) {
+        JobProgress jobProgress = jobProgressService.startJob(jobProgressId, bindingId,
+                "Deleting binding..", JobProgress.UNBIND);
         try {
             bindingServiceImpl.syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
 
         } catch (Exception e) {
-            jobProgressService.failJob(serviceInstance,
+            jobProgressService.failJob(jobProgress.getId(),
                     "Internal error during binding deletion, please contact our support.");
 
             log.error("Exception during binding deletion", e);
             return;
         }
     }
-    
-    public JobProgress getProgress(String bindingId){
-        try {
-            return jobProgressService.getProgress(bindingId);
-        } catch (Exception e) {
-            log.error("Error during job progress retrieval", e);
-            return new JobProgress(JobProgress.UNKNOWN, JobProgress.UNKNOWN, "Error during job progress retrieval");
-        }
-    }
+
 }
