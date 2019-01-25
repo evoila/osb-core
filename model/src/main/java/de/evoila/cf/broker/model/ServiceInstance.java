@@ -14,11 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An instance of a ServiceDefinition.
- * 
- * @author sgreenberg@gopivotal.com
- * @author Johannes Hiemer.
- *
+ * @author sgreenberg@gopivotal.com, Johannes Hiemer.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
@@ -92,8 +88,7 @@ public class ServiceInstance implements BaseEntity<String> {
 	private List<User> users = new ArrayList<>();
 
 	@SuppressWarnings("unused")
-	private ServiceInstance() {
-	}
+	private ServiceInstance() {}
 
 	public ServiceInstance(String id, String serviceDefinitionId, String planId, String organizationGuid,
 			String spaceGuid, Map<String, Object> parameters, String dashboardUrl) {
@@ -206,7 +201,7 @@ public class ServiceInstance implements BaseEntity<String> {
 		return parameters;
 	}
 
-	private void setParameters(Map<String, Object> parameters) {
+	public void setParameters(Map<String, Object> parameters) {
 		this.parameters = new HashMap<>(parameters);
 	}
 
@@ -231,7 +226,7 @@ public class ServiceInstance implements BaseEntity<String> {
 	}
 
 	public void setContext(Map<String, String> context) {
-		this.context = new HashMap<String, String>(context);
+		this.context = new HashMap<>(context);
 	}
 
 	/**

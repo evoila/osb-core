@@ -1,15 +1,15 @@
 {
-    "id": "8d9f736e-4f49-4784-afdd-c155cae88eec",
-    "name": "s",
-    "description": "An invalid test plan",
-    "metadata" : {
-    "instanceGroupConfig" : [ ],
-    "customParameters" : { }
+  "id": "8d9f736e-4f49-4784-afdd-c155cae88eec",
+  "name": "s",
+  "description": "An invalid test plan",
+  "metadata": {
+    "instanceGroupConfig": [],
+    "customParameters": {}
+  },
+  "free": false,
+  "schemas": {
+    "service_instance": {
     },
-    "free": false,
-    "schemas": {
-        "service_instance": {
-        },
-        "service_binding": null
-    }
+    "service_binding": null
+  }
 }

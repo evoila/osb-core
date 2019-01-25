@@ -1,6 +1,8 @@
 package de.evoila.cf.broker.bean;
 
-/** @author Johannes Hiemer */
+/**
+ * @author Johannes Hiemer
+ **/
 public class BaseAuthenticationConfiguration {
 
     private String username;
