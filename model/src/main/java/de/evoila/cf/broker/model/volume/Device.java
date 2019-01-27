@@ -3,7 +3,7 @@ package de.evoila.cf.broker.model.volume;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Created by jannikheyl on 13.02.18.
+ * @author Jannik Heyl.
  */
 public class Device {
 
