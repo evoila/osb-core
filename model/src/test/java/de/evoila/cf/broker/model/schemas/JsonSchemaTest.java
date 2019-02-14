@@ -111,10 +111,9 @@ public class JsonSchemaTest {
 		assertFalse("Initial JSON and generated JSON should be unequal but are equal.", testPlanFromJson(file, false));
 	}
 	
-	/*
-	 * This methos checks for equality of two json Strings!
-	 * Hence changes in order of the json elements, although correct, will throw off this test.
-	 * Be aware of that, when using the test on other files.
+	/**
+	 * This method uses the JSONCompare class with the {@linkplain JSONCompareMode#NON_EXTENSIBLE}.
+	 * Therefore additional fields will cause the test to fail.
 	 */
 	public boolean testPlanFromJson(File file, boolean expectsEqual) throws IOException, JSONException {
 		ObjectMapper mapper = new ObjectMapper();
@@ -129,7 +128,7 @@ public class JsonSchemaTest {
                 .writeValueAsString(p));
 
         JSONCompareResult result =
-                JSONCompare.compareJSON(expected.toString(), value.toString(), JSONCompareMode.STRICT);
+                JSONCompare.compareJSON(expected.toString(), value.toString(), JSONCompareMode.NON_EXTENSIBLE);
 
         boolean equal = expected.equals(value);
 		if (expectsEqual && result.failed()) {
