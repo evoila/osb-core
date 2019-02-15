@@ -91,6 +91,13 @@
             <groupId>com.github.everit-org.json-schema</groupId>
             <artifactId>org.everit.json.schema</artifactId>
             <version>1.10.0</version>
+            <!--
+            Needs following repository to be defined in the root pom:
+            <repository>
+                <id>jitpack.io</id>
+                <url>https://jitpack.io</url>
+            </repository>
+            -->
         </dependency>
 		<dependency>
 			<groupId>de.evoila.cf.broker</groupId>
