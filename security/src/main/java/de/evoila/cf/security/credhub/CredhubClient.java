@@ -1,13 +1,12 @@
 package de.evoila.cf.security.credhub;
 
-
 import de.evoila.cf.broker.bean.CredhubBean;
 import de.evoila.cf.broker.model.EnvironmentUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.env.Environment;
-import org.springframework.credhub.core.CredHubTemplate;
+import org.springframework.credhub.core.CredHubOperations;
 import org.springframework.credhub.support.CredentialDetails;
 import org.springframework.credhub.support.SimpleCredentialName;
 import org.springframework.credhub.support.certificate.CertificateCredential;
@@ -22,16 +21,8 @@ import org.springframework.credhub.support.user.UserCredential;
 import org.springframework.credhub.support.user.UserParametersRequest;
 import org.springframework.stereotype.Service;
 
-import javax.naming.ConfigurationException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.Map;
 
-/**
- * Created by reneschollmeyer, evoila on 24.10.18.
- */
 @Service
 @ConditionalOnBean(CredhubBean.class)
 public class CredhubClient {
@@ -40,32 +31,23 @@ public class CredhubClient {
 
     private CredhubBean credhubBean;
 
-    private CredHubTemplate credHubTemplate;
+    private CredHubOperations credHubTemplate;
 
     private Environment environment;
 
-    private CredhubConnection credhubConnection;
 
     private static String SERVICE_BROKER_PREFIX = "sb-";
 
-    public CredhubClient(CredhubBean credhubBean, Environment environment, CredhubConnection credhubConnection) {
+    public CredhubClient(CredhubBean credhubBean, Environment environment, CredHubOperations credHubTemplate) {
         this.credhubBean = credhubBean;
         this.environment = environment;
+        this.credHubTemplate=credHubTemplate;
 
         if (EnvironmentUtils.isTestEnvironment(environment)) {
             SERVICE_BROKER_PREFIX += "test-";
         }
-
-        try {
-            this.credHubTemplate = credhubConnection.createCredhubTemplate();
-        } catch (KeyStoreException | NoSuchAlgorithmException | ConfigurationException | UnrecoverableKeyException | KeyManagementException e) {
-            log.error(e.getMessage());
-        }
-
-        if (this.credHubTemplate != null) {
-            log.info("Successfully establihsed a connection to Credhub.");
-        }
     }
+
 
     public void createUser(String instanceId, String valueName, String username) {
         createUser(instanceId, valueName, username, 40);
