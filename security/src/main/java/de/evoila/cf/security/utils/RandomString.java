@@ -1,4 +1,4 @@
-package de.evoila.cf.broker.util;
+package de.evoila.cf.security.utils;
 
 import java.security.SecureRandom;
 import java.util.Locale;
@@ -8,7 +8,6 @@ import java.util.Random;
 /**
  * @author Johannes Hiemer-
  */
-@Deprecated
 public class RandomString {
 
     /**
