@@ -130,9 +130,9 @@ public class CredhubClient {
         return password.getValue();
     }
 
-    public String getPassword(String instanceId, String valueName) {
+    public PasswordCredential getPassword(String instanceId, String valueName) {
         CredentialDetails<PasswordCredential> password = credHubTemplate.credentials().getByName(new SimpleCredentialName(credhubBean.getBoshDirector(), SERVICE_BROKER_PREFIX + instanceId, valueName), PasswordCredential.class);
-        return password.getValue().getPassword();
+        return password.getValue();
     }
 
     /**
