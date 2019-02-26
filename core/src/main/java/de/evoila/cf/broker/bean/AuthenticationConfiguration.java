@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.evoila.cf.broker.bean;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -12,5 +9,5 @@ import org.springframework.context.annotation.Profile;
  **/
 @Configuration
 @Profile("!pcf")
-@ConfigurationProperties(prefix="login")
+@ConfigurationProperties(prefix = "login")
 public class AuthenticationConfiguration extends BaseAuthenticationConfiguration {}

@@ -7,7 +7,7 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-cert.pem
+certificate.pem
 key.pem
 ca.pem
 */bin

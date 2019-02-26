@@ -1,4 +1,4 @@
-package de.evoila.cf.security.credhub;
+package de.evoila.cf.security.credentials.credhub;
 
 import de.evoila.cf.broker.bean.CredhubBean;
 import de.evoila.cf.security.keystore.KeyStoreHandler;
@@ -28,9 +28,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.util.Arrays;
 
-
 /**
- * Created by reneschollmeyer, evoila on 15.11.18.
+ * @author Rene Schollmeyer.
  */
 @Service
 @ConditionalOnBean(CredhubBean.class)
@@ -47,13 +46,14 @@ public class CredhubConnection {
         this.keyStoreHandler = new KeyStoreHandler();
     }
 
-    public CredHubTemplate createCredhubTemplate() throws KeyStoreException, NoSuchAlgorithmException, ConfigurationException, UnrecoverableKeyException, KeyManagementException {
+    public CredHubTemplate createCredhubTemplate() throws KeyStoreException, NoSuchAlgorithmException,
+            ConfigurationException, UnrecoverableKeyException, KeyManagementException {
 
         SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(
                 new SSLContextBuilder()
                     .loadTrustMaterial(null, new TrustSelfSignedStrategy())
                     .loadKeyMaterial(keyStoreHandler.getKeyStore(
-                            credhubBean.getCertificate().getCert(),
+                            credhubBean.getCertificate().getCertificate(),
                             credhubBean.getCertificate().getPrivateKey(),
                             credhubBean.getCertificate().getCa(),
                             credhubBean.getKeystorePassword()), credhubBean.getKeystorePassword().toCharArray())

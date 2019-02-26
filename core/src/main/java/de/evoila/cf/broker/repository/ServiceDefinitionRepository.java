@@ -7,30 +7,15 @@ import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import java.util.List;
 
 /**
- * @author Christian Brinker & Johannes Hiemer, evoila.
+ * @author Christian Brinker, Johannes Hiemer.
  *
  */
 public interface ServiceDefinitionRepository {
 
-    /**
-     *
-     * @return ServiceDefinition
-     */
 	List<ServiceDefinition> getServiceDefinition();
 
-    /**
-     *
-     * @param serviceDefinitionId
-     * @throws ServiceDefinitionDoesNotExistException
-     */
 	void validateServiceId(String serviceDefinitionId) throws ServiceDefinitionDoesNotExistException;
 
-    /**
-     *
-     * @param planId
-     * @return Plan
-     * @throws ServiceDefinitionDoesNotExistException
-     */
 	Plan getPlan(String planId) throws ServiceDefinitionDoesNotExistException;
 
 }
