@@ -279,9 +279,9 @@ public class CredhubClient implements CredentialStore {
 
         CredentialDetails<CertificateCredential> certificate = credHubTemplate.credentials().generate(request);
 
-        return new CertificateCredential(certificate.getValue().getCertificateAuthority(),
-                certificate.getValue().getCertificate(),
-                certificate.getValue().getPrivateKey());
+        return new CertificateCredential(buildManifestPlaceHolder(valueName + ".ca"),
+                buildManifestPlaceHolder(valueName + ".certificate"),
+                buildManifestPlaceHolder(valueName + ".private_key"));
     }
 
     @Override
