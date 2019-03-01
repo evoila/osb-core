@@ -23,7 +23,7 @@ import java.util.List;
 /** @author Marco Di Martino
  *
  * This class is used to customize the response body of the ServiceInstanceBindingResponse to provide information about
- * the user the request the binding in the json response. The Controller Advice will look for the annotation
+ * the user that request the binding in the json response. The Controller Advice will look for the annotation
  * @ResponseAdvice: if the annotation is present in the method called, the advice will be supported.
  * The information about the user will be fetched from the Originating-Identity header, if provided in the request.
  * */

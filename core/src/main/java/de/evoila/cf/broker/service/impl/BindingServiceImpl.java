@@ -14,10 +14,7 @@ import de.evoila.cf.broker.repository.RouteBindingRepository;
 import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.repository.*;
-import de.evoila.cf.broker.service.AsyncBindingService;
-import de.evoila.cf.broker.service.BindingService;
-import de.evoila.cf.broker.service.HAProxyService;
-import de.evoila.cf.broker.service.PlatformService;
+import de.evoila.cf.broker.service.*;
 import de.evoila.cf.broker.util.ParameterValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,11 +47,13 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	protected PlatformRepository platformRepository;
 
+	protected CatalogService catalogService;
+
 
 	public BindingServiceImpl(BindingRepository bindingRepository, ServiceDefinitionRepository serviceDefinitionRepository,
 							  ServiceInstanceRepository serviceInstanceRepository, RouteBindingRepository routeBindingRepository,
 							  HAProxyService haProxyService, JobRepository jobRepository, AsyncBindingService asyncBindingService,
-							  PlatformRepository platformRepository) {
+							  PlatformRepository platformRepository, CatalogService catalogService) {
 		this.bindingRepository = bindingRepository;
 		this.serviceDefinitionRepository = serviceDefinitionRepository;
 		this.serviceInstanceRepository = serviceInstanceRepository;
@@ -63,13 +62,14 @@ public abstract class BindingServiceImpl implements BindingService {
 		this.jobRepository = jobRepository;
 		this.asyncBindingService = asyncBindingService;
 		this.platformRepository = platformRepository;
+		this.catalogService = catalogService;
 	}
 
 	@Override
 	public ServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
-			ServiceInstanceBindingRequest serviceInstanceBindingRequest, boolean async) throws ServiceInstanceBindingExistsException,
+																	   ServiceInstanceBindingRequest serviceInstanceBindingRequest, boolean async) throws ServiceInstanceBindingExistsException,
 			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException,
-			InvalidParametersException, AsyncRequiredException, PlatformException {
+			InvalidParametersException, AsyncRequiredException {
 
 		validateBindingNotExists(bindingId, instanceId);
 
@@ -85,7 +85,7 @@ public abstract class BindingServiceImpl implements BindingService {
 			try {
 				ParameterValidator.validateParameters(serviceInstanceBindingRequest, plan);
 			} catch(ProcessingException e) {
-			throw new InvalidParametersException("Error while validating parameters");
+				throw new InvalidParametersException("Error while validating parameters");
 			}
 		}
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
@@ -166,7 +166,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	public ServiceInstanceBindingResponse syncCreateBinding(String bindingId, ServiceInstance serviceInstance, ServiceInstanceBindingRequest serviceInstanceBindingRequest, Plan plan, boolean async)
-			throws ServiceBrokerException, InvalidParametersException, PlatformException {
+			throws ServiceBrokerException, InvalidParametersException {
 		String instanceId = serviceInstance.getId();
 
 		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
@@ -180,20 +180,24 @@ public abstract class BindingServiceImpl implements BindingService {
 
 		ServiceInstanceBinding binding;
 		if (haProxyService != null && serviceInstanceBindingRequest.getAppGuid() == null &&
-					(serviceInstanceBindingRequest.getBindResource() != null && serviceInstanceBindingRequest.getBindResource().getAppGuid() == null)) {
+				(serviceInstanceBindingRequest.getBindResource() != null && serviceInstanceBindingRequest.getBindResource().getAppGuid() == null)) {
 			List<ServerAddress> externalServerAddresses = haProxyService.appendAgent(serviceInstance.getHosts(), bindingId, instanceId);
 
 			binding = bindServiceKey(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalServerAddresses);
 		} else {
 			binding = bindService(bindingId, serviceInstanceBindingRequest, serviceInstance, plan);
 		}
-
+		if ((catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isSensitive())) {
+			binding.getCredentials().remove("username");
+			binding.getCredentials().remove("password");
+			binding.getCredentials().remove("uri");
+		}
 		bindingRepository.addInternalBinding(binding);
 
 		return new ServiceInstanceBindingResponse(binding, async);
 	}
 
-	public void syncDeleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance, Plan plan) {
+	public void syncDeleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance, Plan plan){
 		try {
 			ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
 			List<ServerAddress> externalServerAddresses = binding.getExternalServerAddresses();
@@ -202,7 +206,7 @@ public abstract class BindingServiceImpl implements BindingService {
 			}
 
 			unbindService(binding, serviceInstance, plan);
-		} catch (ServiceBrokerException | PlatformException e) {
+		} catch (ServiceBrokerException e) {
 			log.error("Could not cleanup service binding", e);
 		} finally {
 			bindingRepository.unbindService(bindingId);
@@ -222,7 +226,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                    ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException, InvalidParametersException, PlatformException {
+													ServiceInstance serviceInstance, Plan plan, List<ServerAddress> externalAddresses) throws ServiceBrokerException, InvalidParametersException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalAddresses.get(0));
 
 		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
@@ -232,43 +236,43 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException, PlatformException {
+												 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
 
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
 	}
 
-    protected abstract void unbindService(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
-            throws ServiceBrokerException, PlatformException;
+	protected abstract void unbindService(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
+			throws ServiceBrokerException;
 
 	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                             ServiceInstance serviceInstance, Plan plan, ServerAddress serverAddress) throws ServiceBrokerException, InvalidParametersException, PlatformException;
+															 ServiceInstance serviceInstance, Plan plan, ServerAddress serverAddress) throws ServiceBrokerException, InvalidParametersException;
 
-    protected void validateBindingNotExists(String bindingId, String instanceId)
-            throws ServiceInstanceBindingExistsException {
+	protected void validateBindingNotExists(String bindingId, String instanceId)
+			throws ServiceInstanceBindingExistsException {
 
-    	boolean bindCreation;
+		boolean bindCreation;
 		boolean isBindingInProgress;
 
 		if (bindingRepository.containsInternalBindingId(bindingId)) {
-    		try {
-    			bindCreation = jobRepository.getJobProgress(bindingId).getOperation().equals(JobProgress.BIND);
-    			isBindingInProgress = jobRepository.getJobProgress(bindingId).getDescription().equals(JobProgress.IN_PROGRESS);
-			 } catch (NoSuchElementException e) {
-    			return;
+			try {
+				bindCreation = jobRepository.getJobProgress(bindingId).getOperation().equals(JobProgress.BIND);
+				isBindingInProgress = jobRepository.getJobProgress(bindingId).getDescription().equals(JobProgress.IN_PROGRESS);
+			} catch (NoSuchElementException e) {
+				return;
 			}
-    		if (bindCreation && !isBindingInProgress)
-            	throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
-        }
-    }
+			if (bindCreation && !isBindingInProgress)
+				throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
+		}
+	}
 
-    public ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException{
-    	ServiceInstance serviceInstance;
-    	try {
-    		serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+	public ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException{
+		ServiceInstance serviceInstance;
+		try {
+			serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
 		} catch(Exception e) {
-    		throw new ServiceInstanceDoesNotExistException(instanceId);
+			throw new ServiceInstanceDoesNotExistException(instanceId);
 		}
 		return serviceInstance;
-    }
+	}
 }
