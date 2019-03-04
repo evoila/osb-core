@@ -206,8 +206,8 @@ public class CredhubClient implements CredentialStore {
 
     @Override
     public String getPassword(String instanceId, String valueName) {
-        CredentialDetails<PasswordCredential> password = credHubTemplate.credentials()
-                .getByName(this.identifier(instanceId, valueName), PasswordCredential.class);
+        CredentialDetails<org.springframework.credhub.support.password.PasswordCredential> password = credHubTemplate.credentials()
+                .getByName(this.identifier(instanceId, valueName), org.springframework.credhub.support.password.PasswordCredential.class);
         return password.getValue().getPassword();
     }
 
