@@ -3,6 +3,7 @@ package de.evoila.cf.broker.model;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -17,6 +18,7 @@ import java.util.Map;
  * @author Johannes Hiemer.
  * @author Christian Brinker, evoila.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class ServiceInstanceResponse {
 
@@ -29,7 +31,7 @@ public class ServiceInstanceResponse {
 
 	@JsonSerialize
 	@JsonProperty("extension_apis")
-	private List<Map<String, Object>> extension_apis;
+	private List<Map<String, Object>> extensionApis;
 
 	@JsonSerialize
 	@JsonProperty("service_id")
@@ -46,10 +48,10 @@ public class ServiceInstanceResponse {
 	public ServiceInstanceResponse() {
 	}
 
-	public ServiceInstanceResponse(ServiceInstance serviceInstance, boolean isAsync, List<Map<String, Object>> extension_apis) {
+	public ServiceInstanceResponse(ServiceInstance serviceInstance, boolean isAsync, List<Map<String, Object>> extensionApis) {
 		this.dashboardUrl = serviceInstance.getDashboardUrl();
 		this.isAsync = true;
-		this.extension_apis = extension_apis;
+		this.extensionApis = extensionApis;
 		this.parameters = serviceInstance.getParameters();
 		this.planId = serviceInstance.getPlanId();
 		this.serviceId = serviceInstance.getServiceDefinitionId();
@@ -80,11 +82,11 @@ public class ServiceInstanceResponse {
 		return isAsync;
 	}
 
-	public List<Map<String, Object>> getExtension_apis() {
-		return extension_apis;
+	public List<Map<String, Object>> getExtensionApis() {
+		return extensionApis;
 	}
 
-	public void setExtension_apis(List<Map<String, Object>> extension_apis) {
-		this.extension_apis = extension_apis;
+	public void setExtensionApis(List<Map<String, Object>> extensionApis) {
+		this.extensionApis = extensionApis;
 	}
 }

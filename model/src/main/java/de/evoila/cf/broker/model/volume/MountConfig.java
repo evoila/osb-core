@@ -3,10 +3,12 @@ package de.evoila.cf.broker.model.volume;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Created by jannikheyl on 13.02.18.
+ * @author Jannik Heyl.
  */
 public class MountConfig {
+
     private String uid;
+
     private String gid;
 
     @JsonProperty("file_mode")
@@ -16,8 +18,11 @@ public class MountConfig {
     private String dirMode; // gibes permissions on directory eg 666
 
     private String username;
+
     private String password;
+
     private String source;
+
     private String target;
 
     public MountConfig() {}
