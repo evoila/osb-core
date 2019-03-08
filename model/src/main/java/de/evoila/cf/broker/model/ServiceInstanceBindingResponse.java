@@ -2,7 +2,6 @@ package de.evoila.cf.broker.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -12,13 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The response sent to the cloud controller when a bind request is successful.
- * 
- * @author sgreenberg@gopivotal.com
- * @author Johannes Hiemer.
+ * @author sgreenberg@gopivotal.com, Johannes Hiemer.
  */
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
-public class ServiceInstanceBindingResponse {
+public class ServiceInstanceBindingResponse extends BaseServiceInstanceBindingResponse {
 
 	private Map<String, Object> credentials;
 
@@ -38,35 +34,23 @@ public class ServiceInstanceBindingResponse {
 	}
 
 	public ServiceInstanceBindingResponse(Map<String, Object> credentials, String syslogDrainUrl) {
+        this.async = false;
 		this.credentials = credentials;
 		this.syslogDrainUrl = syslogDrainUrl;
 	}
 
-	public ServiceInstanceBindingResponse(String routeServiceUrl, boolean isAsync) {
+	public ServiceInstanceBindingResponse(String routeServiceUrl) {
 		this.setRouteServiceUrl(routeServiceUrl);
-		this.isAsync = isAsync;
+		this.async = false;
 	}
 
 	public ServiceInstanceBindingResponse(ServiceInstanceBinding binding) {
+        this.async = false;
 		this.credentials = binding.getCredentials();
 		this.syslogDrainUrl = binding.getSyslogDrainUrl();
 		if (binding.getVolumeMounts() != null && binding.getVolumeMounts().size() > 0) {
 			this.volumeMounts = binding.getVolumeMounts();
 		}
-	}
-
-	public ServiceInstanceBindingResponse(ServiceInstanceBinding binding, boolean isAsync) {
-		this(binding);
-		this.isAsync = isAsync;
-	}
-
-	public ServiceInstanceBindingResponse(boolean isAsync) {
-		this.isAsync = isAsync;
-	}
-
-	@JsonIgnore
-	public boolean isAsync() {
-		return isAsync;
 	}
 
 	@JsonSerialize

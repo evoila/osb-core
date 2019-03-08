@@ -21,11 +21,12 @@ import java.security.spec.RSAPrivateCrtKeySpec;
 import java.util.Base64;
 
 /**
- * Created by reneschollmeyer, evoila on 21.11.18.
+ * @author Rene Schollmeyer.
  */
 public class KeyStoreHandler {
 
-    public KeyStore getKeyStore(String unformattedClientCertificate, String unformattedPrivateKey, String unformattedCaCertificate, String keyStorePassword) throws ConfigurationException {
+    public KeyStore getKeyStore(String unformattedClientCertificate, String unformattedPrivateKey, String unformattedCaCertificate,
+                                String keyStorePassword) throws ConfigurationException {
         try {
             Certificate clientCertificate = loadCertificate(unformattedClientCertificate);
             PrivateKey privateKey = loadPrivateKey(unformattedPrivateKey);

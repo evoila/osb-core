@@ -36,6 +36,9 @@ public class CatalogServiceImpl implements CatalogService {
 		this.catalog = catalog;
 		this.environment = environment;
 		this.endpointConfiguration = endpointConfiguration;
+
+		filterActivePlans(catalog);
+
 		prepareCatalogIfTesting(catalog);
 	}
 
@@ -121,6 +124,17 @@ public class CatalogServiceImpl implements CatalogService {
 		}
 
 		return urlStr;
+	}
+
+	public void filterActivePlans(Catalog catalog) {
+		catalog.getServices().stream().forEach(serviceDefinition ->
+		{
+			serviceDefinition.setPlans(
+					serviceDefinition.getPlans().stream().filter(plan ->
+					{
+						return plan.getMetadata().isActive();
+					}).collect(Collectors.toList()));
+		});
 	}
 
 }

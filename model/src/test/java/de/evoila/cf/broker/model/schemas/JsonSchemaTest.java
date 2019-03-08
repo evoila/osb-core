@@ -1,19 +1,5 @@
 package de.evoila.cf.broker.model.schemas;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,8 +9,23 @@ import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
-
 import de.evoila.cf.broker.model.catalog.plan.Plan;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONCompare;
+import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.skyscreamer.jsonassert.JSONCompareResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This Test class checks for simple equality between the given initial json and the generated one, 
@@ -32,9 +33,9 @@ import de.evoila.cf.broker.model.catalog.plan.Plan;
  * @author Marius Berger
  *
  */
-public class SuperficialJsonSchemaTest {
+public class JsonSchemaTest {
 	
-	private Logger log = LoggerFactory.getLogger(SuperficialJsonSchemaTest.class);
+	private Logger log = LoggerFactory.getLogger(JsonSchemaTest.class);
 	
 	
 	private static final String PATH_SCHEMA_VALID_1 = "." + File.separator + "src" + File.separator + "test"
@@ -119,17 +120,21 @@ public class SuperficialJsonSchemaTest {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		parsableJSON(jsonFromFile(file));
+
 		Plan p = mapper.readValue(file, Plan.class);
-		JsonNode node = mapper.readTree(file);
-		String initialJSON = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapper.readValue(node.toString(), Object.class));
-		String afterDeserialization = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(p);
-		boolean equal = initialJSON.equals(afterDeserialization);
-		if (expectsEqual && !equal) {
+
+		JsonNode expected = mapper.readTree(file);
+        JsonNode value = mapper.readTree(mapper
+                .writerWithDefaultPrettyPrinter()
+                .writeValueAsString(p));
+
+        JSONCompareResult result =
+                JSONCompare.compareJSON(expected.toString(), value.toString(), JSONCompareMode.STRICT);
+
+        boolean equal = expected.equals(value);
+		if (expectsEqual && result.failed()) {
 			log.debug("Encountered a test violating result, therefore logging both JSONs");
-			log.debug("Initial JSON from file " + file.getAbsolutePath() + ": " + System.lineSeparator() + initialJSON);
-			log.debug("JSON generated from Java objects after deserialization: " + System.lineSeparator() + afterDeserialization);
-			log.debug("Logging the initial json until the first mismatch is detected between the two:"+System.lineSeparator());
-			log.debug(initialJSON.substring(0, getIndexUntilFirstMismatch(initialJSON, afterDeserialization)));
+			log.debug(result.toString());
 		}
 		return equal;
 	}

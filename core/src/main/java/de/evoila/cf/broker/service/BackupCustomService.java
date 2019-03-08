@@ -6,6 +6,9 @@ import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 
 import java.util.Map;
 
+/**
+ * @author Johannes Hiemer.
+ */
 public interface BackupCustomService {
 
     /**
@@ -18,6 +21,4 @@ public interface BackupCustomService {
     Map<String, String> getItems(String serviceInstanceId) throws ServiceInstanceDoesNotExistException,
             ServiceDefinitionDoesNotExistException, ServiceBrokerException;
 
-    void createItem(String serviceInstanceId, String name, Map<String, Object> parameters) throws ServiceInstanceDoesNotExistException,
-            ServiceDefinitionDoesNotExistException, ServiceBrokerException;
 }

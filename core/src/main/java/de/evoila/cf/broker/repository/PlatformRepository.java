@@ -5,7 +5,6 @@ import de.evoila.cf.broker.service.PlatformService;
 
 /**
  * @author Christian Brinker, Johannes Hiemer.
- *
  */
 public interface PlatformRepository {
 

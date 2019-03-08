@@ -1,7 +1,7 @@
 package de.evoila.cf.broker.model;
 
 /**
- * Created by reneschollmeyer, evoila on 21.06.18.
+ * @author Rene Schollmeyer.
  */
 public class Server {
 
@@ -9,8 +9,7 @@ public class Server {
 
     private String identifier;
 
-    public Server() {
-    }
+    public Server() {}
 
     public Server(String url, String identifier) {
         this.url = url;
