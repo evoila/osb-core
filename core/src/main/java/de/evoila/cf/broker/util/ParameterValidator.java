@@ -31,10 +31,10 @@ public class ParameterValidator {
         JsonSchema jsonSchema;
         if (!isUpdate) {
             jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getCreate().getParameters();
+                    .getServiceBinding().getCreate().getParameters();
         } else {
             jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getUpdate().getParameters();
+                    .getServiceBinding().getUpdate().getParameters();
         }
 
         validateParameters(jsonSchema, serviceInstanceRequestParams);

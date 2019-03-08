@@ -38,8 +38,9 @@ public class ServiceInstanceBindingController extends BaseController {
 	}
 
 	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
+	@PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
 	@ResponseAdvice
-	public ResponseEntity<ServiceInstanceBindingResponse> bindServiceInstance(@PathVariable("instanceId") String instanceId,
+	public ResponseEntity<BaseServiceInstanceBindingResponse> bindServiceInstance(@PathVariable("instanceId") String instanceId,
             @PathVariable("bindingId") String bindingId,
 			@RequestHeader("X-Broker-API-Version") String apiHeader,
 			@RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,

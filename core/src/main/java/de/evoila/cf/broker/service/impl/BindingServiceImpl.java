@@ -49,6 +49,8 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	protected CatalogService catalogService;
 
+	private RandomString randomString = new RandomString();
+
 
 	public BindingServiceImpl(BindingRepository bindingRepository, ServiceDefinitionRepository serviceDefinitionRepository,
 							  ServiceInstanceRepository serviceInstanceRepository, RouteBindingRepository routeBindingRepository,
@@ -238,7 +240,7 @@ public abstract class BindingServiceImpl implements BindingService {
 			}
 
 			unbindService(binding, serviceInstance, plan);
-		} catch (ServiceBrokerException | PlatformException e) {
+		} catch (ServiceBrokerException | PlatformException e) {
 			log.error("Could not cleanup service binding", e);
 		} finally {
 			bindingRepository.unbindService(bindingId);
