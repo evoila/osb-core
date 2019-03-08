@@ -11,6 +11,9 @@ import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.repository.*;
 import de.evoila.cf.broker.service.*;
+import de.evoila.cf.broker.service.AsyncBindingService;
+import de.evoila.cf.broker.service.HAProxyService;
+import de.evoila.cf.broker.service.PlatformService;
 import de.evoila.cf.broker.util.ParameterValidator;
 import de.evoila.cf.security.utils.RandomString;
 import org.everit.json.schema.ValidationException;
@@ -47,15 +50,13 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	protected PlatformRepository platformRepository;
 
-	protected CatalogService catalogService;
-
 	private RandomString randomString = new RandomString();
 
 
 	public BindingServiceImpl(BindingRepository bindingRepository, ServiceDefinitionRepository serviceDefinitionRepository,
 							  ServiceInstanceRepository serviceInstanceRepository, RouteBindingRepository routeBindingRepository,
 							  HAProxyService haProxyService, JobRepository jobRepository, AsyncBindingService asyncBindingService,
-							  PlatformRepository platformRepository, CatalogService catalogService) {
+							  PlatformRepository platformRepository) {
 		this.bindingRepository = bindingRepository;
 		this.serviceDefinitionRepository = serviceDefinitionRepository;
 		this.serviceInstanceRepository = serviceInstanceRepository;
@@ -64,7 +65,6 @@ public abstract class BindingServiceImpl implements BindingService {
 		this.jobRepository = jobRepository;
 		this.asyncBindingService = asyncBindingService;
 		this.platformRepository = platformRepository;
-		this.catalogService = catalogService;
 	}
 
 	@Override
@@ -220,11 +220,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		} else {
 			binding = bindService(bindingId, serviceInstanceBindingRequest, serviceInstance, plan);
 		}
-		if ((catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isSensitive())) {
-			binding.getCredentials().remove("username");
-			binding.getCredentials().remove("password");
-			binding.getCredentials().remove("uri");
-		}
+
 		bindingRepository.addInternalBinding(binding);
         serviceInstanceBindingResponse = new ServiceInstanceBindingResponse(binding);
 
@@ -302,7 +298,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 	}
 
-	public ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException{
+	public ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException {
 		ServiceInstance serviceInstance;
 		try {
 			serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);

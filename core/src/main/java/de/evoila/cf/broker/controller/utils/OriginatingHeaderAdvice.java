@@ -19,14 +19,12 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
-
 /** @author Marco Di Martino
- *
  * This class is used to customize the response body of the ServiceInstanceBindingResponse to provide information about
  * the user that request the binding in the json response. The Controller Advice will look for the annotation
  * @ResponseAdvice: if the annotation is present in the method called, the advice will be supported.
  * The information about the user will be fetched from the Originating-Identity header, if provided in the request.
- * */
+ */
 
 @ControllerAdvice(assignableTypes = ServiceInstanceBindingController.class)
 public class OriginatingHeaderAdvice implements ResponseBodyAdvice<ServiceInstanceBindingResponse> {
@@ -48,21 +46,25 @@ public class OriginatingHeaderAdvice implements ResponseBodyAdvice<ServiceInstan
 
         List<String> header = request.getHeaders().get(ORIGINATING_IDENTITY_HEADER);
         String headerValue;
-        if (header != null) {
 
+        if (header != null && header.size() > 0) {
             headerValue = header.get(0);
             String[] toDecode = headerValue.split(" ");
+
+            if (toDecode.length != 2) {
+                throw new RuntimeException("Bad value on Originating-Identity Header.");
+            }
 
             log.info("decoding header value " + toDecode[1]);
 
             byte[] byteValueBase64Decoded = Base64.getDecoder().decode(toDecode[1]);
-            String stringValueBase64Decoded = new String(byteValueBase64Decoded);
+            String serviceInstanceBindingResponse = new String(byteValueBase64Decoded);
 
             String userId;
             JSONObject jsonObj;
 
             try {
-                jsonObj = new JSONObject(stringValueBase64Decoded);
+                jsonObj = new JSONObject(serviceInstanceBindingResponse);
                 userId = jsonObj.getString("user_id");
             } catch (Exception E) { throw new RuntimeException("Bad value on Originating-Identity Header."); }
 

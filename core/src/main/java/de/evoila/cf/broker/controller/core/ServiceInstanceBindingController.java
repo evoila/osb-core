@@ -37,9 +37,9 @@ public class ServiceInstanceBindingController extends BaseController {
 		this.catalogService = catalogService;
 	}
 
+	@ResponseAdvice
 	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
 	@PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-	@ResponseAdvice
 	public ResponseEntity<BaseServiceInstanceBindingResponse> bindServiceInstance(@PathVariable("instanceId") String instanceId,
             @PathVariable("bindingId") String bindingId,
 			@RequestHeader("X-Broker-API-Version") String apiHeader,

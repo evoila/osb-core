@@ -188,7 +188,4 @@ public class ServiceDefinition {
 		this.instancesRetrievable = instancesRetrievable;
 	}
 
-	public boolean isSensitive() {
-		return this.getTags().contains("sensitive");
-	}
 }
