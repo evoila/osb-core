@@ -16,7 +16,13 @@ public class RandomString {
     public String nextString() {
         for (int idx = 0; idx < buf.length; ++idx)
             buf[idx] = symbols[random.nextInt(symbols.length)];
-        return new String(buf);
+
+        String randomString = new String(buf);
+
+        if (this.lowerCase)
+            return randomString.toLowerCase();
+        else
+            return randomString;
     }
 
     public static final String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -25,41 +31,45 @@ public class RandomString {
 
     public static final String digits = "0123456789";
 
-    public static final String alphanum = upper + lower + digits;
-
     private final Random random;
+
+    private boolean lowerCase;
+
+    private boolean useNumbers;
 
     private final char[] symbols;
 
     private final char[] buf;
 
-    public RandomString(int length, Random random, String symbols) {
-        if (length < 1) throw new IllegalArgumentException();
-        if (symbols.length() < 2) throw new IllegalArgumentException();
+    public RandomString(int length, Random random, boolean useNumbers, boolean lowerCase) {
+        this.lowerCase = lowerCase;
+        this.useNumbers = useNumbers;
+
+        if (length < 1)
+            throw new IllegalArgumentException();
+
+        String symbols = upper + lower;
+        if (this.useNumbers)
+            symbols = symbols + digits;
+
+        if (symbols.length() < 2)
+            throw new IllegalArgumentException();
+
         this.random = Objects.requireNonNull(random);
         this.symbols = symbols.toCharArray();
         this.buf = new char[length];
     }
 
-    /**
-     * Create an alphanumeric string generator.
-     */
-    public RandomString(int length, Random random) {
-        this(length, random, alphanum);
+    public RandomString(int length, boolean useNumbers, boolean lowerCase) {
+        this(length, new SecureRandom(), useNumbers, lowerCase);
     }
 
-    /**
-     * Create an alphanumeric strings from a secure generator.
-     */
-    public RandomString(int length) {
-        this(length, new SecureRandom());
-    }
-
-    /**
-     * Create session identifiers.
-     */
     public RandomString() {
         this(21);
+    }
+
+    public RandomString(int length) {
+        this(length, true, false);
     }
 
 }

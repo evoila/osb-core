@@ -86,7 +86,7 @@ public class CredhubClient implements CredentialStore {
 
     @Override
     public UsernamePasswordCredential createUser(String instanceId, String valueName) {
-        return this.createUser(instanceId, valueName, new RandomString(10).nextString());
+        return this.createUser(instanceId, valueName, new RandomString(10, false, true).nextString());
     }
 
     @Override

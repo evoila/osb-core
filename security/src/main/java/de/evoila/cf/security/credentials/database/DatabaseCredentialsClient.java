@@ -55,7 +55,7 @@ public class DatabaseCredentialsClient implements CredentialStore {
 
     @Override
     public UsernamePasswordCredential createUser(String instanceId, String valueName) {
-        return this.createUser(instanceId, valueName, new RandomString(10).nextString());
+        return this.createUser(instanceId, valueName, new RandomString(10, false, true).nextString());
     }
 
     @Override
@@ -80,7 +80,7 @@ public class DatabaseCredentialsClient implements CredentialStore {
         try {
             usernamePasswordCredential =
                     new UsernamePasswordCredential(identifier(instanceId, valueName),
-                            username,
+                            username.toLowerCase(),
                             cryptoUtil.encrypt(ENCRYPTION_KEY, passwordRandomString.nextString()));
             credentialRepository.save(usernamePasswordCredential);
         } catch(Exception ex) {
