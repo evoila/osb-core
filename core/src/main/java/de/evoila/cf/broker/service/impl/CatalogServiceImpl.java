@@ -1,6 +1,7 @@
 package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.bean.EndpointConfiguration;
+import de.evoila.cf.broker.interfaces.TranformCatalog;
 import de.evoila.cf.broker.model.catalog.Catalog;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.service.CatalogService;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -32,12 +34,15 @@ public class CatalogServiceImpl implements CatalogService {
 
 	private EndpointConfiguration endpointConfiguration;
 
-	public CatalogServiceImpl(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration) {
+	public CatalogServiceImpl(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration, List<TranformCatalog> tranformCatalog) {
 		this.catalog = catalog;
 		this.environment = environment;
 		this.endpointConfiguration = endpointConfiguration;
 
+
 		filterActivePlans(catalog);
+		tranformCatalog.forEach( e -> e.tranform(catalog, environment, endpointConfiguration));
+		tranformCatalog.forEach( e -> e.clean(catalog, environment, endpointConfiguration));
 
 		prepareCatalogIfTesting(catalog);
 	}
