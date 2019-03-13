@@ -8,6 +8,7 @@ import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.model.GlobalConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -34,16 +35,17 @@ public class CatalogServiceImpl implements CatalogService {
 
 	private EndpointConfiguration endpointConfiguration;
 
-	public CatalogServiceImpl(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration, List<TranformCatalog> tranformCatalog) {
+	public CatalogServiceImpl(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration, @Autowired(required = false ) List<TranformCatalog> tranformCatalog) {
 		this.catalog = catalog;
 		this.environment = environment;
 		this.endpointConfiguration = endpointConfiguration;
 
 
 		filterActivePlans(catalog);
-		tranformCatalog.forEach( e -> e.tranform(catalog, environment, endpointConfiguration));
-		tranformCatalog.forEach( e -> e.clean(catalog, environment, endpointConfiguration));
-
+		if (tranformCatalog != null) {
+			tranformCatalog.forEach(e -> e.tranform(catalog, environment, endpointConfiguration));
+			tranformCatalog.forEach(e -> e.clean(catalog, environment, endpointConfiguration));
+		}
 		prepareCatalogIfTesting(catalog);
 	}
 
