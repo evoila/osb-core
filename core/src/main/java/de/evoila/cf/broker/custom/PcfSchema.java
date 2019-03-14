@@ -17,13 +17,14 @@ import java.util.Map;
 
 
 /**
- * @author Patrick Weber
+ * @author Patrick Weber.
  */
-
 @Component
 @Profile("pcf")
 @Order(20)
 public class PcfSchema implements TranformCatalog {
+
+    private final String SCHEMA_JSON = "schemajson";
 
     private ObjectMapper objectMapper;
 
@@ -34,7 +35,6 @@ public class PcfSchema implements TranformCatalog {
     @Override
     public void tranform(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration) {
         catalog.getServices().forEach(s -> s.getPlans().forEach(this::convert));
-
     }
 
     @Override
@@ -44,8 +44,8 @@ public class PcfSchema implements TranformCatalog {
 
     private void convert(Plan plan){
         Map<String, Object> customParameter = plan.getMetadata().getCustomParameters();
-        if (customParameter.containsKey("schemajson")) {
-            String tsParam = (String) customParameter.get("schemajson");
+        if (customParameter.containsKey(SCHEMA_JSON)) {
+            String tsParam = (String) customParameter.get(SCHEMA_JSON);
             try {
                 plan.setSchemas(objectMapper.readValue(tsParam, Schemas.class));
             } catch (IOException e) {
@@ -56,6 +56,6 @@ public class PcfSchema implements TranformCatalog {
 
     private void cleanJson(Plan plan){
         Map<String, Object> customParameter = plan.getMetadata().getCustomParameters();
-        customParameter.remove("schemajson");
+        customParameter.remove(SCHEMA_JSON);
     }
 }
