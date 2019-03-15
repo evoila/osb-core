@@ -44,7 +44,10 @@ public class OriginatingHeaderAdvice implements ResponseBodyAdvice<ServiceInstan
     public ServiceInstanceBindingResponse beforeBodyWrite(ServiceInstanceBindingResponse body, MethodParameter returnType, MediaType selectedContentType, Class<? extends
             HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
 
-        List<String> header = request.getHeaders().get(ORIGINATING_IDENTITY_HEADER);
+        List<String> header = null;
+        if (request.getHeaders() != null && request.getHeaders().containsKey(ORIGINATING_IDENTITY_HEADER)) {
+            header = request.getHeaders().get(ORIGINATING_IDENTITY_HEADER);
+        }
         String headerValue;
 
         if (header != null && header.size() > 0) {
