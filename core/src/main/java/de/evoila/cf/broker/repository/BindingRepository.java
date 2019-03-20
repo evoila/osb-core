@@ -6,7 +6,6 @@ import java.util.List;
 
 /**
  * @author Christian Brinker, Johannes Hiemer.
- *
  */
 public interface BindingRepository {
 

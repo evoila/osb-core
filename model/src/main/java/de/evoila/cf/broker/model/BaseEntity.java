@@ -1,13 +1,9 @@
-/**
- * 
- */
 package de.evoila.cf.broker.model;
 
 import java.io.Serializable;
 
 /**
- * @author Christian Brinker, evoila.
- *
+ * @author Christian Brinker.
  */
 public interface BaseEntity<ID extends Serializable> {
 	

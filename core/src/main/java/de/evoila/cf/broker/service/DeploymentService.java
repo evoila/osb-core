@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.evoila.cf.broker.service;
 
 import de.evoila.cf.broker.exception.*;

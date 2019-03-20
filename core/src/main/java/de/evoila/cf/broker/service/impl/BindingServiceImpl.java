@@ -15,7 +15,7 @@ import de.evoila.cf.broker.service.BindingService;
 import de.evoila.cf.broker.service.HAProxyService;
 import de.evoila.cf.broker.service.PlatformService;
 import de.evoila.cf.broker.util.ParameterValidator;
-import de.evoila.cf.broker.util.RandomString;
+import de.evoila.cf.security.utils.RandomString;
 import org.everit.json.schema.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +70,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	public BaseServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
 			ServiceInstanceBindingRequest serviceInstanceBindingRequest, boolean async) throws ServiceInstanceBindingExistsException,
 			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException,
-			InvalidParametersException, AsyncRequiredException, ValidationException  {
+			InvalidParametersException, AsyncRequiredException, ValidationException, PlatformException  {
 
 		validateBindingNotExists(bindingId, instanceId);
 
@@ -196,7 +196,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	public ServiceInstanceBindingResponse syncCreateBinding(String bindingId, ServiceInstance serviceInstance,
                                                             ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                             Plan plan)
-			throws ServiceBrokerException, InvalidParametersException {
+			throws ServiceBrokerException, InvalidParametersException, PlatformException{
 		String instanceId = serviceInstance.getId();
 
         ServiceInstanceBindingResponse serviceInstanceBindingResponse;
@@ -256,7 +256,7 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                     ServiceInstance serviceInstance, Plan plan,
-                                                    List<ServerAddress> externalAddresses) throws ServiceBrokerException, InvalidParametersException {
+                                                    List<ServerAddress> externalAddresses) throws ServiceBrokerException, InvalidParametersException, PlatformException{
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalAddresses.get(0));
 
 		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
@@ -266,7 +266,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException {
+                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException, PlatformException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
 
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
@@ -277,7 +277,7 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                              ServiceInstance serviceInstance, Plan plan,
-                                                             ServerAddress serverAddress) throws ServiceBrokerException, InvalidParametersException;
+                                                             ServerAddress serverAddress) throws ServiceBrokerException, InvalidParametersException, PlatformException;
 
     protected void validateBindingNotExists(String bindingId, String instanceId)
             throws ServiceInstanceBindingExistsException {

@@ -14,7 +14,7 @@ import de.evoila.cf.broker.service.AsyncDeploymentService;
 import de.evoila.cf.broker.service.DeploymentService;
 import de.evoila.cf.broker.service.PlatformService;
 import de.evoila.cf.broker.util.ParameterValidator;
-import de.evoila.cf.broker.util.RandomString;
+import de.evoila.cf.security.utils.RandomString;
 import org.everit.json.schema.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

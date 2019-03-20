@@ -5,12 +5,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Created by reneschollmeyer, evoila on 29.10.18.
+ * @author Rene Schollmeyer, Johannes Hiemer.
  */
 @Configuration
 @ConfigurationProperties(prefix = "spring.credhub")
 @ConditionalOnProperty(prefix = "spring.credhub", name = {"url", "bosh-director", "oauth2.client-id", "oauth2.client-secret", "oauth2.access-token-uri",
-                                                          "certificate.ca", "certificate.cert", "certificate.private-key"})
+                                                          "certificate.ca", "certificate.certificate", "certificate.private-key"})
 public class CredhubBean {
 
     private String url;
@@ -48,6 +48,7 @@ public class CredhubBean {
     }
 
     public static class Oauth2 {
+
         private String clientId;
 
         private String clientSecret;
@@ -88,9 +89,10 @@ public class CredhubBean {
     }
 
     public static class Certificate {
+
         private String ca;
 
-        private String cert;
+        private String certificate;
 
         private String privateKey;
 
@@ -102,12 +104,12 @@ public class CredhubBean {
             this.ca = ca;
         }
 
-        public String getCert() {
-            return cert;
+        public String getCertificate() {
+            return certificate;
         }
 
-        public void setCert(String cert) {
-            this.cert = cert;
+        public void setCertificate(String certificate) {
+            this.certificate = certificate;
         }
 
         public String getPrivateKey() {

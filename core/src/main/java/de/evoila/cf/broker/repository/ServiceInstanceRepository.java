@@ -5,8 +5,7 @@ import de.evoila.cf.broker.model.ServiceInstance;
 import java.util.List;
 
 /**
- * @author Christian Brinker, evoila.
- * @author Marco Di Martino, evoila.
+ * @author Christian Brinker, Marco Di Martinoevoila.
  */
 public interface ServiceInstanceRepository {
 
