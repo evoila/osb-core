@@ -24,10 +24,12 @@ public class ServiceInstanceBindingResponse extends BaseServiceInstanceBindingRe
 
 	private List<VolumeMount> volumeMounts;
 
+	private String originatingUser;
+
 	public ServiceInstanceBindingResponse() {}
 
 	public ServiceInstanceBindingResponse(Map<String, Object> credentials, String syslogDrainUrl) {
-        this.async = false;
+		this.async = false;
 		this.credentials = credentials;
 		this.syslogDrainUrl = syslogDrainUrl;
 	}
@@ -38,7 +40,7 @@ public class ServiceInstanceBindingResponse extends BaseServiceInstanceBindingRe
 	}
 
 	public ServiceInstanceBindingResponse(ServiceInstanceBinding binding) {
-        this.async = false;
+		this.async = false;
 		this.credentials = binding.getCredentials();
 		this.syslogDrainUrl = binding.getSyslogDrainUrl();
 		if (binding.getVolumeMounts() != null && binding.getVolumeMounts().size() > 0) {
@@ -81,11 +83,22 @@ public class ServiceInstanceBindingResponse extends BaseServiceInstanceBindingRe
 	@JsonSerialize
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	@JsonProperty("volume_mounts")
-    public List<VolumeMount> getVolumeMounts() {
-        return volumeMounts;
-    }
+	public List<VolumeMount> getVolumeMounts() {
+		return volumeMounts;
+	}
 
-    public void setVolumeMounts(List<VolumeMount> volumeMounts) {
-        this.volumeMounts = volumeMounts;
-    }
+	public void setVolumeMounts(List<VolumeMount> volumeMounts) {
+		this.volumeMounts = volumeMounts;
+	}
+
+	@JsonSerialize
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@JsonProperty("user_id")
+	public String getOriginatingUser() {
+		return originatingUser;
+	}
+
+	public void setOriginatingUser(String originatingUser) {
+		this.originatingUser = originatingUser;
+	}
 }
