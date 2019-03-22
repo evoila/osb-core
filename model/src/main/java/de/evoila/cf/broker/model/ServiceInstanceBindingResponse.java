@@ -24,8 +24,6 @@ public class ServiceInstanceBindingResponse extends BaseServiceInstanceBindingRe
 
 	private List<VolumeMount> volumeMounts;
 
-	private String originatingUser;
-
 	public ServiceInstanceBindingResponse() {}
 
 	public ServiceInstanceBindingResponse(Map<String, Object> credentials, String syslogDrainUrl) {
@@ -91,14 +89,4 @@ public class ServiceInstanceBindingResponse extends BaseServiceInstanceBindingRe
 		this.volumeMounts = volumeMounts;
 	}
 
-	@JsonSerialize
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	@JsonProperty("user_id")
-	public String getOriginatingUser() {
-		return originatingUser;
-	}
-
-	public void setOriginatingUser(String originatingUser) {
-		this.originatingUser = originatingUser;
-	}
 }

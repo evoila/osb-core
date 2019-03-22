@@ -71,7 +71,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
 		log.debug("ServiceInstanceBinding Created: " + bindingId);
 
-		if (acceptsIncomplete)
+		if (serviceInstanceBindingResponse.isAsync())
 			return new ResponseEntity<>(serviceInstanceBindingResponse, HttpStatus.ACCEPTED);
 		else
 			return new ResponseEntity<>(serviceInstanceBindingResponse, HttpStatus.CREATED);

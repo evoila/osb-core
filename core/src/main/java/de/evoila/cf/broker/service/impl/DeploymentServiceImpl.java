@@ -90,7 +90,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 		Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
-		if (request.getParameters() != null && request.getParameters().size() > 0) {
+		if (request.getParameters() != null) {
 		    ParameterValidator.validateParameters(request, plan, false);
         }
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
@@ -127,7 +127,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
-        if (request.getParameters() != null && request.getParameters().size() > 0) {
+        if (request.getParameters() != null) {
                 ParameterValidator.validateParameters(request, plan, true);
         }
 

@@ -1,7 +1,7 @@
 package de.evoila.cf.broker.controller.utils;
 
 import de.evoila.cf.broker.controller.core.ServiceInstanceBindingController;
-import de.evoila.cf.broker.model.ServiceInstanceBindingResponse;
+import de.evoila.cf.broker.model.BaseServiceInstanceBindingResponse;
 import de.evoila.cf.broker.model.annotations.ResponseAdvice;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ import java.util.List;
  */
 
 @ControllerAdvice(assignableTypes = ServiceInstanceBindingController.class)
-public class OriginatingHeaderAdvice implements ResponseBodyAdvice<ServiceInstanceBindingResponse> {
+public class OriginatingHeaderAdvice implements ResponseBodyAdvice<BaseServiceInstanceBindingResponse> {
 
     private final Logger log = LoggerFactory.getLogger(OriginatingHeaderAdvice.class);
 
@@ -41,7 +41,7 @@ public class OriginatingHeaderAdvice implements ResponseBodyAdvice<ServiceInstan
     }
 
     @Override
-    public ServiceInstanceBindingResponse beforeBodyWrite(ServiceInstanceBindingResponse body, MethodParameter returnType, MediaType selectedContentType, Class<? extends
+    public BaseServiceInstanceBindingResponse beforeBodyWrite(BaseServiceInstanceBindingResponse body, MethodParameter returnType, MediaType selectedContentType, Class<? extends
             HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
 
         List<String> header = null;
