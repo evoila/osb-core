@@ -83,32 +83,36 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		Plan plan = serviceDefinitionRepository.getPlan(serviceInstanceBindingRequest.getPlanId());
-		if (serviceInstanceBindingRequest.getParameters() != null && serviceInstanceBindingRequest.getParameters().size() > 0) {
+		if (serviceInstanceBindingRequest.getParameters() != null) {
 		    ParameterValidator.validateParameters(serviceInstanceBindingRequest, plan, false);
 		}
 
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
-		if (!platformService.isSyncPossibleOnBind() && !async) {
-			throw new AsyncRequiredException();
-		}
-
 		BaseServiceInstanceBindingResponse baseServiceInstanceBindingResponse;
-		if (platformService.isSyncPossibleOnBind() && !async) {
-            baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
-                    serviceInstanceBindingRequest, plan);
-		} else if (async) {
-			bindingRepository.addInternalBinding(new ServiceInstanceBinding(bindingId, instanceId, null));
 
-			String operationId = randomString.nextString();
+		if (async) {
+			if (platformService.isSyncPossibleOnBind()) {
+				baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
+						serviceInstanceBindingRequest, plan);
+			} else {
+				bindingRepository.addInternalBinding(new ServiceInstanceBinding(bindingId, instanceId, null));
 
-			asyncBindingService.asyncCreateServiceInstanceBinding(this, bindingId,
-                    serviceInstance, serviceInstanceBindingRequest, plan, async, operationId);
+				String operationId = randomString.nextString();
 
-			baseServiceInstanceBindingResponse = new ServiceInstanceBindingOperationResponse(operationId);
-		} else
-			throw new ServiceInstanceBindingBadRequestException(bindingId);
+				asyncBindingService.asyncCreateServiceInstanceBinding(this, bindingId,
+						serviceInstance, serviceInstanceBindingRequest, plan, async, operationId);
 
+				baseServiceInstanceBindingResponse = new ServiceInstanceBindingOperationResponse(operationId);
+			}
+		} else {
+			if (!platformService.isSyncPossibleOnBind()) {
+				throw new AsyncRequiredException();
+			} else {
+				baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
+						serviceInstanceBindingRequest, plan);
+			}
+		}
 		return baseServiceInstanceBindingResponse;
 	}
 
@@ -129,22 +133,25 @@ public abstract class BindingServiceImpl implements BindingService {
 		Plan plan = serviceDefinitionRepository.getPlan(planId);
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
-		if (!platformService.isSyncPossibleOnUnbind() && !async) {
-			throw new AsyncRequiredException();
+		if (async) {
+			if (platformService.isSyncPossibleOnUnbind()) {
+				syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
+			} else {
+				String operationId = randomString.nextString();
+
+				asyncBindingService.asyncDeleteServiceInstanceBinding(this, bindingId, serviceInstance,
+						plan, operationId);
+
+				return new ServiceInstanceBindingOperationResponse(operationId);
+			}
+		} else {
+			if (!platformService.isSyncPossibleOnUnbind()) {
+				throw new AsyncRequiredException();
+			} else {
+				syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
+			}
+
 		}
-
-		if (platformService.isSyncPossibleOnUnbind() && !async) {
-			syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
-		} else if (async) {
-            String operationId = randomString.nextString();
-
-			asyncBindingService.asyncDeleteServiceInstanceBinding(this, bindingId, serviceInstance,
-                    plan, operationId);
-
-			return new ServiceInstanceBindingOperationResponse(operationId);
-		} else
-			throw new ServiceInstanceBindingBadRequestException(bindingId);
-
 		return null;
 	}
 
