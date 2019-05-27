@@ -78,11 +78,13 @@ public class DatabaseCredentialsClient implements CredentialStore {
         RandomString passwordRandomString = new RandomString(passwordLength);
         UsernamePasswordCredential usernamePasswordCredential = null;
         try {
+            String password = passwordRandomString.nextString();
             usernamePasswordCredential =
                     new UsernamePasswordCredential(identifier(instanceId, valueName),
                             username.toLowerCase(),
-                            cryptoUtil.encrypt(ENCRYPTION_KEY, passwordRandomString.nextString()));
+                            cryptoUtil.encrypt(ENCRYPTION_KEY, password));
             credentialRepository.save(usernamePasswordCredential);
+            usernamePasswordCredential.setPassword(password);
         } catch(Exception ex) {
             // TODO: Check how we handle that shit
         }
@@ -104,6 +106,7 @@ public class DatabaseCredentialsClient implements CredentialStore {
                             username.toLowerCase(),
                             cryptoUtil.encrypt(ENCRYPTION_KEY, password));
             credentialRepository.save(usernamePasswordCredential);
+            usernamePasswordCredential.setPassword(cryptoUtil.decrypt(ENCRYPTION_KEY, password));
         } catch(Exception ex) {
             // TODO: Check how we handle that shit
         }
