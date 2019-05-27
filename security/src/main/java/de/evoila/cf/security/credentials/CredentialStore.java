@@ -23,6 +23,10 @@ public interface CredentialStore {
 
     UsernamePasswordCredential createUser(ServiceInstance serviceInstance, String valueName, String username, int passwordLength);
 
+    UsernamePasswordCredential createUser(ServiceInstance serviceInstance, String valueName, String username, String password);
+
+    UsernamePasswordCredential createUser(String instanceId, String valueName, String username, String password);
+
     UsernamePasswordCredential createUser(String instanceId, String valueName, String username, int passwordLength);
 
     UsernamePasswordCredential getUser(ServiceInstance serviceInstance, String valueName);
