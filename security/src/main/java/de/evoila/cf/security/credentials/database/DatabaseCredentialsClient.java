@@ -168,7 +168,7 @@ public class DatabaseCredentialsClient implements CredentialStore {
 
     @Override
     public String getPassword(String instanceId, String valueName) {
-        PasswordCredential passwordCredential = (PasswordCredential) credentialRepository.getById(identifier(instanceId, valueName);
+        PasswordCredential passwordCredential = (PasswordCredential) credentialRepository.getById(identifier(instanceId, valueName));
 
         try {
             passwordCredential.setPassword(cryptoUtil.decrypt(ENCRYPTION_KEY, passwordCredential.getPassword()));
