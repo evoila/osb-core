@@ -4,6 +4,7 @@ import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.annotations.ApiVersion;
+import de.evoila.cf.broker.model.annotations.ResponseAdvice;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
 import de.evoila.cf.broker.util.EmptyRestResponse;
@@ -36,9 +37,10 @@ public class ServiceInstanceBindingController extends BaseController {
 		this.catalogService = catalogService;
 	}
 
+	@ResponseAdvice
 	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
 	@PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-	public ResponseEntity<BaseServiceInstanceBindingResponse> bind(@PathVariable("instanceId") String instanceId,
+	public ResponseEntity<BaseServiceInstanceBindingResponse> bindServiceInstance(@PathVariable("instanceId") String instanceId,
             @PathVariable("bindingId") String bindingId,
 			@RequestHeader("X-Broker-API-Version") String apiHeader,
 			@RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,
@@ -69,7 +71,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
 		log.debug("ServiceInstanceBinding Created: " + bindingId);
 
-		if (acceptsIncomplete)
+		if (serviceInstanceBindingResponse.isAsync())
 			return new ResponseEntity<>(serviceInstanceBindingResponse, HttpStatus.ACCEPTED);
 		else
 			return new ResponseEntity<>(serviceInstanceBindingResponse, HttpStatus.CREATED);

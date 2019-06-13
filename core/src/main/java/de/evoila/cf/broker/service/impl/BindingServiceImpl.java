@@ -10,8 +10,8 @@ import de.evoila.cf.broker.repository.RouteBindingRepository;
 import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.repository.*;
+import de.evoila.cf.broker.service.*;
 import de.evoila.cf.broker.service.AsyncBindingService;
-import de.evoila.cf.broker.service.BindingService;
 import de.evoila.cf.broker.service.HAProxyService;
 import de.evoila.cf.broker.service.PlatformService;
 import de.evoila.cf.broker.util.ParameterValidator;
@@ -50,7 +50,8 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	protected PlatformRepository platformRepository;
 
-    private RandomString randomString = new RandomString();
+	private RandomString randomString = new RandomString();
+
 
 	public BindingServiceImpl(BindingRepository bindingRepository, ServiceDefinitionRepository serviceDefinitionRepository,
 							  ServiceInstanceRepository serviceInstanceRepository, RouteBindingRepository routeBindingRepository,
@@ -82,32 +83,36 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		Plan plan = serviceDefinitionRepository.getPlan(serviceInstanceBindingRequest.getPlanId());
-		if (serviceInstanceBindingRequest.getParameters() != null && serviceInstanceBindingRequest.getParameters().size() > 0) {
+		if (serviceInstanceBindingRequest.getParameters() != null) {
 		    ParameterValidator.validateParameters(serviceInstanceBindingRequest, plan, false);
 		}
 
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
-		if (!platformService.isSyncPossibleOnBind() && !async) {
-			throw new AsyncRequiredException();
-		}
-
 		BaseServiceInstanceBindingResponse baseServiceInstanceBindingResponse;
-		if (platformService.isSyncPossibleOnBind() && !async) {
-            baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
-                    serviceInstanceBindingRequest, plan);
-		} else if (async) {
-			bindingRepository.addInternalBinding(new ServiceInstanceBinding(bindingId, instanceId, null));
 
-			String operationId = randomString.nextString();
+		if (async) {
+			if (platformService.isSyncPossibleOnBind()) {
+				baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
+						serviceInstanceBindingRequest, plan);
+			} else {
+				bindingRepository.addInternalBinding(new ServiceInstanceBinding(bindingId, instanceId, null));
 
-			asyncBindingService.asyncCreateServiceInstanceBinding(this, bindingId,
-                    serviceInstance, serviceInstanceBindingRequest, plan, async, operationId);
+				String operationId = randomString.nextString();
 
-			baseServiceInstanceBindingResponse = new ServiceInstanceBindingOperationResponse(operationId);
-		} else
-			throw new ServiceInstanceBindingBadRequestException(bindingId);
+				asyncBindingService.asyncCreateServiceInstanceBinding(this, bindingId,
+						serviceInstance, serviceInstanceBindingRequest, plan, async, operationId);
 
+				baseServiceInstanceBindingResponse = new ServiceInstanceBindingOperationResponse(operationId);
+			}
+		} else {
+			if (!platformService.isSyncPossibleOnBind()) {
+				throw new AsyncRequiredException();
+			} else {
+				baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
+						serviceInstanceBindingRequest, plan);
+			}
+		}
 		return baseServiceInstanceBindingResponse;
 	}
 
@@ -128,22 +133,25 @@ public abstract class BindingServiceImpl implements BindingService {
 		Plan plan = serviceDefinitionRepository.getPlan(planId);
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
-		if (!platformService.isSyncPossibleOnUnbind() && !async) {
-			throw new AsyncRequiredException();
+		if (async) {
+			if (platformService.isSyncPossibleOnUnbind()) {
+				syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
+			} else {
+				String operationId = randomString.nextString();
+
+				asyncBindingService.asyncDeleteServiceInstanceBinding(this, bindingId, serviceInstance,
+						plan, operationId);
+
+				return new ServiceInstanceBindingOperationResponse(operationId);
+			}
+		} else {
+			if (!platformService.isSyncPossibleOnUnbind()) {
+				throw new AsyncRequiredException();
+			} else {
+				syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
+			}
+
 		}
-
-		if (platformService.isSyncPossibleOnUnbind() && !async) {
-			syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
-		} else if (async) {
-            String operationId = randomString.nextString();
-
-			asyncBindingService.asyncDeleteServiceInstanceBinding(this, bindingId, serviceInstance,
-                    plan, operationId);
-
-			return new ServiceInstanceBindingOperationResponse(operationId);
-		} else
-			throw new ServiceInstanceBindingBadRequestException(bindingId);
-
 		return null;
 	}
 
@@ -212,7 +220,7 @@ public abstract class BindingServiceImpl implements BindingService {
 
 		ServiceInstanceBinding binding;
 		if (haProxyService != null && serviceInstanceBindingRequest.getAppGuid() == null &&
-					(serviceInstanceBindingRequest.getBindResource() != null && serviceInstanceBindingRequest.getBindResource().getAppGuid() == null)) {
+				(serviceInstanceBindingRequest.getBindResource() != null && serviceInstanceBindingRequest.getBindResource().getAppGuid() == null)) {
 			List<ServerAddress> externalServerAddresses = haProxyService.appendAgent(serviceInstance.getHosts(), bindingId, instanceId);
 
 			binding = bindServiceKey(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalServerAddresses);
@@ -266,23 +274,23 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException, PlatformException {
+												 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException, PlatformException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
 
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
 	}
 
-    protected abstract void unbindService(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
-            throws ServiceBrokerException, PlatformException;
+	protected abstract void unbindService(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
+			throws ServiceBrokerException, PlatformException;
 
 	protected abstract Map<String, Object> createCredentials(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                              ServiceInstance serviceInstance, Plan plan,
                                                              ServerAddress serverAddress) throws ServiceBrokerException, InvalidParametersException, PlatformException;
 
-    protected void validateBindingNotExists(String bindingId, String instanceId)
-            throws ServiceInstanceBindingExistsException {
+	protected void validateBindingNotExists(String bindingId, String instanceId)
+			throws ServiceInstanceBindingExistsException {
 
-    	boolean bindCreation;
+		boolean bindCreation;
 		boolean isBindingInProgress;
 
 		if (bindingRepository.containsInternalBindingId(bindingId)) {
@@ -292,18 +300,18 @@ public abstract class BindingServiceImpl implements BindingService {
 			 } catch (NoSuchElementException e) {
     			return;
 			}
-    		if (bindCreation && !isBindingInProgress)
-            	throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
-        }
-    }
+			if (bindCreation && !isBindingInProgress)
+				throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
+		}
+	}
 
-    public ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException{
-    	ServiceInstance serviceInstance;
-    	try {
-    		serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+	public ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException {
+		ServiceInstance serviceInstance;
+		try {
+			serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
 		} catch(Exception e) {
-    		throw new ServiceInstanceDoesNotExistException(instanceId);
+			throw new ServiceInstanceDoesNotExistException(instanceId);
 		}
 		return serviceInstance;
-    }
+	}
 }

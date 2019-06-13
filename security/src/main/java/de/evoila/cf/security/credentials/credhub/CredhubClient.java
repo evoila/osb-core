@@ -22,6 +22,7 @@ import org.springframework.credhub.support.json.JsonCredentialRequest;
 import org.springframework.credhub.support.password.PasswordParameters;
 import org.springframework.credhub.support.password.PasswordParametersRequest;
 import org.springframework.credhub.support.user.UserCredential;
+import org.springframework.credhub.support.user.UserCredentialRequest;
 import org.springframework.credhub.support.user.UserParametersRequest;
 import org.springframework.stereotype.Service;
 
@@ -135,6 +136,26 @@ public class CredhubClient implements CredentialStore {
         log.info("Creating user credentials for instance with id = " + instanceId);
 
         CredentialDetails<UserCredential> user = credHubTemplate.credentials().generate(request);
+
+        return new UsernamePasswordCredential(buildManifestPlaceHolder(valueName + ".username"),
+                buildManifestPlaceHolder(valueName + ".password"));
+    }
+
+    @Override
+    public UsernamePasswordCredential createUser(ServiceInstance serviceInstance, String valueName, String username, String password) {
+        return this.createUser(serviceInstance.getId(), valueName, username, password);
+    }
+
+    @Override
+    public UsernamePasswordCredential createUser(String instanceId, String valueName, String username, String password) {
+        UserCredentialRequest request = UserCredentialRequest.builder()
+                .name(this.identifier(instanceId, valueName))
+                .value(new UserCredential(username, password))
+                .build();
+
+        log.info("Creating user credentials for instance with id = " + instanceId);
+
+        CredentialDetails<UserCredential> user = credHubTemplate.credentials().write(request);
 
         return new UsernamePasswordCredential(buildManifestPlaceHolder(valueName + ".username"),
                 buildManifestPlaceHolder(valueName + ".password"));

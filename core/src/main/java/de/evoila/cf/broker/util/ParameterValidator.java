@@ -28,62 +28,71 @@ public class ParameterValidator {
                                           boolean isUpdate) throws ValidationException, ServiceBrokerException {
         Map<String, Object> serviceInstanceRequestParams = serviceInstanceBindingRequest.getParameters();
 
-        JsonSchema jsonSchema;
-        if (!isUpdate) {
+        JsonSchema jsonSchema = null;
+        if (!isUpdate && planHasBindingSchema(plan, isUpdate)) {
             jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getCreate().getParameters();
-        } else {
+                    .getServiceBinding().getCreate().getParameters();
+        } else if (planHasBindingSchema(plan, isUpdate)) {
             jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getUpdate().getParameters();
+                    .getServiceBinding().getUpdate().getParameters();
         }
-
-        validateParameters(jsonSchema, serviceInstanceRequestParams);
+        if (jsonSchema != null) {
+            validateParameters(jsonSchema, serviceInstanceRequestParams);
+        }
     }
 
     public static void validateParameters(ServiceInstanceRequest serviceInstanceRequest, Plan plan,
                                           boolean isUpdate) throws ValidationException, ServiceBrokerException {
         Map<String, Object> serviceInstanceRequestParams = serviceInstanceRequest.getParameters();
 
-        JsonSchema jsonSchema;
-        if (!isUpdate) {
+        JsonSchema jsonSchema = null;
+
+        if (!isUpdate && planHasInstanceSchema(plan, isUpdate)) {
             jsonSchema = plan.getSchemas()
                     .getServiceInstance().getCreate().getParameters();
-        } else {
+        } else if (planHasInstanceSchema(plan, isUpdate)) {
             jsonSchema = plan.getSchemas()
                     .getServiceInstance().getUpdate().getParameters();
         }
 
-        validateParameters(jsonSchema, serviceInstanceRequestParams);
+        if (jsonSchema != null) {
+            validateParameters(jsonSchema, serviceInstanceRequestParams);
+        }
     }
 
     public static void validateParameters(ServiceInstanceUpdateRequest serviceInstanceUpdateRequest, Plan plan,
                                           boolean isUpdate) throws ValidationException, ServiceBrokerException {
         Map<String, Object> serviceInstanceRequestParams = serviceInstanceUpdateRequest.getParameters();
 
-        JsonSchema jsonSchema;
-        if (!isUpdate) {
+        JsonSchema jsonSchema = null;
+
+        if (!isUpdate && planHasInstanceSchema(plan, isUpdate)) {
             jsonSchema = plan.getSchemas()
                     .getServiceInstance().getCreate().getParameters();
-        } else {
+        } else if (planHasInstanceSchema(plan, isUpdate)) {
             jsonSchema = plan.getSchemas()
                     .getServiceInstance().getUpdate().getParameters();
         }
 
-        validateParameters(jsonSchema, serviceInstanceRequestParams);
+        if (jsonSchema != null) {
+            validateParameters(jsonSchema, serviceInstanceRequestParams);
+        }
     }
 
     public static void validateParameters(Map<String, Object> input, Plan plan,
                                           boolean isUpdate) throws ValidationException, ServiceBrokerException {
-        JsonSchema jsonSchema;
-        if (!isUpdate) {
+        JsonSchema jsonSchema = null;
+        if (!isUpdate && planHasInstanceSchema(plan, isUpdate)) {
             jsonSchema = plan.getSchemas()
                     .getServiceInstance().getCreate().getParameters();
-        } else {
+        } else if (planHasInstanceSchema(plan, isUpdate)) {
             jsonSchema = plan.getSchemas()
                     .getServiceInstance().getUpdate().getParameters();
         }
 
-        validateParameters(jsonSchema, input);
+        if (jsonSchema != null) {
+            validateParameters(jsonSchema, input);
+        }
     }
 
     public static void validateParameters(JsonSchema jsonSchema, Map<String, Object> input) throws ValidationException,
@@ -106,4 +115,31 @@ public class ParameterValidator {
         return new JSONObject(objectMapper.writeValueAsString(value));
     }
 
+    private static boolean planHasBindingSchema(Plan plan, boolean isUpdate) {
+        try {
+            if (isUpdate) {
+                plan.getSchemas().getServiceBinding().getUpdate().getParameters();
+            } else {
+                plan.getSchemas().getServiceBinding().getCreate().getParameters();
+            }
+        } catch(Exception e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static boolean planHasInstanceSchema(Plan plan, boolean isUpdate) {
+        try {
+            if (isUpdate) {
+                plan.getSchemas().getServiceInstance().getUpdate().getParameters();
+            } else {
+                plan.getSchemas().getServiceInstance().getCreate().getParameters();
+            }
+        } catch(Exception e) {
+            return false;
+        }
+
+        return true;
+    }
 }

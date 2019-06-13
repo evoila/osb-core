@@ -1,10 +1,7 @@
-/**
- * 
- */
 package de.evoila.cf.broker.model.catalog;
 
 /**
- * @author Christian Brinker, evoila.*
+ * @author Christian Brinker.
  */
 public class ServerAddress {
 

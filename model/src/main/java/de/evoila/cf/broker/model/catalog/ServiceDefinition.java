@@ -187,4 +187,5 @@ public class ServiceDefinition {
 	public void setInstancesRetrievable(boolean instancesRetrievable) {
 		this.instancesRetrievable = instancesRetrievable;
 	}
+
 }

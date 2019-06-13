@@ -78,11 +78,35 @@ public class DatabaseCredentialsClient implements CredentialStore {
         RandomString passwordRandomString = new RandomString(passwordLength);
         UsernamePasswordCredential usernamePasswordCredential = null;
         try {
+            String password = passwordRandomString.nextString();
             usernamePasswordCredential =
                     new UsernamePasswordCredential(identifier(instanceId, valueName),
                             username.toLowerCase(),
-                            cryptoUtil.encrypt(ENCRYPTION_KEY, passwordRandomString.nextString()));
+                            cryptoUtil.encrypt(ENCRYPTION_KEY, password));
             credentialRepository.save(usernamePasswordCredential);
+            usernamePasswordCredential.setPassword(password);
+        } catch(Exception ex) {
+            // TODO: Check how we handle that shit
+        }
+
+        return usernamePasswordCredential;
+    }
+
+    @Override
+    public UsernamePasswordCredential createUser(ServiceInstance serviceInstance, String valueName, String username, String password) {
+        return createUser(serviceInstance.getId(), valueName, username, password);
+    }
+
+    @Override
+    public UsernamePasswordCredential createUser(String instanceId, String valueName, String username, String password) {
+        UsernamePasswordCredential usernamePasswordCredential = null;
+        try {
+            usernamePasswordCredential =
+                    new UsernamePasswordCredential(identifier(instanceId, valueName),
+                            username.toLowerCase(),
+                            cryptoUtil.encrypt(ENCRYPTION_KEY, password));
+            credentialRepository.save(usernamePasswordCredential);
+            usernamePasswordCredential.setPassword(cryptoUtil.decrypt(ENCRYPTION_KEY, password));
         } catch(Exception ex) {
             // TODO: Check how we handle that shit
         }
@@ -97,7 +121,16 @@ public class DatabaseCredentialsClient implements CredentialStore {
 
     @Override
     public UsernamePasswordCredential getUser(String instanceId, String valueName) {
-        return (UsernamePasswordCredential) credentialRepository.getById(identifier(instanceId, valueName));
+        UsernamePasswordCredential usernamePasswordCredential = (UsernamePasswordCredential) credentialRepository
+                .getById(identifier(instanceId, valueName));
+
+        try {
+            usernamePasswordCredential.setPassword(cryptoUtil.decrypt(ENCRYPTION_KEY, usernamePasswordCredential.getPassword()));
+        } catch(Exception ex) {
+            // TODO: Check how we handle that shit
+        }
+
+        return usernamePasswordCredential;
     }
 
     @Override
@@ -138,8 +171,18 @@ public class DatabaseCredentialsClient implements CredentialStore {
 
     @Override
     public String getPassword(String instanceId, String valueName) {
-        return ((PasswordCredential) credentialRepository.getById(identifier(instanceId, valueName))).getPassword();
+        PasswordCredential passwordCredential = (PasswordCredential) credentialRepository.getById(identifier(instanceId, valueName));
+
+        try {
+            passwordCredential.setPassword(cryptoUtil.decrypt(ENCRYPTION_KEY, passwordCredential.getPassword()));
+        } catch(Exception ex) {
+            // TODO: Check how we handle that shit
+        }
+
+        return passwordCredential.getPassword();
     }
+
+
 
     @Override
     public Map<String, Object> createJson(ServiceInstance serviceInstance, String valueName, Map<String, Object> values) {
