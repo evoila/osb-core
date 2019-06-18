@@ -66,7 +66,7 @@ public class UaaSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf().disable();
     }
 
-    @Bean
+    @Bean(name = "uaaAuthencationEntryPoint")
     public AuthenticationEntryPoint authenticationEntryPoint() {
         CommonCorsAuthenticationEntryPoint entryPoint =
                 new CommonCorsAuthenticationEntryPoint();
