@@ -48,7 +48,7 @@ public class BasicAuthSecurityConfiguration extends WebSecurityConfigurerAdapter
                 .csrf().disable();
     }
 
-    @Bean
+    @Bean (name = "basicAuthenticationEntryPoint")
     public AuthenticationEntryPoint authenticationEntryPoint() {
         BasicAuthenticationEntryPoint entryPoint =
                 new BasicAuthenticationEntryPoint();
