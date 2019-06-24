@@ -67,7 +67,7 @@ public class CredhubClient implements CredentialStore {
         }
 
         if (this.credHubTemplate != null) {
-            log.info("Successfully establihsed a connection to Credhub.");
+            log.info("Successfully established a connection to Credhub.");
         }
     }
 
