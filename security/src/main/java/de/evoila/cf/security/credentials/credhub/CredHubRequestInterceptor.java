@@ -11,6 +11,9 @@ import org.springframework.http.client.support.HttpRequestWrapper;
 import java.io.IOException;
 import java.util.Collections;
 
+/**
+ * @author Marius Berger.
+ */
 public class CredHubRequestInterceptor implements ClientHttpRequestInterceptor {
 
     @Override
