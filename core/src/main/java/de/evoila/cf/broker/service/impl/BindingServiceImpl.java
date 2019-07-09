@@ -309,6 +309,8 @@ public abstract class BindingServiceImpl implements BindingService {
 		ServiceInstance serviceInstance;
 		try {
 			serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+			if (serviceInstance == null)
+				throw new ServiceInstanceDoesNotExistException(instanceId);
 		} catch(Exception e) {
 			throw new ServiceInstanceDoesNotExistException(instanceId);
 		}
