@@ -44,6 +44,11 @@ public abstract class BaseController {
         return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    @ExceptionHandler(ServiceBrokerFeatureIsNotSupportedException.class)
+    public ResponseEntity<ResponseMessage> handleException(ServiceBrokerFeatureIsNotSupportedException ex) {
+        return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
     @ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, ServiceInstanceNotRetrievableException.class })
     public ResponseEntity<ResponseMessage> handleException(Exception ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -62,6 +67,21 @@ public abstract class BaseController {
     @ExceptionHandler(ServiceInstanceNotFoundException.class)
     public ResponseEntity<ResponseMessage> handleException(ServiceInstanceNotFoundException ex){
         return processErrorResponse(HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ServiceInstanceBindingExistsException.class)
+    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceBindingExistsException ex) {
+        return processErrorResponse(HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ServiceInstanceBindingNotFoundException.class)
+    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceBindingNotFoundException ex) {
+        return processErrorResponse(HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ServiceInstanceBindingDoesNotExistsException.class)
+    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceBindingDoesNotExistsException ex) {
+        return processErrorResponse(HttpStatus.GONE);
     }
 
 }
