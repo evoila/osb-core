@@ -158,7 +158,7 @@ public class ServiceInstanceController extends BaseController {
         ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId());
 
 		if (!(serviceDefinition.isInstancesRetrievable())) {
-			throw new ServiceInstanceNotRetrievableException("The Service Instance could not be retrievable. You should not attempt to call this endpoint");
+			throw new ServiceInstanceNotRetrievableException("The Service Instance is not retrievable. You should not attempt to call this endpoint");
 		}
 		ServiceInstanceResponse serviceInstanceResponse = new ServiceInstanceResponse(serviceInstance);
 

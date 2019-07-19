@@ -9,10 +9,13 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.credhub.core.CredHubClient;
 import org.springframework.credhub.core.CredHubTemplate;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.credhub.support.utils.JsonUtils;
+import org.springframework.http.client.*;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.AccessTokenProviderChain;
@@ -20,13 +23,17 @@ import org.springframework.security.oauth2.client.token.grant.client.ClientCrede
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.security.oauth2.common.AuthenticationScheme;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import javax.naming.ConfigurationException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Rene Schollmeyer.
@@ -70,8 +77,8 @@ public class CredhubConnection {
         clientCredentialsAccessTokenProvider.setRequestFactory(clientHttpRequestFactory);
 
         restTemplate.setAccessTokenProvider(new AccessTokenProviderChain(Arrays.asList(clientCredentialsAccessTokenProvider)));
-        CredHubClient.configureRestTemplate(restTemplate, credhubBean.getUrl(), clientHttpRequestFactory);
 
+        configureRestTemplate(restTemplate, credhubBean.getUrl(), clientHttpRequestFactory);
         return new CredHubTemplate(restTemplate);
     }
 
@@ -89,6 +96,24 @@ public class CredhubConnection {
         resource.setClientSecret(credhubBean.getOauth2().getClientSecret());
         resource.setGrantType(GRANT_TYPE);
         return resource;
+    }
+
+    private void configureRestTemplate(RestTemplate restTemplate, String baseUri, ClientHttpRequestFactory clientHttpRequestFactory) {
+        restTemplate.setRequestFactory(clientHttpRequestFactory);
+
+        DefaultUriBuilderFactory defaultUriBuilderFactory = new DefaultUriBuilderFactory(baseUri);
+        restTemplate.setUriTemplateHandler(defaultUriBuilderFactory);
+
+        List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>(3);
+        messageConverters.add(new ByteArrayHttpMessageConverter());
+        messageConverters.add(new StringHttpMessageConverter());
+        messageConverters.add(new MappingJackson2HttpMessageConverter(JsonUtils.buildObjectMapper()));
+        restTemplate.setMessageConverters(messageConverters);
+
+        List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>(1);
+        interceptors.add(new CredHubRequestInterceptor());
+        restTemplate.setInterceptors(interceptors);
+
     }
 }
 

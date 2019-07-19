@@ -148,33 +148,12 @@ public class ServiceInstanceBindingController extends BaseController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	@ResponseBody
+
+	// Needed here instead of in the BaseController because a different status code has to be returned.
 	@ExceptionHandler(ServiceInstanceDoesNotExistException.class)
 	public ResponseEntity<ResponseMessage> handleException(ServiceInstanceDoesNotExistException ex) {
 		return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
 	}
-	
-	@ResponseBody
-	@ExceptionHandler(ServiceBrokerFeatureIsNotSupportedException.class)
-	public ResponseEntity<ResponseMessage> handleException(ServiceBrokerFeatureIsNotSupportedException ex) {
-		return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
-	}
 
-	@ResponseBody
-	@ExceptionHandler(ServiceInstanceBindingExistsException.class)
-	public ResponseEntity<ResponseMessage> handleException(ServiceInstanceBindingExistsException ex) {
-		return processErrorResponse(HttpStatus.CONFLICT);
-	}
 
-	@ResponseBody
-	@ExceptionHandler(ServiceInstanceBindingNotFoundException.class)
-	public ResponseEntity<ResponseMessage> handleException(ServiceInstanceBindingNotFoundException ex) {
-		return processErrorResponse(HttpStatus.NOT_FOUND);
-	}
-
-	@ResponseBody
-	@ExceptionHandler(ServiceInstanceBindingDoesNotExistsException.class)
-	public ResponseEntity<ResponseMessage> handleException(ServiceInstanceBindingDoesNotExistsException ex) {
-		return processErrorResponse(HttpStatus.GONE);
-	}
 }

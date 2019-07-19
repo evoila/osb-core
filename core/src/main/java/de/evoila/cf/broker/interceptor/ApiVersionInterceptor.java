@@ -69,6 +69,7 @@ public class ApiVersionInterceptor implements HandlerInterceptor {
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
             response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, mapper.writeValueAsString(noHeaderFound));
+            log.info("Intercepted a request without an X-Broker-API-Version header.");
             return false;
         }
 
@@ -76,6 +77,7 @@ public class ApiVersionInterceptor implements HandlerInterceptor {
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
             response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, mapper.writeValueAsString(headerValueNotAllowed));
+            log.info("Intercepted a request with a non-matching X-Broker-API-Version header (received "+requestApiVersion+" but method supports "+apis.toString()+").");
             return false;
         }
         return true;
