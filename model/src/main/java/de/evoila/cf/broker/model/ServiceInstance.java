@@ -63,29 +63,14 @@ public class ServiceInstance implements BaseEntity<String> {
 	@JsonProperty("floatingIp_id")
 	private String floatingIpId;
 
-	/**
-	 * Use users instead
-	 */
     @JsonIgnore
-	@Deprecated
     private String username;
 
-	/**
-	 * Use users instead
-	 */
     @JsonIgnore
-	@Deprecated
     private String password;
 
-	/**
-	 * Use users instead
-	 */
     @JsonIgnore
-	@Deprecated
     private String usergroup;
-
-    @JsonIgnore
-	private List<User> users = new ArrayList<>();
 
 	@SuppressWarnings("unused")
 	private ServiceInstance() {}
@@ -229,51 +214,20 @@ public class ServiceInstance implements BaseEntity<String> {
 		this.context = new HashMap<>(context);
 	}
 
-	/**
-	 * Use getUsers() instead
-	 */
-	@Deprecated
     public String getUsername() { return username; }
 
-	/**
-	 * Use setUsers() instead
-	 */
-	@Deprecated
     public void setUsername(String username) { this.username = username; }
 
-	/**
-	 * Use getUsers() instead
-	 */
-	@Deprecated
     public String getPassword() { return password; }
 
-	/**
-	 * Use setUsers() instead
-	 */
-	@Deprecated
     public void setPassword(String password) { this.password = password; }
 
-	/**
-	 * Use getUsers() instead
-	 */
-	@Deprecated
     public String getUsergroup() { return usergroup; }
 
-	/**
-	 * Use setUsers() instead
-	 */
-	@Deprecated
     public void setUsergroup(String usergroup) { this.usergroup = usergroup; }
 
 	public String getFloatingIpId() { return floatingIpId; }
 
 	public void setFloatingIpId(String floatingIpId) { this.floatingIpId = floatingIpId; }
 
-	public List<User> getUsers() {
-		return users;
-	}
-
-	public void setUsers(List<User> users) {
-		this.users = users;
-	}
 }
