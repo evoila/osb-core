@@ -4,12 +4,12 @@
 package de.evoila.cf.broker.service;
 
 
+import de.evoila.cf.broker.bean.HAProxyConfiguration;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.model.HABackendResponse;
 import de.evoila.cf.broker.model.HAProxyServerAddress;
 import de.evoila.cf.broker.model.Mode;
 import de.evoila.cf.broker.model.catalog.ServerAddress;
-import de.evoila.cf.broker.bean.HAProxyConfiguration;
 import de.evoila.cf.security.utils.AcceptSelfSignedClientHttpRequestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

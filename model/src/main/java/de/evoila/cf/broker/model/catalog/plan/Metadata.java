@@ -24,6 +24,8 @@ public class Metadata extends InstanceGroupConfig {
 
     private String ingressInstanceGroup;
 
+    private String egressInstanceGroup;
+
     private List<CustomInstanceGroupConfig> instanceGroupConfig = new ArrayList<>();
 
     private Map<String, Object> customParameters = new HashMap<>();
@@ -99,6 +101,14 @@ public class Metadata extends InstanceGroupConfig {
 
     public void setCustomParameters(Map<String, Object> customParameters) {
         this.customParameters = customParameters;
+    }
+
+    public String getEgressInstanceGroup() {
+        return egressInstanceGroup;
+    }
+
+    public void setEgressInstanceGroup(String egressInstanceGroup) {
+        this.egressInstanceGroup = egressInstanceGroup;
     }
 
     public String getEndpointName() {

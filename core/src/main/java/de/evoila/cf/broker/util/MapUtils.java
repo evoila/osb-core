@@ -25,6 +25,34 @@ public class MapUtils {
         }
     }
 
+    public static void deepInsert(Map<String, Object> map, String key, Object value) {
+        List<String> keyElements = Arrays.asList(key.split("\\."));
+
+        Map<String, Object> actualMap = map;
+        for (int i = 0; i < keyElements.size(); i++) {
+            String keyElement = keyElements.get(i);
+
+            if (i == (keyElements.size()-1) ) {
+                actualMap.put(keyElement, value);
+            } else {
+                if (actualMap.containsKey(keyElement)) {
+                    Object tmp = actualMap.get(keyElement);
+                    if (tmp instanceof Map) {
+                        actualMap = (Map<String, Object>) tmp;
+                    } else {
+                        final HashMap<String, Object> newMap = new HashMap<>();
+                        actualMap.put(keyElement, newMap);
+                        actualMap = newMap;
+                    }
+                } else {
+                    final HashMap<String, Object> newMap = new HashMap<>();
+                    actualMap.put(keyElement, newMap);
+                    actualMap = newMap;
+                }
+            }
+        }
+    }
+
     /**
      * We do not merge on individual list elements here, but instead replace
      * the complete list with the new values.
