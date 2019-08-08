@@ -48,9 +48,6 @@ public class ServiceDefinition {
     @JsonProperty("plan_updateable") // misspelling of attribute kept, do not change it
     private boolean updateable;
 
-    @JsonProperty("maintenance_info")
-    private MaintenanceInfo maintenanceInfo;
-
     public ServiceDefinition() {
     }
 
@@ -190,12 +187,4 @@ public class ServiceDefinition {
     public void setInstancesRetrievable(boolean instancesRetrievable) {
         this.instancesRetrievable = instancesRetrievable;
     }
-
-	public MaintenanceInfo getMaintenanceInfo() {
-		return maintenanceInfo;
-	}
-
-	public void setMaintenanceInfo(MaintenanceInfo maintenanceInfo) {
-		this.maintenanceInfo = maintenanceInfo;
-	}
 }
