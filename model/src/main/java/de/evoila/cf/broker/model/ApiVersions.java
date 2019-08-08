@@ -10,4 +10,5 @@ public final class ApiVersions {
 
     public static final String API_213 = "2.13";
     public static final String API_214 = "2.14";
+    public static final String API_215 = "2.15";
 }
