@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/** @author Johannes Hiemer. */
+/**
+ * @author Johannes Hiemer.
+ */
 @Controller
 @RequestMapping(value = "/v2/catalog")
 public class CatalogController extends BaseController {
@@ -28,7 +30,7 @@ public class CatalogController extends BaseController {
     }
 
     @GetMapping(value = {"/", ""})
-    @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
+    @ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
     public ResponseEntity<Catalog> getCatalog() {
         logger.debug("GET: getCatalog()");
 
