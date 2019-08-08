@@ -38,7 +38,7 @@ public class ServiceInstanceBindingController extends BaseController {
 	}
 
 	@ResponseAdvice
-	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
+	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
 	@PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
 	public ResponseEntity<BaseServiceInstanceBindingResponse> bindServiceInstance(@PathVariable("instanceId") String instanceId,
             @PathVariable("bindingId") String bindingId,
@@ -78,7 +78,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
 	}
 
-	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
+	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
 	@DeleteMapping(value = "/{instanceId}/service_bindings/{bindingId}")
 	public ResponseEntity<String> unbind(@PathVariable("instanceId") String instanceId,
 			@PathVariable("bindingId") String bindingId, @RequestParam("service_id") String serviceId,
@@ -114,7 +114,7 @@ public class ServiceInstanceBindingController extends BaseController {
 		}
 	}
 
-	@ApiVersion(ApiVersions.API_214)
+	@ApiVersion({ApiVersions.API_214, ApiVersions.API_215})
 	@GetMapping(value = "/{instanceId}/service_bindings/{bindingId}/last_operation")
 	public ResponseEntity<JobProgressResponse> lastOperation(@PathVariable("instanceId") String instanceId,
             @PathVariable("bindingId") String bindingId,
@@ -132,7 +132,7 @@ public class ServiceInstanceBindingController extends BaseController {
         return new ResponseEntity<>(jobProgressResponse, HttpStatus.OK);
 	}
 
-	@ApiVersion(ApiVersions.API_214)
+	@ApiVersion({ApiVersions.API_214, ApiVersions.API_215})
 	@GetMapping(value = "/{instanceId}/service_bindings/{bindingId}")
 	public ResponseEntity<ServiceInstanceBindingResponse> fetch(@PathVariable("instanceId") String instanceId,
                                                                 @PathVariable("bindingId") String bindingId) throws

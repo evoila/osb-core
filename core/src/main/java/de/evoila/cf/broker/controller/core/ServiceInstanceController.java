@@ -48,7 +48,7 @@ public class ServiceInstanceController extends BaseController {
     	this.serviceInstanceRepository = serviceInstanceRepository;
 	}
 
-	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
+	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
 	@PutMapping(value = "/{serviceInstanceId}")
 	public ResponseEntity<ServiceInstanceOperationResponse> create(
 			@PathVariable("serviceInstanceId") String serviceInstanceId,
@@ -81,7 +81,7 @@ public class ServiceInstanceController extends BaseController {
 			return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
-	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
+	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
 	@PatchMapping(value= "/{serviceInstanceId}")
 	public ResponseEntity<ServiceInstanceOperationResponse> update(@PathVariable("serviceInstanceId") String serviceInstanceId,
                                                                    @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
@@ -109,7 +109,7 @@ public class ServiceInstanceController extends BaseController {
 		return new ResponseEntity(serviceInstanceOperationResponse, HttpStatus.ACCEPTED);
 	}
 
-	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
+	@ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
 	@DeleteMapping(value = "/{serviceInstanceId}")
 	public ResponseEntity<ServiceInstanceOperationResponse> delete(
 			@PathVariable("serviceInstanceId") String serviceInstanceId,
@@ -132,7 +132,7 @@ public class ServiceInstanceController extends BaseController {
 	    return new ResponseEntity<>(serviceInstanceOperationResponse, HttpStatus.ACCEPTED);
 	}
 
-    @ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
+    @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @GetMapping(value = "/{serviceInstanceId}/last_operation")
     public ResponseEntity<JobProgressResponse> lastOperation(
             @PathVariable("serviceInstanceId") String serviceInstanceId,
@@ -148,7 +148,7 @@ public class ServiceInstanceController extends BaseController {
         return new ResponseEntity<>(jobProgressResponse, HttpStatus.OK);
     }
 
-	@ApiVersion(ApiVersions.API_214)
+	@ApiVersion({ApiVersions.API_214, ApiVersions.API_215})
 	@GetMapping(value = "/{serviceInstanceId}")
 	public ResponseEntity<ServiceInstanceResponse> get(@PathVariable("serviceInstanceId") String serviceInstanceId) throws UnsupportedOperationException,
 			ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceNotFoundException{

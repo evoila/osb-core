@@ -27,7 +27,7 @@ public class CatalogController extends BaseController {
     }
 
     @GetMapping(value = { "/", "" })
-    @ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
+    @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     public ResponseEntity<Catalog> getCatalog() {
         logger.debug("GET: getCatalog()");
 
