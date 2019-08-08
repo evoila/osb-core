@@ -1,7 +1,5 @@
 package de.evoila.cf.broker.interceptor;
 
-import de.evoila.cf.broker.model.ApiVersions;
-import de.evoila.cf.broker.model.annotations.ApiVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
@@ -10,10 +8,7 @@ import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Objects;
 
 public class OriginatingIdentityInterceptor implements HandlerInterceptor {
 
@@ -22,14 +17,12 @@ public class OriginatingIdentityInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-
         if (!(handler instanceof ResourceHttpRequestHandler)) {
             HandlerMethod method = (HandlerMethod) handler;
-            String[] api;
             log.info("Intercepting on method " + method.getMethod().getName());
-
             handleOriginatingIdentity(request, response);
         }
+
         return true;
     }
 
@@ -38,11 +31,9 @@ public class OriginatingIdentityInterceptor implements HandlerInterceptor {
 
         if (originatingIdentity != null) {
             try {
-
                 String[] splitter = originatingIdentity.split(" ");
                 String decodedValue = new String(Base64.getDecoder().decode(splitter[1]));
                 log.info(X_BROKER_API_REQUEST_IDENTITY + " Platform " + splitter[0] + " and Value: " + decodedValue);
-
                 response.setHeader(X_BROKER_API_REQUEST_IDENTITY, originatingIdentity);
             } catch (Exception e) {
                 log.info("Failed retrieving X-Broker-API-Originating-Identity with Cause", e);

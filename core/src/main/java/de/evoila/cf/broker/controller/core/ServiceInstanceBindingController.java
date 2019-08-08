@@ -43,6 +43,7 @@ public class ServiceInstanceBindingController extends BaseController {
 	public ResponseEntity<BaseServiceInstanceBindingResponse> bindServiceInstance(@PathVariable("instanceId") String instanceId,
             @PathVariable("bindingId") String bindingId,
 			@RequestHeader("X-Broker-API-Version") String apiHeader,
+			@RequestHeader("X-Broker-API-Originating-Identity") String originatingIdentity,
 			@RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,
 			@Valid @RequestBody ServiceInstanceBindingRequest request)
 					throws ServiceInstanceDoesNotExistException, ServiceInstanceBindingExistsException,
@@ -83,6 +84,7 @@ public class ServiceInstanceBindingController extends BaseController {
 	public ResponseEntity<String> unbind(@PathVariable("instanceId") String instanceId,
 			@PathVariable("bindingId") String bindingId, @RequestParam("service_id") String serviceId,
 			@RequestParam("plan_id") String planId, @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
+			@RequestHeader("X-Broker-API-Originating-Identity") String originatingIdentity,
 			@RequestHeader("X-Broker-API-Version") String apiHeader) throws ServiceBrokerException, AsyncRequiredException {
 
 		log.debug("DELETE: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
@@ -118,8 +120,9 @@ public class ServiceInstanceBindingController extends BaseController {
 	@GetMapping(value = "/{instanceId}/service_bindings/{bindingId}/last_operation")
 	public ResponseEntity<JobProgressResponse> lastOperation(@PathVariable("instanceId") String instanceId,
             @PathVariable("bindingId") String bindingId,
-            @RequestParam(value = "service_id", required = false) String serivceId,
+            @RequestParam(value = "service_id", required = false) String serviceId,
             @RequestParam(value = "plan_id", required = false) String planId,
+            @RequestHeader(value = "X-Broker-API-Originating-Identity") String originatingIdentity,
             @RequestHeader(value = "operation", required = false) String operation)
 			throws ServiceInstanceBindingDoesNotExistsException {
 
@@ -134,8 +137,10 @@ public class ServiceInstanceBindingController extends BaseController {
 
 	@ApiVersion(ApiVersions.API_214)
 	@GetMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-	public ResponseEntity<ServiceInstanceBindingResponse> fetch(@PathVariable("instanceId") String instanceId,
-                                                                @PathVariable("bindingId") String bindingId) throws
+	public ResponseEntity<ServiceInstanceBindingResponse> fetch(
+			@RequestHeader(value = "X-Broker-API-Originating-Identity") String originatingIdentity,
+			@PathVariable("instanceId") String instanceId,
+            @PathVariable("bindingId") String bindingId) throws
             ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
 
 		ServiceInstance serviceInstance = bindingService.getServiceInstance(instanceId);

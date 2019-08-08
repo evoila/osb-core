@@ -11,10 +11,7 @@ import de.evoila.cf.broker.service.CatalogService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,7 +36,10 @@ public class CustomFormSchemaController extends BaseController {
     }
 
     @GetMapping(value = "/{serviceInstanceId}/update")
-    public ResponseEntity<Map> items(@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException {
+    public ResponseEntity<Map> items(
+            @PathVariable String serviceInstanceId,
+            @RequestHeader(value = "X-Broker-API-Originating-Identity") String originatingIdentity
+    ) throws ServiceInstanceDoesNotExistException {
 
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
         if (serviceInstance == null)
