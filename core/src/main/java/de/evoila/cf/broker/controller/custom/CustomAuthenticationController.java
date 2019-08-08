@@ -60,8 +60,7 @@ public class CustomAuthenticationController extends BaseController {
 
     @GetMapping(value = "/{serviceInstanceId}")
     public Object authRedirect(
-            @PathVariable String serviceInstanceId,
-            @RequestHeader(value = "X-Broker-API-Originating-Identity") String originatingIdentity
+            @PathVariable String serviceInstanceId
     ) throws URISyntaxException, IOException {
         ServiceDefinition serviceDefinition = resolveServiceDefinitionByServiceInstanceId(serviceInstanceId);
         if (serviceDefinition != null && serviceDefinition.getDashboard() != null
@@ -94,8 +93,7 @@ public class CustomAuthenticationController extends BaseController {
 
     @GetMapping(value = "/{serviceInstanceId}" + CONFIRM)
     public Object confirm(@PathVariable String serviceInstanceId,
-                          @RequestParam(value = "code") String authCode,
-                          @RequestHeader(value = "X-Broker-API-Originating-Identity") String originatingIdentity
+                          @RequestParam(value = "code") String authCode
     ) throws Exception {
         ModelAndView mav = new ModelAndView("index");
         if (authCode == null)

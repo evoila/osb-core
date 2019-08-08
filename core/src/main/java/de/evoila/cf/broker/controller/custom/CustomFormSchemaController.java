@@ -37,8 +37,7 @@ public class CustomFormSchemaController extends BaseController {
 
     @GetMapping(value = "/{serviceInstanceId}/update")
     public ResponseEntity<Map> items(
-            @PathVariable String serviceInstanceId,
-            @RequestHeader(value = "X-Broker-API-Originating-Identity") String originatingIdentity
+            @PathVariable String serviceInstanceId
     ) throws ServiceInstanceDoesNotExistException {
 
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);

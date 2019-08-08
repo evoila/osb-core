@@ -32,7 +32,7 @@ public class CatalogController extends BaseController {
     @GetMapping(value = {"/", ""})
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214})
     public ResponseEntity<Catalog> getCatalog(
-            @RequestHeader("X-Broker-API-Originating-Identity") String originatingIdentity
+            @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity
     ) {
         logger.debug("GET: getCatalog()");
 

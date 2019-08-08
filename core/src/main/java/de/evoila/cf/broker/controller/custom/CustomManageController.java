@@ -57,8 +57,7 @@ public class CustomManageController extends BaseController {
 
     @PatchMapping(value = "/{serviceInstanceId}")
     public ResponseEntity submit(@PathVariable("serviceInstanceId") String serviceInstanceId,
-                                 @RequestBody Map<String, Object> request,
-                                 @RequestHeader(value = "X-Broker-API-Originating-Identity") String originatingIdentity
+                                 @RequestBody Map<String, Object> request
     ) throws ServiceBrokerException,
             ServiceInstanceDoesNotExistException, ValidationException {
 
@@ -78,7 +77,7 @@ public class CustomManageController extends BaseController {
 
         UriComponents uriComponents = MvcUriComponentsBuilder
                 .fromMethodCall(MvcUriComponentsBuilder.on(CustomManageController.class)
-                        .lastOperation(serviceInstanceId, null, originatingIdentity)).build();
+                        .lastOperation(serviceInstanceId, null)).build();
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.LOCATION, uriComponents.toUriString());
@@ -89,8 +88,7 @@ public class CustomManageController extends BaseController {
     @GetMapping(value = "/{serviceInstanceId}/last_operation")
     public ResponseEntity<JobProgressResponse> lastOperation(
             @PathVariable("serviceInstanceId") String serviceInstanceId,
-            @RequestParam(value = "operation", required = false) String operation,
-            @RequestHeader(value = "X-Broker-API-Originating-Identity") String originatingIdentity)
+            @RequestParam(value = "operation", required = false) String operation)
             throws ServiceInstanceDoesNotExistException {
 
         JobProgressResponse jobProgressResponse;

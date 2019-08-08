@@ -39,8 +39,7 @@ public class CustomServiceKeysController extends BaseController {
 
     @GetMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<Page<ServiceInstanceBinding>> getGeneralInformation(
-            @PathVariable String serviceInstanceId,
-            @RequestHeader(value = "X-Broker-API-Originating-Identity") String originatingIdentity
+            @PathVariable String serviceInstanceId
     ) {
         List<ServiceInstanceBinding> bindings = bindingRepository.getBindingsForServiceInstance(serviceInstanceId);
         return new ResponseEntity<>(new PageImpl<>(bindings), HttpStatus.OK);
@@ -48,8 +47,7 @@ public class CustomServiceKeysController extends BaseController {
 
     @GetMapping(value = "/{serviceInstanceId}/{serviceBindingId}")
     public ResponseEntity<ServiceInstanceBinding> getServiceKey(
-            @PathVariable String serviceInstanceId, @PathVariable String serviceBindingId,
-            @RequestHeader(value = "X-Broker-API-Originating-Identity") String originatingIdentity
+            @PathVariable String serviceInstanceId, @PathVariable String serviceBindingId
     ) {
         ServiceInstanceBinding binding = bindingRepository.findOne(serviceBindingId);
         return new ResponseEntity<>(binding, HttpStatus.OK);
@@ -57,8 +55,7 @@ public class CustomServiceKeysController extends BaseController {
 
     @PostMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<ServiceInstanceBinding> createServiceKey(
-            @PathVariable String serviceInstanceId,
-            @RequestHeader(value = "X-Broker-API-Originating-Identity") String originatingIdentity
+            @PathVariable String serviceInstanceId
     ) throws ServiceInstanceDoesNotExistException,
             ServiceBrokerException, ServiceInstanceBindingExistsException, ServiceDefinitionDoesNotExistException,
             ServiceBrokerFeatureIsNotSupportedException, PlatformException,
@@ -82,8 +79,7 @@ public class CustomServiceKeysController extends BaseController {
 
     @DeleteMapping(value = "/{serviceInstanceId}/{serviceBindingId}")
     public ResponseEntity delete(@PathVariable String serviceInstanceId,
-                                 @PathVariable String serviceBindingId,
-                                 @RequestHeader(value = "X-Broker-API-Originating-Identity") String originatingIdentity)
+                                 @PathVariable String serviceBindingId)
             throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException,
             ServiceInstanceBindingDoesNotExistsException, AsyncRequiredException, ServiceBrokerException {
 
