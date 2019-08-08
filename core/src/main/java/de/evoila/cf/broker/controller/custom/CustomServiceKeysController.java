@@ -38,7 +38,9 @@ public class CustomServiceKeysController extends BaseController {
     }
 
     @GetMapping(value = "/{serviceInstanceId}")
-    public ResponseEntity<Page<ServiceInstanceBinding>> getGeneralInformation(@PathVariable String serviceInstanceId) {
+    public ResponseEntity<Page<ServiceInstanceBinding>> getGeneralInformation(
+            @PathVariable String serviceInstanceId
+    ) {
         List<ServiceInstanceBinding> bindings = bindingRepository.getBindingsForServiceInstance(serviceInstanceId);
         return new ResponseEntity<>(new PageImpl<>(bindings), HttpStatus.OK);
     }
@@ -51,7 +53,9 @@ public class CustomServiceKeysController extends BaseController {
     }
 
     @PostMapping(value = "/{serviceInstanceId}")
-    public ResponseEntity<ServiceInstanceBinding> createServiceKey(@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException,
+    public ResponseEntity<ServiceInstanceBinding> createServiceKey(
+            @PathVariable String serviceInstanceId
+    ) throws ServiceInstanceDoesNotExistException,
             ServiceBrokerException, ServiceInstanceBindingExistsException, ServiceDefinitionDoesNotExistException,
             ServiceBrokerFeatureIsNotSupportedException, PlatformException,
             InvalidParametersException, AsyncRequiredException {

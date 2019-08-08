@@ -4,6 +4,7 @@
 package de.evoila.config.web;
 
 import de.evoila.cf.broker.interceptor.ApiVersionInterceptor;
+import de.evoila.cf.broker.interceptor.OriginatingIdentityInterceptor;
 import de.evoila.cf.broker.interceptor.RequestIdentityInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -39,6 +40,7 @@ public class BaseConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(org.springframework.web.servlet.config.annotation.InterceptorRegistry registry) {
         registry.addInterceptor(new ApiVersionInterceptor()).addPathPatterns("/**").excludePathPatterns("/resources/**");
+        registry.addInterceptor(new OriginatingIdentityInterceptor()).addPathPatterns("/**").excludePathPatterns("/resources/**");
         registry.addInterceptor(new RequestIdentityInterceptor()).addPathPatterns("/**").excludePathPatterns("/resources/**");
     }
 }

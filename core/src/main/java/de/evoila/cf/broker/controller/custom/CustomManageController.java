@@ -57,7 +57,8 @@ public class CustomManageController extends BaseController {
 
     @PatchMapping(value = "/{serviceInstanceId}")
     public ResponseEntity submit(@PathVariable("serviceInstanceId") String serviceInstanceId,
-                                 @RequestBody Map<String, Object> request) throws ServiceBrokerException,
+                                 @RequestBody Map<String, Object> request
+    ) throws ServiceBrokerException,
             ServiceInstanceDoesNotExistException, ValidationException {
 
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);

@@ -36,7 +36,9 @@ public class CustomFormSchemaController extends BaseController {
     }
 
     @GetMapping(value = "/{serviceInstanceId}/update")
-    public ResponseEntity<Map> items(@PathVariable String serviceInstanceId) throws ServiceInstanceDoesNotExistException {
+    public ResponseEntity<Map> items(
+            @PathVariable String serviceInstanceId
+    ) throws ServiceInstanceDoesNotExistException {
 
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
         if (serviceInstance == null)

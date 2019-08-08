@@ -54,8 +54,9 @@ public class ServiceInstanceController extends BaseController {
             @PathVariable("serviceInstanceId") String serviceInstanceId,
             @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
             @Valid @RequestBody ServiceInstanceRequest request,
-            @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity) throws ServiceDefinitionDoesNotExistException,
-            ServiceInstanceExistsException, ServiceBrokerException, AsyncRequiredException {
+            @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
+            @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity)
+            throws ServiceDefinitionDoesNotExistException, ServiceInstanceExistsException, ServiceBrokerException, AsyncRequiredException {
 
         if (acceptsIncomplete == null || !acceptsIncomplete) {
             throw new AsyncRequiredException();
@@ -63,7 +64,6 @@ public class ServiceInstanceController extends BaseController {
 
         log.debug("PUT: " + SERVICE_INSTANCE_BASE_PATH + "/{serviceInstanceId}"
                 + ", createServiceInstance(), serviceInstanceId = " + serviceInstanceId);
-
         ServiceDefinition svc = catalogService.getServiceDefinition(request.getServiceDefinitionId());
 
         if (svc == null) {
@@ -84,11 +84,13 @@ public class ServiceInstanceController extends BaseController {
 
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @PatchMapping(value = "/{serviceInstanceId}")
-    public ResponseEntity<ServiceInstanceOperationResponse> update(@PathVariable("serviceInstanceId") String serviceInstanceId,
-                                                                   @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
-                                                                   @RequestBody ServiceInstanceUpdateRequest request,
-                                                                   @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
-            ServiceInstanceDoesNotExistException, AsyncRequiredException {
+    public ResponseEntity<ServiceInstanceOperationResponse> update(
+            @PathVariable("serviceInstanceId") String serviceInstanceId,
+            @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
+            @RequestBody ServiceInstanceUpdateRequest request,
+            @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
+            @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity
+    ) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceInstanceDoesNotExistException {
 
         if (request.getServiceDefinitionId() == null) {
             return new ResponseEntity("Missing required fields: service_id", HttpStatus.BAD_REQUEST);
@@ -114,6 +116,7 @@ public class ServiceInstanceController extends BaseController {
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @DeleteMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<ServiceInstanceOperationResponse> delete(
+            @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
             @PathVariable("serviceInstanceId") String serviceInstanceId,
             @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
@@ -140,6 +143,7 @@ public class ServiceInstanceController extends BaseController {
     public ResponseEntity<JobProgressResponse> lastOperation(
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
             @PathVariable("serviceInstanceId") String serviceInstanceId,
+            @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestParam(value = "operation", required = false) String operation)
             throws ServiceInstanceDoesNotExistException {
 
@@ -156,6 +160,7 @@ public class ServiceInstanceController extends BaseController {
     @GetMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<ServiceInstanceResponse> get(
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
+            @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @PathVariable("serviceInstanceId") String serviceInstanceId) throws UnsupportedOperationException,
             ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceNotFoundException {
 
