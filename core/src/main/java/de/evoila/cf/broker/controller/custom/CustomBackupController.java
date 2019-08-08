@@ -40,8 +40,7 @@ public class CustomBackupController extends BaseController {
 
     @GetMapping(value = "/{serviceInstanceId}/items")
     public ResponseEntity<Page<BackupItem>> items(
-            @PathVariable String serviceInstanceId, @PageableDefault(size = 10, sort = {"name"}, direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestHeader(value = "X-Broker-API-Request-Identity") String requestIdentity) throws ServiceDefinitionDoesNotExistException,
+            @PathVariable String serviceInstanceId, @PageableDefault(size = 10, sort = {"name"}, direction = Sort.Direction.DESC) Pageable pageable) throws ServiceDefinitionDoesNotExistException,
             ServiceBrokerException, ServiceInstanceDoesNotExistException {
         Map<String, String> responses = backupCustomService.getItems(serviceInstanceId);
 

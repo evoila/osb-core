@@ -54,7 +54,7 @@ public class ServiceInstanceController extends BaseController {
             @PathVariable("serviceInstanceId") String serviceInstanceId,
             @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
             @Valid @RequestBody ServiceInstanceRequest request,
-            @RequestHeader(value = "X-Broker-API-Request-Identity") String requestIdentity) throws ServiceDefinitionDoesNotExistException,
+            @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity) throws ServiceDefinitionDoesNotExistException,
             ServiceInstanceExistsException, ServiceBrokerException, AsyncRequiredException {
 
         if (acceptsIncomplete == null || !acceptsIncomplete) {
@@ -87,7 +87,7 @@ public class ServiceInstanceController extends BaseController {
     public ResponseEntity<ServiceInstanceOperationResponse> update(@PathVariable("serviceInstanceId") String serviceInstanceId,
                                                                    @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
                                                                    @RequestBody ServiceInstanceUpdateRequest request,
-                                                                   @RequestHeader(value = "X-Broker-API-Request-Identity") String requestIdentity) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
+                                                                   @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
             ServiceInstanceDoesNotExistException, AsyncRequiredException {
 
         if (request.getServiceDefinitionId() == null) {
@@ -114,7 +114,7 @@ public class ServiceInstanceController extends BaseController {
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @DeleteMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<ServiceInstanceOperationResponse> delete(
-            @RequestHeader(value = "X-Broker-API-Request-Identity") String requestIdentity,
+            @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
             @PathVariable("serviceInstanceId") String serviceInstanceId,
             @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
             @RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId) throws ServiceBrokerException, AsyncRequiredException,
@@ -138,7 +138,7 @@ public class ServiceInstanceController extends BaseController {
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @GetMapping(value = "/{serviceInstanceId}/last_operation")
     public ResponseEntity<JobProgressResponse> lastOperation(
-            @RequestHeader(value = "X-Broker-API-Request-Identity") String requestIdentity,
+            @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
             @PathVariable("serviceInstanceId") String serviceInstanceId,
             @RequestParam(value = "operation", required = false) String operation)
             throws ServiceInstanceDoesNotExistException {
@@ -155,7 +155,7 @@ public class ServiceInstanceController extends BaseController {
     @ApiVersion({ApiVersions.API_214, ApiVersions.API_215})
     @GetMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<ServiceInstanceResponse> get(
-            @RequestHeader(value = "X-Broker-API-Request-Identity") String requestIdentity,
+            @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
             @PathVariable("serviceInstanceId") String serviceInstanceId) throws UnsupportedOperationException,
             ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceNotFoundException {
 

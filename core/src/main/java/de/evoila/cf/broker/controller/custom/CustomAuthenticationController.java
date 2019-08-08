@@ -57,8 +57,7 @@ public class CustomAuthenticationController extends BaseController {
     }
 
     @GetMapping(value = "/{serviceInstanceId}")
-    public Object authRedirect(@PathVariable String serviceInstanceId,
-                               @RequestHeader(value = "X-Broker-API-Request-Identity") String requestIdentity) throws URISyntaxException, IOException {
+    public Object authRedirect(@PathVariable String serviceInstanceId) throws URISyntaxException, IOException {
         ServiceDefinition serviceDefinition = resolveServiceDefinitionByServiceInstanceId(serviceInstanceId);
         if (serviceDefinition != null && serviceDefinition.getDashboard() != null
                 && serviceDefinition.getDashboard().getAuthEndpoint() != null
@@ -90,8 +89,7 @@ public class CustomAuthenticationController extends BaseController {
 
     @GetMapping(value = "/{serviceInstanceId}" + CONFIRM)
     public Object confirm(@PathVariable String serviceInstanceId,
-                          @RequestParam(value = "code") String authCode,
-                          @RequestHeader(value = "X-Broker-API-Request-Identity") String requestIdentity) throws Exception {
+                          @RequestParam(value = "code") String authCode) throws Exception {
         ModelAndView mav = new ModelAndView("index");
         if (authCode == null)
             return this.processErrorResponse("No authentication code from UAA could be found",
