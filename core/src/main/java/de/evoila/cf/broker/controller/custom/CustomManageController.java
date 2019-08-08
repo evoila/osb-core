@@ -19,7 +19,7 @@ import org.springframework.web.util.UriComponents;
 import java.util.Map;
 
 /**
- * @author  Yannic Remmet, Johannes Hiemer.
+ * @author Yannic Remmet, Johannes Hiemer.
  */
 @Controller
 @RequestMapping(value = "/custom/v2/manage/service_instances")
@@ -57,7 +57,8 @@ public class CustomManageController extends BaseController {
 
     @PatchMapping(value = "/{serviceInstanceId}")
     public ResponseEntity submit(@PathVariable("serviceInstanceId") String serviceInstanceId,
-                                 @RequestBody Map<String, Object> request) throws ServiceBrokerException,
+                                 @RequestBody Map<String, Object> request
+    ) throws ServiceBrokerException,
             ServiceInstanceDoesNotExistException, ValidationException {
 
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
@@ -81,7 +82,7 @@ public class CustomManageController extends BaseController {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.LOCATION, uriComponents.toUriString());
 
-        return new ResponseEntity<>(new ResponseMessage<>("Configuration updated successfully"), headers,  HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessage<>("Configuration updated successfully"), headers, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{serviceInstanceId}/last_operation")
