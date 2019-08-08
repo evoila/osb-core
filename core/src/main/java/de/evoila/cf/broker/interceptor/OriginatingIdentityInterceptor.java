@@ -12,29 +12,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 
 public class OriginatingIdentityInterceptor implements HandlerInterceptor {
 
-    private static final String X_BROKER_API_REQUEST_IDENTITY = "X-Broker-API-Request-Identity";
+    private static final String X_BROKER_API_REQUEST_IDENTITY = "X-Broker-API-Originating-Identity";
     private final Logger log = LoggerFactory.getLogger(OriginatingIdentityInterceptor.class);
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
         if (!(handler instanceof ResourceHttpRequestHandler)) {
             HandlerMethod method = (HandlerMethod) handler;
             String[] api;
             log.info("Intercepting on method " + method.getMethod().getName());
 
-            if (method.hasMethodAnnotation(ApiVersion.class)) {
-                api = Objects.requireNonNull(method.getMethodAnnotation(ApiVersion.class)).value();
-                ArrayList<String> apiVersions = new ArrayList<>(Arrays.asList(api));
-
-                if (apiVersions.contains(ApiVersions.API_215)) {
-                    handleOriginatingIdentity(request, response);
-                }
-            }
+            handleOriginatingIdentity(request, response);
         }
         return true;
     }
@@ -43,8 +37,16 @@ public class OriginatingIdentityInterceptor implements HandlerInterceptor {
         String originatingIdentity = request.getHeader(X_BROKER_API_REQUEST_IDENTITY);
 
         if (originatingIdentity != null) {
-            response.setHeader(X_BROKER_API_REQUEST_IDENTITY, originatingIdentity);
-            log.info(X_BROKER_API_REQUEST_IDENTITY + ": " + originatingIdentity);
+            try {
+
+                String[] splitter = originatingIdentity.split(" ");
+                String decodedValue = new String(Base64.getDecoder().decode(splitter[1]));
+                log.info(X_BROKER_API_REQUEST_IDENTITY + " Platform " + splitter[0] + " and Value: " + decodedValue);
+
+                response.setHeader(X_BROKER_API_REQUEST_IDENTITY, originatingIdentity);
+            } catch (Exception e) {
+                log.info("Failed retrieving X-Broker-API-Originating-Identity with Cause", e);
+            }
         }
     }
 }
