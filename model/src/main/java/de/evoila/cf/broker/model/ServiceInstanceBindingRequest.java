@@ -73,10 +73,12 @@ public class ServiceInstanceBindingRequest {
 		this.planId = planId;
 	}
 
+	@Deprecated
 	public String getAppGuid() {
 		return appGuid;
 	}
 
+	@Deprecated
 	public void setAppGuid(String appGuid) {
 		this.appGuid = appGuid;
 	}
