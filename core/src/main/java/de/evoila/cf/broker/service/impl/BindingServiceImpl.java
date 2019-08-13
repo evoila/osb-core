@@ -200,7 +200,6 @@ public abstract class BindingServiceImpl implements BindingService {
                                                             ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                             Plan plan)
 			throws ServiceBrokerException, InvalidParametersException, PlatformException{
-		String instanceId = serviceInstance.getId();
 
         ServiceInstanceBindingResponse serviceInstanceBindingResponse;
 		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
