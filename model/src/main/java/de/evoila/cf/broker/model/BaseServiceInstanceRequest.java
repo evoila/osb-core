@@ -2,6 +2,7 @@ package de.evoila.cf.broker.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
@@ -29,6 +30,10 @@ public class BaseServiceInstanceRequest {
     @JsonSerialize
     @JsonProperty("parameters")
     protected Map<String, Object> parameters = new HashMap<>();
+
+    @JsonSerialize
+    @JsonProperty("maintenance_info")
+    private MaintenanceInfo maintenanceInfo;
 
     public Map<String, String> getContext() {
         return context;
@@ -60,5 +65,13 @@ public class BaseServiceInstanceRequest {
 
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
+    }
+
+    public MaintenanceInfo getMaintenanceInfo() {
+        return maintenanceInfo;
+    }
+
+    public void setMaintenanceInfo(MaintenanceInfo maintenanceInfo) {
+        this.maintenanceInfo = maintenanceInfo;
     }
 }

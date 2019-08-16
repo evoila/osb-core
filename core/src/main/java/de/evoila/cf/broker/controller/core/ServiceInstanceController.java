@@ -7,6 +7,7 @@ import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.annotations.ApiVersion;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
+import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.DeploymentService;
@@ -56,7 +57,8 @@ public class ServiceInstanceController extends BaseController {
             @Valid @RequestBody ServiceInstanceRequest request,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity)
-            throws ServiceDefinitionDoesNotExistException, ServiceInstanceExistsException, ServiceBrokerException, AsyncRequiredException {
+            throws ServiceDefinitionDoesNotExistException, ServiceInstanceExistsException, ServiceBrokerException,
+            AsyncRequiredException, MaintenanceInfoVersionsDontMatchException, ServiceDefinitionPlanDoesNotExistException {
 
         if (acceptsIncomplete == null || !acceptsIncomplete) {
             throw new AsyncRequiredException();
@@ -70,6 +72,8 @@ public class ServiceInstanceController extends BaseController {
             throw new ServiceDefinitionDoesNotExistException(request.getServiceDefinitionId());
         }
 
+        checkMaintenanceInfo(request);
+
         ServiceInstanceOperationResponse response = deploymentService.createServiceInstance(serviceInstanceId, request);
 
         if (DashboardUtils.hasDashboard(svc))
@@ -82,6 +86,16 @@ public class ServiceInstanceController extends BaseController {
             return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    private void checkMaintenanceInfo(BaseServiceInstanceRequest request) throws ServiceDefinitionPlanDoesNotExistException, MaintenanceInfoVersionsDontMatchException {
+        ServiceDefinition svc = catalogService.getServiceDefinition(request.getServiceDefinitionId());
+        Plan plan = svc.getPlans().stream().filter(plan1 -> request.getPlanId().equals(plan1.getId()))
+                .findFirst().orElseThrow(() -> new ServiceDefinitionPlanDoesNotExistException(request.getServiceDefinitionId(), request.getPlanId()));
+
+        if (request.getMaintenanceInfo() != null && !request.getMaintenanceInfo().getVersion().equals(plan.getMaintenanceInfo().getVersion())) {
+            throw new MaintenanceInfoVersionsDontMatchException(request.getMaintenanceInfo().getVersion(), plan.getMaintenanceInfo().getVersion());
+        }
+    }
+
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @PatchMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<ServiceInstanceOperationResponse> update(
@@ -90,11 +104,13 @@ public class ServiceInstanceController extends BaseController {
             @RequestBody ServiceInstanceUpdateRequest request,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity
-    ) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceInstanceDoesNotExistException {
+    ) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceInstanceDoesNotExistException,
+            MaintenanceInfoVersionsDontMatchException, ServiceDefinitionPlanDoesNotExistException {
 
         if (request.getServiceDefinitionId() == null) {
             return new ResponseEntity("Missing required fields: service_id", HttpStatus.BAD_REQUEST);
         }
+        checkMaintenanceInfo(request);
 
         log.debug("PATCH: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
                 + ", updateServiceInstance(), serviceInstanceId = " + serviceInstanceId);

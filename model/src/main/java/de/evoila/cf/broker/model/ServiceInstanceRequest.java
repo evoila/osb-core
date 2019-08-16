@@ -11,32 +11,33 @@ import java.util.Map;
 /**
  * A request sent by the cloud controller to create a new instance
  * of a service.
- * 
+ *
  * @author sgreenberg@gopivotal.com
  * @author Johannes Hiemer.
  */
 @JsonAutoDetect(getterVisibility = Visibility.NONE)
 public class ServiceInstanceRequest extends BaseServiceInstanceRequest {
 
-	@NotEmpty
-	@JsonSerialize
-	@JsonProperty("organization_guid")
-	private String organizationGuid;
-	
-	@NotEmpty
-	@JsonSerialize
-	@JsonProperty("space_guid")
-	private String spaceGuid;
-	
-	public ServiceInstanceRequest() {}
-	
-	public ServiceInstanceRequest(String serviceDefinitionId, String planId, String organizationGuid, String spaceGuid, Map<String, String> context) {
-		this.serviceDefinitionId = serviceDefinitionId;
-		this.planId = planId;
-		this.organizationGuid = organizationGuid;
-		this.spaceGuid = spaceGuid;
-		setContext(context);
-	}
+    @NotEmpty
+    @JsonSerialize
+    @JsonProperty("organization_guid")
+    private String organizationGuid;
+
+    @NotEmpty
+    @JsonSerialize
+    @JsonProperty("space_guid")
+    private String spaceGuid;
+
+    public ServiceInstanceRequest() {
+    }
+
+    public ServiceInstanceRequest(String serviceDefinitionId, String planId, String organizationGuid, String spaceGuid, Map<String, String> context) {
+        this.serviceDefinitionId = serviceDefinitionId;
+        this.planId = planId;
+        this.organizationGuid = organizationGuid;
+        this.spaceGuid = spaceGuid;
+        setContext(context);
+    }
 
     public String getOrganizationGuid() {
         return organizationGuid;

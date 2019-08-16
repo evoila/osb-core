@@ -15,31 +15,36 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  **/
 public abstract class BaseController {
 
-	private final Logger log = LoggerFactory.getLogger(BaseController.class);
+    private final Logger log = LoggerFactory.getLogger(BaseController.class);
 
     protected ResponseEntity processErrorResponse(HttpStatus status) {
         return new ResponseEntity(status);
     }
 
-	protected ResponseEntity processErrorResponse(String message, HttpStatus status) {
-		return new ResponseEntity(new ResponseMessage(message), status);
-	}
+    protected ResponseEntity processErrorResponse(String message, HttpStatus status) {
+        return new ResponseEntity(new ResponseMessage(message), status);
+    }
 
     protected ResponseEntity processErrorResponse(JSONObject message, HttpStatus status) {
         return new ResponseEntity(message, status);
     }
 
-    @ExceptionHandler({ ValidationException.class })
+    @ExceptionHandler({ValidationException.class})
     public ResponseEntity<ResponseMessage> handleException(ValidationException ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({ ConcurrencyErrorException.class })
+    @ExceptionHandler({MaintenanceInfoVersionsDontMatchException.class})
+    public ResponseEntity<ResponseMessage> handleException(MaintenanceInfoVersionsDontMatchException ex) {
+        return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler({ConcurrencyErrorException.class})
     public ResponseEntity<ResponseMessage> handleException(ConcurrencyErrorException ex) {
         return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    @ExceptionHandler({ AsyncRequiredException.class })
+    @ExceptionHandler({AsyncRequiredException.class})
     public ResponseEntity<ResponseMessage> handleException(AsyncRequiredException ex) {
         return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -49,7 +54,7 @@ public abstract class BaseController {
         return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    @ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, ServiceInstanceNotRetrievableException.class })
+    @ExceptionHandler({ServiceDefinitionDoesNotExistException.class, ServiceDefinitionPlanDoesNotExistException.class, ServiceInstanceNotRetrievableException.class})
     public ResponseEntity<ResponseMessage> handleException(Exception ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
@@ -65,7 +70,7 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler(ServiceInstanceNotFoundException.class)
-    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceNotFoundException ex){
+    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceNotFoundException ex) {
         return processErrorResponse(HttpStatus.NOT_FOUND);
     }
 
