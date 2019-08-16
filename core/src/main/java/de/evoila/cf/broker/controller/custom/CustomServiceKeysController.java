@@ -46,9 +46,8 @@ public class CustomServiceKeysController extends BaseController {
     }
 
     @GetMapping(value = "/{serviceInstanceId}/{serviceBindingId}")
-    public ResponseEntity<ServiceInstanceBinding> getServiceKey(
-            @PathVariable String serviceInstanceId, @PathVariable String serviceBindingId
-    ) {
+    public ResponseEntity<ServiceInstanceBinding> getServiceKey(@PathVariable String serviceInstanceId,
+                                                                @PathVariable String serviceBindingId) {
         ServiceInstanceBinding binding = bindingRepository.findOne(serviceBindingId);
         return new ResponseEntity<>(binding, HttpStatus.OK);
     }
@@ -92,5 +91,4 @@ public class CustomServiceKeysController extends BaseController {
         bindingService.deleteServiceInstanceBinding(serviceBindingId, instance.getPlanId(), false);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
 }

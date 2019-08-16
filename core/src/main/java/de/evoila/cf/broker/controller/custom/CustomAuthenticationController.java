@@ -3,6 +3,7 @@
  */
 package de.evoila.cf.broker.controller.custom;
 
+import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.controller.utils.DashboardAuthenticationRedirectBuilder;
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
@@ -12,7 +13,6 @@ import de.evoila.cf.broker.model.catalog.Dashboard;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.CatalogService;
-import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.security.model.CompositeAccessToken;
 import de.evoila.cf.security.openid.OpenIdAuthenticationUtils;
 import org.slf4j.Logger;
@@ -25,8 +25,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 /** @author Johannes Hiemer. */
 @Controller
@@ -59,9 +57,7 @@ public class CustomAuthenticationController extends BaseController {
     }
 
     @GetMapping(value = "/{serviceInstanceId}")
-    public Object authRedirect(
-            @PathVariable String serviceInstanceId
-    ) throws URISyntaxException, IOException {
+    public Object authRedirect(@PathVariable String serviceInstanceId) throws URISyntaxException, IOException {
         ServiceDefinition serviceDefinition = resolveServiceDefinitionByServiceInstanceId(serviceInstanceId);
         if (serviceDefinition != null && serviceDefinition.getDashboard() != null
                 && serviceDefinition.getDashboard().getAuthEndpoint() != null
@@ -93,8 +89,7 @@ public class CustomAuthenticationController extends BaseController {
 
     @GetMapping(value = "/{serviceInstanceId}" + CONFIRM)
     public Object confirm(@PathVariable String serviceInstanceId,
-                          @RequestParam(value = "code") String authCode
-    ) throws Exception {
+                          @RequestParam(value = "code") String authCode) throws Exception {
         ModelAndView mav = new ModelAndView("index");
         if (authCode == null)
             return this.processErrorResponse("No authentication code from UAA could be found",
