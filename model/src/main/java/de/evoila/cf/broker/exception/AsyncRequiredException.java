@@ -1,15 +1,21 @@
 package de.evoila.cf.broker.exception;
+
+import org.springframework.http.HttpStatus;
+
 /**
  * 
- * @author Dennis Mueller, evoila GmbH, Sep 7, 2015
+ * @author Dennis Mueller, Marius Berger
  *
  */
-public class AsyncRequiredException extends Exception {
-
-	private static final long serialVersionUID = 545744662141910897L;
+public class AsyncRequiredException extends ServiceBrokerErrorException {
 
 	@Override
-	public String getMessage() {
-		return "This service plan requires client support for asynchronous service operations.";
+	public String getError() {
+		return "AsyncRequired";
+	}
+
+	@Override
+	public String getDescription() {
+		return "This Service Plan requires client support for asynchronous service operations.";
 	}
 }

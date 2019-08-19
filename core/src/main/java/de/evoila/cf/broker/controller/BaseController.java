@@ -2,8 +2,8 @@ package de.evoila.cf.broker.controller;
 
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.ResponseMessage;
+import de.evoila.cf.broker.model.ServiceBrokerErrorResponse;
 import org.everit.json.schema.ValidationException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -25,8 +25,9 @@ public abstract class BaseController {
         return new ResponseEntity(new ResponseMessage(message), status);
     }
 
-    protected ResponseEntity processErrorResponse(JSONObject message, HttpStatus status) {
-        return new ResponseEntity(message, status);
+    protected ResponseEntity processErrorResponse(String error, String description, HttpStatus status) {
+        log.debug("Handled following service broker error: " + error + " - " + description);
+        return new ResponseEntity(new ServiceBrokerErrorResponse(error, description), status);
     }
 
     @ExceptionHandler({ValidationException.class})
@@ -36,17 +37,17 @@ public abstract class BaseController {
 
     @ExceptionHandler({MaintenanceInfoVersionsDontMatchException.class})
     public ResponseEntity<ResponseMessage> handleException(MaintenanceInfoVersionsDontMatchException ex) {
-        return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
+        return processErrorResponse(ex.getError(), ex.getDescription(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler({ConcurrencyErrorException.class})
     public ResponseEntity<ResponseMessage> handleException(ConcurrencyErrorException ex) {
-        return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
+        return processErrorResponse(ex.getError(), ex.getDescription(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler({AsyncRequiredException.class})
     public ResponseEntity<ResponseMessage> handleException(AsyncRequiredException ex) {
-        return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
+        return processErrorResponse(ex.getError(), ex.getDescription(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(ServiceBrokerFeatureIsNotSupportedException.class)
