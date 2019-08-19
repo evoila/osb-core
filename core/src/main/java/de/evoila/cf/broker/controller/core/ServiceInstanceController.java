@@ -6,6 +6,7 @@ import de.evoila.cf.broker.controller.utils.DashboardUtils;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.annotations.ApiVersion;
+import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
@@ -91,8 +92,12 @@ public class ServiceInstanceController extends BaseController {
         Plan plan = svc.getPlans().stream().filter(plan1 -> request.getPlanId().equals(plan1.getId()))
                 .findFirst().orElseThrow(() -> new ServiceDefinitionPlanDoesNotExistException(request.getServiceDefinitionId(), request.getPlanId()));
 
-        if (request.getMaintenanceInfo() != null && !request.getMaintenanceInfo().getVersion().equals(plan.getMaintenanceInfo().getVersion())) {
-            throw new MaintenanceInfoVersionsDontMatchException(request.getMaintenanceInfo().getVersion(), plan.getMaintenanceInfo().getVersion());
+        MaintenanceInfo requestInfo = request.getMaintenanceInfo();
+        MaintenanceInfo planInfo = plan.getMaintenanceInfo();
+        if (requestInfo != null && planInfo == null
+                ||
+                requestInfo != null && !requestInfo.getVersion().equals(planInfo.getVersion())) {
+            throw new MaintenanceInfoVersionsDontMatchException(requestInfo, planInfo);
         }
     }
 
