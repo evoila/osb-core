@@ -244,17 +244,6 @@ public abstract class BindingServiceImpl implements BindingService {
 		return serviceInstanceRepository.getServiceInstance(serviceInstanceId);
 	}
 
-	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                    ServiceInstance serviceInstance, Plan plan,
-                                                    List<ServerAddress> externalAddresses) throws ServiceBrokerException, InvalidParametersException, PlatformException{
-		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalAddresses.get(0));
-
-		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
-				credentials);
-		serviceInstanceBinding.setExternalServerAddresses(externalAddresses);
-		return serviceInstanceBinding;
-	}
-
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
 												 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException, PlatformException {
 		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
