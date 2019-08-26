@@ -223,7 +223,6 @@ public abstract class BindingServiceImpl implements BindingService {
 	public void syncDeleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance, Plan plan) {
 		try {
 			ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
-			List<ServerAddress> externalServerAddresses = binding.getExternalServerAddresses();
 			unbindService(binding, serviceInstance, plan);
 		} catch (ServiceBrokerException | PlatformException e) {
 			log.error("Could not cleanup service binding", e);
