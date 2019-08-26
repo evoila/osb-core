@@ -81,6 +81,7 @@ public class ServiceInstanceBindingRequest {
 	 * the field of this calls will be returned.
 	 * @return Id of the referenced application
 	 */
+	@Deprecated
 	public String getAppGuid() {
 		if (bindResource != null && !StringUtils.isEmpty(bindResource.getAppGuid())) {
 			return bindResource.getAppGuid();
@@ -96,6 +97,7 @@ public class ServiceInstanceBindingRequest {
 	 * of this class.
 	 * @param appGuid String with the Id of the referenced application to set to
 	 */
+	@Deprecated
 	public void setAppGuid(String appGuid) {
 		this.appGuid = appGuid;
 		if (bindResource != null) {
