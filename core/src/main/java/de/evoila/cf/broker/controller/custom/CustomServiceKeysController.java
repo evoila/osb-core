@@ -8,6 +8,9 @@ import de.evoila.cf.broker.model.ServiceInstanceBindingRequest;
 import de.evoila.cf.broker.repository.BindingRepository;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.BindingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
@@ -23,7 +26,10 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping(value = "/custom/v2/manage/servicekeys")
+@ConditionalOnProperty(prefix = "service-keys", name = "enabled", havingValue = "true")
 public class CustomServiceKeysController extends BaseController {
+
+    static Logger log = LoggerFactory.getLogger(CustomServiceKeysController.class);
 
     BindingRepository bindingRepository;
     BindingService bindingService;
@@ -35,6 +41,7 @@ public class CustomServiceKeysController extends BaseController {
         this.bindingRepository = repository;
         this.bindingService = service;
         this.serviceInstanceRepository = serviceInstanceRepository;
+        log.info("Service Keys are enabled");
     }
 
     @GetMapping(value = "/{serviceInstanceId}")
