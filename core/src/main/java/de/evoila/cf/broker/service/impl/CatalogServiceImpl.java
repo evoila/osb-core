@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -51,7 +52,7 @@ public class CatalogServiceImpl implements CatalogService {
 		}
 		prepareCatalogIfTesting(catalog);
 
-		controllAndManageMaintenanceInfo(catalog);
+		controlAndManageAllMaintenanceInfos(catalog);
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class CatalogServiceImpl implements CatalogService {
 				env -> (env.equalsIgnoreCase(GlobalConstants.TEST_PROFILE)))) {
 
 			catalog.getServices().stream().map(service -> {
-				if (service.getName().indexOf(GlobalConstants.TEST_PROFILE) == -1)
+				if (!service.getName().contains(GlobalConstants.TEST_PROFILE))
 					service.setName(service.getName() + "-" + GlobalConstants.TEST_PROFILE);
 
 				service.setId(replaceLastChar(service.getId()));
@@ -83,7 +84,7 @@ public class CatalogServiceImpl implements CatalogService {
 						.setSecret(replaceLastChar(service.getDashboardClient().getSecret()));
 
 
-				if (service.getDashboardClient().getId().indexOf(GlobalConstants.TEST_PROFILE) == -1)
+				if (!service.getDashboardClient().getId().contains(GlobalConstants.TEST_PROFILE))
 					service.getDashboardClient().setId(
 							service.getDashboardClient().getId() + "-" + GlobalConstants.TEST_PROFILE
 					);
@@ -125,7 +126,7 @@ public class CatalogServiceImpl implements CatalogService {
 		try {
 			URL url = new URL(urlStr);
 
-			if (url.getHost().indexOf(GlobalConstants.TEST_PROFILE) == -1) {
+			if (!url.getHost().contains(GlobalConstants.TEST_PROFILE)) {
 				URL newURL = new URL(url.getProtocol(),
 						url.getHost().replaceFirst("\\.", "-" + GlobalConstants.TEST_PROFILE + "."),
 						url.getPort(), url.getFile());
@@ -149,38 +150,53 @@ public class CatalogServiceImpl implements CatalogService {
 		});
 	}
 
-	public void controllAndManageMaintenanceInfo(Catalog catalog) {
-		if (catalog == null || catalog.getServices() == null) return;
-		for (ServiceDefinition definition : catalog.getServices()) {
-			if (definition.getPlans() != null) {
-				for (Plan plan : definition.getPlans()) {
-					MaintenanceInfo maintenanceInfo = plan.getMaintenanceInfo();
-					if (maintenanceInfo != null) {
-						String version = maintenanceInfo.getVersion();
-						if (StringUtils.isEmpty(version)) {
-							logger.error("Version field of maintenance_info for plan "
-									+ (plan.getId() == null ? "'ID NOT SET'" : plan.getId())
-									+ " is not set, but necessary if the object exists. Disabling it to prevent false configuration.");
-							plan.setMaintenanceInfo(null);
-						} else if (!checkIfVersionIsSemantic2(version)) {
-							logger.error("The configured version of the maintenance_info for plan "
-									+ (plan.getId() == null ? "'ID NOT SET'" : plan.getId())
-									+ "is not complying with required Semantic Versioning 2.0.0. Disabling it to prevent false configuration.");
-							plan.setMaintenanceInfo(null);
-							logger.info("######################");
-							logger.info("The version of the maintenance_info object for plan "+ (plan.getId() == null ? "'ID NOT SET'" : plan.getId()) + " is not complying to required Semantic Versioning 2.0.0");
-							logger.info("The version should look like following examples:");
-							logger.info("- 1.2.3");
-							logger.info("- 2.0.0");
-							logger.info("- 2.2.1-rc.1");
-							logger.info("- 1.0.0-beta");
-							logger.info("Please change your current value '"+version+"' to a compatible string.");
-							logger.info("######################");
-						}
+	private void controlAndManageAllMaintenanceInfos(Catalog catalog) {
+		Optional.ofNullable(catalog).ifPresent(o -> {
+			catalog.getServices().forEach(serviceDefinition -> {
+						serviceDefinition.getPlans().forEach(this::controlAndManageSingleMaintenanceInfo);
 					}
+			);
+		});
+	}
+
+	private void controlAndManageSingleMaintenanceInfo(Plan plan) {
+		Optional.ofNullable(plan.getMaintenanceInfo()).ifPresent(maintenanceInfo -> {
+			String version = maintenanceInfo.getVersion();
+
+			if (StringUtils.isEmpty(version)) {
+				logVersionFieldDoesNotExist(plan.getId());
+				plan.setMaintenanceInfo(null);
+			} else{
+				validateAndLogSemverVersion(plan);
 				}
-			}
+		});
+	}
+
+	private void validateAndLogSemverVersion(Plan plan){
+		MaintenanceInfo maintenanceInfo = plan.getMaintenanceInfo();
+		if(!checkIfVersionIsSemantic2(maintenanceInfo.getVersion())){
+			plan.setMaintenanceInfo(null);
+			logIncorrectSemverVersion(plan.getId(), maintenanceInfo.getVersion());
 		}
+	}
+
+	private void logIncorrectSemverVersion(String planId, String version){
+		logger.error("The configured version of the maintenance_info for plan " +  planId
+				+ "is not complying with required Semantic Versioning 2.0.0. Disabling it to prevent false configuration.");
+		logger.info("\n######################"
+				+ "\n The version of the maintenance_info object for plan " + planId + " is not complying to required Semantic Versioning 2.0.0"
+				+ "\n The version should look like following examples:"
+				+ "\n- 1.2.3 "
+				+ "\n- 2.0.0"
+				+ "\n- 2.2.1-rc.1"
+				+ "\n- 1.0.0-beta"
+				+ "\nPlease change your current value '" + version + "' to a compatible string."
+				+ "\n######################");
+	}
+
+	private void logVersionFieldDoesNotExist(String planId) {
+		logger.error("Version field of maintenance_info for plan " + planId +
+				" is not set, but necessary if the object exists. Disabling it to prevent false configuration.");
 	}
 
 	private boolean checkIfVersionIsSemantic2(String versionToCheck) {
