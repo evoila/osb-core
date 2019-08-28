@@ -12,7 +12,6 @@ import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.repository.*;
 import de.evoila.cf.broker.service.*;
 import de.evoila.cf.broker.service.AsyncBindingService;
-import de.evoila.cf.broker.service.HAProxyService;
 import de.evoila.cf.broker.service.PlatformService;
 import de.evoila.cf.broker.util.ParameterValidator;
 import de.evoila.cf.security.utils.RandomString;
@@ -42,8 +41,6 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	protected RouteBindingRepository routeBindingRepository;
 
-	protected HAProxyService haProxyService;
-
 	protected JobRepository jobRepository;
 
 	protected AsyncBindingService asyncBindingService;
@@ -55,13 +52,11 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	public BindingServiceImpl(BindingRepository bindingRepository, ServiceDefinitionRepository serviceDefinitionRepository,
 							  ServiceInstanceRepository serviceInstanceRepository, RouteBindingRepository routeBindingRepository,
-							  HAProxyService haProxyService, JobRepository jobRepository, AsyncBindingService asyncBindingService,
-							  PlatformRepository platformRepository) {
+							  JobRepository jobRepository, AsyncBindingService asyncBindingService, PlatformRepository platformRepository) {
 		this.bindingRepository = bindingRepository;
 		this.serviceDefinitionRepository = serviceDefinitionRepository;
 		this.serviceInstanceRepository = serviceInstanceRepository;
 		this.routeBindingRepository = routeBindingRepository;
-		this.haProxyService = haProxyService;
 		this.jobRepository = jobRepository;
 		this.asyncBindingService = asyncBindingService;
 		this.platformRepository = platformRepository;
@@ -205,7 +200,6 @@ public abstract class BindingServiceImpl implements BindingService {
                                                             ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                             Plan plan)
 			throws ServiceBrokerException, InvalidParametersException, PlatformException{
-		String instanceId = serviceInstance.getId();
 
         ServiceInstanceBindingResponse serviceInstanceBindingResponse;
 		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
@@ -218,15 +212,7 @@ public abstract class BindingServiceImpl implements BindingService {
 			return serviceInstanceBindingResponse;
 		}
 
-		ServiceInstanceBinding binding;
-		if (haProxyService != null && serviceInstanceBindingRequest.getAppGuid() == null &&
-				(serviceInstanceBindingRequest.getBindResource() != null && serviceInstanceBindingRequest.getBindResource().getAppGuid() == null)) {
-			List<ServerAddress> externalServerAddresses = haProxyService.appendAgent(serviceInstance.getHosts(), bindingId, instanceId);
-
-			binding = bindServiceKey(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalServerAddresses);
-		} else {
-			binding = bindService(bindingId, serviceInstanceBindingRequest, serviceInstance, plan);
-		}
+		ServiceInstanceBinding binding = bindService(bindingId, serviceInstanceBindingRequest, serviceInstance, plan);
 
 		bindingRepository.addInternalBinding(binding);
         serviceInstanceBindingResponse = new ServiceInstanceBindingResponse(binding);
@@ -237,11 +223,6 @@ public abstract class BindingServiceImpl implements BindingService {
 	public void syncDeleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance, Plan plan) {
 		try {
 			ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
-			List<ServerAddress> externalServerAddresses = binding.getExternalServerAddresses();
-			if (externalServerAddresses != null && haProxyService != null) {
-				haProxyService.removeAgent(serviceInstance.getHosts(), bindingId);
-			}
-
 			unbindService(binding, serviceInstance, plan);
 		} catch (ServiceBrokerException | PlatformException e) {
 			log.error("Could not cleanup service binding", e);
@@ -260,17 +241,6 @@ public abstract class BindingServiceImpl implements BindingService {
 			throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
 		}
 		return serviceInstanceRepository.getServiceInstance(serviceInstanceId);
-	}
-
-	protected ServiceInstanceBinding bindServiceKey(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                                                    ServiceInstance serviceInstance, Plan plan,
-                                                    List<ServerAddress> externalAddresses) throws ServiceBrokerException, InvalidParametersException, PlatformException{
-		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, externalAddresses.get(0));
-
-		ServiceInstanceBinding serviceInstanceBinding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(),
-				credentials);
-		serviceInstanceBinding.setExternalServerAddresses(externalAddresses);
-		return serviceInstanceBinding;
 	}
 
 	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,

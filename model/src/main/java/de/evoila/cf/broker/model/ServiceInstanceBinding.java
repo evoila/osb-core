@@ -27,8 +27,6 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 
 	private Map<String, String> parameters;
 
-	private List<ServerAddress> externalServerAddresses;
-
 	private List<VolumeMount> volumeMounts;
 
 	public ServiceInstanceBinding() {
@@ -79,14 +77,6 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 
 	public void setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
-	}
-
-	public List<ServerAddress> getExternalServerAddresses() {
-		return externalServerAddresses;
-	}
-
-	public void setExternalServerAddresses(List<ServerAddress> externalServerAddresses) {
-		this.externalServerAddresses = externalServerAddresses;
 	}
 
 	public List<VolumeMount> getVolumeMounts() {
