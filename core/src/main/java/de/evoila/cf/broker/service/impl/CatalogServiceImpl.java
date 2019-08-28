@@ -1,23 +1,24 @@
 package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.bean.EndpointConfiguration;
+import de.evoila.cf.broker.exception.CatalogIsNotValidException;
 import de.evoila.cf.broker.interfaces.TranformCatalog;
 import de.evoila.cf.broker.model.catalog.Catalog;
-import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.model.GlobalConstants;
+import de.evoila.cf.broker.service.CatalogValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,11 +40,10 @@ public class CatalogServiceImpl implements CatalogService {
 
 	private EndpointConfiguration endpointConfiguration;
 
-	public CatalogServiceImpl(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration, @Autowired(required = false ) List<TranformCatalog> tranformCatalog) {
+	public CatalogServiceImpl(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration, @Autowired(required = false ) List<TranformCatalog> tranformCatalog) throws CatalogIsNotValidException {
 		this.catalog = catalog;
 		this.environment = environment;
 		this.endpointConfiguration = endpointConfiguration;
-
 
 		filterActivePlans(catalog);
 		if (tranformCatalog != null) {
@@ -51,8 +51,6 @@ public class CatalogServiceImpl implements CatalogService {
 			tranformCatalog.forEach(e -> e.clean(catalog, environment, endpointConfiguration));
 		}
 		prepareCatalogIfTesting(catalog);
-
-		controlAndManageAllMaintenanceInfos(catalog);
 	}
 
 	@Override
@@ -148,64 +146,6 @@ public class CatalogServiceImpl implements CatalogService {
 						return plan.getMetadata().isActive();
 					}).collect(Collectors.toList()));
 		});
-	}
-
-	private void controlAndManageAllMaintenanceInfos(Catalog catalog) {
-		Optional.ofNullable(catalog).ifPresent(o -> {
-			catalog.getServices().forEach(serviceDefinition -> {
-						serviceDefinition.getPlans().forEach(this::controlAndManageSingleMaintenanceInfo);
-					}
-			);
-		});
-	}
-
-	private void controlAndManageSingleMaintenanceInfo(Plan plan) {
-		Optional.ofNullable(plan.getMaintenanceInfo()).ifPresent(maintenanceInfo -> {
-			String version = maintenanceInfo.getVersion();
-
-			if (StringUtils.isEmpty(version)) {
-				logVersionFieldDoesNotExist(plan.getId());
-				plan.setMaintenanceInfo(null);
-			} else{
-				validateAndLogSemverVersion(plan);
-				}
-		});
-	}
-
-	private void validateAndLogSemverVersion(Plan plan){
-		MaintenanceInfo maintenanceInfo = plan.getMaintenanceInfo();
-		if(!checkIfVersionIsSemantic2(maintenanceInfo.getVersion())){
-			plan.setMaintenanceInfo(null);
-			logIncorrectSemverVersion(plan.getId(), maintenanceInfo.getVersion());
-		}
-	}
-
-	private void logIncorrectSemverVersion(String planId, String version){
-		logger.error("The configured version of the maintenance_info for plan " +  planId
-				+ "is not complying with required Semantic Versioning 2.0.0. Disabling it to prevent false configuration.");
-		logger.info("\n######################"
-				+ "\n The version of the maintenance_info object for plan " + planId + " is not complying to required Semantic Versioning 2.0.0"
-				+ "\n The version should look like following examples:"
-				+ "\n- 1.2.3 "
-				+ "\n- 2.0.0"
-				+ "\n- 2.2.1-rc.1"
-				+ "\n- 1.0.0-beta"
-				+ "\nPlease change your current value '" + version + "' to a compatible string."
-				+ "\n######################");
-	}
-
-	private void logVersionFieldDoesNotExist(String planId) {
-		logger.error("Version field of maintenance_info for plan " + planId +
-				" is not set, but necessary if the object exists. Disabling it to prevent false configuration.");
-	}
-
-	private boolean checkIfVersionIsSemantic2(String versionToCheck) {
-		return !StringUtils.isEmpty(versionToCheck) &&
-			versionToCheck.matches("^(0|[1-9]\\d*)" +
-					"\\.(0|[1-9]\\d*)" +
-					"\\.(0|[1-9]\\d*)" +
-					"(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))" +
-					"?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$");
 	}
 
 }
