@@ -3,7 +3,9 @@ package de.evoila.cf.broker.service.impl;
 import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.broker.interfaces.TranformCatalog;
 import de.evoila.cf.broker.model.catalog.Catalog;
+import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
+import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.model.GlobalConstants;
 import org.slf4j.Logger;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -47,6 +50,8 @@ public class CatalogServiceImpl implements CatalogService {
 			tranformCatalog.forEach(e -> e.clean(catalog, environment, endpointConfiguration));
 		}
 		prepareCatalogIfTesting(catalog);
+
+		controllAndManageMaintenanceInfo(catalog);
 	}
 
 	@Override
@@ -142,6 +147,49 @@ public class CatalogServiceImpl implements CatalogService {
 						return plan.getMetadata().isActive();
 					}).collect(Collectors.toList()));
 		});
+	}
+
+	public void controllAndManageMaintenanceInfo(Catalog catalog) {
+		if (catalog == null || catalog.getServices() == null) return;
+		for (ServiceDefinition definition : catalog.getServices()) {
+			if (definition.getPlans() != null) {
+				for (Plan plan : definition.getPlans()) {
+					MaintenanceInfo maintenanceInfo = plan.getMaintenanceInfo();
+					if (maintenanceInfo != null) {
+						String version = maintenanceInfo.getVersion();
+						if (StringUtils.isEmpty(version)) {
+							logger.error("Version field of maintenance_info for plan "
+									+ (plan.getId() == null ? "'ID NOT SET'" : plan.getId())
+									+ " is not set, but necessary if the object exists. Disabling it to prevent false configuration.");
+							plan.setMaintenanceInfo(null);
+						} else if (!checkIfVersionIsSemantic2(version)) {
+							logger.error("The configured version of the maintenance_info for plan "
+									+ (plan.getId() == null ? "'ID NOT SET'" : plan.getId())
+									+ "is not complying with required Semantic Versioning 2.0.0. Disabling it to prevent false configuration.");
+							plan.setMaintenanceInfo(null);
+							logger.info("######################");
+							logger.info("The version of the maintenance_info object for plan "+ (plan.getId() == null ? "'ID NOT SET'" : plan.getId()) + " is not complying to required Semantic Versioning 2.0.0");
+							logger.info("The version should look like following examples:");
+							logger.info("- 1.2.3");
+							logger.info("- 2.0.0");
+							logger.info("- 2.2.1-rc.1");
+							logger.info("- 1.0.0-beta");
+							logger.info("Please change your current value '"+version+"' to a compatible string.");
+							logger.info("######################");
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private boolean checkIfVersionIsSemantic2(String versionToCheck) {
+		return !StringUtils.isEmpty(versionToCheck) &&
+			versionToCheck.matches("^(0|[1-9]\\d*)" +
+					"\\.(0|[1-9]\\d*)" +
+					"\\.(0|[1-9]\\d*)" +
+					"(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))" +
+					"?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$");
 	}
 
 }
