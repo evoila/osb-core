@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.mvc.ParameterizableViewController;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,7 @@ public class ApiVersionInterceptor implements HandlerInterceptor {
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
 
-        if (!(handler instanceof ResourceHttpRequestHandler)) {
+        if (!(handler instanceof ResourceHttpRequestHandler || handler instanceof ParameterizableViewController)) {
             HandlerMethod method = (HandlerMethod) handler;
             String[] api;
             boolean doesApiMatch = true;
