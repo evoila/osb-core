@@ -106,6 +106,8 @@ public class CatalogValidationService {
                 log.info("Invalid parts were changed or disabled to ensure a proper start and runtime. " +
                         "Please review the catalog or logs of class 'CatalogValidationService' to see which parts were changed or disabled.");
             }
+        } else {
+            log.info("Catalog was validated and passed.");
         }
 
         return valid;
@@ -131,6 +133,14 @@ public class CatalogValidationService {
 
         if (!validateGuid(serviceDefinition.getId())) {
             log.info("Id of a service definition is not a valid guid (name = " + serviceDefinition.getName() + ")");
+            return false;
+        }
+        if (StringUtils.isEmpty(serviceDefinition.getName())) {
+            log.info("Name of service definition " + serviceDefinition.getId() + " is null or empty.");
+            return false;
+        }
+        if (StringUtils.isEmpty(serviceDefinition.getDescription())) {
+            log.info("Description of service definition " + serviceDefinition.getId() + " is null or empty.");
             return false;
         }
 
@@ -162,6 +172,14 @@ public class CatalogValidationService {
 
         if (!validateGuid(plan.getId())) {
             log.info("Id of a plan is not a valid guid (name = " + plan.getName() + ")");
+            return false;
+        }
+        if (StringUtils.isEmpty(plan.getName())) {
+            log.info("Name of plan " + plan.getId() + " is null or empty.");
+            return false;
+        }
+        if (StringUtils.isEmpty(plan.getDescription())) {
+            log.info("Description of plan " + plan.getId() + " is null or empty.");
             return false;
         }
 
