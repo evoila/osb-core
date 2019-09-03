@@ -144,7 +144,10 @@ public class CatalogValidationService {
             return false;
         }
 
-        if (serviceDefinition.getPlans() == null) return true;
+        if (serviceDefinition.getPlans() == null || serviceDefinition.getPlans().isEmpty()) {
+            log.info("Service definition " + serviceDefinition.getId() + " has no plans.");
+            return false;
+        }
 
         // Foreach instead of Stream because of accessing a variable outside of the stream
         boolean valid = true;
