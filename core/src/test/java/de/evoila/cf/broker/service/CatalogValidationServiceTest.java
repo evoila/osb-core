@@ -118,6 +118,10 @@ public class CatalogValidationServiceTest {
             assertFalse("Service definition should be invalid after changes to " + nameOfChangedObject + " but is not.",
                     catalogValidationService.validateServiceDefinition(getServiceDefinition()));
 
+            if (getServiceDefinition().getPlans() == null || getServiceDefinition().getPlans().isEmpty()) {
+                return;
+            }
+                
             if (indexOfChangedPlan == 0) {
                 assertFalse("Plan A should be invalid after changes to " + nameOfChangedObject + " but is not.",
                         catalogValidationService.validateServicePlan(getPlan(0)));
