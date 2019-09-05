@@ -27,7 +27,6 @@ public class CatalogValidationService {
 
     private boolean validate;
     private boolean strict;
-    private boolean intrusive;
 
     private CatalogService catalogService;
 
@@ -51,24 +50,12 @@ public class CatalogValidationService {
         this.strict = strict;
     }
 
-    public boolean isIntrusive() {
-        return intrusive;
-    }
-
-    public void setIntrusive(boolean intrusive) {
-        this.intrusive = intrusive;
-    }
-
-    public boolean isAllowedToChangeCatalog() {
-        return !strict && intrusive;
-    }
-
     /**
      * Method for Spring to run a validation on startup.
      * If the service is configured as {@linkplain #isStrict()}, the method will throw an uncaught {@linkplain CatalogIsNotValidException}.
      * The catalog will be provided by the {@linkplain CatalogService}.
      * For further information see {@linkplain #validateCatalog(Catalog)}.
-     * @throws CatalogIsNotValidException
+     * @throws CatalogIsNotValidException if catalog does not pass the validation check and the validation service {@linkplain #isStrict()}
      */
     @PostConstruct
     public void validate() throws CatalogIsNotValidException {
@@ -86,7 +73,6 @@ public class CatalogValidationService {
      *     <li>has at least one service definition</li>
      *     <li>{@linkplain #validateServiceDefinition(ServiceDefinition)} for each service definition</li>
      * </ul>
-     * If the service {@linkplain #isAllowedToChangeCatalog()}, then fields can be changed or parts disabled to prevent misconfiguration.
      * @param catalog Catalog object to validate
      * @return true if the catalog is valid according to the performed checks or false if at least one check fails
      */
@@ -102,10 +88,6 @@ public class CatalogValidationService {
         }
         if (!valid) {
             log.info("The catalog that was build on the given configuration is not valid.");
-            if (isAllowedToChangeCatalog()) {
-                log.info("Invalid parts were changed or disabled to ensure a proper start and runtime. " +
-                        "Please review the catalog or logs of class 'CatalogValidationService' to see which parts were changed or disabled.");
-            }
         } else {
             log.info("Catalog was validated and passed.");
         }
@@ -118,10 +100,9 @@ public class CatalogValidationService {
      * <ul>
      *     <li>null check</li>
      *     <li>{@linkplain #validateGuid(String)} for the id</li>
-     *     <li>{@linkplain #validateServicePlan(Plan)} for each plan</li>
+     *     <li>{@linkplain #validateServicePlan(String, Plan)} for each plan</li>
      * </ul>
      *
-     * If the service {@linkplain #isAllowedToChangeCatalog()}, then fields can be changed or parts disabled to prevent misconfiguration.
      * @param serviceDefinition ServiceDefinition object to validate
      * @return true if the service definition is valid according to the performed checks or false if at least one check fails
      */
@@ -152,7 +133,7 @@ public class CatalogValidationService {
         // Foreach instead of Stream because of accessing a variable outside of the stream
         boolean valid = true;
         for (Plan plan : serviceDefinition.getPlans()) {
-            valid &= validateServicePlan(plan);
+            valid &= validateServicePlan(plan.getId(), plan);
         }
         return valid;
     }
@@ -162,19 +143,20 @@ public class CatalogValidationService {
      * <ul>
      *     <li>null check</li>
      *     <li>{@linkplain #validateGuid(String)} for the id</li>
-     *     <li>{@linkplain #validateMaintenanceInfo(Plan)} for the maintenance info object</li>
+     *     <li>{@linkplain #validateMaintenanceInfo(String, MaintenanceInfo)} for the maintenance info object</li>
      * </ul>
-     * @param plan
+     * @param serviceDefinitionId id of the owning service definition used for logging purposes
+     * @param plan the plan object to validate
      * @return
      */
-    public boolean validateServicePlan(Plan plan) {
+    public boolean validateServicePlan(String serviceDefinitionId, Plan plan) {
         if (plan == null) {
-            log.info("A service definition contains a plan that is a null value");
+            log.info("The service definition " + serviceDefinitionId + " contains a plan that is a null value");
             return false;
         }
 
         if (!validateGuid(plan.getId())) {
-            log.info("Id of a plan is not a valid guid (name = " + plan.getName() + ")");
+            log.info("Id of a plan of the service definition " + serviceDefinitionId + " is not a valid guid (name = " + plan.getName() + ")");
             return false;
         }
         if (StringUtils.isEmpty(plan.getName())) {
@@ -186,36 +168,23 @@ public class CatalogValidationService {
             return false;
         }
 
-        return validateMaintenanceInfo(plan);
+        return validateMaintenanceInfo(plan.getId(), plan.getMaintenanceInfo());
     }
 
     private boolean validateGuid(String guid) {
         return !StringUtils.isEmpty(guid) && guid.matches(GUID_REGEX);
     }
 
-    private boolean validateMaintenanceInfo(Plan plan) {
-        if (plan == null) {
-            log.info("A plan is null.");
-            return false;
-        }
-
-        if (plan.getMaintenanceInfo() == null) return true;
-
-        MaintenanceInfo maintenanceInfo = plan.getMaintenanceInfo();
+    private boolean validateMaintenanceInfo(String planId, MaintenanceInfo maintenanceInfo) {
+        if (maintenanceInfo == null) return true;
 
         if (StringUtils.isEmpty(maintenanceInfo.getVersion())) {
-            logVersionFieldDoesNotExist(plan.getId());
-            if (isAllowedToChangeCatalog()) {
-                plan.setMaintenanceInfo(null);
-            }
+            logVersionFieldDoesNotExist(planId);
             return false;
         }
 
         if (!validateSemanticVersion2(maintenanceInfo.getVersion())){
-            logIncorrectSemverVersion(plan.getId(), maintenanceInfo.getVersion());
-            if (isAllowedToChangeCatalog()) {
-                plan.setMaintenanceInfo(null);
-            }
+            logIncorrectSemverVersion(planId, maintenanceInfo.getVersion());
             return false;
         }
         return true;
