@@ -171,10 +171,22 @@ public class CatalogValidationService {
         return validateMaintenanceInfo(plan.getId(), plan.getMaintenanceInfo());
     }
 
+    /**
+     * Validates a given String to be a GUID.
+     * @param guid string to validate
+     * @return true if the given string qualifies for a GUID and false if it does not
+     */
     private boolean validateGuid(String guid) {
         return !StringUtils.isEmpty(guid) && guid.matches(GUID_REGEX);
     }
 
+    /**
+     * Validates a given maintenance_info object by checking its version for existence
+     * and compliance with Semantic Version 2
+     * @param planId id of the owning plan for logging purposes
+     * @param maintenanceInfo maintenance_info object to validate
+     * @return true if the given maintenance_info is valid or false if it is not
+     */
     private boolean validateMaintenanceInfo(String planId, MaintenanceInfo maintenanceInfo) {
         if (maintenanceInfo == null) return true;
 
@@ -190,6 +202,12 @@ public class CatalogValidationService {
         return true;
     }
 
+    /**
+     * Logs the incorrect version with the given id of the plan object owning maintenance_info object.
+     * Also logs a few examples of Semantic Versioning 2 to help the user with changing the version.
+     * @param planId id of the plan object, that owns the maintenance_info object
+     * @param version incorrect version string
+     */
     private void logIncorrectSemverVersion(String planId, String version){
         log.info("\n######################"
                 + "\n The version of the maintenance_info object for plan " + planId + " is not complying to required Semantic Versioning 2.0.0"
@@ -202,10 +220,19 @@ public class CatalogValidationService {
                 + "\n######################");
     }
 
+    /**
+     * Logs the absence of the {@linkplain MaintenanceInfo#getVersion()} field.
+     * @param planId id of the plan object, that owns the maintenance_info object
+     */
     private void logVersionFieldDoesNotExist(String planId) {
         log.info("Version field of maintenance_info for plan " + planId + " is not set, but necessary if the object exists.");
     }
 
+    /**
+     * Validates a String to qualify as a Semantic Versioning 2 version.
+     * @param versionToCheck the version String to check
+     * @return true if given version String is Semantic Versioning 2
+     */
     private boolean validateSemanticVersion2(String versionToCheck) {
         return !StringUtils.isEmpty(versionToCheck) &&
                 versionToCheck.matches("^(0|[1-9]\\d*)" +
