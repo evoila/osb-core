@@ -158,16 +158,15 @@ public class DeploymentServiceImpl implements DeploymentService {
     public ServiceInstanceOperationResponse deleteServiceInstance(String instanceId)
             throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
         ServiceInstance serviceInstance;
+        Plan plan;
         try {
             serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+            plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
         } catch(Exception e) {
             throw new ServiceInstanceDoesNotExistException(instanceId);
         }
 
-        Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
-
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
-
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
         if (platformService.isSyncPossibleOnDelete(serviceInstance)) {
