@@ -23,6 +23,11 @@ public class CatalogValidationServiceTest {
     private Catalog catalog;
     private CatalogValidationService catalogValidationService;
 
+    /**
+     * Initializes the catalog and validation service object of this test.
+     * Creates one service offering with three service plans.
+     * The resulting test is supposed to be valid.
+     */
     @Before
     public void initCatalog() {
 
@@ -80,10 +85,22 @@ public class CatalogValidationServiceTest {
         return plan;
     }
 
+    /**
+     * Returns a specific plan from the catalog object of this test.
+     * Be aware that no checks for index position are done and exceptions can occur if handled incorrectly.
+     * See {@linkplain #initCatalog()} and {@linkplain #getTestPlan(String, String, String, Platform, boolean, String)} for information about the creation of the service plan.
+     * @param index index of the plan to get
+     * @return service plan object that corresponds to the given index
+     */
     private Plan getPlan(int index) {
         return catalog.getServices().get(0).getPlans().get(index);
     }
 
+    /**
+     * Returns the service definition object of this tests catalog object.
+     * See {@linkplain #initCatalog()} for information about the creation of the service definition.
+     * @return the service definition of this tests catalog object
+     */
     private ServiceDefinition getServiceDefinition() {
         return catalog.getServices().get(0);
     }
@@ -93,7 +110,7 @@ public class CatalogValidationServiceTest {
      * When expecting a negative validation, this method only takes one plan into consideration when changed.
      * @param expected whether to expect a valid or invalid catalog
      * @param nameOfChangedObject name of the object that was changed for logging purposes
-     * @param indexOfChangedPlan indicates which plan was made invalid, insert a number which is no index in the plans list like -1
+     * @param indexOfChangedPlan indicates which plan was made invalid; field is ignored if a valid catalog is expected
      */
     private void assertCatalogComponents(boolean expected, String nameOfChangedObject, int indexOfChangedPlan) {
         if (expected) {
@@ -144,6 +161,10 @@ public class CatalogValidationServiceTest {
         }
     }
 
+    /**
+     * Tests the tests catalog object with {@linkplain #assertCatalogComponents(boolean, String, int)} and expects a valid catalog.
+     * The catalog has to be created and initiated beforehand.
+     */
     @Test
     public void testValidDefault() {
         assertCatalogComponents(true, "", -1);
@@ -234,9 +255,11 @@ public class CatalogValidationServiceTest {
 
     @Test
     public void testInvalidCatalog() {
+        // Test services equals null
         catalog.setServices(null);
         assertFalse("Catalog has null for services list but passed validation.", catalogValidationService.validateCatalog(catalog));
 
+        // Test empty services list
         initCatalog();
         catalog.setServices(new LinkedList<>());
         assertFalse("Catalog has no service definitions but passed validation.", catalogValidationService.validateCatalog(catalog));
