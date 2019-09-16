@@ -2,7 +2,9 @@ package de.evoila.cf.broker.model.catalog.plan;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.evoila.cf.broker.model.Platform;
+import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
 
 /**
  * A service plan available for a ServiceDefinition
@@ -24,6 +26,10 @@ public class Plan {
 	private boolean free = true;
 
 	private Schemas schemas;
+
+
+	@JsonProperty("maintenance_info")
+	private MaintenanceInfo maintenanceInfo;
 
 	public Plan() {}
 
@@ -110,5 +116,13 @@ public class Plan {
 
 	public void setSchemas(Schemas schemas) {
 		this.schemas = schemas;
+	}
+
+	public MaintenanceInfo getMaintenanceInfo() {
+		return maintenanceInfo;
+	}
+
+	public void setMaintenanceInfo(MaintenanceInfo maintenanceInfo) {
+		this.maintenanceInfo = maintenanceInfo;
 	}
 }

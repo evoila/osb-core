@@ -2,8 +2,8 @@ package de.evoila.cf.broker.controller;
 
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.ResponseMessage;
+import de.evoila.cf.broker.model.ServiceBrokerErrorResponse;
 import org.everit.json.schema.ValidationException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,33 +15,39 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  **/
 public abstract class BaseController {
 
-	private final Logger log = LoggerFactory.getLogger(BaseController.class);
+    private final Logger log = LoggerFactory.getLogger(BaseController.class);
 
     protected ResponseEntity processErrorResponse(HttpStatus status) {
         return new ResponseEntity(status);
     }
 
-	protected ResponseEntity processErrorResponse(String message, HttpStatus status) {
-		return new ResponseEntity(new ResponseMessage(message), status);
-	}
-
-    protected ResponseEntity processErrorResponse(JSONObject message, HttpStatus status) {
-        return new ResponseEntity(message, status);
+    protected ResponseEntity processErrorResponse(String message, HttpStatus status) {
+        return new ResponseEntity(new ResponseMessage(message), status);
     }
 
-    @ExceptionHandler({ ValidationException.class })
+    protected ResponseEntity processErrorResponse(String error, String description, HttpStatus status) {
+        log.debug("Handled following service broker error: " + error + " - " + description);
+        return new ResponseEntity(new ServiceBrokerErrorResponse(error, description), status);
+    }
+
+    @ExceptionHandler({ValidationException.class})
     public ResponseEntity<ResponseMessage> handleException(ValidationException ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({ ConcurrencyErrorException.class })
-    public ResponseEntity<ResponseMessage> handleException(ConcurrencyErrorException ex) {
-        return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
+    @ExceptionHandler({MaintenanceInfoVersionsDontMatchException.class})
+    public ResponseEntity<ResponseMessage> handleException(MaintenanceInfoVersionsDontMatchException ex) {
+        return processErrorResponse(ex.getError(), ex.getDescription(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    @ExceptionHandler({ AsyncRequiredException.class })
+    @ExceptionHandler({ConcurrencyErrorException.class})
+    public ResponseEntity<ResponseMessage> handleException(ConcurrencyErrorException ex) {
+        return processErrorResponse(ex.getError(), ex.getDescription(), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler({AsyncRequiredException.class})
     public ResponseEntity<ResponseMessage> handleException(AsyncRequiredException ex) {
-        return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
+        return processErrorResponse(ex.getError(), ex.getDescription(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(ServiceBrokerFeatureIsNotSupportedException.class)
@@ -49,7 +55,7 @@ public abstract class BaseController {
         return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    @ExceptionHandler({ ServiceDefinitionDoesNotExistException.class, ServiceInstanceNotRetrievableException.class })
+    @ExceptionHandler({ServiceDefinitionDoesNotExistException.class, ServiceDefinitionPlanDoesNotExistException.class, ServiceInstanceNotRetrievableException.class})
     public ResponseEntity<ResponseMessage> handleException(Exception ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
@@ -65,7 +71,7 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler(ServiceInstanceNotFoundException.class)
-    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceNotFoundException ex){
+    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceNotFoundException ex) {
         return processErrorResponse(HttpStatus.NOT_FOUND);
     }
 

@@ -1,17 +1,20 @@
 package de.evoila.cf.broker.exception;
 
-import java.io.Serializable;
+import org.springframework.http.HttpStatus;
 
 /**
- * @author Marco Di Martino
+ * @author Marco Di Martino, Marius Berger
  */
 
-public class ConcurrencyErrorException extends Exception {
-
-    private static final long serialVersionUID = 42L;
+public class ConcurrencyErrorException extends ServiceBrokerErrorException {
 
     @Override
-    public String getMessage() {
-        return "Service Instance is being updated and therefore cannot be fetched.";
+    public String getError() {
+        return "ConcurrencyError";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Another operation for this Service Instance is in progress.";
     }
 }
