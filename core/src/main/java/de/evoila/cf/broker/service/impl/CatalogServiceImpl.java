@@ -1,11 +1,14 @@
 package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.bean.EndpointConfiguration;
+import de.evoila.cf.broker.exception.CatalogIsNotValidException;
 import de.evoila.cf.broker.interfaces.TranformCatalog;
 import de.evoila.cf.broker.model.catalog.Catalog;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
+import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.model.GlobalConstants;
+import de.evoila.cf.broker.service.CatalogValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +18,9 @@ import org.springframework.stereotype.Service;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -39,7 +44,6 @@ public class CatalogServiceImpl implements CatalogService {
 		this.catalog = catalog;
 		this.environment = environment;
 		this.endpointConfiguration = endpointConfiguration;
-
 
 		filterActivePlans(catalog);
 		if (tranformCatalog != null) {
@@ -70,7 +74,7 @@ public class CatalogServiceImpl implements CatalogService {
 				env -> (env.equalsIgnoreCase(GlobalConstants.TEST_PROFILE)))) {
 
 			catalog.getServices().stream().map(service -> {
-				if (service.getName().indexOf(GlobalConstants.TEST_PROFILE) == -1)
+				if (!service.getName().contains(GlobalConstants.TEST_PROFILE))
 					service.setName(service.getName() + "-" + GlobalConstants.TEST_PROFILE);
 
 				service.setId(replaceLastChar(service.getId()));
@@ -78,7 +82,7 @@ public class CatalogServiceImpl implements CatalogService {
 						.setSecret(replaceLastChar(service.getDashboardClient().getSecret()));
 
 
-				if (service.getDashboardClient().getId().indexOf(GlobalConstants.TEST_PROFILE) == -1)
+				if (!service.getDashboardClient().getId().contains(GlobalConstants.TEST_PROFILE))
 					service.getDashboardClient().setId(
 							service.getDashboardClient().getId() + "-" + GlobalConstants.TEST_PROFILE
 					);
@@ -120,7 +124,7 @@ public class CatalogServiceImpl implements CatalogService {
 		try {
 			URL url = new URL(urlStr);
 
-			if (url.getHost().indexOf(GlobalConstants.TEST_PROFILE) == -1) {
+			if (!url.getHost().contains(GlobalConstants.TEST_PROFILE)) {
 				URL newURL = new URL(url.getProtocol(),
 						url.getHost().replaceFirst("\\.", "-" + GlobalConstants.TEST_PROFILE + "."),
 						url.getPort(), url.getFile());
