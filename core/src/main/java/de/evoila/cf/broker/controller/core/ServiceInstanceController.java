@@ -128,7 +128,7 @@ public class ServiceInstanceController extends BaseController {
         if (catalogService.getServiceDefinition(request.getServiceDefinitionId()).isUpdateable()) {
             serviceInstanceOperationResponse = deploymentService.updateServiceInstance(serviceInstanceId, request);
         } else {
-            return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.UNPROCESSABLE_ENTITY);
+            return new ResponseEntity(new ServiceBrokerErrorResponse("NotUpdatable", "An update on the requested service instance is not supported."), HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         return new ResponseEntity(serviceInstanceOperationResponse, HttpStatus.ACCEPTED);
