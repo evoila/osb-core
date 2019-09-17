@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.util;
 
+import de.evoila.cf.broker.model.ServiceInstance;
+import de.evoila.cf.broker.model.ServiceInstanceUpdateRequest;
 import de.evoila.cf.broker.model.catalog.ServerAddress;
 import org.springframework.util.StringUtils;
 
@@ -95,5 +97,29 @@ public class ServiceInstanceUtils {
 
     public static ServerAddress serverAddress(String name, String host, int port) {
         return new ServerAddress(name, host, port);
+    }
+
+    /**
+     * Checks whether an update with the given ServiceInstanceUpdateRequest would effectively change the service instance.
+     *
+     * This method heavily relies on the {@linkplain Object#equals(Object)} method to check for equality
+     * and resulting non-effective changes to a field. So it is mandatory for all objects contained in
+     * {@linkplain ServiceInstance#getParameters()} to have an overwritten equals method or can ensure equality by identity.
+     * @param serviceInstance the service instance object to compare with the update request
+     * @param request the update request object to compare with the service instance
+     * @return true if update would have effects and false if it would not
+     */
+    public static boolean isEffectivelyUpdating(ServiceInstance serviceInstance, ServiceInstanceUpdateRequest request) {
+        if (serviceInstance == null && request == null) return false;
+        if (serviceInstance == null ^ request == null) return true;
+        if (request.getContext() == null ^ serviceInstance.getContext() == null) return true;
+        if (request.getParameters() == null ^ serviceInstance.getParameters() == null) return true;
+
+        if (!request.getServiceDefinitionId().equals(serviceInstance.getServiceDefinitionId())
+            || !request.getPlanId().equals(serviceInstance.getPlanId()))
+            return true;
+
+        return !request.getContext().equals(serviceInstance.getContext())
+                || !request.getParameters().equals(serviceInstance.getParameters());
     }
 }
