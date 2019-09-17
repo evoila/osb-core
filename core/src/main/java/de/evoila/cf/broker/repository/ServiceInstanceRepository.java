@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.repository;
 
+import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.ServiceInstance;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
  */
 public interface ServiceInstanceRepository {
 
-	ServiceInstance getServiceInstance(String instanceId);
+	ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException;
 
 	List<ServiceInstance> getServiceInstancesByServiceDefinitionId(String serviceDefinitionId);
 
