@@ -110,8 +110,7 @@ public class ServiceInstanceUtils {
      * @return true if update would have effects and false if it would not
      */
     public static boolean isEffectivelyUpdating(ServiceInstance serviceInstance, ServiceInstanceUpdateRequest request) {
-        if (serviceInstance == null && request == null) return false;
-        if (serviceInstance == null ^ request == null) return true;
+        if (serviceInstance == null || request == null) return false;
         if (request.getContext() == null ^ serviceInstance.getContext() == null) return true;
         if (request.getParameters() == null ^ serviceInstance.getParameters() == null) return true;
 
