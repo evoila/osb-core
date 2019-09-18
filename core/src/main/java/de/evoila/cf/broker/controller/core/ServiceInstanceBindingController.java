@@ -147,9 +147,19 @@ public class ServiceInstanceBindingController extends BaseController {
             @PathVariable("bindingId") String bindingId,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity) throws
-            ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
+            ServiceInstanceBindingNotFoundException, ServiceBrokerException {
 
-        ServiceInstance serviceInstance = bindingService.getServiceInstance(instanceId);
+        ServiceInstance serviceInstance;
+        try {
+            serviceInstance = bindingService.getServiceInstance(instanceId);
+        } catch (ServiceInstanceDoesNotExistException ex) {
+            // Has to return different status code instead of 404, because 404 is reserved for when the binding does not exist
+            // 400 was chosen, because the id of the service instance is defined as "MUST be the ID of a previously provisioned Service Instance"
+            return processErrorResponse("ServiceInstanceNotFound",
+                    "No service instance was found for the given id. This could be caused by a desynchronization between broker and platform.",
+                    HttpStatus.BAD_REQUEST);
+        }
+
         if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isBindingsRetrievable())) {
             throw new ServiceInstanceBindingNotRetrievableException("The Service Binding could not be retrievable. You should not attempt to call this endpoint");
         }
@@ -158,13 +168,5 @@ public class ServiceInstanceBindingController extends BaseController {
         ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(binding);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
-    // Needed here instead of in the BaseController because a different status code has to be returned.
-    @ExceptionHandler(ServiceInstanceDoesNotExistException.class)
-    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceDoesNotExistException ex) {
-        return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
 
 }
