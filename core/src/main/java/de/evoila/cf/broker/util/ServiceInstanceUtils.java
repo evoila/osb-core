@@ -102,12 +102,14 @@ public class ServiceInstanceUtils {
     /**
      * Checks whether an update with the given ServiceInstanceUpdateRequest would effectively change the service instance.
      *
+     * If either of the two values is null, the return value is always false.
+     *
      * This method heavily relies on the {@linkplain Object#equals(Object)} method to check for equality
      * and resulting non-effective changes to a field. So it is mandatory for all objects contained in
      * {@linkplain ServiceInstance#getParameters()} to have an overwritten equals method or can ensure equality by identity.
      * @param serviceInstance the service instance object to compare with the update request
      * @param request the update request object to compare with the service instance
-     * @return true if update would have effects and false if it would not
+     * @return true if update would have effects and false if it would not or a parameter is null
      */
     public static boolean isEffectivelyUpdating(ServiceInstance serviceInstance, ServiceInstanceUpdateRequest request) {
         if (serviceInstance == null || request == null) return false;
