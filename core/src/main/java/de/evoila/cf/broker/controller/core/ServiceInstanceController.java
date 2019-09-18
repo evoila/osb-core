@@ -111,7 +111,7 @@ public class ServiceInstanceController extends BaseController {
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity
     ) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceInstanceDoesNotExistException,
-            MaintenanceInfoVersionsDontMatchException, ServiceDefinitionPlanDoesNotExistException {
+            MaintenanceInfoVersionsDontMatchException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException {
 
         if (request.getServiceDefinitionId() == null) {
             return new ResponseEntity("Missing required fields: service_id", HttpStatus.BAD_REQUEST);
@@ -127,7 +127,11 @@ public class ServiceInstanceController extends BaseController {
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse;
         if (catalogService.getServiceDefinition(request.getServiceDefinitionId()).isUpdateable()) {
-            if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstanceRepository.getServiceInstance(serviceInstanceId), request)) {
+            ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+            if (serviceInstance == null) {
+                throw new ServiceInstanceNotFoundException(serviceInstanceId);
+            }
+            if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request)) {
                 log.info("Update would have not effective changes.");
                 return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.OK);
             }
