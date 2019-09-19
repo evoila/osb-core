@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.util;
 
+import de.evoila.cf.broker.model.ServiceInstance;
+import de.evoila.cf.broker.model.ServiceInstanceRequest;
 import de.evoila.cf.broker.model.catalog.ServerAddress;
 import org.springframework.util.StringUtils;
 
@@ -95,5 +97,19 @@ public class ServiceInstanceUtils {
 
     public static ServerAddress serverAddress(String name, String host, int port) {
         return new ServerAddress(name, host, port);
+    }
+
+    public static boolean wouldCreateIdenticalInstance(String serviceInstanceId, ServiceInstanceRequest request, ServiceInstance serviceInstance) {
+        if (StringUtils.isEmpty(serviceInstanceId) || request == null || serviceInstance == null) return true;
+        if (request.getContext() == null ^ serviceInstance.getContext() == null) return false;
+        if (request.getParameters() == null ^ serviceInstance.getParameters() == null) return false;
+
+        return serviceInstanceId.equals(serviceInstance.getId())
+                && request.getServiceDefinitionId().equals(serviceInstance.getServiceDefinitionId())
+                && request.getPlanId().equals(serviceInstance.getPlanId())
+                && request.getOrganizationGuid().equals(serviceInstance.getOrganizationGuid())
+                && request.getSpaceGuid().equals(serviceInstance.getSpaceGuid())
+                && request.getContext().equals(serviceInstance.getContext())
+                && request.getParameters().equals(request.getParameters());
     }
 }
