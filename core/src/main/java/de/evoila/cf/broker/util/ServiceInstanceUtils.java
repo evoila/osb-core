@@ -98,7 +98,19 @@ public class ServiceInstanceUtils {
     public static ServerAddress serverAddress(String name, String host, int port) {
         return new ServerAddress(name, host, port);
     }
-
+    
+    /**
+     * Checks whether a service creation with the fiven ServiceInstanceRequest would provision an identical service instance.
+     *
+     * This method heavily relies on the {@linkplain Object#equals(Object)} method to check for equality
+     * and resulting non-effective changes to a field. So it is mandatory for all objects contained in
+     * {@linkplain ServiceInstance#getParameters()} to have an overwritten equals method or can ensure equality by identity.
+     *
+     * @param serviceInstanceId the service instance object to compare with the provision request
+     * @param request the provision request object to compare with the service instance
+     * @param serviceInstance the service instance object to compare with the provision request
+     * @return true if provisioning would create an identical instance and false if it would not
+     */
     public static boolean wouldCreateIdenticalInstance(String serviceInstanceId, ServiceInstanceRequest request, ServiceInstance serviceInstance) {
         if (StringUtils.isEmpty(serviceInstanceId) || request == null || serviceInstance == null) return true;
         if (request.getContext() == null ^ serviceInstance.getContext() == null) return false;
