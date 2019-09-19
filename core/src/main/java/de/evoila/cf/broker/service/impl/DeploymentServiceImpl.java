@@ -82,6 +82,12 @@ public class DeploymentServiceImpl implements DeploymentService {
 		serviceDefinitionRepository.validateServiceId(request.getServiceDefinitionId());
 
 		if (serviceInstanceRepository.containsServiceInstanceId(serviceInstanceId)) {
+		    JobProgress jobProgress = jobRepository.getJobProgressByReferenceId(serviceInstanceId);
+		    if (jobProgress != null && jobProgress.isProvisioning() && jobProgress.isInProgress()) {
+		        // Service Instance can not be null, because containsServiceInstanceId check was done before
+                return new ServiceInstanceOperationResponse(jobProgress.getId(),
+                        serviceInstanceRepository.getServiceInstance(serviceInstanceId).getDashboardUrl(), true);
+            }
 			throw new ServiceInstanceExistsException(serviceInstanceId, request.getServiceDefinitionId());
 		}
 

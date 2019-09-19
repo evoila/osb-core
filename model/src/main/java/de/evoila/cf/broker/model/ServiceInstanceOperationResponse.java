@@ -24,12 +24,17 @@ public class ServiceInstanceOperationResponse {
 	public ServiceInstanceOperationResponse() {}
 
     public ServiceInstanceOperationResponse(String operation) {
-        this.operation = operation;
+        this(operation, "");
     }
 
     public ServiceInstanceOperationResponse(String operation, String dashboardUrl) {
-        this.operation = operation;
-        this.dashboardUrl = dashboardUrl;
+        this(operation, dashboardUrl, false);
+    }
+
+    public ServiceInstanceOperationResponse(String operation, String dashboardUrl, boolean isAsync) {
+	    this.operation = operation;
+	    this.dashboardUrl = dashboardUrl;
+	    this.async = isAsync;
     }
 
     public String getOperation() {
