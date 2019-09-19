@@ -123,7 +123,7 @@ public class ServiceInstanceUtils {
                 && request.getOrganizationGuid().equals(serviceInstance.getOrganizationGuid())
                 && request.getSpaceGuid().equals(serviceInstance.getSpaceGuid())
                 && request.getContext().equals(serviceInstance.getContext())
-                && request.getParameters().equals(request.getParameters());
+                && request.getParameters().equals(serviceInstance.getParameters());
     }
 
      /**
