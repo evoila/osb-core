@@ -1,6 +1,7 @@
 package de.evoila.cf.broker.util;
 
 import de.evoila.cf.broker.model.ServiceInstance;
+import de.evoila.cf.broker.model.ServiceInstanceRequest;
 import de.evoila.cf.broker.model.ServiceInstanceUpdateRequest;
 import de.evoila.cf.broker.model.catalog.ServerAddress;
 import org.springframework.util.StringUtils;
@@ -100,13 +101,39 @@ public class ServiceInstanceUtils {
     }
 
     /**
-     * Checks whether an update with the given ServiceInstanceUpdateRequest would effectively change the service instance.
-     *
-     * If either of the two values is null, the return value is always false.
+     * Checks whether a service creation with the given ServiceInstanceRequest would provision an identical service instance.
      *
      * This method heavily relies on the {@linkplain Object#equals(Object)} method to check for equality
      * and resulting non-effective changes to a field. So it is mandatory for all objects contained in
      * {@linkplain ServiceInstance#getParameters()} to have an overwritten equals method or can ensure equality by identity.
+     *
+     * @param serviceInstanceId the service instance object to compare with the provision request
+     * @param request the provision request object to compare with the service instance
+     * @param serviceInstance the service instance object to compare with the provision request
+     * @return true if provisioning would create an identical instance and false if it would not
+     */
+    public static boolean wouldCreateIdenticalInstance(String serviceInstanceId, ServiceInstanceRequest request, ServiceInstance serviceInstance) {
+        if (StringUtils.isEmpty(serviceInstanceId) || request == null || serviceInstance == null) return true;
+        if (request.getContext() == null ^ serviceInstance.getContext() == null) return false;
+        if (request.getParameters() == null ^ serviceInstance.getParameters() == null) return false;
+
+        return serviceInstanceId.equals(serviceInstance.getId())
+                && request.getServiceDefinitionId().equals(serviceInstance.getServiceDefinitionId())
+                && request.getPlanId().equals(serviceInstance.getPlanId())
+                && request.getOrganizationGuid().equals(serviceInstance.getOrganizationGuid())
+                && request.getSpaceGuid().equals(serviceInstance.getSpaceGuid())
+                && request.getContext().equals(serviceInstance.getContext())
+                && request.getParameters().equals(serviceInstance.getParameters());
+    }
+
+     /**
+     * Checks whether an update with the given ServiceInstanceUpdateRequest would effectively change the service instance.
+     *
+     * This method heavily relies on the {@linkplain Object#equals(Object)} method to check for equality
+     * and resulting non-effective changes to a field. So it is mandatory for all objects contained in
+     * {@linkplain ServiceInstance#getParameters()} to have an overwritten equals method or can ensure equality by identity.
+     *
+     * If either of the two values is null, the return value is always false.
      * @param serviceInstance the service instance object to compare with the update request
      * @param request the update request object to compare with the service instance
      * @return true if update would have effects and false if it would not or a parameter is null

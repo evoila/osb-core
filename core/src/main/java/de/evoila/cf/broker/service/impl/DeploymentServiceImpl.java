@@ -14,6 +14,7 @@ import de.evoila.cf.broker.service.AsyncDeploymentService;
 import de.evoila.cf.broker.service.DeploymentService;
 import de.evoila.cf.broker.service.PlatformService;
 import de.evoila.cf.broker.util.ParameterValidator;
+import de.evoila.cf.broker.util.ServiceInstanceUtils;
 import de.evoila.cf.security.utils.RandomString;
 import org.everit.json.schema.ValidationException;
 import org.slf4j.Logger;
@@ -83,10 +84,17 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 		if (serviceInstanceRepository.containsServiceInstanceId(serviceInstanceId)) {
 		    JobProgress jobProgress = jobRepository.getJobProgressByReferenceId(serviceInstanceId);
-		    if (jobProgress != null && jobProgress.isProvisioning() && jobProgress.isInProgress()) {
-		        // Service Instance can not be null, because containsServiceInstanceId check was done before
-                return new ServiceInstanceOperationResponse(jobProgress.getId(),
-                        serviceInstanceRepository.getServiceInstance(serviceInstanceId).getDashboardUrl(), true);
+
+		    if (jobProgress != null && jobProgress.isProvisioning()) {
+                // Service Instance can not be null, because containsServiceInstanceId check was done before
+		        ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+                if (jobProgress.isInProgress()) {
+                    return new ServiceInstanceOperationResponse(jobProgress.getId(),
+                            serviceInstance.getDashboardUrl(), true);
+                } else if (jobProgress.isSucceeded()
+                        && ServiceInstanceUtils.wouldCreateIdenticalInstance(serviceInstanceId, request, serviceInstance)) {
+                    throw new ServiceInstanceExistsException(serviceInstanceId, request.getServiceDefinitionId(), true);
+                }
             }
 			throw new ServiceInstanceExistsException(serviceInstanceId, request.getServiceDefinitionId());
 		}
