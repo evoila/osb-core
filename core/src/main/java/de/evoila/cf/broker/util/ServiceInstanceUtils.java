@@ -2,6 +2,7 @@ package de.evoila.cf.broker.util;
 
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.ServiceInstanceRequest;
+import de.evoila.cf.broker.model.ServiceInstanceUpdateRequest;
 import de.evoila.cf.broker.model.catalog.ServerAddress;
 import org.springframework.util.StringUtils;
 
@@ -98,9 +99,9 @@ public class ServiceInstanceUtils {
     public static ServerAddress serverAddress(String name, String host, int port) {
         return new ServerAddress(name, host, port);
     }
-    
+
     /**
-     * Checks whether a service creation with the fiven ServiceInstanceRequest would provision an identical service instance.
+     * Checks whether a service creation with the given ServiceInstanceRequest would provision an identical service instance.
      *
      * This method heavily relies on the {@linkplain Object#equals(Object)} method to check for equality
      * and resulting non-effective changes to a field. So it is mandatory for all objects contained in
@@ -123,5 +124,30 @@ public class ServiceInstanceUtils {
                 && request.getSpaceGuid().equals(serviceInstance.getSpaceGuid())
                 && request.getContext().equals(serviceInstance.getContext())
                 && request.getParameters().equals(request.getParameters());
+    }
+
+     /**
+     * Checks whether an update with the given ServiceInstanceUpdateRequest would effectively change the service instance.
+     *
+     * This method heavily relies on the {@linkplain Object#equals(Object)} method to check for equality
+     * and resulting non-effective changes to a field. So it is mandatory for all objects contained in
+     * {@linkplain ServiceInstance#getParameters()} to have an overwritten equals method or can ensure equality by identity.
+     *
+     * If either of the two values is null, the return value is always false.
+     * @param serviceInstance the service instance object to compare with the update request
+     * @param request the update request object to compare with the service instance
+     * @return true if update would have effects and false if it would not or a parameter is null
+     */
+    public static boolean isEffectivelyUpdating(ServiceInstance serviceInstance, ServiceInstanceUpdateRequest request) {
+        if (serviceInstance == null || request == null) return false;
+        if (request.getContext() == null ^ serviceInstance.getContext() == null) return true;
+        if (request.getParameters() == null ^ serviceInstance.getParameters() == null) return true;
+
+        if (!request.getServiceDefinitionId().equals(serviceInstance.getServiceDefinitionId())
+            || !request.getPlanId().equals(serviceInstance.getPlanId()))
+            return true;
+
+        return !request.getContext().equals(serviceInstance.getContext())
+                || !request.getParameters().equals(serviceInstance.getParameters());
     }
 }
