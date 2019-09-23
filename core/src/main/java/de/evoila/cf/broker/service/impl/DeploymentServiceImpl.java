@@ -87,7 +87,13 @@ public class DeploymentServiceImpl implements DeploymentService {
 
 		    if (jobProgress != null && jobProgress.isProvisioning()) {
                 // Service Instance can not be null, because containsServiceInstanceId check was done before
-		        ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+                ServiceInstance serviceInstance = null;
+                try {
+                    serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+                } catch (ServiceInstanceDoesNotExistException e) {
+                    log.error("The Service Instance does not exist!", e);
+                    throw new ServiceInstanceExistsException(serviceInstanceId, request.getServiceDefinitionId());
+                }
                 if (jobProgress.isInProgress()) {
                     return new ServiceInstanceOperationResponse(jobProgress.getId(),
                             serviceInstance.getDashboardUrl(), true);
@@ -171,18 +177,11 @@ public class DeploymentServiceImpl implements DeploymentService {
     @Override
     public ServiceInstanceOperationResponse deleteServiceInstance(String instanceId)
             throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
-        ServiceInstance serviceInstance;
-        Plan plan;
-        try {
-            serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-            plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
-        } catch(Exception e) {
-            throw new ServiceInstanceDoesNotExistException(instanceId);
-        }
-
+        ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+        Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
-
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
+
         if (platformService.isSyncPossibleOnDelete(serviceInstance)) {
             syncDeleteInstance(serviceInstance, plan, platformService);
         } else {

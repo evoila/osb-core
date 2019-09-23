@@ -2,16 +2,11 @@ package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
-import de.evoila.cf.broker.model.catalog.plan.Plan;
-import de.evoila.cf.broker.model.RouteBinding;
 import de.evoila.cf.broker.model.catalog.ServerAddress;
-import de.evoila.cf.broker.repository.BindingRepository;
-import de.evoila.cf.broker.repository.RouteBindingRepository;
-import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
-import de.evoila.cf.broker.repository.ServiceInstanceRepository;
+import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.repository.*;
-import de.evoila.cf.broker.service.*;
 import de.evoila.cf.broker.service.AsyncBindingService;
+import de.evoila.cf.broker.service.BindingService;
 import de.evoila.cf.broker.service.PlatformService;
 import de.evoila.cf.broker.util.ParameterValidator;
 import de.evoila.cf.security.utils.RandomString;
@@ -21,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -242,7 +236,8 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 		ServiceInstance serviceInstance;
 		try {
-		serviceInstance =	serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+		serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+
 		}catch (ServiceInstanceDoesNotExistException e){
 			log.error("Service Instance does not exist!", e);
 			throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
