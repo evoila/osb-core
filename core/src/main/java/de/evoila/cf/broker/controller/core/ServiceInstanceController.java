@@ -41,14 +41,18 @@ public class ServiceInstanceController extends BaseController {
 
     private ServiceInstanceRepository serviceInstanceRepository;
 
+    private ServiceInstanceUtils serviceInstanceUtils;
+
     public ServiceInstanceController(DeploymentService deploymentService,
                                      EndpointConfiguration endpointConfiguration,
                                      CatalogService catalogService,
-                                     ServiceInstanceRepository serviceInstanceRepository) {
+                                     ServiceInstanceRepository serviceInstanceRepository,
+                                     ServiceInstanceUtils serviceInstanceUtils) {
         this.deploymentService = deploymentService;
         this.endpointConfiguration = endpointConfiguration;
         this.catalogService = catalogService;
         this.serviceInstanceRepository = serviceInstanceRepository;
+        this.serviceInstanceUtils = serviceInstanceUtils;
     }
 
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
@@ -111,7 +115,7 @@ public class ServiceInstanceController extends BaseController {
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity
     ) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceInstanceDoesNotExistException,
-            MaintenanceInfoVersionsDontMatchException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException {
+            MaintenanceInfoVersionsDontMatchException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException, ConcurrencyErrorException {
 
         if (request.getServiceDefinitionId() == null) {
             return new ResponseEntity("Missing required fields: service_id", HttpStatus.BAD_REQUEST);
@@ -130,6 +134,9 @@ public class ServiceInstanceController extends BaseController {
             ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
             if (serviceInstance == null) {
                 throw new ServiceInstanceNotFoundException(serviceInstanceId);
+            }
+            if (serviceInstanceUtils.isBlocked(serviceInstance, JobProgress.UPDATE)) {
+                throw new ConcurrencyErrorException();
             }
             if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request)) {
                 log.info("Update would have not effective changes.");
@@ -151,7 +158,7 @@ public class ServiceInstanceController extends BaseController {
             @PathVariable("serviceInstanceId") String serviceInstanceId,
             @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
             @RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId) throws ServiceBrokerException, AsyncRequiredException,
-            ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException {
+            ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException, ConcurrencyErrorException {
 
         log.debug("DELETE: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
                 + ", deleteServiceInstanceBinding(), serviceInstanceId = " + serviceInstanceId + ", serviceId = " + serviceId
@@ -159,6 +166,10 @@ public class ServiceInstanceController extends BaseController {
 
         if (acceptsIncomplete == null || !acceptsIncomplete) {
             throw new AsyncRequiredException();
+        }
+
+        if (serviceInstanceUtils.isBlocked(serviceInstanceRepository.getServiceInstance(serviceInstanceId), JobProgress.DELETE)) {
+            throw new ConcurrencyErrorException();
         }
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = deploymentService.deleteServiceInstance(serviceInstanceId);
