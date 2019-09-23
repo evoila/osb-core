@@ -3,6 +3,7 @@ package de.evoila.cf.broker.controller;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.ResponseMessage;
 import de.evoila.cf.broker.model.ServiceBrokerErrorResponse;
+import de.evoila.cf.broker.util.EmptyRestResponse;
 import org.everit.json.schema.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,8 @@ public abstract class BaseController {
     protected ResponseEntity processErrorResponse(HttpStatus status) {
         return new ResponseEntity(status);
     }
+
+    protected ResponseEntity processEmptyErrorResponse(HttpStatus status) { return new ResponseEntity<String>(EmptyRestResponse.BODY, status);}
 
     protected ResponseEntity processErrorResponse(String message, HttpStatus status) {
         return new ResponseEntity(new ResponseMessage(message), status);
@@ -62,6 +65,8 @@ public abstract class BaseController {
 
     @ExceptionHandler(ServiceInstanceExistsException.class)
     public ResponseEntity<ResponseMessage> handleException(ServiceInstanceExistsException ex) {
+        if (ex.isIdenticalInstance())
+            return processEmptyErrorResponse(HttpStatus.OK);
         return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 

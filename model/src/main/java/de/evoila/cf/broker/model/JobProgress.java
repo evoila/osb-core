@@ -36,6 +36,11 @@ public class JobProgress implements BaseEntity<String> {
 	
 	private String description;
 
+	/**
+	 * This field describes the kind of operation this object describes, not the "operation" field for the response to the platform!
+	 * Use id to return to the platform as "operation" field in the json.
+	 *
+	 */
 	private String operation;
 
 	private String referenceId;
@@ -89,6 +94,11 @@ public class JobProgress implements BaseEntity<String> {
 		this.description = description;
 	}
 
+	/**
+	 * Returns the {@linkplain #operation} that describes the kind of operation.
+	 * See {@linkplain #PROVISION}, {@linkplain #UPDATE}, {@linkplain #DELETE}, {@linkplain #BIND} and {@linkplain #UNBIND} for values to expect.
+	 * @return description string for the current kind of operation
+	 */
 	public String getOperation() {
 		return operation;
 	}
@@ -104,4 +114,36 @@ public class JobProgress implements BaseEntity<String> {
     public void setReferenceId(String referenceId) {
         this.referenceId = referenceId;
     }
+
+    public boolean isInProgress() {
+		return IN_PROGRESS.equals(state);
+	}
+
+	public boolean isFailed() {
+		return FAILED.equals(state);
+	}
+
+	public boolean isSucceeded() {
+		return SUCCESS.equals(state);
+	}
+
+	public boolean isProvisioning() {
+		return PROVISION.equals(operation);
+	}
+
+	public boolean isUpdating() {
+		return UPDATE.equals(operation);
+	}
+
+	public boolean isDeleting() {
+		return DELETE.equals(operation);
+	}
+
+	public boolean isBinding() {
+		return BIND.equals(operation);
+	}
+
+	public boolean isUnbinding() {
+		return UNBIND.equals(operation);
+	}
 }

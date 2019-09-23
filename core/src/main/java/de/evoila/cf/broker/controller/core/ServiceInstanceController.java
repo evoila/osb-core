@@ -13,6 +13,7 @@ import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.DeploymentService;
 import de.evoila.cf.broker.util.EmptyRestResponse;
+import de.evoila.cf.broker.util.ServiceInstanceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -89,7 +90,7 @@ public class ServiceInstanceController extends BaseController {
 
     private void checkMaintenanceInfo(BaseServiceInstanceRequest request) throws ServiceDefinitionPlanDoesNotExistException, MaintenanceInfoVersionsDontMatchException {
         ServiceDefinition svc = catalogService.getServiceDefinition(request.getServiceDefinitionId());
-        Plan plan = svc.getPlans().stream().filter(plan1 -> request.getPlanId().equals(plan1.getId()))
+        Plan plan = svc.getPlans().stream().filter(planInStream -> request.getPlanId().equals(planInStream.getId()))
                 .findFirst().orElseThrow(() -> new ServiceDefinitionPlanDoesNotExistException(request.getServiceDefinitionId(), request.getPlanId()));
 
         MaintenanceInfo requestInfo = request.getMaintenanceInfo();
@@ -110,7 +111,7 @@ public class ServiceInstanceController extends BaseController {
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity
     ) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceInstanceDoesNotExistException,
-            MaintenanceInfoVersionsDontMatchException, ServiceDefinitionPlanDoesNotExistException {
+            MaintenanceInfoVersionsDontMatchException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException {
 
         if (request.getServiceDefinitionId() == null) {
             return new ResponseEntity("Missing required fields: service_id", HttpStatus.BAD_REQUEST);
@@ -124,8 +125,16 @@ public class ServiceInstanceController extends BaseController {
             throw new AsyncRequiredException();
         }
 
-        ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
+        ServiceInstanceOperationResponse serviceInstanceOperationResponse;
         if (catalogService.getServiceDefinition(request.getServiceDefinitionId()).isUpdateable()) {
+            ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+            if (serviceInstance == null) {
+                throw new ServiceInstanceNotFoundException(serviceInstanceId);
+            }
+            if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request)) {
+                log.info("Update would have not effective changes.");
+                return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.OK);
+            }
             serviceInstanceOperationResponse = deploymentService.updateServiceInstance(serviceInstanceId, request);
         } else {
             return new ResponseEntity(new ServiceBrokerErrorResponse("NotUpdatable", "An update on the requested service instance is not supported."), HttpStatus.UNPROCESSABLE_ENTITY);
