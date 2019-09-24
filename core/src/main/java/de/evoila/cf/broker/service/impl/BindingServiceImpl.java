@@ -64,12 +64,7 @@ public abstract class BindingServiceImpl implements BindingService {
 
 		validateBindingNotExists(bindingId, instanceId);
 
-		ServiceInstance serviceInstance;
-		try {
-			serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-		} catch(Exception e) {
-			throw new ServiceInstanceDoesNotExistException(instanceId);
-		}
+		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
 
 		Plan plan = serviceDefinitionRepository.getPlan(serviceInstanceBindingRequest.getPlanId());
 		if (serviceInstanceBindingRequest.getParameters() != null) {
@@ -236,7 +231,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 		ServiceInstance serviceInstance;
 		try {
-		serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+			serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
 		} catch (ServiceInstanceDoesNotExistException e) {
 			log.error("Service Instance does not exist!", e);
 			throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
