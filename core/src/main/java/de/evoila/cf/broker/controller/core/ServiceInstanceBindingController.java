@@ -147,7 +147,7 @@ public class ServiceInstanceBindingController extends BaseController {
             @PathVariable("bindingId") String bindingId,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity) throws
-            ServiceInstanceBindingNotFoundException, ServiceBrokerException {
+            ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceDefinitionDoesNotExistException {
 
         ServiceInstance serviceInstance;
         try {

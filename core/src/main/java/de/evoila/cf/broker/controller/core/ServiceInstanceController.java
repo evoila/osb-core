@@ -88,7 +88,8 @@ public class ServiceInstanceController extends BaseController {
             return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    private void checkMaintenanceInfo(BaseServiceInstanceRequest request) throws ServiceDefinitionPlanDoesNotExistException, MaintenanceInfoVersionsDontMatchException {
+    private void checkMaintenanceInfo(BaseServiceInstanceRequest request)
+            throws ServiceDefinitionPlanDoesNotExistException, MaintenanceInfoVersionsDontMatchException, ServiceDefinitionDoesNotExistException {
         ServiceDefinition svc = catalogService.getServiceDefinition(request.getServiceDefinitionId());
         Plan plan = svc.getPlans().stream().filter(planInStream -> request.getPlanId().equals(planInStream.getId()))
                 .findFirst().orElseThrow(() -> new ServiceDefinitionPlanDoesNotExistException(request.getServiceDefinitionId(), request.getPlanId()));
@@ -124,13 +125,18 @@ public class ServiceInstanceController extends BaseController {
         if (acceptsIncomplete == null || !acceptsIncomplete) {
             throw new AsyncRequiredException();
         }
-
         ServiceInstanceOperationResponse serviceInstanceOperationResponse;
+
+        ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(request.getServiceDefinitionId());
+
+
         if (catalogService.getServiceDefinition(request.getServiceDefinitionId()).isUpdateable()) {
             ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
             if (serviceInstance == null) {
                 throw new ServiceInstanceNotFoundException(serviceInstanceId);
             }
+
+
             if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request)) {
                 log.info("Update would have not effective changes.");
                 return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.OK);
@@ -192,7 +198,7 @@ public class ServiceInstanceController extends BaseController {
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @PathVariable("serviceInstanceId") String serviceInstanceId) throws UnsupportedOperationException,
-            ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceNotFoundException {
+            ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceNotFoundException, ServiceDefinitionDoesNotExistException {
 
         ServiceInstance serviceInstance = deploymentService.fetchServiceInstance(serviceInstanceId);
 
