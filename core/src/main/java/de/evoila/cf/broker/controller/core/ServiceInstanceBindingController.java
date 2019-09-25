@@ -142,7 +142,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
     @ApiVersion({ApiVersions.API_214, ApiVersions.API_215})
     @GetMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-    public ResponseEntity<ServiceInstanceBindingResponse> fetch(
+    public ResponseEntity fetch(
             @PathVariable("instanceId") String instanceId,
             @PathVariable("bindingId") String bindingId,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
