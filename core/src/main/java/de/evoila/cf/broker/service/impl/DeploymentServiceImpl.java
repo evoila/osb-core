@@ -175,12 +175,21 @@ public class DeploymentServiceImpl implements DeploymentService {
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
 
+        // Will cause a NPE, if there is no JobProgress object. To fix this, the JobRepository has to be touched.
+        JobProgress jobProgress = jobRepository.getJobProgressByReferenceId(instanceId);
+        if (jobProgress != null && jobProgress.isDeleting() && jobProgress.isInProgress()) {
+            serviceInstanceOperationResponse.setOperation(jobProgress.getId());
+            serviceInstanceOperationResponse.setAsync(true);
+            return serviceInstanceOperationResponse;
+        }
+
         if (platformService.isSyncPossibleOnDelete(serviceInstance)) {
             syncDeleteInstance(serviceInstance, plan, platformService);
         } else {
             String jobProgressId = randomString.nextString();
             asyncDeploymentService.asyncDeleteInstance(this, serviceInstance, plan, platformService, jobProgressId);
             serviceInstanceOperationResponse.setOperation(jobProgressId);
+            serviceInstanceOperationResponse.setAsync(true);
         }
 
         return serviceInstanceOperationResponse;

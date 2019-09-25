@@ -65,8 +65,9 @@ public class AsyncDeploymentServiceImpl extends AsyncOperationServiceImpl implem
         JobProgress jobProgress = progressService.startJob(jobProgressId, serviceInstance.getId(),
                 "Deleting service..", JobProgress.DELETE);
 		try {
+			String serviceInstanceId = serviceInstance.getId();
             deploymentService.syncDeleteInstance(serviceInstance, plan, platformService);
-
+			log.debug("Deletion finished for: " + serviceInstanceId);
 		} catch(Exception e) {
 			progressService.failJob(jobProgress.getId(),
 					"Internal error during Instance deletion, please contact our support.");

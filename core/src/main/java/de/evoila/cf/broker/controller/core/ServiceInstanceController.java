@@ -175,9 +175,13 @@ public class ServiceInstanceController extends BaseController {
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = deploymentService.deleteServiceInstance(serviceInstanceId);
 
-        log.debug("ServiceInstance Deleted: " + serviceInstanceId);
-
-        return new ResponseEntity<>(serviceInstanceOperationResponse, HttpStatus.ACCEPTED);
+        if (serviceInstanceOperationResponse.isAsync()) {
+            log.debug("ServiceInstance deletion started: " + serviceInstanceId);
+            return new ResponseEntity<>(serviceInstanceOperationResponse, HttpStatus.ACCEPTED);
+        } else {
+            log.debug("ServiceInstance Deleted: " + serviceInstanceId);
+            return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.OK);
+        }
     }
 
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
