@@ -111,7 +111,7 @@ public class ServiceInstanceController extends BaseController {
             @RequestBody ServiceInstanceUpdateRequest request,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity
-    ) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceInstanceDoesNotExistException,
+    ) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException,
             MaintenanceInfoVersionsDontMatchException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException {
 
         if (request.getServiceDefinitionId() == null) {
@@ -127,23 +127,22 @@ public class ServiceInstanceController extends BaseController {
         }
         ServiceInstanceOperationResponse serviceInstanceOperationResponse;
 
-        ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(request.getServiceDefinitionId());
-
-
-        if (catalogService.getServiceDefinition(request.getServiceDefinitionId()).isUpdateable()) {
+        try {
             ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
-            if (serviceInstance == null) {
-                throw new ServiceInstanceNotFoundException(serviceInstanceId);
-            }
+            ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(request.getServiceDefinitionId());
 
-
-            if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request)) {
-                log.info("Update would have not effective changes.");
-                return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.OK);
+            if (serviceDefinition.planIsUpdatable(serviceInstance.getPlanId())) {
+                if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request)) {
+                    log.info("Update would have not effective changes.");
+                    return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.OK);
+                }
+                serviceInstanceOperationResponse = deploymentService.updateServiceInstance(serviceInstanceId, request);
+            } else {
+                return new ResponseEntity(new ServiceBrokerErrorResponse("NotUpdatable", "An update on the requested service instance is not supported."), HttpStatus.UNPROCESSABLE_ENTITY);
             }
-            serviceInstanceOperationResponse = deploymentService.updateServiceInstance(serviceInstanceId, request);
-        } else {
-            return new ResponseEntity(new ServiceBrokerErrorResponse("NotUpdatable", "An update on the requested service instance is not supported."), HttpStatus.UNPROCESSABLE_ENTITY);
+        } catch (ServiceInstanceDoesNotExistException e) {
+            log.error("Service Instance has not been found!", e);
+            throw new ServiceInstanceNotFoundException();
         }
 
         return new ResponseEntity(serviceInstanceOperationResponse, HttpStatus.ACCEPTED);

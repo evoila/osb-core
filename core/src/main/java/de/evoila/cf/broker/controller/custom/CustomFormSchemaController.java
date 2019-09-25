@@ -42,9 +42,6 @@ public class CustomFormSchemaController extends BaseController {
     ) throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
 
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
-        if (serviceInstance == null)
-            throw new ServiceInstanceDoesNotExistException("Could not find Service Instance");
-
         ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId());
 
         Plan plan = serviceDefinition.getPlans().stream()

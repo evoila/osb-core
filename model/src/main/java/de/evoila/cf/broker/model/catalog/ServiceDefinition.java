@@ -2,6 +2,7 @@ package de.evoila.cf.broker.model.catalog;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.evoila.cf.broker.exception.ServiceDefinitionPlanDoesNotExistException;
 import de.evoila.cf.broker.model.DashboardClient;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
 
@@ -86,6 +87,17 @@ public class ServiceDefinition {
 
     public boolean isBindingsRetrievable() {
         return bindingsRetrievable;
+    }
+
+    public boolean planIsUpdatable(String planId) throws ServiceDefinitionPlanDoesNotExistException {
+        Plan plan = plans.stream().filter(plan1 -> plan1.getId().equals(planId))
+                .findFirst().orElseThrow(() -> new ServiceDefinitionPlanDoesNotExistException(this.id, planId));
+
+        if (plan.isPlanUpdatable() == null) {
+            return this.isUpdateable();
+        } else {
+            return plan.isPlanUpdatable();
+        }
     }
 
     public void setBindingsRetrievable(boolean bindingsRetrievable) {
