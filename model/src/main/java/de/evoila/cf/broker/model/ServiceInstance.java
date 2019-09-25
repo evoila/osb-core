@@ -72,6 +72,10 @@ public class ServiceInstance implements BaseEntity<String> {
     @JsonIgnore
     private String usergroup;
 
+    @JsonSerialize
+	@JsonProperty("allow_context_update")
+    private boolean allowContextUpdates;
+
 	@SuppressWarnings("unused")
 	private ServiceInstance() {}
 
@@ -230,4 +234,11 @@ public class ServiceInstance implements BaseEntity<String> {
 
 	public void setFloatingIpId(String floatingIpId) { this.floatingIpId = floatingIpId; }
 
+	public boolean isAllowContextUpdates() {
+		return allowContextUpdates;
+	}
+
+	public void setAllowContextUpdates(boolean allowContextUpdates) {
+		this.allowContextUpdates = allowContextUpdates;
+	}
 }

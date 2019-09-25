@@ -131,6 +131,18 @@ public class ServiceInstanceController extends BaseController {
             if (serviceInstance == null) {
                 throw new ServiceInstanceNotFoundException(serviceInstanceId);
             }
+
+            if (request.isContextUpdate()) {
+                if (serviceInstance.isAllowContextUpdates()) {
+                    serviceInstanceOperationResponse = deploymentService.updateServiceInstanceContext(serviceInstanceId, request);
+                    return new ResponseEntity(serviceInstanceOperationResponse, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity(new ServiceBrokerErrorResponse("ContextUpdateNotAllowed",
+                            "It is not allowed to alter the context of the requested service instance"),
+                            HttpStatus.UNPROCESSABLE_ENTITY);
+                }
+            }
+
             if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request)) {
                 log.info("Update would have not effective changes.");
                 return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.OK);

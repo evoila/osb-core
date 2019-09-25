@@ -32,4 +32,8 @@ public class ServiceInstanceUpdateRequest extends BaseServiceInstanceRequest {
     public void setPreviousValues(ServiceInstancePreviousValues previousValues) {
         this.previousValues = previousValues;
     }
+
+    public Boolean isContextUpdate() {
+	    return (parameters == null || parameters.isEmpty()) && (context != null && !context.isEmpty());
+    }
 }

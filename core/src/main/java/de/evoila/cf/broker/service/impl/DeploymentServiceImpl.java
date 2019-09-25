@@ -168,6 +168,21 @@ public class DeploymentServiceImpl implements DeploymentService {
     }
 
     @Override
+    public ServiceInstanceOperationResponse updateServiceInstanceContext(String serviceInstanceId,
+                                                                         ServiceInstanceUpdateRequest serviceInstanceUpdateRequest)
+            throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
+
+        ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+        if (serviceInstance == null) {
+            throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
+        }
+        serviceInstance.setContext(serviceInstanceUpdateRequest.getContext());
+        serviceInstanceRepository.updateServiceInstance(serviceInstance);
+
+        return new ServiceInstanceOperationResponse();
+    }
+
+    @Override
     public ServiceInstanceOperationResponse deleteServiceInstance(String instanceId)
             throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
