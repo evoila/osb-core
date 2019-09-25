@@ -129,14 +129,15 @@ public class ServiceInstanceController extends BaseController {
             throw new AsyncRequiredException();
         }
 
+        if (serviceInstanceUtils.isBlocked(serviceInstanceId, JobProgress.UPDATE)) {
+            throw new ConcurrencyErrorException("Service Instance");
+        }
+
         ServiceInstanceOperationResponse serviceInstanceOperationResponse;
         if (catalogService.getServiceDefinition(request.getServiceDefinitionId()).isUpdateable()) {
             ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
             if (serviceInstance == null) {
                 throw new ServiceInstanceNotFoundException(serviceInstanceId);
-            }
-            if (serviceInstanceUtils.isBlocked(serviceInstance, JobProgress.UPDATE)) {
-                throw new ConcurrencyErrorException();
             }
             if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request)) {
                 log.info("Update would have not effective changes.");
@@ -168,8 +169,8 @@ public class ServiceInstanceController extends BaseController {
             throw new AsyncRequiredException();
         }
 
-        if (serviceInstanceUtils.isBlocked(serviceInstanceRepository.getServiceInstance(serviceInstanceId), JobProgress.DELETE)) {
-            throw new ConcurrencyErrorException();
+        if (serviceInstanceUtils.isBlocked(serviceInstanceId, JobProgress.DELETE)) {
+            throw new ConcurrencyErrorException("Service Instance");
         }
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = deploymentService.deleteServiceInstance(serviceInstanceId);

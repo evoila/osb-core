@@ -8,6 +8,8 @@ import de.evoila.cf.broker.model.annotations.ResponseAdvice;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
 import de.evoila.cf.broker.util.EmptyRestResponse;
+import de.evoila.cf.broker.util.ServiceBindingUtils;
+import de.evoila.cf.broker.util.ServiceInstanceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -32,9 +34,15 @@ public class ServiceInstanceBindingController extends BaseController {
 
     private CatalogService catalogService;
 
-    public ServiceInstanceBindingController(BindingServiceImpl bindingService, CatalogService catalogService) {
+    private ServiceInstanceUtils serviceInstanceUtils;
+    private ServiceBindingUtils serviceBindingUtils;
+
+    public ServiceInstanceBindingController(BindingServiceImpl bindingService, CatalogService catalogService,
+                                            ServiceInstanceUtils serviceInstanceUtils, ServiceBindingUtils serviceBindingUtils) {
         this.bindingService = bindingService;
         this.catalogService = catalogService;
+        this.serviceInstanceUtils = serviceInstanceUtils;
+        this.serviceBindingUtils = serviceBindingUtils;
     }
 
     @ResponseAdvice
@@ -49,7 +57,7 @@ public class ServiceInstanceBindingController extends BaseController {
                                                                                   @Valid @RequestBody ServiceInstanceBindingRequest request)
             throws ServiceInstanceDoesNotExistException, ServiceInstanceBindingExistsException,
             ServiceBrokerException, ServiceDefinitionDoesNotExistException,
-            InvalidParametersException, AsyncRequiredException, PlatformException, UnsupportedOperationException {
+            InvalidParametersException, AsyncRequiredException, PlatformException, UnsupportedOperationException, ConcurrencyErrorException {
 
         log.debug("PUT: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
                 + ", bindServiceInstance(), instanceId = " + instanceId + ", bindingId = " + bindingId);
@@ -66,6 +74,10 @@ public class ServiceInstanceBindingController extends BaseController {
 
         if (acceptsIncomplete && apiHeader.equals("2.13")) {
             throw new ServiceInstanceBindingBadRequestException(bindingId);
+        }
+
+        if (serviceInstanceUtils.isBlocked(instanceId, JobProgress.BIND)) {
+            throw new ConcurrencyErrorException("Service Instance");
         }
 
         BaseServiceInstanceBindingResponse serviceInstanceBindingResponse = bindingService.createServiceInstanceBinding(bindingId,
@@ -88,7 +100,7 @@ public class ServiceInstanceBindingController extends BaseController {
                                          @RequestHeader("X-Broker-API-Version") String apiHeader,
                                          @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
                                          @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity
-    ) throws ServiceBrokerException, AsyncRequiredException {
+    ) throws ServiceBrokerException, AsyncRequiredException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException, ServiceInstanceBindingDoesNotExistsException {
 
         log.debug("DELETE: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
                 + ", deleteServiceInstanceBinding(),  serviceInstance.id = " + instanceId + ", bindingId = " + bindingId
@@ -102,11 +114,17 @@ public class ServiceInstanceBindingController extends BaseController {
             throw new ServiceInstanceBindingBadRequestException(bindingId);
         }
 
+        if (serviceInstanceUtils.isBlocked(instanceId, JobProgress.UNBIND)) {
+            throw new ConcurrencyErrorException("Service Instance");
+        } else if (serviceBindingUtils.isBlocked(bindingId, JobProgress.UNBIND)) {
+            throw new ConcurrencyErrorException("Service Binding");
+        }
+
         BaseServiceInstanceBindingResponse baseServiceInstanceBindingResponse;
         try {
             baseServiceInstanceBindingResponse = bindingService
                     .deleteServiceInstanceBinding(bindingId, planId, acceptsIncomplete);
-        } catch (ServiceInstanceBindingDoesNotExistsException | ServiceDefinitionDoesNotExistException e) {
+        } catch (ServiceDefinitionDoesNotExistException e) {
             return new ResponseEntity<>(EmptyRestResponse.BODY, HttpStatus.GONE);
         }
 
@@ -161,7 +179,7 @@ public class ServiceInstanceBindingController extends BaseController {
         }
 
         if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isBindingsRetrievable())) {
-            throw new ServiceInstanceBindingNotRetrievableException("The Service Binding could not be retrievable. You should not attempt to call this endpoint");
+            throw new ServiceInstanceBindingNotRetrievableException("The Service Binding is not retrievable. You should not attempt to call this endpoint");
         }
 
         ServiceInstanceBinding binding = bindingService.fetchServiceInstanceBinding(bindingId, instanceId);

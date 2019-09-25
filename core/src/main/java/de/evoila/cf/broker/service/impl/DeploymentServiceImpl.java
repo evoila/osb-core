@@ -210,7 +210,7 @@ public class DeploymentServiceImpl implements DeploymentService {
                 throw new ServiceInstanceNotFoundException();
             } else if (job.getOperation().equals(JobProgress.UPDATE) &&
                     job.getState().equals(JobProgress.IN_PROGRESS)) {
-                throw new ConcurrencyErrorException();
+                throw new ConcurrencyErrorException("Service Instance");
             }
         }
         return serviceInstance;

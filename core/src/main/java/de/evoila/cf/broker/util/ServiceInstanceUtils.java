@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.util;
 
+import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
+import de.evoila.cf.broker.exception.ServiceInstanceNotFoundException;
 import de.evoila.cf.broker.model.JobProgress;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.ServiceInstanceRequest;
@@ -29,9 +31,11 @@ public class ServiceInstanceUtils {
     private static String HOSTS = "hosts";
 
     private JobRepository jobRepository;
+    private ServiceInstanceRepository serviceInstanceRepository;
 
-    public ServiceInstanceUtils(JobRepository jobRepository) {
+    public ServiceInstanceUtils(JobRepository jobRepository, ServiceInstanceRepository serviceInstanceRepository) {
         this.jobRepository = jobRepository;
+        this.serviceInstanceRepository = serviceInstanceRepository;
     }
 
     public static List<ServerAddress> filteredServerAddress(List<ServerAddress> serverAddresses, String filter) {
@@ -178,5 +182,16 @@ public class ServiceInstanceUtils {
         if (jobProgress == null) return false;
 
         return jobProgress.isInProgress() && !jobProgress.getOperation().equals(action);
+    }
+
+    /**
+     * Searches for the service instance with the given serviceInstanceId and then calls {@linkplain #isBlocked(ServiceInstance, String)}.
+     * @param serviceInstanceId id of the service instance to search with
+     * @param action desired action to take
+     * @return false if service instance has no running operations or the action is equal to the running operation; true otherwise
+     * @throws ServiceInstanceDoesNotExistException if no service instance was found with the given serviceInstanceId
+     */
+    public boolean isBlocked(String serviceInstanceId, String action) throws ServiceInstanceDoesNotExistException {
+        return isBlocked(serviceInstanceRepository.getServiceInstance(serviceInstanceId), action);
     }
 }
