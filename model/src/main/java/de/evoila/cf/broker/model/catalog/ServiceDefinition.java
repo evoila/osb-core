@@ -2,6 +2,7 @@ package de.evoila.cf.broker.model.catalog;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.evoila.cf.broker.exception.ServiceDefinitionPlanDoesNotExistException;
 import de.evoila.cf.broker.model.DashboardClient;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
@@ -48,6 +49,10 @@ public class ServiceDefinition {
 
     @JsonProperty("plan_updateable") // misspelling of attribute kept, do not change it
     private boolean updateable;
+
+    @JsonSerialize
+    @JsonProperty("allow_context_updates")
+    private boolean allowContextUpdates;
 
     public ServiceDefinition() {
     }
@@ -198,5 +203,13 @@ public class ServiceDefinition {
 
     public void setInstancesRetrievable(boolean instancesRetrievable) {
         this.instancesRetrievable = instancesRetrievable;
+    }
+
+    public boolean isAllowContextUpdates() {
+        return allowContextUpdates;
+    }
+
+    public void setAllowContextUpdates(boolean allowContextUpdates) {
+        this.allowContextUpdates = allowContextUpdates;
     }
 }
