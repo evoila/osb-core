@@ -132,12 +132,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     @Override
     public ServiceInstanceOperationResponse updateServiceInstance(String serviceInstanceId, ServiceInstanceUpdateRequest request) throws ServiceBrokerException,
             ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ValidationException {
-
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
-        if (serviceInstance == null) {
-            throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
-        }
-
         Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
         if (request.getParameters() != null) {
@@ -171,11 +166,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     public ServiceInstanceOperationResponse updateServiceInstanceContext(String serviceInstanceId,
                                                                          ServiceInstanceUpdateRequest serviceInstanceUpdateRequest)
             throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
-
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
-        if (serviceInstance == null) {
-            throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
-        }
         serviceInstance.setContext(serviceInstanceUpdateRequest.getContext());
         serviceInstanceRepository.updateServiceInstance(serviceInstance);
 
