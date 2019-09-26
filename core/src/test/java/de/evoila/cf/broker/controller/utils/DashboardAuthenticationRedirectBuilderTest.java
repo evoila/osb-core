@@ -28,10 +28,10 @@ class DashboardAuthenticationRedirectBuilderTest {
         when(dashboard.getAuthEndpoint()).thenReturn("base");
         when(dashboadClient.getId()).thenReturn("123456");
 
-        builder = new DashboardAuthenticationRedirectBuilder(dashboard, dashboadClient, "redirekt", "testscope");
+        builder = new DashboardAuthenticationRedirectBuilder(dashboard, dashboadClient, "redirect", "testscope");
 
         String redirectUrl = builder.getRedirectUrl();
-        assertEquals("base/authorize?client_id=123456&redirect_uri=redirekt&response_type=code&scopes=testscope", redirectUrl);
+        assertEquals("base/authorize?client_id=123456&redirect_uri=redirect&response_type=code&scopes=testscope", redirectUrl);
     }
 
     @Test
@@ -39,28 +39,28 @@ class DashboardAuthenticationRedirectBuilderTest {
         when(dashboard.getAuthEndpoint()).thenReturn("base");
         when(dashboadClient.getId()).thenReturn("?=&123456");
 
-        builder = new DashboardAuthenticationRedirectBuilder(dashboard, dashboadClient, "?=&redirekt", "?=&testscope");
+        builder = new DashboardAuthenticationRedirectBuilder(dashboard, dashboadClient, "?=&redirect", "?=&testscope");
 
         String redirectUrl = builder.getRedirectUrl();
-        assertEquals("base/authorize?client_id=%3F%3D%26123456&redirect_uri=%3F%3D%26redirekt&response_type=code&scopes=%3F%3D%26testscope", redirectUrl);
+        assertEquals("base/authorize?client_id=%3F%3D%26123456&redirect_uri=%3F%3D%26redirect&response_type=code&scopes=%3F%3D%26testscope", redirectUrl);
     }
 
     @Test
     void getRedirectUrl_Invalid() {
         when(dashboard.getAuthEndpoint()).thenReturn("ba se");
         when(dashboadClient.getId()).thenReturn("123456");
-        builder = new DashboardAuthenticationRedirectBuilder(dashboard, dashboadClient, "redirekt", "testscope");
+        builder = new DashboardAuthenticationRedirectBuilder(dashboard, dashboadClient, "redirect", "testscope");
 
         assertThrows(URISyntaxException.class, () -> builder.getRedirectUrl());
     }
 
     @Test
     void DashboardAuthenticationRedirectBuilder_IllegalArgumentDashboard() {
-        assertThrows(IllegalArgumentException.class, () -> new DashboardAuthenticationRedirectBuilder(null, dashboadClient, "redirekt", "testscope"));
+        assertThrows(IllegalArgumentException.class, () -> new DashboardAuthenticationRedirectBuilder(null, dashboadClient, "redirect", "testscope"));
     }
 
     @Test
     void DashboardAuthenticationRedirectBuilder_IllegalArgumentClient() {
-        assertThrows(IllegalArgumentException.class, () -> new DashboardAuthenticationRedirectBuilder(dashboard, null, "redirekt", "testscope"));
+        assertThrows(IllegalArgumentException.class, () -> new DashboardAuthenticationRedirectBuilder(dashboard, null, "redirect", "testscope"));
     }
 }

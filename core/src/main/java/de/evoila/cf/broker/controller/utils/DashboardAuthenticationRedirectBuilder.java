@@ -26,8 +26,9 @@ public class DashboardAuthenticationRedirectBuilder {
 	
 	public DashboardAuthenticationRedirectBuilder(Dashboard dashboard, DashboardClient dashboadClient, String redirectUri,
 			String scopes) throws IllegalArgumentException {
-		if (dashboard == null || dashboadClient == null)
+		if (dashboard == null || dashboadClient == null) {
 			throw new IllegalArgumentException();
+		}
 		this.baseUrl = dashboard.getAuthEndpoint();
 		this.clientId = dashboadClient.getId();
 		this.redirectUri = redirectUri;
