@@ -131,7 +131,7 @@ public class ServiceInstanceController extends BaseController {
             ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
             ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(request.getServiceDefinitionId());
 
-            if (serviceDefinition.planIsUpdatable(serviceInstance.getPlanId())) {
+            if (serviceDefinition.specificPlanIsUpdatable(serviceInstance.getPlanId())) {
                 if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request)) {
                     log.info("Update would have not effective changes.");
                     return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.OK);

@@ -28,7 +28,7 @@ public class Plan {
 	private Schemas schemas;
 
     @JsonProperty("plan_updateable") // misspelling of attribute kept, do not change it
-    private Boolean planUpdatable;
+    private Boolean planUpdateable;
 
 	@JsonProperty("maintenance_info")
 	private MaintenanceInfo maintenanceInfo;
@@ -128,11 +128,11 @@ public class Plan {
 		this.maintenanceInfo = maintenanceInfo;
 	}
 
-    public Boolean isPlanUpdatable() {
-        return planUpdatable;
+    public Boolean isPlanUpdateable() {
+        return this.planUpdateable;
     }
 
-    public void setPlanUpdatable(Boolean planUpdatable) {
-        this.planUpdatable = planUpdatable;
+    public void setPlanUpdateable(Boolean planUpdateable) {
+        this.planUpdateable = planUpdateable;
     }
 }

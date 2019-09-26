@@ -89,14 +89,14 @@ public class ServiceDefinition {
         return bindingsRetrievable;
     }
 
-    public boolean planIsUpdatable(String planId) throws ServiceDefinitionPlanDoesNotExistException {
+    public boolean specificPlanIsUpdatable(String planId) throws ServiceDefinitionPlanDoesNotExistException {
         Plan plan = plans.stream().filter(plan1 -> plan1.getId().equals(planId))
                 .findFirst().orElseThrow(() -> new ServiceDefinitionPlanDoesNotExistException(this.id, planId));
 
-        if (plan.isPlanUpdatable() == null) {
+        if (plan.isPlanUpdateable() == null) {
             return this.isUpdateable();
         } else {
-            return plan.isPlanUpdatable();
+            return plan.isPlanUpdateable();
         }
     }
 
