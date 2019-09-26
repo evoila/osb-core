@@ -73,7 +73,7 @@ public class ServiceInstance implements BaseEntity<String> {
     private String usergroup;
 
     @JsonSerialize
-	@JsonProperty("allow_context_update")
+	@JsonProperty("allow_context_updates")
     private boolean allowContextUpdates;
 
 	@SuppressWarnings("unused")
