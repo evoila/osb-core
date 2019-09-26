@@ -57,7 +57,7 @@ public class ServiceInstance implements BaseEntity<String> {
 	
 	@JsonSerialize
 	@JsonProperty("context")
-	private Map<String, String> context;
+	private Map<String, Object> context;
 
 	@JsonSerialize
 	@JsonProperty("floatingIp_id")
@@ -121,7 +121,7 @@ public class ServiceInstance implements BaseEntity<String> {
 	}
 
 	public ServiceInstance(String serviceInstanceId, String serviceDefinitionId, String planId, String organizationGuid,
-			String spaceGuid, Map<String, Object> parameters, Map<String, String> context) {
+			String spaceGuid, Map<String, Object> parameters, Map<String, Object> context) {
 		initialize(serviceInstanceId, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
 		if(context != null)
 			setContext(context);
@@ -210,11 +210,11 @@ public class ServiceInstance implements BaseEntity<String> {
 		this.hosts = hosts;
 	}
 
-	public Map<String, String> getContext() {
+	public Map<String, Object> getContext() {
 		return context;
 	}
 
-	public void setContext(Map<String, String> context) {
+	public void setContext(Map<String, Object> context) {
 		this.context = new HashMap<>(context);
 	}
 

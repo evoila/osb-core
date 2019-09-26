@@ -19,7 +19,7 @@ public class ServiceInstanceUpdateRequest extends BaseServiceInstanceRequest {
 
 	public ServiceInstanceUpdateRequest() {}
 
-	public ServiceInstanceUpdateRequest(String serviceDefinitionId, String planId, Map<String, String> context) {
+	public ServiceInstanceUpdateRequest(String serviceDefinitionId, String planId, Map<String, Object> context) {
 		this.serviceDefinitionId = serviceDefinitionId;
 		this.planId = planId;
 		setContext(context);
