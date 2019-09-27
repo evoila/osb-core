@@ -147,16 +147,9 @@ public class ServiceInstanceBindingController extends BaseController {
             @PathVariable("bindingId") String bindingId,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity) throws
-            ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceInstanceNotFoundException, ServiceDefinitionDoesNotExistException {
+            ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException {
 
-
-        ServiceInstance serviceInstance;
-        try {
-            serviceInstance = bindingService.getServiceInstance(instanceId);
-        } catch (ServiceInstanceDoesNotExistException ex) {
-            log.error("Tried to fetch a binding without a existing service instance. InstanceId : " + instanceId, ex);
-            throw new ServiceInstanceNotFoundException(instanceId);
-        }
+        ServiceInstance serviceInstance = bindingService.getServiceInstance(instanceId);
 
         if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isBindingsRetrievable())) {
             throw new ServiceInstanceBindingNotRetrievableException("The Service Binding could not be retrievable. You should not attempt to call this endpoint");
@@ -171,8 +164,8 @@ public class ServiceInstanceBindingController extends BaseController {
      * Over writing the ExceptionHandler in this controller, as 404 is reserved for service-bindings. Using 400 instead.
      * Not using try catch, to unify this behaviour.
      */
-    @ExceptionHandler(ServiceInstanceNotFoundException.class)
-    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceNotFoundException ex) {
+    @ExceptionHandler(ServiceInstanceDoesNotExistException.class)
+    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceDoesNotExistException ex) {
         return processErrorResponse(ex.getError(), ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
