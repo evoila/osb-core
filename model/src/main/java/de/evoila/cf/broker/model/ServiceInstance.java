@@ -96,9 +96,9 @@ public class ServiceInstance implements BaseEntity<String> {
 			setParameters(parameters);
 	}
 
-	public ServiceInstance(String serviceInstanceId, String serviceDefintionId, String planId, String organizationGuid,
+	public ServiceInstance(String serviceInstanceId, String serviceDefinitionId, String planId, String organizationGuid,
 			String spaceGuid, Map<String, Object> parameters, String dashboardUrl, String internalId) {
-		initialize(id, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
+		initialize(serviceInstanceId, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
 		setInternalId(internalId);
 		setDashboardUrl(dashboardUrl);
 	}
