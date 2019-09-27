@@ -3,6 +3,9 @@ package de.evoila.cf.broker.model.catalog.plan;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Objects;
+
 import de.evoila.cf.broker.model.Platform;
 import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
 
@@ -125,4 +128,25 @@ public class Plan {
 	public void setMaintenanceInfo(MaintenanceInfo maintenanceInfo) {
 		this.maintenanceInfo = maintenanceInfo;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		Plan plan = (Plan) o;
+		return free == plan.free &&
+			   id.equals(plan.id) &&
+			   name.equals(plan.name) &&
+			   description.equals(plan.description) &&
+			   Objects.equals(metadata, plan.metadata) &&
+			   Objects.equals(schemas, plan.schemas) &&
+			   Objects.equals(maintenanceInfo, plan.maintenanceInfo) &&
+			   platform == plan.platform;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, name, description, metadata, free, schemas, maintenanceInfo, platform);
+	}
+
 }

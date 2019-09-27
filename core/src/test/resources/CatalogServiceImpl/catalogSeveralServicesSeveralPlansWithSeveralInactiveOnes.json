@@ -1,0 +1,132 @@
+{
+  "services":[
+    {
+      "bindable": true,
+      "bindingsRetrievable": true,
+      "dashboard": {
+        "authEndpoint": "https://uaa.local/oauth",
+        "url": "https://osb-example.local/custom/v2/authentication"
+      },
+      "dashboardClient": {
+        "id": "osb-example.local",
+        "redirectUri": "https://osb-example.local/custom/v2/authentication",
+        "secret": "59180F71-5830-4FE4-BD90-9EB8108DGB28"
+      },
+      "description": "Example Service - Simulating a database service",
+      "id": "8653E6CE-D760-4B63-98B8-7D6361BF1EB4",
+      "instancesRetrievable": true,
+      "metadata": {
+        "displayName": "osb-example",
+        "documentationUrl": "https://github.com/evoila/osb-docs",
+        "longDescription": "Managed, high performance, example service",
+        "providerDisplayName": "evoila"
+      },
+      "name": "osb-example",
+      "plans": [
+        {
+          "connections": 4,
+          "description": "Deployment of a small example service to an existing shared instance.",
+          "free": true,
+          "id": "206DBCB2-9F04-4F29-8BE4-411309DD520C",
+          "metadata": {
+            "active": false,
+            "bullets": [
+              "1 GB disk size",
+              "super-fast",
+              "awesome"
+            ],
+            "costs": [
+              {
+                "amount": {
+                  "eur": 10.732
+                },
+                "unit": "monthly per vm"
+              },
+              {
+                "amount": {
+                  "eur": 10.54,
+                  "usd": 21.125
+                },
+                "unit": "weekly per call"
+              }
+            ],
+            "displayName": "Small DB"
+          },
+          "name": "s",
+          "platform": "EXISTING_SERVICE"
+        },
+        {
+          "metadata": {
+            "active": false
+          },
+          "connections": 10,
+          "description": "Deployment of a medium example service to an existing shared instance.",
+          "free": false,
+          "id": "7A0FA2C0-F615-4498-97CE-CD45E477C46B",
+          "name": "m",
+          "platform": "EXISTING_SERVICE"
+        },
+        {
+          "connections": 50,
+          "description": "Deployment of a large example service to an existing shared instance.",
+          "free": false,
+          "id": "602917BA-A0FE-4B75-ACA5-6FEACE29EFF0",
+          "name": "l",
+          "platform": "EXISTING_SERVICE"
+        },
+        {
+          "connections": 100,
+          "description": "Deployment of an extra large example service to an existing shared instance.",
+          "free": false,
+          "id": "A05E7CB2-34F6-4015-BE94-4CF577CE737F",
+          "name": "xl",
+          "platform": "EXISTING_SERVICE"
+        }
+      ]
+    },
+    {
+      "bindable": true,
+      "bindingsRetrievable": true,
+      "dashboard": {
+        "authEndpoint": "https://uaa.local/oauth",
+        "url": "https://osb-example.local/v2/authentication"
+      },
+      "dashboardClient": {
+        "id": "osb-example-second.local",
+        "redirectUri": "https://osb-example.local/v2/authentication",
+        "secret": "70292F82-7052-4FE4-BC90-9EB8108DFB28"
+      },
+      "description": "Second Example Service - Also simulating a database service",
+      "id": "0764E7CE-D760-4B63-98B8-7D6361BF1EB4",
+      "instances_retrievable": true,
+      "metadata": {
+        "displayName": "osb-example-second",
+        "documentationUrl": "https://github.com/evoila/osb-docs",
+        "longDescription": "Managed, high performance, second example service",
+        "providerDisplayName": "evoila"
+      },
+      "name": "osb-example-second",
+      "plans": [
+        {
+          "metadata": {
+            "active": false
+          },
+          "connections": 4,
+          "description": "Deployment of a small example service to an existing shared instance.",
+          "free": true,
+          "id": "306DBCB2-8F93-4F29-8BE4-411309DD520C",
+          "name": "s",
+          "platform": "EXISTING_SERVICE"
+        },
+        {
+          "connections": 50,
+          "description": "Deployment of a large example service to an existing shared instance.",
+          "free": false,
+          "id": "782917BA-A9FE-4B75-ACA5-6FEACE29EFF0",
+          "name": "l",
+          "platform": "EXISTING_SERVICE"
+        }
+      ]
+    }
+  ]
+}

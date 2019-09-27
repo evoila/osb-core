@@ -2,6 +2,7 @@ package de.evoila.cf.broker.model.catalog.plan;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class InstanceGroupConfig {
 
@@ -87,4 +88,24 @@ public class InstanceGroupConfig {
     public void setAzs(List<String> azs) {
         this.azs = azs;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        InstanceGroupConfig that = (InstanceGroupConfig) o;
+        return Objects.equals(connections, that.connections) &&
+               Objects.equals(nodes, that.nodes) &&
+               Objects.equals(vmType, that.vmType) &&
+               Objects.equals(persistentDiskType, that.persistentDiskType) &&
+               Objects.equals(properties, that.properties) &&
+               Objects.equals(networks, that.networks) &&
+               Objects.equals(azs, that.azs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(connections, nodes, vmType, persistentDiskType, properties, networks, azs);
+    }
+
 }

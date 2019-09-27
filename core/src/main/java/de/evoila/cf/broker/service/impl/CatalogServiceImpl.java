@@ -138,7 +138,10 @@ public class CatalogServiceImpl implements CatalogService {
 	}
 
 	public void filterActivePlans(Catalog catalog) {
-		catalog.getServices().stream().forEach(serviceDefinition ->
+		if (catalog == null) {
+			return;
+		}
+		catalog.getServices().forEach(serviceDefinition ->
 		{
 			serviceDefinition.setPlans(
 					serviceDefinition.getPlans().stream().filter(plan ->
