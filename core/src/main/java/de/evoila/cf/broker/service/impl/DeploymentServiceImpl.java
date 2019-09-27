@@ -123,7 +123,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         if (platformService.isSyncPossibleOnCreate(plan)) {
             return serviceInstanceOperationResponse;
         } else {
-            serviceInstanceRepository.addServiceInstance(serviceInstance.getId(), serviceInstance);
+            serviceInstanceRepository.saveServiceInstance(serviceInstance);
 
             String jobProgressId = randomString.nextString();
             asyncDeploymentService.asyncCreateInstance(this, serviceInstance, request.getParameters(),
@@ -242,7 +242,8 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         try {
             serviceInstance = platformService.createInstance(serviceInstance, plan, parameters);
-        } catch (PlatformException e) {
+        } catch (PlatformException | ServiceDefinitionDoesNotExistException e) {
+            log.error("Could not create instance due to: ", e);
             throw new ServiceBrokerException("Could not create instance due to: ", e);
         }
 
@@ -252,7 +253,7 @@ public class DeploymentServiceImpl implements DeploymentService {
             throw new ServiceBrokerException("Error during post service instance creation", e);
         }
 
-        serviceInstanceRepository.addServiceInstance(serviceInstance.getId(), serviceInstance);
+        serviceInstanceRepository.saveServiceInstance(serviceInstance);
 
         return serviceInstance;
     }
