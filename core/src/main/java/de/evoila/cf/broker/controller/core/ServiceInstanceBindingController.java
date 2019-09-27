@@ -167,4 +167,12 @@ public class ServiceInstanceBindingController extends BaseController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    /*
+     * Over writing the ExceptionHandler in this controller, as 404 is reserved for service-bindings. Using 400 instead.
+     * Not using try catch, to unify this behaviour.
+     */
+    @ExceptionHandler(ServiceInstanceNotFoundException.class)
+    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceNotFoundException ex) {
+        return processErrorResponse(ex.getError(), ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }
