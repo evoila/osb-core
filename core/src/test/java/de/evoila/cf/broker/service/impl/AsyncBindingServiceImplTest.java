@@ -73,8 +73,6 @@ class AsyncBindingServiceImplTest {
             verify(jobProgressService, never()).failJob("Id3", "Internal error during binding creation, please contact our support.");
             verify(jobProgressService, times(1)).succeedProgress("Id3", "Instance Binding successfully created");
         }
-
-
     }
 
     @Nested
@@ -99,7 +97,5 @@ class AsyncBindingServiceImplTest {
 
             verify(jobProgressService, never()).failJob("Id3", "Internal error during binding deletion, please contact our support.");
         }
-
     }
-
 }
