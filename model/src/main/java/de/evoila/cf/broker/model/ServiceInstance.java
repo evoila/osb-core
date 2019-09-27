@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.evoila.cf.broker.model.catalog.ServerAddress;
+import de.evoila.cf.broker.model.context.Context;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,7 +58,7 @@ public class ServiceInstance implements BaseEntity<String> {
 	
 	@JsonSerialize
 	@JsonProperty("context")
-	private Map<String, Object> context;
+	private Context context;
 
 	@JsonSerialize
 	@JsonProperty("floatingIp_id")
@@ -121,7 +122,7 @@ public class ServiceInstance implements BaseEntity<String> {
 	}
 
 	public ServiceInstance(String serviceInstanceId, String serviceDefinitionId, String planId, String organizationGuid,
-			String spaceGuid, Map<String, Object> parameters, Map<String, Object> context) {
+			String spaceGuid, Map<String, Object> parameters, Context context) {
 		initialize(serviceInstanceId, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
 		if(context != null)
 			setContext(context);
@@ -210,12 +211,12 @@ public class ServiceInstance implements BaseEntity<String> {
 		this.hosts = hosts;
 	}
 
-	public Map<String, Object> getContext() {
+	public Context getContext() {
 		return context;
 	}
 
-	public void setContext(Map<String, Object> context) {
-		this.context = new HashMap<>(context);
+	public void setContext(Context context) {
+		this.context = context;
 	}
 
     public String getUsername() { return username; }
