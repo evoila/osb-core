@@ -10,6 +10,10 @@ public class ServiceInstanceNotFoundException extends Exception {
 
     private static final long serialVersionUID = -5984853893472349837L;
 
+    public String getError() {
+        return "ServiceInstanceNotFound";
+    }
+
     public ServiceInstanceNotFoundException() {
         this("");
     }
