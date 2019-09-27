@@ -112,7 +112,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	@Override
 	public BaseServiceInstanceBindingResponse deleteServiceInstanceBinding(String bindingId, String planId, boolean async)
 			throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException,
-            AsyncRequiredException, ServiceInstanceBindingBadRequestException {
+            AsyncRequiredException {
 		ServiceInstance serviceInstance = getBinding(bindingId);
 		Plan plan = serviceDefinitionRepository.getPlan(planId);
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
