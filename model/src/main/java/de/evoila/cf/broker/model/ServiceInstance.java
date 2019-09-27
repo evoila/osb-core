@@ -154,7 +154,7 @@ public class ServiceInstance implements BaseEntity<String> {
 		return planId;
 	}
 
-	private void setPlanId(String planId) {
+	public void setPlanId(String planId) {
 		this.planId = planId;
 	}
 	
