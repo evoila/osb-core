@@ -47,7 +47,7 @@ public class ServiceInstanceBindingController extends BaseController {
                                                                                   @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
                                                                                   @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,
                                                                                   @Valid @RequestBody ServiceInstanceBindingRequest request)
-            throws ServiceInstanceDoesNotExistException, ServiceInstanceBindingExistsException,
+            throws ServiceInstanceBindingExistsException,
             ServiceBrokerException, ServiceDefinitionDoesNotExistException,
             InvalidParametersException, AsyncRequiredException, PlatformException, UnsupportedOperationException {
 
@@ -67,9 +67,13 @@ public class ServiceInstanceBindingController extends BaseController {
         if (acceptsIncomplete && apiHeader.equals("2.13")) {
             throw new ServiceInstanceBindingBadRequestException(bindingId);
         }
-
-        BaseServiceInstanceBindingResponse serviceInstanceBindingResponse = bindingService.createServiceInstanceBinding(bindingId,
-                instanceId, request, acceptsIncomplete);
+        BaseServiceInstanceBindingResponse serviceInstanceBindingResponse;
+        try {
+            serviceInstanceBindingResponse = bindingService.createServiceInstanceBinding(bindingId,
+                    instanceId, request, acceptsIncomplete);
+        } catch (ServiceInstanceDoesNotExistException ex) {
+            return processErrorResponse(ex.getError(), ex.getMessage(), HttpStatus.NOT_FOUND);
+        }
 
         log.debug("ServiceInstanceBinding Created: " + bindingId);
 
@@ -147,9 +151,14 @@ public class ServiceInstanceBindingController extends BaseController {
             @PathVariable("bindingId") String bindingId,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity) throws
-            ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException {
+            ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceDefinitionDoesNotExistException {
 
-        ServiceInstance serviceInstance = bindingService.getServiceInstance(instanceId);
+        ServiceInstance serviceInstance;
+        try {
+            serviceInstance = bindingService.getServiceInstance(instanceId);
+        } catch (ServiceInstanceDoesNotExistException ex) {
+            return processErrorResponse(ex.getError(), ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }
 
         if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isBindingsRetrievable())) {
             throw new ServiceInstanceBindingNotRetrievableException("The Service Binding could not be retrievable. You should not attempt to call this endpoint");
@@ -158,14 +167,5 @@ public class ServiceInstanceBindingController extends BaseController {
         ServiceInstanceBinding binding = bindingService.fetchServiceInstanceBinding(bindingId, instanceId);
         ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(binding);
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    /*
-     * Over writing the ExceptionHandler in this controller, as 404 is reserved for service-bindings. Using 400 instead.
-     * Not using try catch, to unify this behaviour.
-     */
-    @ExceptionHandler(ServiceInstanceDoesNotExistException.class)
-    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceDoesNotExistException ex) {
-        return processErrorResponse(ex.getError(), ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
