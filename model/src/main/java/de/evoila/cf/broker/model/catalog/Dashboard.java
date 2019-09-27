@@ -5,6 +5,8 @@ package de.evoila.cf.broker.model.catalog;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 /**
  * @author Johannes Hiemer
  */
@@ -38,6 +40,20 @@ public class Dashboard {
 
     public void setAuthEndpoint(String authEndpoint) {
         this.authEndpoint = authEndpoint;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Dashboard dashboard = (Dashboard) o;
+        return Objects.equals(url, dashboard.url) &&
+               Objects.equals(authEndpoint, dashboard.authEndpoint);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(url, authEndpoint);
     }
 
 }

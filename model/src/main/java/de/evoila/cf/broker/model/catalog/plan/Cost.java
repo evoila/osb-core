@@ -1,6 +1,7 @@
 package de.evoila.cf.broker.model.catalog.plan;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class Cost {
 
@@ -30,4 +31,19 @@ public class Cost {
     public void setUnit(String unit) {
         this.unit = unit;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cost cost = (Cost) o;
+        return amount.equals(cost.amount) &&
+               unit.equals(cost.unit);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, unit);
+    }
+
 }
