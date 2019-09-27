@@ -1,7 +1,6 @@
 package de.evoila.cf.broker.model.context;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.evoila.cf.broker.model.context.Context;
 
 public class Cloudfoundry extends Context {
 
