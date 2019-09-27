@@ -8,7 +8,7 @@ public class Kubernetes extends Context {
     @JsonProperty("namespace")
     private String namespace;
 
-    @JsonProperty("clusterId")
+    @JsonProperty("clusterid")
     private String clusterId;
 
     public Kubernetes() {
