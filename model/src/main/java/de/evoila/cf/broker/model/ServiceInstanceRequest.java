@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.evoila.cf.broker.model.context.Cloudfoundry;
+import de.evoila.cf.broker.model.context.Context;
 
 import javax.validation.constraints.NotEmpty;
 
@@ -31,7 +31,7 @@ public class ServiceInstanceRequest extends BaseServiceInstanceRequest {
     public ServiceInstanceRequest() {
     }
 
-    public ServiceInstanceRequest(String serviceDefinitionId, String planId, String organizationGuid, String spaceGuid, Cloudfoundry context) {
+    public ServiceInstanceRequest(String serviceDefinitionId, String planId, String organizationGuid, String spaceGuid, Context context) {
         this.serviceDefinitionId = serviceDefinitionId;
         this.planId = planId;
         this.organizationGuid = organizationGuid;
