@@ -74,15 +74,16 @@ public abstract class BindingServiceImpl implements BindingService {
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
 		BaseServiceInstanceBindingResponse baseServiceInstanceBindingResponse;
+        String operationId = randomString.nextString();
 
-		if (async) {
-			if (platformService.isSyncPossibleOnBind()) {
-				baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
+        if (async) {
+            if (platformService.isSyncPossibleOnBind()) {
+                baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
 						serviceInstanceBindingRequest, plan);
-			} else {
-				bindingRepository.addInternalBinding(new ServiceInstanceBinding(bindingId, instanceId, null));
+                jobRepository.saveJobProgress(randomString.nextString(), bindingId, JobProgress.SUCCESS, "Synchronous binding.", operationId);
+            } else {
+                bindingRepository.addInternalBinding(new ServiceInstanceBinding(bindingId, instanceId, null));
 
-				String operationId = randomString.nextString();
 
 				asyncBindingService.asyncCreateServiceInstanceBinding(this, bindingId,
 						serviceInstance, serviceInstanceBindingRequest, plan, async, operationId);
@@ -166,6 +167,7 @@ public abstract class BindingServiceImpl implements BindingService {
 			throws  ServiceInstanceBindingDoesNotExistsException {
 		JobProgress progress = asyncBindingService.getProgressByReferenceId(referenceId);
 
+		//Progress is never null
 		if (progress == null || !bindingRepository.containsInternalBindingId(referenceId)) {
 			throw new ServiceInstanceBindingDoesNotExistsException(referenceId);
 		}
