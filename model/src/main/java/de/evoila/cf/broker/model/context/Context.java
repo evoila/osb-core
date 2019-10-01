@@ -174,7 +174,7 @@ public class Context {
     }
 
     private boolean fieldIsPresent(String value) {
-        return Optional.ofNullable(value).map(s -> !s.isEmpty()).orElse(false);
+        return !StringUtils.isEmpty(value);
     }
 
     @Override
