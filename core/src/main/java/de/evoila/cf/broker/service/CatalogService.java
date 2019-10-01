@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.service;
 
+import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.model.catalog.Catalog;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 
@@ -19,8 +20,9 @@ public interface CatalogService {
 
 	/**
 	 * @param serviceId  The id of the service in the catalog
-	 * @return The service definition or null if it doesn't exist
+	 * @return The service definition or null
+	 * @throws ServiceDefinitionDoesNotExistException if the service definition does not exist.
 	 */
-	ServiceDefinition getServiceDefinition(String serviceId);
+	ServiceDefinition getServiceDefinition(String serviceId) throws ServiceDefinitionDoesNotExistException;
 	
 }

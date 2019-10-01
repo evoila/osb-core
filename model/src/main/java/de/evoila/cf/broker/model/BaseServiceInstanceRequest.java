@@ -15,7 +15,7 @@ public class BaseServiceInstanceRequest {
 
     @JsonSerialize
     @JsonProperty("context")
-    protected Map<String, String> context = new HashMap<>();
+    protected Map<String, Object> context = new HashMap<>();
 
     @NotEmpty
     @JsonSerialize
@@ -35,11 +35,11 @@ public class BaseServiceInstanceRequest {
     @JsonProperty("maintenance_info")
     private MaintenanceInfo maintenanceInfo;
 
-    public Map<String, String> getContext() {
+    public Map<String, Object> getContext() {
         return context;
     }
 
-    public void setContext(Map<String, String> context) {
+    public void setContext(Map<String, Object> context) {
         this.context = context;
     }
 

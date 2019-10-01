@@ -19,7 +19,7 @@ public class ServiceInstanceUpdateRequest extends BaseServiceInstanceRequest {
 
 	public ServiceInstanceUpdateRequest() {}
 
-	public ServiceInstanceUpdateRequest(String serviceDefinitionId, String planId, Map<String, String> context) {
+	public ServiceInstanceUpdateRequest(String serviceDefinitionId, String planId, Map<String, Object> context) {
 		this.serviceDefinitionId = serviceDefinitionId;
 		this.planId = planId;
 		setContext(context);
@@ -31,5 +31,9 @@ public class ServiceInstanceUpdateRequest extends BaseServiceInstanceRequest {
 
     public void setPreviousValues(ServiceInstancePreviousValues previousValues) {
         this.previousValues = previousValues;
+    }
+
+    public Boolean isContextUpdate() {
+	    return (parameters == null || parameters.isEmpty()) && (context != null && !context.isEmpty());
     }
 }

@@ -55,7 +55,7 @@ public class ServiceInstanceBindingController extends BaseController {
                                                                                   @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
                                                                                   @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,
                                                                                   @Valid @RequestBody ServiceInstanceBindingRequest request)
-            throws ServiceInstanceDoesNotExistException, ServiceInstanceBindingExistsException,
+            throws ServiceInstanceBindingExistsException,
             ServiceBrokerException, ServiceDefinitionDoesNotExistException,
             InvalidParametersException, AsyncRequiredException, PlatformException, UnsupportedOperationException, ConcurrencyErrorException {
 
@@ -76,12 +76,18 @@ public class ServiceInstanceBindingController extends BaseController {
             throw new ServiceInstanceBindingBadRequestException(bindingId);
         }
 
-        if (serviceInstanceUtils.isBlocked(instanceId, JobProgress.BIND)) {
-            throw new ConcurrencyErrorException("Service Instance");
-        }
 
-        BaseServiceInstanceBindingResponse serviceInstanceBindingResponse = bindingService.createServiceInstanceBinding(bindingId,
-                instanceId, request, acceptsIncomplete);
+
+        BaseServiceInstanceBindingResponse serviceInstanceBindingResponse;
+        try {
+            if (serviceInstanceUtils.isBlocked(instanceId, JobProgress.BIND)) {
+                throw new ConcurrencyErrorException("Service Instance");
+            }
+            serviceInstanceBindingResponse = bindingService.createServiceInstanceBinding(bindingId,
+                    instanceId, request, acceptsIncomplete);
+        } catch (ServiceInstanceDoesNotExistException ex) {
+            return processErrorResponse(ex.getError(), ex.getMessage(), HttpStatus.NOT_FOUND);
+        }
 
         log.debug("ServiceInstanceBinding Created: " + bindingId);
 
@@ -165,17 +171,13 @@ public class ServiceInstanceBindingController extends BaseController {
             @PathVariable("bindingId") String bindingId,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity) throws
-            ServiceInstanceBindingNotFoundException, ServiceBrokerException {
+            ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceDefinitionDoesNotExistException {
 
         ServiceInstance serviceInstance;
         try {
             serviceInstance = bindingService.getServiceInstance(instanceId);
         } catch (ServiceInstanceDoesNotExistException ex) {
-            // Has to return different status code instead of 404, because 404 is reserved for when the binding does not exist
-            // 400 was chosen, because the id of the service instance is defined as "MUST be the ID of a previously provisioned Service Instance"
-            return processErrorResponse("ServiceInstanceNotFound",
-                    "No service instance was found for the given id. This could be caused by a desynchronization between broker and platform.",
-                    HttpStatus.BAD_REQUEST);
+            return processErrorResponse(ex.getError(), ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
         if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isBindingsRetrievable())) {
@@ -186,5 +188,4 @@ public class ServiceInstanceBindingController extends BaseController {
         ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(binding);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 }

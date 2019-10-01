@@ -31,7 +31,7 @@ public class ServiceInstanceRequest extends BaseServiceInstanceRequest {
     public ServiceInstanceRequest() {
     }
 
-    public ServiceInstanceRequest(String serviceDefinitionId, String planId, String organizationGuid, String spaceGuid, Map<String, String> context) {
+    public ServiceInstanceRequest(String serviceDefinitionId, String planId, String organizationGuid, String spaceGuid, Map<String, Object> context) {
         this.serviceDefinitionId = serviceDefinitionId;
         this.planId = planId;
         this.organizationGuid = organizationGuid;
