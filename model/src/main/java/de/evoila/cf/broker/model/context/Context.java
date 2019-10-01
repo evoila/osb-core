@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 public class Context {
@@ -174,5 +175,26 @@ public class Context {
 
     private boolean fieldIsPresent(String value) {
         return Optional.ofNullable(value).map(s -> !s.isEmpty()).orElse(false);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Context context = (Context) o;
+        return Objects.equals(platform, context.platform) &&
+                Objects.equals(organizationGuid, context.organizationGuid) &&
+                Objects.equals(organizationName, context.organizationName) &&
+                Objects.equals(spaceGuid, context.spaceGuid) &&
+                Objects.equals(spaceName, context.spaceName) &&
+                Objects.equals(instanceName, context.instanceName) &&
+                Objects.equals(clusterId, context.clusterId) &&
+                Objects.equals(namespace, context.namespace) &&
+                Objects.equals(additionalFields, context.additionalFields);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(platform, organizationGuid, organizationName, spaceGuid, spaceName, instanceName, clusterId, namespace, additionalFields);
     }
 }

@@ -6,10 +6,7 @@ import de.evoila.cf.broker.model.ServiceInstanceUpdateRequest;
 import de.evoila.cf.broker.model.catalog.ServerAddress;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -122,10 +119,14 @@ public class ServiceInstanceUtils {
                 && request.getPlanId().equals(serviceInstance.getPlanId())
                 && request.getOrganizationGuid().equals(serviceInstance.getOrganizationGuid())
                 && request.getSpaceGuid().equals(serviceInstance.getSpaceGuid())
-                && request.getContext().equals(serviceInstance.getContext())
+                && compareContext(request, serviceInstance)
                 && request.getParameters().equals(serviceInstance.getParameters());
     }
 
+    private static boolean compareContext(ServiceInstanceRequest request, ServiceInstance serviceInstance) {
+        return Optional.ofNullable(request.getContext()).map(context -> context.equals(serviceInstance.getContext())).orElse(serviceInstance.getContext() == null
+        );
+    }
      /**
      * Checks whether an update with the given ServiceInstanceUpdateRequest would effectively change the service instance.
      *
