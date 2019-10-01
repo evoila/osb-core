@@ -115,7 +115,7 @@ public class ServiceInstanceController extends BaseController {
             @RequestBody ServiceInstanceUpdateRequest request,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity
-    ) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceInstanceDoesNotExistException,
+    ) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException,
             MaintenanceInfoVersionsDontMatchException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException, ConcurrencyErrorException {
 
 
@@ -131,14 +131,14 @@ public class ServiceInstanceController extends BaseController {
             throw new AsyncRequiredException();
         }
 
-        if (serviceInstanceUtils.isBlocked(serviceInstanceId, JobProgress.UPDATE)) {
-            throw new ConcurrencyErrorException("Service Instance");
-        }
-
         ServiceInstanceOperationResponse serviceInstanceOperationResponse;
         try {
             ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
             ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(request.getServiceDefinitionId());
+
+            if (serviceInstanceUtils.isBlocked(serviceInstance, JobProgress.UPDATE)) {
+                throw new ConcurrencyErrorException("Service Instance");
+            }
 
             if (serviceDefinition.specificPlanIsUpdatable(serviceInstance.getPlanId())) {
                 if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request)) {
