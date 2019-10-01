@@ -129,8 +129,13 @@ public class ServiceInstanceUtils {
      *
      */
     private static boolean compareContext(ServiceInstanceRequest request, ServiceInstance serviceInstance) {
-        return Optional.ofNullable(request.getContext()).map(context -> context.equals(serviceInstance.getContext()))
-                .orElse(serviceInstance.getContext() == null);
+        if (request.getContext() == null) {
+
+            return serviceInstance.getContext() == null;
+        } else {
+
+            return request.getContext().equals(serviceInstance.getContext());
+        }
     }
      /**
      * Checks whether an update with the given ServiceInstanceUpdateRequest would effectively change the service instance.
