@@ -80,7 +80,8 @@ public abstract class BindingServiceImpl implements BindingService {
             if (platformService.isSyncPossibleOnBind()) {
                 baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
 						serviceInstanceBindingRequest, plan);
-                jobRepository.saveJobProgress(randomString.nextString(), bindingId, JobProgress.SUCCESS, "Synchronous binding.", operationId);
+                jobRepository.saveJobProgress(randomString.nextString(), bindingId, JobProgress.SUCCESS,
+						"Successfully created a synchronous binding.", operationId);
             } else {
                 bindingRepository.addInternalBinding(new ServiceInstanceBinding(bindingId, instanceId, null));
 
@@ -96,6 +97,8 @@ public abstract class BindingServiceImpl implements BindingService {
 			} else {
 				baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
 						serviceInstanceBindingRequest, plan);
+				jobRepository.saveJobProgress(randomString.nextString(), bindingId, JobProgress.SUCCESS,
+						"Successfully created a synchronous binding.", operationId);
 			}
 		}
 		return baseServiceInstanceBindingResponse;
