@@ -6,11 +6,11 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Context {
 
@@ -55,18 +55,6 @@ public class Context {
     }
 
     public void setPlatform(String platform) {
-        if(fieldIsPresent(platform)) {
-            switch (platform) {
-                case PLATFORM_CLOUDFOUNDRY:
-                case PLATFORM_KUBERNETES:
-                    break;
-                default:
-                    throw new IllegalArgumentException("Only Cloudfoundry and Kubernetes are supported Platforms.");
-            }
-        } else {
-            throw new IllegalArgumentException("Did not find a value for Platform!");
-        }
-
         this.platform = platform;
     }
 
@@ -140,17 +128,29 @@ public class Context {
         this.additionalFields.put(key, value);
     }
 
+    /**
+     * throws IllegalArgumentException to force jackson to fail when deserializing a invalid context object according to osb-api-spec, and if platform is empty or null.
+     */
     public void validateContextObject() {
+        if (StringUtils.isEmpty(this.getPlatform())) {
+            throw new IllegalArgumentException("no value for Platform found!");
+        }
+
         switch (this.getPlatform()) {
             case PLATFORM_CLOUDFOUNDRY:
                 validateCloudfoundryContextObject();
                 break;
             case PLATFORM_KUBERNETES:
                 validateKubernetesContextObject();
+                break;
+            case "null":
+                throw new IllegalArgumentException("Platform " + this.getPlatform() + " is not supported. Use kubernetes or cloudfoundry");
         }
-
     }
 
+    /**
+     * Throws IllegalArgumentException to force jackson to fail when deserializing a invalid kubernetes context object according to osb-api-spec.*
+     */
     private void validateKubernetesContextObject() {
         if (fieldIsPresent(this.getNamespace()) && fieldIsPresent(this.getClusterId())) {
             log.debug("Received a valid Kubernetes context object.");
@@ -159,6 +159,9 @@ public class Context {
         }
     }
 
+    /**
+     * Throws IllegalArgumentException to force jackson to fail when de serializing a invalid cloudfoundry context object according to osb-api-spec.*
+     */
     private void validateCloudfoundryContextObject() {
         if (fieldIsPresent(this.getOrganizationGuid()) &&
                 fieldIsPresent(this.getOrganizationName()) &&
