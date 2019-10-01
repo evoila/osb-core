@@ -161,7 +161,6 @@ public class Context {
 
     private void validateCloudfoundryContextObject() {
         if (fieldIsPresent(this.getOrganizationGuid()) &&
-                fieldIsPresent(this.getOrganizationGuid()) &&
                 fieldIsPresent(this.getOrganizationName()) &&
                 fieldIsPresent(this.getSpaceGuid()) &&
                 fieldIsPresent(this.getSpaceName()) &&
