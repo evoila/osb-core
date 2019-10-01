@@ -123,9 +123,14 @@ public class ServiceInstanceUtils {
                 && request.getParameters().equals(serviceInstance.getParameters());
     }
 
+    /*
+     * calls context.equals if the ServiceInstanceRequest contains a context Object and returns the. If the context object
+     * from the request the method returns true if the context object from serviceInstance is also null.
+     *
+     */
     private static boolean compareContext(ServiceInstanceRequest request, ServiceInstance serviceInstance) {
-        return Optional.ofNullable(request.getContext()).map(context -> context.equals(serviceInstance.getContext())).orElse(serviceInstance.getContext() == null
-        );
+        return Optional.ofNullable(request.getContext()).map(context -> context.equals(serviceInstance.getContext()))
+                .orElse(serviceInstance.getContext() == null);
     }
      /**
      * Checks whether an update with the given ServiceInstanceUpdateRequest would effectively change the service instance.
