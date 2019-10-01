@@ -77,7 +77,7 @@ public abstract class BaseController {
 
     @ExceptionHandler(ServiceInstanceNotFoundException.class)
     public ResponseEntity<ResponseMessage> handleException(ServiceInstanceNotFoundException ex) {
-        return processErrorResponse(HttpStatus.NOT_FOUND);
+        return processErrorResponse(ex.getError(), ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ServiceInstanceBindingExistsException.class)
