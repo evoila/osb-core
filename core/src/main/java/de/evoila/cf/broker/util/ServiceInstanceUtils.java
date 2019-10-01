@@ -123,10 +123,12 @@ public class ServiceInstanceUtils {
                 && request.getParameters().equals(serviceInstance.getParameters());
     }
 
-    /*
-     * calls context.equals if the ServiceInstanceRequest contains a context Object and returns the. If the context object
-     * from the request the method returns true if the context object from serviceInstance is also null.
+    /**
+     * A null safe comparison of context objects from a request and service instance.
      *
+     * @param request The ServiceInstanceRequest that may holds a context object
+     * @param serviceInstance The ServiceInstance that may holds a context objects
+     * @return true if both context objects are null or they are equal.
      */
     private static boolean compareContext(ServiceInstanceRequest request, ServiceInstance serviceInstance) {
         if (request.getContext() == null) {
