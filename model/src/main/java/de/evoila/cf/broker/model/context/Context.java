@@ -54,12 +54,16 @@ public class Context {
     }
 
     public void setPlatform(String platform) {
-        switch (platform) {
-            case PLATFORM_CLOUDFOUNDRY:
-            case PLATFORM_KUBERNETES:
-                break;
-            default:
-                throw new IllegalArgumentException("Only Cloudfoundry and Kubernetes are supported Platforms");
+        if(fieldIsPresent(platform)) {
+            switch (platform) {
+                case PLATFORM_CLOUDFOUNDRY:
+                case PLATFORM_KUBERNETES:
+                    break;
+                default:
+                    throw new IllegalArgumentException("Only Cloudfoundry and Kubernetes are supported Platforms.");
+            }
+        } else {
+            throw new IllegalArgumentException("Did not find a value for Platform!");
         }
 
         this.platform = platform;
