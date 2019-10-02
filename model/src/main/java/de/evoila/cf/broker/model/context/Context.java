@@ -143,13 +143,14 @@ public class Context {
             case PLATFORM_KUBERNETES:
                 validateKubernetesContextObject();
                 break;
-            case "null":
-                throw new IllegalArgumentException("Platform " + this.getPlatform() + " is not supported. Use kubernetes or cloudfoundry");
+            default:
+                throw new IllegalArgumentException("Platform " + this.getPlatform() + " is not supported. " +
+                        "Use "+PLATFORM_KUBERNETES+" or "+PLATFORM_CLOUDFOUNDRY + ".");
         }
     }
 
     /**
-     * Throws IllegalArgumentException to force jackson to fail when deserializing a invalid kubernetes context object according to osb-api-spec.*
+     * Throws IllegalArgumentException to force jackson to fail when deserializing an invalid kubernetes context object according to osb-api-spec.*
      */
     private void validateKubernetesContextObject() {
         if (fieldIsPresent(this.getNamespace()) && fieldIsPresent(this.getClusterId())) {
