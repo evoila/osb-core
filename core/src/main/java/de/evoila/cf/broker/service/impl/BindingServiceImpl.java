@@ -74,29 +74,26 @@ public abstract class BindingServiceImpl implements BindingService {
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
 		BaseServiceInstanceBindingResponse baseServiceInstanceBindingResponse;
-
-		if (async) {
-			if (platformService.isSyncPossibleOnBind()) {
-				baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
-						serviceInstanceBindingRequest, plan);
-			} else {
-				bindingRepository.addInternalBinding(new ServiceInstanceBinding(bindingId, instanceId, null));
-
-				String operationId = randomString.nextString();
-
-				asyncBindingService.asyncCreateServiceInstanceBinding(this, bindingId,
-						serviceInstance, serviceInstanceBindingRequest, plan, async, operationId);
-
-				baseServiceInstanceBindingResponse = new ServiceInstanceBindingOperationResponse(operationId);
-			}
+        String operationId = randomString.nextString();
+        
+        if (platformService.isSyncPossibleOnBind()) {
+			baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
+					serviceInstanceBindingRequest, plan);
+			jobRepository.saveJobProgress(operationId, bindingId, JobProgress.SUCCESS,
+					"Successfully created a synchronous binding.", operationId);
 		} else {
-			if (!platformService.isSyncPossibleOnBind()) {
+        	if (!async) {
 				throw new AsyncRequiredException();
-			} else {
-				baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
-						serviceInstanceBindingRequest, plan);
 			}
+
+			bindingRepository.addInternalBinding(new ServiceInstanceBinding(bindingId, instanceId, null));
+
+			asyncBindingService.asyncCreateServiceInstanceBinding(this, bindingId,
+					serviceInstance, serviceInstanceBindingRequest, plan, true, operationId);
+
+			baseServiceInstanceBindingResponse = new ServiceInstanceBindingOperationResponse(operationId);
 		}
+
 		return baseServiceInstanceBindingResponse;
 	}
 
