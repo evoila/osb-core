@@ -79,8 +79,6 @@ public abstract class BindingServiceImpl implements BindingService {
         if (platformService.isSyncPossibleOnBind()) {
 			baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
 					serviceInstanceBindingRequest, plan);
-			jobRepository.saveJobProgress(operationId, bindingId, JobProgress.SUCCESS,
-					"Successfully created a synchronous binding.", operationId);
 		} else {
         	if (!async) {
 				throw new AsyncRequiredException();
@@ -186,11 +184,10 @@ public abstract class BindingServiceImpl implements BindingService {
                                                             ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                             Plan plan)
 			throws ServiceBrokerException, InvalidParametersException, PlatformException{
+		ServiceInstanceBindingResponse  response = createBinding(bindingId, serviceInstance, serviceInstanceBindingRequest, plan);
+		jobRepository.saveJobProgress(randomString.nextString(), bindingId, JobProgress.SUCCESS, "Successfully created synchronous binding.", JobProgress.BIND);
 
-		String operationId = randomString.nextString();
-		jobRepository.saveJobProgress(operationId, bindingId, JobProgress.SUCCESS, "Successfully created synchronous binding.", JobProgress.BIND);
-
-		return createBinding(bindingId, serviceInstance, serviceInstanceBindingRequest, plan);
+		return response;
 	}
 
 	public ServiceInstanceBindingResponse createBinding(String bindingId, ServiceInstance serviceInstance,
