@@ -75,32 +75,25 @@ public abstract class BindingServiceImpl implements BindingService {
 
 		BaseServiceInstanceBindingResponse baseServiceInstanceBindingResponse;
         String operationId = randomString.nextString();
-
-        if (async) {
-            if (platformService.isSyncPossibleOnBind()) {
-                baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
-						serviceInstanceBindingRequest, plan);
-                jobRepository.saveJobProgress(randomString.nextString(), bindingId, JobProgress.SUCCESS,
-						"Successfully created a synchronous binding.", operationId);
-            } else {
-                bindingRepository.addInternalBinding(new ServiceInstanceBinding(bindingId, instanceId, null));
-
-
-				asyncBindingService.asyncCreateServiceInstanceBinding(this, bindingId,
-						serviceInstance, serviceInstanceBindingRequest, plan, async, operationId);
-
-				baseServiceInstanceBindingResponse = new ServiceInstanceBindingOperationResponse(operationId);
-			}
+        
+        if (platformService.isSyncPossibleOnBind()) {
+			baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
+					serviceInstanceBindingRequest, plan);
+			jobRepository.saveJobProgress(operationId, bindingId, JobProgress.SUCCESS,
+					"Successfully created a synchronous binding.", operationId);
 		} else {
-			if (!platformService.isSyncPossibleOnBind()) {
+        	if (!async) {
 				throw new AsyncRequiredException();
-			} else {
-				baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
-						serviceInstanceBindingRequest, plan);
-				jobRepository.saveJobProgress(randomString.nextString(), bindingId, JobProgress.SUCCESS,
-						"Successfully created a synchronous binding.", operationId);
 			}
+
+			bindingRepository.addInternalBinding(new ServiceInstanceBinding(bindingId, instanceId, null));
+
+			asyncBindingService.asyncCreateServiceInstanceBinding(this, bindingId,
+					serviceInstance, serviceInstanceBindingRequest, plan, true, operationId);
+
+			baseServiceInstanceBindingResponse = new ServiceInstanceBindingOperationResponse(operationId);
 		}
+
 		return baseServiceInstanceBindingResponse;
 	}
 
