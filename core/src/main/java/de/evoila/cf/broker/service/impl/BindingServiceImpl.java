@@ -252,7 +252,7 @@ public abstract class BindingServiceImpl implements BindingService {
         ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
         binding.setAppGuid(appGuid);
 
-		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
+		return binding;
 	}
 
 	protected abstract void unbindService(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
