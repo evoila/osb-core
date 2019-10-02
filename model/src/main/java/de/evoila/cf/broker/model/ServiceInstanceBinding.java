@@ -25,7 +25,7 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 
 	private String appGuid;
 
-	private Map<String, Object> parameters;
+    private Map<String, Object> parameters = new HashMap<>();
 
 	private List<VolumeMount> volumeMounts;
 

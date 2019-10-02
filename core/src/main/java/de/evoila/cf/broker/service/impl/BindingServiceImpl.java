@@ -245,9 +245,12 @@ public abstract class BindingServiceImpl implements BindingService {
 		return serviceInstance;
 	}
 
-	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-												 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException, PlatformException {
-		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
+    protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
+                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException, PlatformException {
+        Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
+        String appGuid = getAppGuidFromBindingRequest(serviceInstanceBindingRequest);
+        ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
+        binding.setAppGuid(appGuid);
 
 		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
 	}
@@ -281,5 +284,12 @@ public abstract class BindingServiceImpl implements BindingService {
 
 	public ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException {
 		return serviceInstanceRepository.getServiceInstance(instanceId);
+	}
+	private String getAppGuidFromBindingRequest(ServiceInstanceBindingRequest request) {
+		String appGuid = request.getAppGuid();
+		if (request.getBindResource() != null && request.getBindResource().getAppGuid() != null) {
+			appGuid = request.getBindResource().getAppGuid();
+		}
+		return appGuid;
 	}
 }
