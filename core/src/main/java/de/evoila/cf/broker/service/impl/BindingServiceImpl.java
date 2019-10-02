@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * @author Johannes Hiemer, Marco Di Martino.
@@ -62,7 +63,7 @@ public abstract class BindingServiceImpl implements BindingService {
 			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException,
 			InvalidParametersException, AsyncRequiredException, ValidationException, PlatformException  {
 
-		validateBindingNotExists(bindingId, instanceId);
+		validateBindingNotExists(serviceInstanceBindingRequest, bindingId, instanceId);
 
 		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
 
@@ -262,8 +263,8 @@ public abstract class BindingServiceImpl implements BindingService {
                                                              ServiceInstance serviceInstance, Plan plan,
                                                              ServerAddress serverAddress) throws ServiceBrokerException, InvalidParametersException, PlatformException;
 
-	protected void validateBindingNotExists(String bindingId, String instanceId)
-			throws ServiceInstanceBindingExistsException {
+    protected void validateBindingNotExists(ServiceInstanceBindingRequest serviceInstanceBindingRequest, String bindingId, String instanceId)
+            throws ServiceInstanceBindingExistsException, ServiceInstanceDoesNotExistException {
 
 		if (bindingRepository.containsInternalBindingId(bindingId)) {
 			boolean bindCreation;
@@ -276,20 +277,58 @@ public abstract class BindingServiceImpl implements BindingService {
 			} catch (NoSuchElementException e) {
 				return;
 			}
-			if (bindCreation && !isBindingInProgress)
-				throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
-		}
+            if (bindCreation && !isBindingInProgress) {
+                ServiceInstanceBinding serviceInstanceBinding = bindingRepository.findOne(bindingId);
+                boolean identical = wouldCreateIdenticalBinding(serviceInstanceBindingRequest, serviceInstanceBinding);
 
-	}
+                throw new ServiceInstanceBindingExistsException(bindingId, instanceId, identical);
+            }
+        }
+    }
 
 	public ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException {
 		return serviceInstanceRepository.getServiceInstance(instanceId);
 	}
+	private boolean wouldCreateIdenticalBinding(ServiceInstanceBindingRequest request, ServiceInstanceBinding serviceInstanceBinding) throws ServiceInstanceDoesNotExistException {
+		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceBinding.getServiceInstanceId());
+		String routeBinding = getRouteBindingFromInstanceBinding(serviceInstanceBinding.getId());
+		String requestRouteBinding = getRouteBindingFromBindingRequest(request);
+		String requestAppGuid = getAppGuidFromBindingRequest(request);
+
+		return Objects.equals(routeBinding, requestRouteBinding) &&
+				Objects.equals(requestAppGuid, serviceInstanceBinding.getAppGuid()) &&
+				Objects.equals(request.getServiceDefinitionId(), serviceInstance.getServiceDefinitionId()) &&
+				Objects.equals(request.getPlanId(), (serviceInstance.getPlanId())) &&
+				Objects.equals(request.getParameters(), serviceInstanceBinding.getParameters());
+	}
+
 	private String getAppGuidFromBindingRequest(ServiceInstanceBindingRequest request) {
 		String appGuid = request.getAppGuid();
 		if (request.getBindResource() != null && request.getBindResource().getAppGuid() != null) {
 			appGuid = request.getBindResource().getAppGuid();
 		}
 		return appGuid;
+	}
+
+	private String getRouteBindingFromBindingRequest(ServiceInstanceBindingRequest request) {
+		BindResource bindResource = request.getBindResource();
+
+		if (bindResource != null) {
+			return bindResource.getRoute();
+		}
+		return null;
+	}
+
+	private String getRouteBindingFromInstanceBinding(String bindingId) {
+		RouteBinding routeBinding;
+		try {
+			routeBinding = routeBindingRepository.findOne(bindingId);
+
+			return routeBinding.getRoute();
+		} catch (NoSuchElementException e) {
+			log.debug("No route for BindingId: " + bindingId + " found", e);
+
+			return null;
+		}
 	}
 }
