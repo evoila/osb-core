@@ -131,14 +131,10 @@ public class ServiceInstanceUtils {
      * @return true if both context objects are null or they are equal.
      */
     private static boolean compareContext(ServiceInstanceRequest request, ServiceInstance serviceInstance) {
-        if (request.getContext() == null) {
-
-            return serviceInstance.getContext() == null;
-        } else {
-
-            return request.getContext().equals(serviceInstance.getContext());
-        }
+        return request.getContext() == null ? serviceInstance.getContext() == null
+                : request.getContext().equals(serviceInstance.getContext());
     }
+
      /**
      * Checks whether an update with the given ServiceInstanceUpdateRequest would effectively change the service instance.
      *
