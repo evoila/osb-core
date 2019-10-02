@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.evoila.cf.broker.model.context.Context;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.Map;
 
 /**
  * A request sent by the cloud controller to create a new instance
@@ -31,7 +31,7 @@ public class ServiceInstanceRequest extends BaseServiceInstanceRequest {
     public ServiceInstanceRequest() {
     }
 
-    public ServiceInstanceRequest(String serviceDefinitionId, String planId, String organizationGuid, String spaceGuid, Map<String, Object> context) {
+    public ServiceInstanceRequest(String serviceDefinitionId, String planId, String organizationGuid, String spaceGuid, Context context) {
         this.serviceDefinitionId = serviceDefinitionId;
         this.planId = planId;
         this.organizationGuid = organizationGuid;
