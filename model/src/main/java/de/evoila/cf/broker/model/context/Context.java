@@ -129,7 +129,7 @@ public class Context {
     }
 
     /**
-     * throws IllegalArgumentException to force jackson to fail when deserializing a invalid context object according to osb-api-spec, and if platform is empty or null.
+     * Throws IllegalArgumentException to force jackson to fail when deserializing an invalid context object according to osb-api-spec, and if platform is empty or null.
      */
     public void validateContextObject() {
         if (StringUtils.isEmpty(this.getPlatform())) {
@@ -160,7 +160,7 @@ public class Context {
     }
 
     /**
-     * Throws IllegalArgumentException to force jackson to fail when de serializing a invalid cloudfoundry context object according to osb-api-spec.*
+     * Throws IllegalArgumentException to force jackson to fail when deserializing an invalid cloudfoundry context object according to osb-api-spec.*
      */
     private void validateCloudfoundryContextObject() {
         if (fieldIsPresent(this.getOrganizationGuid()) &&
@@ -171,7 +171,7 @@ public class Context {
         ) {
             log.debug("Received a valid Cloudfoundry context object.");
         } else {
-            throw new IllegalArgumentException("A valid Cloudfoundry context object should contain organization_guid, organization_name, space_guid, space_name and instance_name");
+            throw new IllegalArgumentException("A valid Cloudfoundry context object should contain the fields organization_guid, organization_name, space_guid, space_name and instance_name");
         }
     }
 
