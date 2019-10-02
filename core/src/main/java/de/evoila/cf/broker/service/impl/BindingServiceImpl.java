@@ -280,14 +280,6 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	public ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException {
-		ServiceInstance serviceInstance;
-		try {
-			serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-			if (serviceInstance == null)
-				throw new ServiceInstanceDoesNotExistException(instanceId);
-		} catch(Exception e) {
-			throw new ServiceInstanceDoesNotExistException(instanceId);
-		}
-		return serviceInstance;
+		return serviceInstanceRepository.getServiceInstance(instanceId);
 	}
 }
