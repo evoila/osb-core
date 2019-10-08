@@ -2,6 +2,8 @@ package de.evoila.cf.broker.model.catalog.plan;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 /**
  * @author Marco Di Martino.
  */
@@ -34,6 +36,20 @@ public class Schemas {
 
 	public void setServiceBinding(SchemaServiceBinding serviceBinding) {
 		this.serviceBinding = serviceBinding;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Schemas schemas = (Schemas) o;
+		return Objects.equals(serviceInstance, schemas.serviceInstance) &&
+			   Objects.equals(serviceBinding, schemas.serviceBinding);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(serviceInstance, serviceBinding);
 	}
 
 }
