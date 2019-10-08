@@ -289,6 +289,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	public ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException {
 		return serviceInstanceRepository.getServiceInstance(instanceId);
 	}
+	
 	private boolean wouldCreateIdenticalBinding(ServiceInstanceBindingRequest request, ServiceInstanceBinding serviceInstanceBinding) throws ServiceInstanceDoesNotExistException {
 		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceBinding.getServiceInstanceId());
 		String routeBinding = getRouteBindingFromInstanceBinding(serviceInstanceBinding.getId());
@@ -320,15 +321,10 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	private String getRouteBindingFromInstanceBinding(String bindingId) {
-		RouteBinding routeBinding;
-		try {
-			routeBinding = routeBindingRepository.findOne(bindingId);
+		if (routeBindingRepository.containsRouteBindingId(bindingId)) {
 
-			return routeBinding.getRoute();
-		} catch (NoSuchElementException e) {
-			log.debug("No route for BindingId: " + bindingId + " found", e);
-
-			return null;
+			return routeBindingRepository.findOne(bindingId).getRoute();
 		}
+		return null;
 	}
 }
