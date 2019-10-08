@@ -307,7 +307,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         }
 
         serviceInstanceRepository.deleteServiceInstance(serviceInstance.getId());
-        jobRepository.deleteJobProgress(serviceInstance.getId());
+        jobRepository.deleteJobProgressByReferenceId(serviceInstance.getId());
     }
 
     public void updateInstanceInfo(ServiceInstance serviceInstance) {

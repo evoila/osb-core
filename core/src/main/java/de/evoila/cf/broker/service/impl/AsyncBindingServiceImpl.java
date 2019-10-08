@@ -54,14 +54,13 @@ public class AsyncBindingServiceImpl extends AsyncOperationServiceImpl implement
         JobProgress jobProgress = jobProgressService.startJob(jobProgressId, bindingId,
                 "Deleting binding..", JobProgress.UNBIND);
         try {
-            bindingServiceImpl.syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
+            bindingServiceImpl.deleteServiceInstanceBinding(bindingId, serviceInstance, plan);
 
         } catch (Exception e) {
             jobProgressService.failJob(jobProgress.getId(),
                     "Internal error during binding deletion, please contact our support.");
 
             log.error("Exception during binding deletion", e);
-            return;
         }
     }
 
