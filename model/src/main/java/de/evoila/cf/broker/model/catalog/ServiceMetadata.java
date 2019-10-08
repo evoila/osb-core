@@ -2,6 +2,8 @@ package de.evoila.cf.broker.model.catalog;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class ServiceMetadata {
 
     @JsonProperty("displayName")
@@ -81,4 +83,23 @@ public class ServiceMetadata {
     public void setSupportUrl(String supportUrl) {
         this.supportUrl = supportUrl;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ServiceMetadata that = (ServiceMetadata) o;
+        return Objects.equals(displayName, that.displayName) &&
+               Objects.equals(imageUrl, that.imageUrl) &&
+               Objects.equals(longDescription, that.longDescription) &&
+               Objects.equals(providerDisplayName, that.providerDisplayName) &&
+               Objects.equals(documentationUrl, that.documentationUrl) &&
+               Objects.equals(supportUrl, that.supportUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(displayName, imageUrl, longDescription, providerDisplayName, documentationUrl, supportUrl);
+    }
+
 }
