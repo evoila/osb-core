@@ -97,7 +97,9 @@ public class DeploymentServiceImpl implements DeploymentService {
                             serviceInstanceOptional.get().getDashboardUrl(), true);
                 } else if (jobProgress.isSucceeded() && ServiceInstanceUtils.wouldCreateIdenticalInstance(
                         serviceInstanceId, request, serviceInstanceOptional.get())) {
-                    throw new ServiceInstanceExistsException(serviceInstanceId, request.getServiceDefinitionId(), true);
+                    throw new ServiceInstanceExistsException(serviceInstanceId, request.getServiceDefinitionId(), true,
+                            new ServiceInstanceOperationResponse(jobProgress.getId(),
+                                    serviceInstanceOptional.get().getDashboardUrl(), true));
                 }
             }
             throw new ServiceInstanceExistsException(serviceInstanceId, request.getServiceDefinitionId());

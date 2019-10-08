@@ -22,7 +22,9 @@ public abstract class BaseController {
         return new ResponseEntity(status);
     }
 
-    protected ResponseEntity processEmptyErrorResponse(HttpStatus status) { return new ResponseEntity<String>(EmptyRestResponse.BODY, status);}
+    protected ResponseEntity processEmptyErrorResponse(HttpStatus status) {
+        return new ResponseEntity<String>(EmptyRestResponse.BODY, status);
+    }
 
     protected ResponseEntity processErrorResponse(String message, HttpStatus status) {
         return new ResponseEntity(new ResponseMessage(message), status);
@@ -64,9 +66,9 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler(ServiceInstanceExistsException.class)
-    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceExistsException ex) {
+    public ResponseEntity handleException(ServiceInstanceExistsException ex) {
         if (ex.isIdenticalInstance())
-            return processEmptyErrorResponse(HttpStatus.OK);
+            return ResponseEntity.ok(ex.getResponse());
         return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
