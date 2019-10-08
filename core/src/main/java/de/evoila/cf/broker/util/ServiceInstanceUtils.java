@@ -12,10 +12,7 @@ import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -137,8 +134,20 @@ public class ServiceInstanceUtils {
                 && request.getPlanId().equals(serviceInstance.getPlanId())
                 && request.getOrganizationGuid().equals(serviceInstance.getOrganizationGuid())
                 && request.getSpaceGuid().equals(serviceInstance.getSpaceGuid())
-                && request.getContext().equals(serviceInstance.getContext())
+                && compareContext(request, serviceInstance)
                 && request.getParameters().equals(serviceInstance.getParameters());
+    }
+
+    /**
+     * A null safe comparison of context objects from a request and service instance.
+     *
+     * @param request The ServiceInstanceRequest that may holds a context object
+     * @param serviceInstance The ServiceInstance that may holds a context objects
+     * @return true if both context objects are null or they are equal.
+     */
+    private static boolean compareContext(ServiceInstanceRequest request, ServiceInstance serviceInstance) {
+        return request.getContext() == null ? serviceInstance.getContext() == null
+                : request.getContext().equals(serviceInstance.getContext());
     }
 
      /**
