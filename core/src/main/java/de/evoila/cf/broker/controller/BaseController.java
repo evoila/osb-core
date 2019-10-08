@@ -84,6 +84,9 @@ public abstract class BaseController {
 
     @ExceptionHandler(ServiceInstanceBindingExistsException.class)
     public ResponseEntity<ResponseMessage> handleException(ServiceInstanceBindingExistsException ex) {
+        if (ex.isIdenticalBinding()) {
+            return processEmptyErrorResponse(HttpStatus.OK);
+        }
         return processErrorResponse(HttpStatus.CONFLICT);
     }
 

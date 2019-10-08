@@ -25,7 +25,7 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 
 	private String appGuid;
 
-	private Map<String, String> parameters;
+    private Map<String, Object> parameters = new HashMap<>();
 
 	private List<VolumeMount> volumeMounts;
 
@@ -71,11 +71,11 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 
 	public void setAppGuid(String appGuid) { this.appGuid = appGuid; }
 
-	public Map<String, String> getParameters() {
+	public Map<String, Object> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(Map<String, String> parameters) {
+	public void setParameters(Map<String, Object> parameters) {
 		this.parameters = parameters;
 	}
 
