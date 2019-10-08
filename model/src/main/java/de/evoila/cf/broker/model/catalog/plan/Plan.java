@@ -30,6 +30,8 @@ public class Plan {
 
 	private Schemas schemas;
 
+    @JsonProperty("plan_updateable") // misspelling of attribute kept, do not change it
+    private Boolean planUpdateable;
 
 	@JsonProperty("maintenance_info")
 	private MaintenanceInfo maintenanceInfo;
@@ -129,6 +131,14 @@ public class Plan {
 		this.maintenanceInfo = maintenanceInfo;
 	}
 
+  public Boolean isPlanUpdateable() {
+      return this.planUpdateable;
+  }
+
+  public void setPlanUpdateable(Boolean planUpdateable) {
+      this.planUpdateable = planUpdateable;
+  }
+  
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -140,12 +150,13 @@ public class Plan {
 			   description.equals(plan.description) &&
 			   Objects.equals(metadata, plan.metadata) &&
 			   Objects.equals(schemas, plan.schemas) &&
-			   platform == plan.platform;
+			   platform == plan.platform &&
+         planUpdateable == plan.planUpdateable;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, name, description, metadata, free, schemas, platform);
+		return Objects.hash(id, name, description, metadata, free, schemas, platform, planUpdateable);
 	}
-
+  
 }
