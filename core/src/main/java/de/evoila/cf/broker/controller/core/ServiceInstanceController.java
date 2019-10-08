@@ -78,8 +78,6 @@ public class ServiceInstanceController extends BaseController {
 
         ServiceInstanceOperationResponse response = deploymentService.createServiceInstance(serviceInstanceId, request);
 
-        if (DashboardUtils.hasDashboard(svc))
-            response.setDashboardUrl(DashboardUtils.dashboard(svc, serviceInstanceId));
         log.debug("ServiceInstance Creation Started: " + serviceInstanceId);
 
         if (response.isAsync())

@@ -3,6 +3,7 @@
  */
 package de.evoila.cf.broker.service.impl;
 
+import de.evoila.cf.broker.controller.utils.DashboardUtils;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
@@ -110,6 +111,14 @@ public class DeploymentServiceImpl implements DeploymentService {
                 request.getPlanId(), request.getOrganizationGuid(), request.getSpaceGuid(), request.getParameters(), request.getContext());
         serviceInstance.setAllowContextUpdates(serviceDefinition.isAllowContextUpdates());
 
+        ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
+
+        if (DashboardUtils.hasDashboard(serviceDefinition)){
+            String dashboardUrl = DashboardUtils.dashboard(serviceDefinition, serviceInstanceId);
+            serviceInstance.setDashboardUrl(dashboardUrl);
+            serviceInstanceOperationResponse.setDashboardUrl(dashboardUrl);
+        }
+
         Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
         if (request.getParameters() != null) {
@@ -121,7 +130,6 @@ public class DeploymentServiceImpl implements DeploymentService {
             throw new ServiceBrokerException("Not Platform configured for " + plan.getPlatform());
         }
 
-        ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
         if (platformService.isSyncPossibleOnCreate(plan)) {
             return serviceInstanceOperationResponse;
         } else {
