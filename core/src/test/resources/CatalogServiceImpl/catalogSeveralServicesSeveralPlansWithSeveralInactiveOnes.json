@@ -2,19 +2,19 @@
   "services":[
     {
       "bindable": true,
-      "bindingsRetrievable": true,
+      "bindings_retrievable": true,
       "dashboard": {
-        "authEndpoint": "https://uaa.local/oauth",
+        "auth_endpoint": "https://uaa.local/oauth",
         "url": "https://osb-example.local/custom/v2/authentication"
       },
-      "dashboardClient": {
+      "dashboard_client": {
         "id": "osb-example.local",
-        "redirectUri": "https://osb-example.local/custom/v2/authentication",
+        "redirect_uri": "https://osb-example.local/custom/v2/authentication",
         "secret": "59180F71-5830-4FE4-BD90-9EB8108DGB28"
       },
       "description": "Example Service - Simulating a database service",
       "id": "8653E6CE-D760-4B63-98B8-7D6361BF1EB4",
-      "instancesRetrievable": true,
+      "instances_retrievable": true,
       "metadata": {
         "displayName": "osb-example",
         "documentationUrl": "https://github.com/evoila/osb-docs",
@@ -24,11 +24,11 @@
       "name": "osb-example",
       "plans": [
         {
-          "connections": 4,
           "description": "Deployment of a small example service to an existing shared instance.",
           "free": true,
           "id": "206DBCB2-9F04-4F29-8BE4-411309DD520C",
           "metadata": {
+            "connections": 4,
             "active": false,
             "bullets": [
               "1 GB disk size",
@@ -57,9 +57,9 @@
         },
         {
           "metadata": {
+            "connections": 10,
             "active": false
           },
-          "connections": 10,
           "description": "Deployment of a medium example service to an existing shared instance.",
           "free": false,
           "id": "7A0FA2C0-F615-4498-97CE-CD45E477C46B",
@@ -67,7 +67,9 @@
           "platform": "EXISTING_SERVICE"
         },
         {
-          "connections": 50,
+          "metadata": {
+            "connections": 50
+          },
           "description": "Deployment of a large example service to an existing shared instance.",
           "free": false,
           "id": "602917BA-A0FE-4B75-ACA5-6FEACE29EFF0",
@@ -75,7 +77,9 @@
           "platform": "EXISTING_SERVICE"
         },
         {
-          "connections": 100,
+          "metadata": {
+            "connections": 100
+          },
           "description": "Deployment of an extra large example service to an existing shared instance.",
           "free": false,
           "id": "A05E7CB2-34F6-4015-BE94-4CF577CE737F",
@@ -86,14 +90,14 @@
     },
     {
       "bindable": true,
-      "bindingsRetrievable": true,
+      "bindings_retrievable": true,
       "dashboard": {
-        "authEndpoint": "https://uaa.local/oauth",
+        "auth_endpoint": "https://uaa.local/oauth",
         "url": "https://osb-example.local/v2/authentication"
       },
-      "dashboardClient": {
+      "dashboard_client": {
         "id": "osb-example-second.local",
-        "redirectUri": "https://osb-example.local/v2/authentication",
+        "redirect_uri": "https://osb-example.local/v2/authentication",
         "secret": "70292F82-7052-4FE4-BC90-9EB8108DFB28"
       },
       "description": "Second Example Service - Also simulating a database service",
@@ -109,9 +113,9 @@
       "plans": [
         {
           "metadata": {
+            "connections": 4,
             "active": false
           },
-          "connections": 4,
           "description": "Deployment of a small example service to an existing shared instance.",
           "free": true,
           "id": "306DBCB2-8F93-4F29-8BE4-411309DD520C",
@@ -119,7 +123,9 @@
           "platform": "EXISTING_SERVICE"
         },
         {
-          "connections": 50,
+          "metadata": {
+            "connections": 50
+          },
           "description": "Deployment of a large example service to an existing shared instance.",
           "free": false,
           "id": "782917BA-A9FE-4B75-ACA5-6FEACE29EFF0",

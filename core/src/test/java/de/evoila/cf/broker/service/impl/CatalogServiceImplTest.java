@@ -1,8 +1,7 @@
 package de.evoila.cf.broker.service.impl;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.env.Environment;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import de.evoila.cf.broker.bean.EndpointConfiguration;
@@ -44,8 +42,8 @@ class CatalogServiceImplTest {
     private CatalogServiceImpl catalogService;
 
     private <T> T getObjectFromFile(Class<T> clazz, String filename) throws IOException {
-        String json = Files.readString(resourcePath.resolve(filename));
-        return new Gson().fromJson(json, clazz);
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(resourcePath.resolve(filename).toFile(), clazz);
     }
 
     @BeforeEach
@@ -57,8 +55,7 @@ class CatalogServiceImplTest {
         catalogService = new CatalogServiceImpl(catalog, environment, endpointConfiguration, null);
     }
 
-    @AfterEach
-    void tearDown() throws IOException {
+    void validateCatalog() throws IOException {
         assertSame(catalog, catalogService.getCatalog());
         assertEquals(getObjectFromFile(Catalog.class, FILE_CATALOG_WITH_INACTIVE_PLANS_FILTERED),
                      catalogService.getCatalog());
@@ -72,18 +69,21 @@ class CatalogServiceImplTest {
             ServiceDefinition expectedServiceDefinition = getObjectFromFile(ServiceDefinition.class, FILE_EXPECTED_SERVICE_DEFINITION);
             ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(ID_EXPECTED_SERVICE_DEFINITION);
             assertEquals(expectedServiceDefinition, serviceDefinition);
+            validateCatalog();
         }
 
         @Test
-        void invalidId() {
+        void invalidId() throws IOException {
             ServiceDefinition serviceDefinition = catalogService.getServiceDefinition("576o");
             assertNull(serviceDefinition);
+            validateCatalog();
         }
 
         @Test
-        void nullId() {
+        void nullId() throws IOException {
             ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(null);
             assertNull(serviceDefinition);
+            validateCatalog();
         }
 
     }
@@ -92,8 +92,9 @@ class CatalogServiceImplTest {
     class filterActivePlans {
 
         @Test
-        void nullCatalog() {
+        void nullCatalog() throws IOException {
             catalogService.filterActivePlans(null);
+            validateCatalog();
         }
 
         @Test
@@ -102,6 +103,7 @@ class CatalogServiceImplTest {
             catalogService.filterActivePlans(inputCatalog);
             assertEquals(getObjectFromFile(Catalog.class, FILE_CATALOG_WITH_INACTIVE_PLANS_FILTERED),
                          inputCatalog);
+            validateCatalog();
         }
 
     }
