@@ -1,10 +1,10 @@
 package de.evoila.cf.broker.controller.core;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,10 +45,6 @@ class CatalogControllerTest {
         this.catalogController = new CatalogController(catalogService);
     }
 
-    @AfterEach
-    void tearDown() {
-    }
-
     /**
      * Reads a JSON file containing an array of ServiceDefinitions and returns a list containing all these service
      * definitions.
@@ -57,13 +52,9 @@ class CatalogControllerTest {
      * @return  A list containing all service definitions contained in the submitted file.
      * @throws Exception
      */
-    private List<ServiceDefinition> readServicesFile(String filePath) throws Exception
-    {
-        List<ServiceDefinition> generatedServices;
-        try (FileReader fileReader = new FileReader(new File(filePath))) {
-            generatedServices = new Gson().fromJson(fileReader, new TypeToken<List<ServiceDefinition>>() {}.getType());
-        }
-        return generatedServices;
+    private List<ServiceDefinition> readServicesFile(String filePath) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(new File(filePath), new TypeReference<List<ServiceDefinition>>() {});
     }
 
     /**
@@ -77,8 +68,7 @@ class CatalogControllerTest {
      */
     private void validCatalogTest(String catalogPath,
                                   String requestIdentity,
-                                  String originatingIdentity) throws Exception
-    {
+                                  String originatingIdentity) throws Exception {
         // mocks
         when(catalogService.getCatalog()).thenReturn(catalog);
 
@@ -93,44 +83,32 @@ class CatalogControllerTest {
         expectedCatalog.setServices(expectedServices);
         // check results
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedCatalog, response.getBody()); // ist dieser Test wirklich sinnvoll? Wir mocken ja gerade getServices. Wäre es ausreichend zu prüfen, dass der Catalog nicht null ist? Oder nicht leer? In diesen Fällen bräuchte man auch die ganzen equals Funktionen nicht hinzufügen.
+        assertEquals(expectedCatalog, response.getBody());
     }
 
-    @Test
-    void getCatalog_EmptyCatalog() {
-        // mocks
-        when(catalogService.getCatalog()).thenReturn(catalog);
-        when(catalog.getServices()).thenReturn(new ArrayList<>());
-        // actual method call
-        ResponseEntity<Catalog> response = catalogController.getCatalog(REQUEST_IDENTITY,
-                                                                        ORIGINATING_IDENTITY);
-        // check results
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(new Catalog(), response.getBody());
-    }
+    @Nested
+    class getCatalog {
 
-    @Test
-    void getCatalog_ValidCatalog()
-            throws Exception {
-        validCatalogTest(PATH_VALID_CATALOG_SERVICES,
-                REQUEST_IDENTITY,
-                ORIGINATING_IDENTITY);
-    }
+        @Test
+        void emptyCatalog() {
+            // mocks
+            when(catalogService.getCatalog()).thenReturn(catalog);
+            when(catalog.getServices()).thenReturn(new ArrayList<>());
+            // actual method call
+            ResponseEntity<Catalog> response = catalogController.getCatalog(REQUEST_IDENTITY,
+                                                                            ORIGINATING_IDENTITY);
+            // check results
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(new Catalog(), response.getBody());
+        }
 
-    @Test
-    void getCatalog_ValidCatalogNoIdentityHeaders()
-            throws Exception {
-        validCatalogTest(PATH_VALID_CATALOG_SERVICES,
-                null,
-                null);
-    }
+        @Test
+        void validCatalog() throws Exception {
+            validCatalogTest(PATH_VALID_CATALOG_SERVICES,
+                             REQUEST_IDENTITY,
+                             ORIGINATING_IDENTITY);
+        }
 
-    @Test
-    void getCatalog_ValidCatalogInvalidIdentityFormat()
-            throws Exception {
-        validCatalogTest(PATH_VALID_CATALOG_SERVICES,
-                ORIGINATING_IDENTITY, // expected: GUID, here: platform + base64-String
-                REQUEST_IDENTITY);  // expected: platform + base64-String, here: GUID
     }
 
 }
