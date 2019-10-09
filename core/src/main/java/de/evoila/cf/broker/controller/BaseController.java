@@ -66,9 +66,9 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler(ServiceInstanceExistsException.class)
-    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceExistsException ex) {
+    public ResponseEntity handleException(ServiceInstanceExistsException ex) {
         if (ex.isIdenticalInstance())
-            return processEmptyErrorResponse(HttpStatus.OK);
+            return ResponseEntity.ok(ex.getResponse());
         return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
