@@ -17,6 +17,7 @@ import de.evoila.cf.broker.exception.ServiceInstanceBindingBadRequestException;
 import de.evoila.cf.broker.exception.ServiceInstanceBindingExistsException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.BaseServiceInstanceBindingResponse;
+import de.evoila.cf.broker.model.ServiceBrokerErrorResponse;
 import de.evoila.cf.broker.model.ServiceInstanceBindingRequest;
 import de.evoila.cf.broker.util.EmptyRestResponse;
 
@@ -40,7 +41,7 @@ class BindServiceInstanceTest extends BaseTest {
     }
 
     @Test
-    void emptyAppGuid() throws Exception {
+    void emptyAppGuid() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, InvalidParametersException {
         when(request.getAppGuid()).thenReturn("");
         ResponseEntity response = controller.bindServiceInstance(HAPPY_INSTANCE_ID,
                                                                  HAPPY_BINDING_ID,
@@ -65,34 +66,60 @@ class BindServiceInstanceTest extends BaseTest {
                                                           request));
     }
 
-    @Test
-    void createServiceInstanceBindingThrows() throws Exception {
-        Exception[] exceptions = {
-                new ServiceInstanceBindingExistsException("Test1", "Test2"),
-                new ServiceBrokerException(),
-                new ServiceDefinitionDoesNotExistException("Test3"),
-                new ServiceInstanceDoesNotExistException("Test4"),
-                new InvalidParametersException("Test5"),
-                new AsyncRequiredException(),
-                new ValidationException("Test6"),
-                new PlatformException("Test7")
-        };
-        when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
-                                                         HAPPY_INSTANCE_ID,
-                                                         request,
-                                                         HAPPY_ACCEPTS_INCOMPLETE))
-                .thenThrow(exceptions);
-        for (Exception expectedEx : exceptions) {
-            Exception ex = assertThrows(expectedEx.getClass(),
-                                        () -> controller.bindServiceInstance(HAPPY_INSTANCE_ID,
-                                                                             HAPPY_BINDING_ID,
-                                                                             HAPPY_API_HEADER,
-                                                                             HAPPY_REQUEST_ID,
-                                                                             HAPPY_ORIGINATING_ID,
-                                                                             HAPPY_ACCEPTS_INCOMPLETE,
-                                                                             request));
-            assertSame(expectedEx, ex);
+    @Nested
+    class createServiceInstanceBindingThrows {
+
+        @SuppressWarnings("unchecked")
+        @Test
+        void caught() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException {
+            ServiceInstanceDoesNotExistException expectedException = new ServiceInstanceDoesNotExistException("Test9");
+            when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                             HAPPY_INSTANCE_ID,
+                                                             request,
+                                                             HAPPY_ACCEPTS_INCOMPLETE))
+                    .thenThrow(expectedException);
+            ServiceBrokerErrorResponse expectedErrorResponse = new ServiceBrokerErrorResponse(expectedException.getError(), expectedException.getMessage());
+            ResponseEntity<ServiceBrokerErrorResponse> response = controller.bindServiceInstance(HAPPY_INSTANCE_ID,
+                                                                                                 HAPPY_BINDING_ID,
+                                                                                                 HAPPY_API_HEADER,
+                                                                                                 HAPPY_REQUEST_ID,
+                                                                                                 HAPPY_ORIGINATING_ID,
+                                                                                                 HAPPY_ACCEPTS_INCOMPLETE,
+                                                                                                 request);
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertEquals(expectedErrorResponse, response.getBody());
         }
+
+        @Test
+        void notCaught() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException {
+            Exception[] exceptions = {
+                    new ServiceInstanceBindingExistsException("Test1", "Test2", true),
+                    new ServiceInstanceBindingExistsException("Test3", "Test4", false),
+                    new ServiceBrokerException(),
+                    new ServiceDefinitionDoesNotExistException("Test5"),
+                    new InvalidParametersException("Test6"),
+                    new AsyncRequiredException(),
+                    new ValidationException("Test7"),
+                    new PlatformException("Test8")
+            };
+            when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                             HAPPY_INSTANCE_ID,
+                                                             request,
+                                                             HAPPY_ACCEPTS_INCOMPLETE))
+                    .thenThrow(exceptions);
+            for (Exception expectedEx : exceptions) {
+                Exception ex = assertThrows(expectedEx.getClass(),
+                                            () -> controller.bindServiceInstance(HAPPY_INSTANCE_ID,
+                                                                                 HAPPY_BINDING_ID,
+                                                                                 HAPPY_API_HEADER,
+                                                                                 HAPPY_REQUEST_ID,
+                                                                                 HAPPY_ORIGINATING_ID,
+                                                                                 HAPPY_ACCEPTS_INCOMPLETE,
+                                                                                 request));
+                assertSame(expectedEx, ex);
+            }
+        }
+
     }
 
     @SuppressWarnings("unchecked")
@@ -102,7 +129,7 @@ class BindServiceInstanceTest extends BaseTest {
         private ResponseEntity<BaseServiceInstanceBindingResponse> response;
 
         @BeforeEach
-        void setUp() throws Exception {
+        void setUp() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException {
             when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
                                                              HAPPY_INSTANCE_ID,
                                                              request,
@@ -117,7 +144,7 @@ class BindServiceInstanceTest extends BaseTest {
         }
 
         @Test
-        void validIdentityHeaders() throws Exception {
+        void validIdentityHeaders() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, InvalidParametersException {
             response = controller.bindServiceInstance(HAPPY_INSTANCE_ID,
                                                       HAPPY_BINDING_ID,
                                                       HAPPY_API_HEADER,
@@ -142,7 +169,7 @@ class BindServiceInstanceTest extends BaseTest {
         }
 
         @Test
-        void acceptsIncompleteTrue() throws Exception {
+        void acceptsIncompleteTrue() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException {
             when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
                                                              HAPPY_INSTANCE_ID,
                                                              request,
@@ -160,7 +187,7 @@ class BindServiceInstanceTest extends BaseTest {
         }
 
         @Test
-        void acceptsIncompleteFalse() throws Exception {
+        void acceptsIncompleteFalse() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException {
             final boolean async = false;
             when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
                                                              HAPPY_INSTANCE_ID,
@@ -179,7 +206,7 @@ class BindServiceInstanceTest extends BaseTest {
         }
 
         @Test
-        void acceptsIncompleteNull() throws Exception {
+        void acceptsIncompleteNull() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException {
             final boolean async = false;
             when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
                                                              HAPPY_INSTANCE_ID,

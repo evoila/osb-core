@@ -30,7 +30,7 @@ class LastOperationTest extends BaseTest {
         }
 
         @Test
-        void withOperation() throws Exception {
+        void withOperation() throws ServiceInstanceBindingDoesNotExistsException {
             when(bindingService.getLastOperationById(HAPPY_BINDING_ID, HAPPY_OPERATION))
                     .thenReturn(jobProgressResponse);
             response = controller.lastOperation(HAPPY_INSTANCE_ID,
@@ -44,7 +44,7 @@ class LastOperationTest extends BaseTest {
         }
 
         @Test
-        void nullOperation() throws Exception {
+        void nullOperation() throws ServiceInstanceBindingDoesNotExistsException {
             when(bindingService.getLastOperationByReferenceId(HAPPY_BINDING_ID))
                     .thenReturn(jobProgressResponse);
             response = controller.lastOperation(HAPPY_INSTANCE_ID,
@@ -63,7 +63,7 @@ class LastOperationTest extends BaseTest {
     class exceptionThrown {
 
         @Test
-        void getLastOperationById() throws Exception {
+        void getLastOperationById() throws ServiceInstanceBindingDoesNotExistsException {
             ServiceInstanceBindingDoesNotExistsException expectedEx = new ServiceInstanceBindingDoesNotExistsException("Test");
             when(bindingService.getLastOperationById(HAPPY_BINDING_ID, HAPPY_OPERATION))
                     .thenThrow(expectedEx);
@@ -79,7 +79,7 @@ class LastOperationTest extends BaseTest {
         }
 
         @Test
-        void getLastOperationByReferenceId() throws Exception {
+        void getLastOperationByReferenceId() throws ServiceInstanceBindingDoesNotExistsException {
             ServiceInstanceBindingDoesNotExistsException expectedEx = new ServiceInstanceBindingDoesNotExistsException("Test");
             when(bindingService.getLastOperationByReferenceId(HAPPY_BINDING_ID))
                     .thenThrow(expectedEx);

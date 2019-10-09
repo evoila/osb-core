@@ -9,8 +9,11 @@ import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
 import java.nio.file.Files;
 
+import de.evoila.cf.broker.exception.ServiceBrokerException;
+import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceBindingNotFoundException;
 import de.evoila.cf.broker.exception.ServiceInstanceBindingNotRetrievableException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
@@ -33,27 +36,26 @@ class FetchTest extends BaseTest {
     private ServiceDefinition serviceDefinition;
 
 
-    @SuppressWarnings({"unchecked", "ConstantConditions"})
+    @SuppressWarnings("unchecked")
     @Test
-    void serviceBrokerErrorResponse() throws Exception {
+    void serviceBrokerErrorResponse() throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceBindingNotFoundException {
+        ServiceInstanceDoesNotExistException expectedException = new ServiceInstanceDoesNotExistException("Test");
+        ServiceBrokerErrorResponse expectedErrorResponse = new ServiceBrokerErrorResponse(expectedException.getError(), expectedException.getMessage());
         when(bindingService.getServiceInstance(HAPPY_INSTANCE_ID))
-                .thenThrow(new ServiceInstanceDoesNotExistException("Test"));
+                .thenThrow(expectedException);
         ResponseEntity<ServiceBrokerErrorResponse> response = controller.fetch(HAPPY_INSTANCE_ID,
                                                                                HAPPY_BINDING_ID,
                                                                                HAPPY_ORIGINATING_ID,
                                                                                HAPPY_REQUEST_ID);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("ServiceInstanceNotFound",
-                     response.getBody().getError());
-        assertEquals("No service instance was found for the given id. This could be caused by a desynchronization between broker and platform.",
-                     response.getBody().getDescription());
+        assertEquals(expectedErrorResponse, response.getBody());
     }
 
     @Nested
     class exceptionThrown {
 
         @Test
-        void fetchServiceInstanceBinding() throws Exception {
+        void fetchServiceInstanceBinding() throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceInstanceBindingNotFoundException {
             when(bindingService.getServiceInstance(HAPPY_INSTANCE_ID))
                     .thenReturn(serviceInstance);
             when(serviceInstance.getServiceDefinitionId())
@@ -75,7 +77,7 @@ class FetchTest extends BaseTest {
         }
 
         @Test
-        void serviceInstanceBindingNotRetrievableException() throws Exception {
+        void serviceInstanceBindingNotRetrievableException() throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
             when(bindingService.getServiceInstance(HAPPY_INSTANCE_ID))
                     .thenReturn(serviceInstance);
             when(serviceInstance.getServiceDefinitionId())
@@ -103,7 +105,7 @@ class FetchTest extends BaseTest {
         private ResponseEntity<ServiceInstanceBindingResponse>  response;
 
         @BeforeEach
-        void setUp() throws Exception {
+        void setUp() throws IOException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceInstanceBindingNotFoundException {
             String json = Files.readString(resourcePath.resolve(FILE_EXPECTED_SERVICE_INSTANCE_BINDING));
             ServiceInstanceBinding binding = new ObjectMapper().readValue(json, ServiceInstanceBinding.class);
             bindingResponse = new ServiceInstanceBindingResponse(binding);
@@ -125,7 +127,7 @@ class FetchTest extends BaseTest {
         }
 
         @Test
-        void validIdentityHeaders() throws Exception {
+        void validIdentityHeaders() throws ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceBindingNotFoundException {
             response = controller.fetch(HAPPY_INSTANCE_ID,
                                         HAPPY_BINDING_ID,
                                         HAPPY_ORIGINATING_ID,
