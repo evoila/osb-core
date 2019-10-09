@@ -26,21 +26,25 @@ public class DashboardUtils {
 	
 	public static String dashboard(ServiceDefinition serviceDefinition, String serviceInstanceId)
 			throws IllegalArgumentException {
-		if (serviceDefinition == null ||
-			serviceDefinition.getDashboard() == null ||
-			TextUtils.isEmpty(serviceInstanceId)) {
-
-			throw new IllegalArgumentException();
+		if (serviceDefinition == null) {
+			throw new IllegalArgumentException("serviceDefinition is null");
+		}
+		if (serviceDefinition.getDashboard() == null) {
+			throw new IllegalArgumentException("dashboard is null");
+		}
+		if (TextUtils.isEmpty(serviceInstanceId)) {
+			throw new IllegalArgumentException("serviceInstanceId is null/empty");
 		}
 		return DashboardUtils.appendSegmentToPath(serviceDefinition.getDashboard().getUrl(), serviceInstanceId);
 	}
 
 	public static String redirectUri(DashboardClient dashboardClient, String... appendixes)
 			throws IllegalArgumentException {
-		if (dashboardClient == null ||
-			appendixes == null) {
-
-			throw new IllegalArgumentException();
+		if (dashboardClient == null) {
+			throw new IllegalArgumentException("dashboardClient is null");
+		}
+		if (appendixes == null) {
+			throw new IllegalArgumentException("appendixes are null");
 		}
 		String url = dashboardClient.getRedirectUri();
 		for (String appendix : appendixes) {
