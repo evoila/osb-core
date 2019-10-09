@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import de.evoila.cf.broker.bean.EndpointConfiguration;
+import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.model.catalog.Catalog;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 
@@ -65,7 +66,7 @@ class CatalogServiceImplTest {
     class getServiceDefinition {
 
         @Test
-        void validId() throws IOException {
+        void validId() throws Exception {
             ServiceDefinition expectedServiceDefinition = getObjectFromFile(ServiceDefinition.class, FILE_EXPECTED_SERVICE_DEFINITION);
             ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(ID_EXPECTED_SERVICE_DEFINITION);
             assertEquals(expectedServiceDefinition, serviceDefinition);
@@ -73,16 +74,14 @@ class CatalogServiceImplTest {
         }
 
         @Test
-        void invalidId() throws IOException {
-            ServiceDefinition serviceDefinition = catalogService.getServiceDefinition("576o");
-            assertNull(serviceDefinition);
+        void invalidId() throws Exception {
+            assertThrows(ServiceDefinitionDoesNotExistException.class, () -> catalogService.getServiceDefinition("576o"));
             validateCatalog();
         }
 
         @Test
-        void nullId() throws IOException {
-            ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(null);
-            assertNull(serviceDefinition);
+        void nullId() throws Exception {
+            assertThrows(ServiceDefinitionDoesNotExistException.class, () -> catalogService.getServiceDefinition(null));
             validateCatalog();
         }
 
