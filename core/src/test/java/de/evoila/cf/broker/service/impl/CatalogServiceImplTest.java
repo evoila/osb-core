@@ -66,7 +66,7 @@ class CatalogServiceImplTest {
     class getServiceDefinition {
 
         @Test
-        void validId() throws Exception {
+        void validId() throws IOException, ServiceDefinitionDoesNotExistException {
             ServiceDefinition expectedServiceDefinition = getObjectFromFile(ServiceDefinition.class, FILE_EXPECTED_SERVICE_DEFINITION);
             ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(ID_EXPECTED_SERVICE_DEFINITION);
             assertEquals(expectedServiceDefinition, serviceDefinition);
@@ -74,13 +74,13 @@ class CatalogServiceImplTest {
         }
 
         @Test
-        void invalidId() throws Exception {
+        void invalidId() throws IOException {
             assertThrows(ServiceDefinitionDoesNotExistException.class, () -> catalogService.getServiceDefinition("576o"));
             validateCatalog();
         }
 
         @Test
-        void nullId() throws Exception {
+        void nullId() throws IOException {
             assertThrows(ServiceDefinitionDoesNotExistException.class, () -> catalogService.getServiceDefinition(null));
             validateCatalog();
         }
