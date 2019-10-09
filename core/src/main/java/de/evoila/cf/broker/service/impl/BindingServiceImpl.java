@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * @author Johannes Hiemer, Marco Di Martino.
@@ -62,7 +63,7 @@ public abstract class BindingServiceImpl implements BindingService {
 			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException,
 			InvalidParametersException, AsyncRequiredException, ValidationException, PlatformException  {
 
-		validateBindingNotExists(bindingId, instanceId);
+		validateBindingNotExists(serviceInstanceBindingRequest, bindingId, instanceId);
 
 		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
 
@@ -74,29 +75,24 @@ public abstract class BindingServiceImpl implements BindingService {
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
 		BaseServiceInstanceBindingResponse baseServiceInstanceBindingResponse;
-
-		if (async) {
-			if (platformService.isSyncPossibleOnBind()) {
-				baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
-						serviceInstanceBindingRequest, plan);
-			} else {
-				bindingRepository.addInternalBinding(new ServiceInstanceBinding(bindingId, instanceId, null));
-
-				String operationId = randomString.nextString();
-
-				asyncBindingService.asyncCreateServiceInstanceBinding(this, bindingId,
-						serviceInstance, serviceInstanceBindingRequest, plan, async, operationId);
-
-				baseServiceInstanceBindingResponse = new ServiceInstanceBindingOperationResponse(operationId);
-			}
+        String operationId = randomString.nextString();
+        
+        if (platformService.isSyncPossibleOnBind()) {
+			baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
+					serviceInstanceBindingRequest, plan);
 		} else {
-			if (!platformService.isSyncPossibleOnBind()) {
+        	if (!async) {
 				throw new AsyncRequiredException();
-			} else {
-				baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
-						serviceInstanceBindingRequest, plan);
 			}
+
+			bindingRepository.addInternalBinding(new ServiceInstanceBinding(bindingId, instanceId, null));
+
+			asyncBindingService.asyncCreateServiceInstanceBinding(this, bindingId,
+					serviceInstance, serviceInstanceBindingRequest, plan, true, operationId);
+
+			baseServiceInstanceBindingResponse = new ServiceInstanceBindingOperationResponse(operationId);
 		}
+
 		return baseServiceInstanceBindingResponse;
 	}
 
@@ -189,11 +185,20 @@ public abstract class BindingServiceImpl implements BindingService {
                                                             ServiceInstanceBindingRequest serviceInstanceBindingRequest,
                                                             Plan plan)
 			throws ServiceBrokerException, InvalidParametersException, PlatformException{
+		ServiceInstanceBindingResponse  response = createBinding(bindingId, serviceInstance, serviceInstanceBindingRequest, plan);
+		jobRepository.saveJobProgress(randomString.nextString(), bindingId, JobProgress.SUCCESS, "Successfully created synchronous binding.", JobProgress.BIND);
 
-        ServiceInstanceBindingResponse serviceInstanceBindingResponse;
+		return response;
+	}
+
+	public ServiceInstanceBindingResponse createBinding(String bindingId, ServiceInstance serviceInstance,
+														ServiceInstanceBindingRequest serviceInstanceBindingRequest,
+														Plan plan)
+			throws ServiceBrokerException, InvalidParametersException, PlatformException {
+
+		ServiceInstanceBindingResponse serviceInstanceBindingResponse;
 		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
 				.isEmpty(serviceInstanceBindingRequest.getBindResource().getRoute())) {
-
 			RouteBinding routeBinding = bindRoute(serviceInstance, serviceInstanceBindingRequest.getBindResource().getRoute());
 			routeBindingRepository.addRouteBinding(routeBinding);
 			serviceInstanceBindingResponse = new ServiceInstanceBindingResponse(routeBinding.getRoute());
@@ -204,10 +209,11 @@ public abstract class BindingServiceImpl implements BindingService {
 		ServiceInstanceBinding binding = bindService(bindingId, serviceInstanceBindingRequest, serviceInstance, plan);
 
 		bindingRepository.addInternalBinding(binding);
-        serviceInstanceBindingResponse = new ServiceInstanceBindingResponse(binding);
+		serviceInstanceBindingResponse = new ServiceInstanceBindingResponse(binding);
 
 		return serviceInstanceBindingResponse;
 	}
+
 
 	public void syncDeleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance, Plan plan) {
 		try {
@@ -240,11 +246,14 @@ public abstract class BindingServiceImpl implements BindingService {
 		return serviceInstance;
 	}
 
-	protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-												 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException, PlatformException {
-		Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
+    protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
+                                                 ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException, PlatformException {
+        Map<String, Object> credentials = createCredentials(bindingId, serviceInstanceBindingRequest, serviceInstance, plan, null);
+        String appGuid = getAppGuidFromBindingRequest(serviceInstanceBindingRequest);
+        ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
+        binding.setAppGuid(appGuid);
 
-		return new ServiceInstanceBinding(bindingId, serviceInstance.getId(), credentials);
+		return binding;
 	}
 
 	protected abstract void unbindService(ServiceInstanceBinding binding, ServiceInstance serviceInstance, Plan plan)
@@ -254,33 +263,68 @@ public abstract class BindingServiceImpl implements BindingService {
                                                              ServiceInstance serviceInstance, Plan plan,
                                                              ServerAddress serverAddress) throws ServiceBrokerException, InvalidParametersException, PlatformException;
 
-	protected void validateBindingNotExists(String bindingId, String instanceId)
-			throws ServiceInstanceBindingExistsException {
-
-		boolean bindCreation;
-		boolean isBindingInProgress;
+    protected void validateBindingNotExists(ServiceInstanceBindingRequest serviceInstanceBindingRequest, String bindingId, String instanceId)
+            throws ServiceInstanceBindingExistsException, ServiceInstanceDoesNotExistException {
 
 		if (bindingRepository.containsInternalBindingId(bindingId)) {
-    		try {
-    			bindCreation = jobRepository.getJobProgressByReferenceId(bindingId).getOperation().equals(JobProgress.BIND);
-    			isBindingInProgress = jobRepository.getJobProgressByReferenceId(bindingId).getDescription().equals(JobProgress.IN_PROGRESS);
-			 } catch (NoSuchElementException e) {
-    			return;
+			boolean bindCreation;
+			boolean isBindingInProgress;
+
+			try {
+				JobProgress jobProgress = jobRepository.getJobProgressByReferenceId(bindingId);
+				bindCreation = jobProgress.isBinding();
+				isBindingInProgress = jobProgress.isInProgress();
+			} catch (NoSuchElementException e) {
+				return;
 			}
-			if (bindCreation && !isBindingInProgress)
-				throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
-		}
-	}
+            if (bindCreation && !isBindingInProgress) {
+                ServiceInstanceBinding serviceInstanceBinding = bindingRepository.findOne(bindingId);
+                boolean identical = wouldCreateIdenticalBinding(serviceInstanceBindingRequest, serviceInstanceBinding);
+
+                throw new ServiceInstanceBindingExistsException(bindingId, instanceId, identical);
+            }
+        }
+    }
 
 	public ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException {
-		ServiceInstance serviceInstance;
-		try {
-			serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-			if (serviceInstance == null)
-				throw new ServiceInstanceDoesNotExistException(instanceId);
-		} catch(Exception e) {
-			throw new ServiceInstanceDoesNotExistException(instanceId);
+		return serviceInstanceRepository.getServiceInstance(instanceId);
+	}
+	
+	private boolean wouldCreateIdenticalBinding(ServiceInstanceBindingRequest request, ServiceInstanceBinding serviceInstanceBinding) throws ServiceInstanceDoesNotExistException {
+		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceBinding.getServiceInstanceId());
+		String routeBinding = getRouteBindingFromInstanceBinding(serviceInstanceBinding.getId());
+		String requestRouteBinding = getRouteBindingFromBindingRequest(request);
+		String requestAppGuid = getAppGuidFromBindingRequest(request);
+
+		return Objects.equals(routeBinding, requestRouteBinding) &&
+				Objects.equals(requestAppGuid, serviceInstanceBinding.getAppGuid()) &&
+				Objects.equals(request.getServiceDefinitionId(), serviceInstance.getServiceDefinitionId()) &&
+				Objects.equals(request.getPlanId(), (serviceInstance.getPlanId())) &&
+				Objects.equals(request.getParameters(), serviceInstanceBinding.getParameters());
+	}
+
+	private String getAppGuidFromBindingRequest(ServiceInstanceBindingRequest request) {
+		String appGuid = request.getAppGuid();
+		if (request.getBindResource() != null && request.getBindResource().getAppGuid() != null) {
+			appGuid = request.getBindResource().getAppGuid();
 		}
-		return serviceInstance;
+		return appGuid;
+	}
+
+	private String getRouteBindingFromBindingRequest(ServiceInstanceBindingRequest request) {
+		BindResource bindResource = request.getBindResource();
+
+		if (bindResource != null) {
+			return bindResource.getRoute();
+		}
+		return null;
+	}
+
+	private String getRouteBindingFromInstanceBinding(String bindingId) {
+		if (routeBindingRepository.containsRouteBindingId(bindingId)) {
+
+			return routeBindingRepository.findOne(bindingId).getRoute();
+		}
+		return null;
 	}
 }

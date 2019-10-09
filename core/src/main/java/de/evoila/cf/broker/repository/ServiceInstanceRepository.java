@@ -37,7 +37,17 @@ public interface ServiceInstanceRepository {
 
 	boolean containsServiceInstanceId(String serviceInstanceId);
 
+	/**
+	 * Method to add a new service instance to the repository.
+	 * Setting a service instance with an id unequal to the id parameter will save a copy of the instance with the different id.
+	 * Deprecated for usage of {@linkplain #saveServiceInstance(ServiceInstance)}
+	 * @param id id for the service instance
+	 * @param serviceInstance service instance object to add / save
+	 */
+	@Deprecated
 	void addServiceInstance(String id, ServiceInstance serviceInstance);
+
+	void saveServiceInstance(ServiceInstance serviceInstance);
 
 	void deleteServiceInstance(String serviceInstanceId);
 

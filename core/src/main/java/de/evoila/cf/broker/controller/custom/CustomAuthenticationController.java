@@ -7,6 +7,7 @@ import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.controller.utils.DashboardAuthenticationRedirectBuilder;
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
+import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.DashboardClient;
 import de.evoila.cf.broker.model.ServiceInstance;
@@ -84,9 +85,11 @@ public class CustomAuthenticationController extends BaseController {
             ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
 
             return catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId());
-        } catch (ServiceInstanceDoesNotExistException e){
+        } catch (ServiceInstanceDoesNotExistException e) {
             log.error("Service Instance does not exist!", e);
-
+            return null;
+        } catch (ServiceDefinitionDoesNotExistException e) {
+            log.error("Service Definition does not exist! ", e);
             return null;
         }
     }

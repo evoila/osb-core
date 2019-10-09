@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.evoila.cf.broker.model.context.Context;
 
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class ServiceInstanceUpdateRequest extends BaseServiceInstanceRequest {
 
 	public ServiceInstanceUpdateRequest() {}
 
-	public ServiceInstanceUpdateRequest(String serviceDefinitionId, String planId, Map<String, String> context) {
+	public ServiceInstanceUpdateRequest(String serviceDefinitionId, String planId, Context context) {
 		this.serviceDefinitionId = serviceDefinitionId;
 		this.planId = planId;
 		setContext(context);
@@ -31,5 +32,9 @@ public class ServiceInstanceUpdateRequest extends BaseServiceInstanceRequest {
 
     public void setPreviousValues(ServiceInstancePreviousValues previousValues) {
         this.previousValues = previousValues;
+    }
+
+    public Boolean isContextUpdate() {
+	    return (parameters == null || parameters.isEmpty()) && (context != null);
     }
 }

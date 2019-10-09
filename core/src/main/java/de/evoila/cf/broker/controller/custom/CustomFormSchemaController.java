@@ -1,6 +1,7 @@
 package de.evoila.cf.broker.controller.custom;
 
 import de.evoila.cf.broker.controller.BaseController;
+import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
@@ -38,12 +39,9 @@ public class CustomFormSchemaController extends BaseController {
     @GetMapping(value = "/{serviceInstanceId}/update")
     public ResponseEntity<Map> items(
             @PathVariable String serviceInstanceId
-    ) throws ServiceInstanceDoesNotExistException {
+    ) throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
 
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
-        if (serviceInstance == null)
-            throw new ServiceInstanceDoesNotExistException("Could not find Service Instance");
-
         ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId());
 
         Plan plan = serviceDefinition.getPlans().stream()
