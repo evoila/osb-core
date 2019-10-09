@@ -1,9 +1,8 @@
 package de.evoila.cf.broker.controller.core;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.everit.json.schema.ValidationException;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -52,7 +51,7 @@ class ServiceInstanceBindingControllerTest {
     private static final String     HAPPY_SERVICE_ID            = "48d3ceef-dbf9-43eb-b53e-e3a394873e17";
     private static final String     HAPPY_PLAN_ID               = "466f8623-2cc5-4f24-9823-e2533272e190";
     private static final String     HAPPY_API_HEADER            = "2.15";
-    private static final String     HAPPY_REQUEST_ID = "17e0e6a9-aea6-432c-92dd-280b5bf62dea";
+    private static final String     HAPPY_REQUEST_ID            = "17e0e6a9-aea6-432c-92dd-280b5bf62dea";
     private static final String     HAPPY_ORIGINATING_ID        = "cloudfoundry eyANCiAgInVzZXJfaWQiOiAiNjgzZWE3NDgtMzA5Mi00ZmY0LWI2NTYtMzljYWNjNGQ1MzYwIg0KfQ==";
     private static final Boolean    HAPPY_ACCEPTS_INCOMPLETE    = true;
     private static final String     HAPPY_OPERATION             = "cbfb4b3f-0653-4877-88ff-51e7dd4d9d23";
@@ -160,11 +159,10 @@ class ServiceInstanceBindingControllerTest {
                                                                  request,
                                                                  HAPPY_ACCEPTS_INCOMPLETE))
                         .thenReturn(bindingResponse);
-                when(bindingResponse.isAsync()).thenReturn(HAPPY_ACCEPTS_INCOMPLETE);
+                when(bindingResponse.isAsync()).thenReturn(true);
             }
 
-            @AfterEach
-            void tearDown() {
+            void validateResponse() {
                 assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
                 assertSame(bindingResponse, response.getBody());
             }
@@ -178,28 +176,7 @@ class ServiceInstanceBindingControllerTest {
                                                           HAPPY_ORIGINATING_ID,
                                                           HAPPY_ACCEPTS_INCOMPLETE,
                                                           request);
-            }
-
-            @Test
-            void noIdentityHeaders() throws Exception {
-                response = controller.bindServiceInstance(HAPPY_INSTANCE_ID,
-                                                          HAPPY_BINDING_ID,
-                                                          HAPPY_API_HEADER,
-                                                          null,
-                                                          null,
-                                                          HAPPY_ACCEPTS_INCOMPLETE,
-                                                          request);
-            }
-
-            @Test
-            void invalidIdentityHeaders() throws Exception {
-                response = controller.bindServiceInstance(HAPPY_INSTANCE_ID,
-                                                          HAPPY_BINDING_ID,
-                                                          HAPPY_API_HEADER,
-                                                          HAPPY_ORIGINATING_ID,
-                                                          HAPPY_REQUEST_ID,
-                                                          HAPPY_ACCEPTS_INCOMPLETE,
-                                                          request);
+                validateResponse();
             }
 
         }
@@ -210,14 +187,13 @@ class ServiceInstanceBindingControllerTest {
 
             private ResponseEntity<BaseServiceInstanceBindingResponse> response;
 
-            @AfterEach
-            void tearDown() {
+            void validateResponse() {
                 assertEquals(HttpStatus.CREATED, response.getStatusCode());
                 assertSame(bindingResponse, response.getBody());
             }
 
             @Test
-            void acceptsIncomplete_True() throws Exception {
+            void acceptsIncompleteTrue() throws Exception {
                 when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
                                                                  HAPPY_INSTANCE_ID,
                                                                  request,
@@ -231,10 +207,11 @@ class ServiceInstanceBindingControllerTest {
                                                           HAPPY_ORIGINATING_ID,
                                                           HAPPY_ACCEPTS_INCOMPLETE,
                                                           request);
+                validateResponse();
             }
 
             @Test
-            void acceptsIncomplete_False() throws Exception {
+            void acceptsIncompleteFalse() throws Exception {
                 final boolean async = false;
                 when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
                                                                  HAPPY_INSTANCE_ID,
@@ -249,10 +226,11 @@ class ServiceInstanceBindingControllerTest {
                                                           HAPPY_ORIGINATING_ID,
                                                           async,
                                                           request);
+                validateResponse();
             }
 
             @Test
-            void acceptsIncomplete_Null() throws Exception {
+            void acceptsIncompleteNull() throws Exception {
                 final boolean async = false;
                 when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
                                                                  HAPPY_INSTANCE_ID,
@@ -267,6 +245,7 @@ class ServiceInstanceBindingControllerTest {
                                                           HAPPY_ORIGINATING_ID,
                                                           null,
                                                           request);
+                validateResponse();
             }
 
         }
@@ -298,7 +277,7 @@ class ServiceInstanceBindingControllerTest {
         class deleteServiceInstanceBindingThrows {
 
             @Test
-            void catched() throws Exception {
+            void caught() throws Exception {
                 Exception[] exceptions = {
                         new ServiceInstanceBindingDoesNotExistsException("Test1"),
                         new ServiceDefinitionDoesNotExistException("Test2")
@@ -322,7 +301,7 @@ class ServiceInstanceBindingControllerTest {
             }
 
             @Test
-            void notCatched() throws Exception {
+            void notCaught() throws Exception {
                 Exception[] exceptions = {
                         new AsyncRequiredException()
                 };
@@ -361,8 +340,7 @@ class ServiceInstanceBindingControllerTest {
                 when(bindingResponse.isAsync()).thenReturn(HAPPY_ACCEPTS_INCOMPLETE);
             }
 
-            @AfterEach
-            void tearDown() {
+            void validateResponse() {
                 assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
                 assertSame(bindingResponse, response.getBody());
             }
@@ -377,30 +355,7 @@ class ServiceInstanceBindingControllerTest {
                                              HAPPY_API_HEADER,
                                              HAPPY_REQUEST_ID,
                                              HAPPY_ORIGINATING_ID);
-            }
-
-            @Test
-            void noIdentityHeaders() throws Exception {
-                response = controller.unbind(HAPPY_INSTANCE_ID,
-                                             HAPPY_BINDING_ID,
-                                             HAPPY_SERVICE_ID,
-                                             HAPPY_PLAN_ID,
-                                             HAPPY_ACCEPTS_INCOMPLETE,
-                                             HAPPY_API_HEADER,
-                                             null,
-                                             null);
-            }
-
-            @Test
-            void invalidIdentityHeaders() throws Exception {
-                response = controller.unbind(HAPPY_INSTANCE_ID,
-                                             HAPPY_BINDING_ID,
-                                             HAPPY_SERVICE_ID,
-                                             HAPPY_PLAN_ID,
-                                             HAPPY_ACCEPTS_INCOMPLETE,
-                                             HAPPY_API_HEADER,
-                                             HAPPY_ORIGINATING_ID,
-                                             HAPPY_REQUEST_ID);
+                validateResponse();
             }
 
         }
@@ -410,8 +365,7 @@ class ServiceInstanceBindingControllerTest {
 
             private ResponseEntity response;
 
-            @AfterEach
-            void tearDown() {
+            void validateResponse() {
                 assertEquals(HttpStatus.OK, response.getStatusCode());
                 assertEquals(EmptyRestResponse.BODY, response.getBody());
             }
@@ -430,10 +384,11 @@ class ServiceInstanceBindingControllerTest {
                                              HAPPY_API_HEADER,
                                              HAPPY_REQUEST_ID,
                                              HAPPY_ORIGINATING_ID);
+                validateResponse();
             }
 
             @Test
-            void acceptsIncomplete_True() throws Exception {
+            void acceptsIncompleteTrue() throws Exception {
                 when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
                                                                  HAPPY_PLAN_ID,
                                                                  HAPPY_ACCEPTS_INCOMPLETE))
@@ -447,10 +402,11 @@ class ServiceInstanceBindingControllerTest {
                                              HAPPY_API_HEADER,
                                              HAPPY_REQUEST_ID,
                                              HAPPY_ORIGINATING_ID);
+                validateResponse();
             }
 
             @Test
-            void acceptsIncomplete_False() throws Exception {
+            void acceptsIncompleteFalse() throws Exception {
                 final boolean async = false;
                 when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
                                                                  HAPPY_PLAN_ID,
@@ -465,10 +421,11 @@ class ServiceInstanceBindingControllerTest {
                                              HAPPY_API_HEADER,
                                              HAPPY_REQUEST_ID,
                                              HAPPY_ORIGINATING_ID);
+                validateResponse();
             }
 
             @Test
-            void acceptsIncomplete_Null() throws Exception {
+            void acceptsIncompleteNull() throws Exception {
                 final boolean async = false;
                 when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
                                                                  HAPPY_PLAN_ID,
@@ -483,6 +440,7 @@ class ServiceInstanceBindingControllerTest {
                                              HAPPY_API_HEADER,
                                              HAPPY_REQUEST_ID,
                                              HAPPY_ORIGINATING_ID);
+                validateResponse();
             }
 
         }
@@ -500,8 +458,7 @@ class ServiceInstanceBindingControllerTest {
         @Nested
         class jobProgressResponse {
 
-            @AfterEach
-            void tearDown() {
+            void validateResponse() {
                 assertEquals(HttpStatus.OK, response.getStatusCode());
                 assertSame(jobProgressResponse, response.getBody());
             }
@@ -517,6 +474,7 @@ class ServiceInstanceBindingControllerTest {
                                                     HAPPY_REQUEST_ID,
                                                     HAPPY_ORIGINATING_ID,
                                                     HAPPY_OPERATION);
+                validateResponse();
             }
 
             @Test
@@ -530,32 +488,7 @@ class ServiceInstanceBindingControllerTest {
                                                     HAPPY_REQUEST_ID,
                                                     HAPPY_ORIGINATING_ID,
                                                     null);
-            }
-
-            @Test
-            void noIdentityHeaders() throws Exception {
-                when(bindingService.getLastOperationById(HAPPY_BINDING_ID, HAPPY_OPERATION))
-                        .thenReturn(jobProgressResponse);
-                response = controller.lastOperation(HAPPY_INSTANCE_ID,
-                                                    HAPPY_BINDING_ID,
-                                                    null,
-                                                    null,
-                                                    null,
-                                                    null,
-                                                    HAPPY_OPERATION);
-            }
-
-            @Test
-            void invalidIdentityHeaders() throws Exception {
-                when(bindingService.getLastOperationById(HAPPY_BINDING_ID, HAPPY_OPERATION))
-                        .thenReturn(jobProgressResponse);
-                response = controller.lastOperation("",
-                                                    HAPPY_BINDING_ID,
-                                                    "",
-                                                    "",
-                                                    HAPPY_ORIGINATING_ID,
-                                                    HAPPY_REQUEST_ID,
-                                                    HAPPY_OPERATION);
+                validateResponse();
             }
 
         }
@@ -680,7 +613,7 @@ class ServiceInstanceBindingControllerTest {
             @BeforeEach
             void setUp() throws Exception {
                 String json = Files.readString(resourcePath.resolve(FILE_EXPECTED_SERVICE_INSTANCE_BINDING));
-                ServiceInstanceBinding binding = new Gson().fromJson(json, ServiceInstanceBinding.class);
+                ServiceInstanceBinding binding = new ObjectMapper().readValue(json, ServiceInstanceBinding.class);
                 bindingResponse = new ServiceInstanceBindingResponse(binding);
                 when(bindingService.getServiceInstance(HAPPY_INSTANCE_ID))
                         .thenReturn(serviceInstance);
@@ -694,8 +627,7 @@ class ServiceInstanceBindingControllerTest {
                         .thenReturn(binding);
             }
 
-            @AfterEach
-            void tearDown() {
+            void validateResponse() {
                 assertEquals(HttpStatus.OK, response.getStatusCode());
                 assertEquals(bindingResponse, response.getBody());
             }
@@ -706,22 +638,7 @@ class ServiceInstanceBindingControllerTest {
                                             HAPPY_BINDING_ID,
                                             HAPPY_ORIGINATING_ID,
                                             HAPPY_REQUEST_ID);
-            }
-
-            @Test
-            void noIdentityHeaders() throws Exception {
-                response = controller.fetch(HAPPY_INSTANCE_ID,
-                                            HAPPY_BINDING_ID,
-                                            null,
-                                            null);
-            }
-
-            @Test
-            void invalidIdentityHeaders() throws Exception {
-                response = controller.fetch(HAPPY_INSTANCE_ID,
-                                            HAPPY_BINDING_ID,
-                                            HAPPY_REQUEST_ID,
-                                            HAPPY_ORIGINATING_ID);
+                validateResponse();
             }
 
         }

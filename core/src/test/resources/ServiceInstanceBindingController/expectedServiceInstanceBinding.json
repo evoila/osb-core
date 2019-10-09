@@ -11,16 +11,16 @@
   "volumeMounts": [
     {
       "driver": "TestDriver",
-      "containerDir": "TestContainerDir",
+      "container_dir": "Testcontainer_dir",
       "mode": "r",
-      "deviceType": "shared",
+      "device_type": "shared",
       "device": {
-        "volumeId": "TestVolumeId",
-        "mountConfig": {
+        "volume_id": "TestVolumeId",
+        "mount_config": {
           "uid": "TestUId",
           "gid": "TestGId",
-          "fileMode": "TestFileMode",
-          "dirMode": "TestDirMode",
+          "file_mode": "TestFileMode",
+          "dir_mode": "TestDirMode",
           "username": "TestUsername",
           "password": "TestPassword",
           "source": "TestSource",
