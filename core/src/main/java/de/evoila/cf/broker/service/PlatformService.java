@@ -5,6 +5,7 @@ package de.evoila.cf.broker.service;
 
 import de.evoila.cf.broker.exception.PlatformException;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
+import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
 
@@ -61,14 +62,15 @@ public interface PlatformService {
      * @return
      * @throws PlatformException
      */
-	ServiceInstance createInstance(ServiceInstance serviceInstance, Plan plan, Map<String, Object> customParameters) throws PlatformException;
+	ServiceInstance createInstance(ServiceInstance serviceInstance, Plan plan, Map<String, Object> customParameters)
+            throws PlatformException, ServiceDefinitionDoesNotExistException;
 
     /**
      * @param serviceInstance
      * @param plan
      * @return
      */
-    ServiceInstance getCreateInstancePromise(ServiceInstance serviceInstance, Plan plan);
+    ServiceInstance getCreateInstancePromise(ServiceInstance serviceInstance, Plan plan) throws ServiceDefinitionDoesNotExistException;
 
     /**
      * @param serviceInstance

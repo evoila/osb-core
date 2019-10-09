@@ -5,12 +5,14 @@ package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
+import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.repository.JobRepository;
 import de.evoila.cf.broker.repository.PlatformRepository;
 import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.AsyncDeploymentService;
+import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.DeploymentService;
 import de.evoila.cf.broker.service.PlatformService;
 import de.evoila.cf.broker.util.ParameterValidator;
@@ -40,18 +42,21 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     private JobRepository jobRepository;
 
+    private CatalogService catalogService;
+
     private AsyncDeploymentService asyncDeploymentService;
 
     private RandomString randomString = new RandomString();
 
     public DeploymentServiceImpl(PlatformRepository platformRepository, ServiceDefinitionRepository serviceDefinitionRepository,
                                  ServiceInstanceRepository serviceInstanceRepository,
-                                 JobRepository jobRepository, AsyncDeploymentService asyncDeploymentService) {
+                                 JobRepository jobRepository, AsyncDeploymentService asyncDeploymentService, CatalogService catalogService) {
         this.platformRepository = platformRepository;
         this.serviceDefinitionRepository = serviceDefinitionRepository;
         this.serviceInstanceRepository = serviceInstanceRepository;
         this.jobRepository = jobRepository;
         this.asyncDeploymentService = asyncDeploymentService;
+        this.catalogService = catalogService;
     }
 
     @Override
@@ -98,8 +103,10 @@ public class DeploymentServiceImpl implements DeploymentService {
             throw new ServiceInstanceExistsException(serviceInstanceId, request.getServiceDefinitionId());
         }
 
+        ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(request.getServiceDefinitionId());
         ServiceInstance serviceInstance = new ServiceInstance(serviceInstanceId, request.getServiceDefinitionId(),
                 request.getPlanId(), request.getOrganizationGuid(), request.getSpaceGuid(), request.getParameters(), request.getContext());
+        serviceInstance.setAllowContextUpdates(serviceDefinition.isAllowContextUpdates());
 
         Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
@@ -116,7 +123,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         if (platformService.isSyncPossibleOnCreate(plan)) {
             return serviceInstanceOperationResponse;
         } else {
-            serviceInstanceRepository.addServiceInstance(serviceInstance.getId(), serviceInstance);
+            serviceInstanceRepository.saveServiceInstance(serviceInstance);
 
             String jobProgressId = randomString.nextString();
             asyncDeploymentService.asyncCreateInstance(this, serviceInstance, request.getParameters(),
@@ -132,12 +139,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     @Override
     public ServiceInstanceOperationResponse updateServiceInstance(String serviceInstanceId, ServiceInstanceUpdateRequest request) throws ServiceBrokerException,
             ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ValidationException {
-
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
-        if (serviceInstance == null) {
-            throw new ServiceInstanceDoesNotExistException(serviceInstanceId);
-        }
-
         Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
 
         if (request.getParameters() != null) {
@@ -165,6 +167,17 @@ public class DeploymentServiceImpl implements DeploymentService {
         }
 
         return serviceInstanceOperationResponse;
+    }
+
+    @Override
+    public ServiceInstanceOperationResponse updateServiceInstanceContext(String serviceInstanceId,
+                                                                         ServiceInstanceUpdateRequest serviceInstanceUpdateRequest)
+            throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
+        ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
+        serviceInstance.setContext(serviceInstanceUpdateRequest.getContext());
+        serviceInstanceRepository.updateServiceInstance(serviceInstance);
+
+        return new ServiceInstanceOperationResponse();
     }
 
     @Override
@@ -229,7 +242,8 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         try {
             serviceInstance = platformService.createInstance(serviceInstance, plan, parameters);
-        } catch (PlatformException e) {
+        } catch (PlatformException | ServiceDefinitionDoesNotExistException e) {
+            log.error("Could not create instance due to: ", e);
             throw new ServiceBrokerException("Could not create instance due to: ", e);
         }
 
@@ -239,7 +253,7 @@ public class DeploymentServiceImpl implements DeploymentService {
             throw new ServiceBrokerException("Error during post service instance creation", e);
         }
 
-        serviceInstanceRepository.addServiceInstance(serviceInstance.getId(), serviceInstance);
+        serviceInstanceRepository.saveServiceInstance(serviceInstance);
 
         return serviceInstance;
     }

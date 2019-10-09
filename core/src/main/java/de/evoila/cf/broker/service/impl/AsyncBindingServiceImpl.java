@@ -36,7 +36,7 @@ public class AsyncBindingServiceImpl extends AsyncOperationServiceImpl implement
                 "Creating binding..", JobProgress.BIND);
         ServiceInstanceBindingResponse response;
         try {
-            response = bindingService.syncCreateBinding(bindingId, serviceInstance, serviceInstanceBindingRequest, plan);
+            response = bindingService.createBinding(bindingId, serviceInstance, serviceInstanceBindingRequest, plan);
         } catch (Exception e) {
             jobProgressService.failJob(jobProgress.getId(),
                     "Internal error during binding creation, please contact our support.");

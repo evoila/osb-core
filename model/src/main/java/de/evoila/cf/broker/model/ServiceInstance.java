@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.evoila.cf.broker.model.catalog.ServerAddress;
+import de.evoila.cf.broker.model.context.Context;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,7 +58,7 @@ public class ServiceInstance implements BaseEntity<String> {
 	
 	@JsonSerialize
 	@JsonProperty("context")
-	private Map<String, String> context;
+	private Context context;
 
 	@JsonSerialize
 	@JsonProperty("floatingIp_id")
@@ -71,6 +72,10 @@ public class ServiceInstance implements BaseEntity<String> {
 
     @JsonIgnore
     private String usergroup;
+
+    @JsonSerialize
+	@JsonProperty("allow_context_updates")
+    private boolean allowContextUpdates;
 
 	@SuppressWarnings("unused")
 	private ServiceInstance() {}
@@ -92,9 +97,9 @@ public class ServiceInstance implements BaseEntity<String> {
 			setParameters(parameters);
 	}
 
-	public ServiceInstance(String serviceInstanceId, String serviceDefintionId, String planId, String organizationGuid,
+	public ServiceInstance(String serviceInstanceId, String serviceDefinitionId, String planId, String organizationGuid,
 			String spaceGuid, Map<String, Object> parameters, String dashboardUrl, String internalId) {
-		initialize(id, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
+		initialize(serviceInstanceId, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
 		setInternalId(internalId);
 		setDashboardUrl(dashboardUrl);
 	}
@@ -117,7 +122,7 @@ public class ServiceInstance implements BaseEntity<String> {
 	}
 
 	public ServiceInstance(String serviceInstanceId, String serviceDefinitionId, String planId, String organizationGuid,
-			String spaceGuid, Map<String, Object> parameters, Map<String, String> context) {
+			String spaceGuid, Map<String, Object> parameters, Context context) {
 		initialize(serviceInstanceId, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
 		if(context != null)
 			setContext(context);
@@ -150,7 +155,7 @@ public class ServiceInstance implements BaseEntity<String> {
 		return planId;
 	}
 
-	private void setPlanId(String planId) {
+	public void setPlanId(String planId) {
 		this.planId = planId;
 	}
 	
@@ -206,12 +211,12 @@ public class ServiceInstance implements BaseEntity<String> {
 		this.hosts = hosts;
 	}
 
-	public Map<String, String> getContext() {
+	public Context getContext() {
 		return context;
 	}
 
-	public void setContext(Map<String, String> context) {
-		this.context = new HashMap<>(context);
+	public void setContext(Context context) {
+		this.context = context;
 	}
 
     public String getUsername() { return username; }
@@ -230,4 +235,11 @@ public class ServiceInstance implements BaseEntity<String> {
 
 	public void setFloatingIpId(String floatingIpId) { this.floatingIpId = floatingIpId; }
 
+	public boolean isAllowContextUpdates() {
+		return allowContextUpdates;
+	}
+
+	public void setAllowContextUpdates(boolean allowContextUpdates) {
+		this.allowContextUpdates = allowContextUpdates;
+	}
 }
