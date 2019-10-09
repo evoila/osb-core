@@ -9,7 +9,7 @@ import java.util.Objects;
 public class CustomInstanceGroupConfig extends InstanceGroupConfig {
 
     protected String name;
-
+    
     public Map<String, Object> consumes;
 
     public Map<String, Object> provides;
