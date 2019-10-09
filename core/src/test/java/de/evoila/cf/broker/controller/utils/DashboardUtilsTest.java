@@ -34,10 +34,10 @@ class DashboardUtilsTest {
     private Dashboard dashboard;
 
     @Nested
-    class hashDashboard {
+    class hasDashboard {
 
         @Test
-        void isTrue() {
+        void returnsTrue() {
             DashboardClient dashboardClient = mock(DashboardClient.class);
             when(serviceDefinition.getDashboard())
                     .thenReturn(dashboard);
@@ -50,26 +50,21 @@ class DashboardUtilsTest {
         }
 
         @Nested
-        class isFalse {
-
-            private boolean result;
-
-            @AfterEach
-            void tearDown() {
-                assertFalse(result);
-            }
+        class returnsFalse {
 
             @SuppressWarnings("ConstantConditions")
             @Test
             void serviceDefinitionNull() {
-                result = DashboardUtils.hasDashboard(null);
+                boolean result = DashboardUtils.hasDashboard(null);
+                assertFalse(result);
             }
 
             @Test
             void dashboardNull() {
                 when(serviceDefinition.getDashboard())
                         .thenReturn(null);
-                result = DashboardUtils.hasDashboard(serviceDefinition);
+                boolean result = DashboardUtils.hasDashboard(serviceDefinition);
+                assertFalse(result);
             }
 
             @Test
@@ -78,7 +73,8 @@ class DashboardUtilsTest {
                         .thenReturn(dashboard);
                 when(dashboard.getUrl())
                         .thenReturn(null);
-                result = DashboardUtils.hasDashboard(serviceDefinition);
+                boolean result = DashboardUtils.hasDashboard(serviceDefinition);
+                assertFalse(result);
             }
 
             @Test
@@ -87,7 +83,8 @@ class DashboardUtilsTest {
                         .thenReturn(dashboard);
                 when(dashboard.getUrl())
                         .thenReturn("noUrl");
-                result = DashboardUtils.hasDashboard(serviceDefinition);
+                boolean result = DashboardUtils.hasDashboard(serviceDefinition);
+                assertFalse(result);
             }
 
             @Test
@@ -98,7 +95,8 @@ class DashboardUtilsTest {
                         .thenReturn(HAPPY_DASHBOARD_URL);
                 when(serviceDefinition.getDashboardClient())
                         .thenReturn(null);
-                result = DashboardUtils.hasDashboard(serviceDefinition);
+                boolean result = DashboardUtils.hasDashboard(serviceDefinition);
+                assertFalse(result);
             }
 
         }
@@ -680,34 +678,31 @@ class DashboardUtilsTest {
     @Nested
     class isURL {
 
-        boolean result;
-
         @Nested
         class valid {
 
-            @AfterEach
-            void tearDown() {
+            @Test
+            void onlyOneSlashInScheme() {
+                boolean result = DashboardUtils.isURL("https:/www.test.com");
                 assertTrue(result);
             }
 
             @Test
-            void onlyOneSlashInScheme() {
-                result = DashboardUtils.isURL("https:/www.test.com");
-            }
-
-            @Test
             void moreThanTwoSlashesInScheme() {
-                result = DashboardUtils.isURL("https://///////////////////www.test.com");
+                boolean result = DashboardUtils.isURL("https://///////////////////www.test.com");
+                assertTrue(result);
             }
 
             @Test
             void randomStringWithoutColon() {
-                result = DashboardUtils.isURL("https://ui.ad7.89;_P34zö5fiwej.e5lwah5gas.vffwäopppß0üä/&/()ö54öu7tOP%&T§");
+                boolean result = DashboardUtils.isURL("https://ui.ad7.89;_P34zö5fiwej.e5lwah5gas.vffwäopppß0üä/&/()ö54öu7tOP%&T§");
+                assertTrue(result);
             }
 
             @Test
             void colonWithNormalPort() {
-                result = DashboardUtils.isURL("https://www.test.com:443/search");
+                boolean result = DashboardUtils.isURL("https://www.test.com:443/search");
+                assertTrue(result);
             }
 
         }
@@ -715,29 +710,28 @@ class DashboardUtilsTest {
         @Nested
         class invalid {
 
-            @AfterEach
-            void tearDown() {
+            @Test
+            void nullString() {
+                boolean result = DashboardUtils.isURL(null);
                 assertFalse(result);
             }
 
             @Test
-            void nullString() {
-                result = DashboardUtils.isURL(null);
-            }
-
-            @Test
             void emptyString() {
-                result = DashboardUtils.isURL("");
+                boolean result = DashboardUtils.isURL("");
+                assertFalse(result);
             }
 
             @Test
             void colonFollowedByLetter() {
-                result = DashboardUtils.isURL("https://www.test.com:d/search");
+                boolean result = DashboardUtils.isURL("https://www.test.com:d/search");
+                assertFalse(result);
             }
 
             @Test
             void colonFollowedByNumbersAndLetter() {
-                result = DashboardUtils.isURL("https://www.test.com:234d/search");
+                boolean result = DashboardUtils.isURL("https://www.test.com:234d/search");
+                assertFalse(result);
             }
 
             @Nested
@@ -745,17 +739,20 @@ class DashboardUtilsTest {
 
                 @Test
                 void missing() {
-                    result = DashboardUtils.isURL("www.test.com");
+                    boolean result = DashboardUtils.isURL("www.test.com");
+                    assertFalse(result);
                 }
 
                 @Test
                 void unknownProtocol() {
-                    result = DashboardUtils.isURL("xxxxxx://www.test.com");
+                    boolean result = DashboardUtils.isURL("xxxxxx://www.test.com");
+                    assertFalse(result);
                 }
 
                 @Test
                 void noColon() {
-                    result = DashboardUtils.isURL("https//www.test.com");
+                    boolean result = DashboardUtils.isURL("https//www.test.com");
+                    assertFalse(result);
                 }
 
             }
