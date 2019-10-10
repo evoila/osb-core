@@ -16,8 +16,8 @@ public class ServiceInstanceBindingExistsException extends Exception {
 	private String serviceInstanceId;
 
     /**
-     * Whether this exception was thrown because the binding request would create an identical binding,
-     * we want te return information about the service binding.
+     * When this exception was thrown because the binding request would create an identical binding,
+     * we want to return information about the service binding.
      */
     private ServiceInstanceBindingResponse response;
 
