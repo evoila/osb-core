@@ -290,9 +290,9 @@ class RedirectUriTest extends BaseTest {
                 void first() {
                     when(dashboardClient.getRedirectUri())
                             .thenReturn(HAPPY_REDIRECT_URI);
-                    String[] appendixes = getHappyAppendixesCopy();
-                    appendixes[0] = "/" + appendixes[0];
-                    String result = DashboardUtils.redirectUri(dashboardClient, appendixes);
+                    String[] copy = getHappyAppendixesCopy();
+                    copy[0] = "/" + copy[0];
+                    String result = DashboardUtils.redirectUri(dashboardClient, copy);
                     assertEquals(HAPPY_REDIRECT_URI + "/" +
                                  HAPPY_APPENDIXES[0] + "/" +
                                  HAPPY_APPENDIXES[1] + "/" +
