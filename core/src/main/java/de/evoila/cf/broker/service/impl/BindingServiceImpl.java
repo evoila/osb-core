@@ -277,11 +277,9 @@ public abstract class BindingServiceImpl implements BindingService {
 			}
             if (bindCreation && !isBindingInProgress) {
                 ServiceInstanceBinding serviceInstanceBinding = bindingRepository.findOne(bindingId);
-                boolean identical = wouldCreateIdenticalBinding(serviceInstanceBindingRequest, serviceInstanceBinding);
-                if (identical){
-
+                if (wouldCreateIdenticalBinding(serviceInstanceBindingRequest, serviceInstanceBinding)) {
                 	ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(serviceInstanceBinding);
-					throw new ServiceInstanceBindingExistsException(bindingId, instanceId, identical, response);
+					throw new ServiceInstanceBindingExistsException(bindingId, instanceId, true, response);
 				}
                 throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
             }
