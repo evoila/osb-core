@@ -86,8 +86,8 @@ public class ServiceMetadata {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         ServiceMetadata that = (ServiceMetadata) o;
         return Objects.equals(displayName, that.displayName) &&
                Objects.equals(imageUrl, that.imageUrl) &&

@@ -205,7 +205,7 @@ public class ServiceDefinition {
     public void setInstancesRetrievable(boolean instancesRetrievable) {
         this.instancesRetrievable = instancesRetrievable;
     }
-  
+
     public boolean isAllowContextUpdates() {
         return allowContextUpdates;
     }
@@ -213,11 +213,11 @@ public class ServiceDefinition {
     public void setAllowContextUpdates(boolean allowContextUpdates) {
         this.allowContextUpdates = allowContextUpdates;
     }
-  
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         ServiceDefinition that = (ServiceDefinition) o;
         return bindable == that.bindable &&
                instancesRetrievable == that.instancesRetrievable &&
@@ -239,4 +239,5 @@ public class ServiceDefinition {
     public int hashCode() {
         return Objects.hash(id, name, description, bindable, plans, tags, metadata, requires, dashboard, instancesRetrievable, bindingsRetrievable, dashboardClient, updateable, allowContextUpdates);
     }
+
 }

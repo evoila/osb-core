@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.model;
 
+import java.util.Objects;
+
 public class ServiceBrokerErrorResponse {
 
     private String error;
@@ -40,19 +42,16 @@ public class ServiceBrokerErrorResponse {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         ServiceBrokerErrorResponse that = (ServiceBrokerErrorResponse) o;
-
-        if (error != null ? !error.equals(that.error) : that.error != null) return false;
-        return description != null ? description.equals(that.description) : that.description == null;
+        return Objects.equals(error, that.error) &&
+               Objects.equals(description, that.description);
     }
 
     @Override
     public int hashCode() {
-        int result = error != null ? error.hashCode() : 0;
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        return result;
+        return Objects.hash(error, description);
     }
+
 }

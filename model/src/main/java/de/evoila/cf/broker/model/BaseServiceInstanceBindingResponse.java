@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.util.Objects;
+
 /**
  * @author Johannes Hiemer
  */
@@ -33,4 +35,19 @@ public class BaseServiceInstanceBindingResponse {
     public void setOriginatingUser(String originatingUser) {
         this.originatingUser = originatingUser;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        BaseServiceInstanceBindingResponse that = (BaseServiceInstanceBindingResponse) o;
+        return async == that.async &&
+               Objects.equals(originatingUser, that.originatingUser);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(async, originatingUser);
+    }
+
 }

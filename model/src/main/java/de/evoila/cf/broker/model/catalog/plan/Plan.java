@@ -131,18 +131,18 @@ public class Plan {
 		this.maintenanceInfo = maintenanceInfo;
 	}
 
-  public Boolean isPlanUpdateable() {
-      return this.planUpdateable;
-  }
+    public Boolean isPlanUpdateable() {
+        return this.planUpdateable;
+    }
 
-  public void setPlanUpdateable(Boolean planUpdateable) {
-      this.planUpdateable = planUpdateable;
-  }
-  
+    public void setPlanUpdateable(Boolean planUpdateable) {
+        this.planUpdateable = planUpdateable;
+    }
+
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
 		Plan plan = (Plan) o;
 		return free == plan.free &&
 			   id.equals(plan.id) &&
@@ -150,13 +150,14 @@ public class Plan {
 			   description.equals(plan.description) &&
 			   Objects.equals(metadata, plan.metadata) &&
 			   Objects.equals(schemas, plan.schemas) &&
-			   platform == plan.platform &&
-         planUpdateable == plan.planUpdateable;
+			   Objects.equals(planUpdateable, plan.planUpdateable) &&
+			   Objects.equals(maintenanceInfo, plan.maintenanceInfo) &&
+			   platform == plan.platform;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, name, description, metadata, free, schemas, platform, planUpdateable);
+		return Objects.hash(id, name, description, metadata, free, schemas, planUpdateable, maintenanceInfo, platform);
 	}
-  
+
 }
