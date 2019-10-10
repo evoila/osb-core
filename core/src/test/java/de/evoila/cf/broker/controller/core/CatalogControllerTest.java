@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,11 +49,14 @@ class CatalogControllerTest {
     /**
      * Reads a JSON file containing an array of ServiceDefinitions and returns a list containing all these service
      * definitions.
+     *
      * @param filePath  The path (relative or absolute) to the JSON file.
+     *
      * @return  A list containing all service definitions contained in the submitted file.
-     * @throws Exception
+     *
+     * @throws IOException  Cannot read JSON file.
      */
-    private List<ServiceDefinition> readServicesFile(String filePath) throws Exception {
+    private List<ServiceDefinition> readServicesFile(String filePath) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(new File(filePath), new TypeReference<List<ServiceDefinition>>() {});
     }
@@ -61,14 +65,17 @@ class CatalogControllerTest {
      * A function testing CatalogController.getCatalog with a valid catalog.
      * The catalog is stored in a JSON file.
      * Not an @Test but called in @Test methods.
+     *
      * @param catalogPath           The path of the JSON file containing the catalog.
      * @param requestIdentity       A string representing a request identity.
      * @param originatingIdentity   A string representing a originating identity.
-     * @throws Exception
+     *
+     * @throws IOException  {@link CatalogControllerTest#readServicesFile(String)} throws
      */
     private void validCatalogTest(String catalogPath,
                                   String requestIdentity,
-                                  String originatingIdentity) throws Exception {
+                                  String originatingIdentity)
+            throws IOException {
         // mocks
         when(catalogService.getCatalog()).thenReturn(catalog);
 
@@ -103,7 +110,7 @@ class CatalogControllerTest {
         }
 
         @Test
-        void validCatalog() throws Exception {
+        void validCatalog() throws IOException {
             validCatalogTest(PATH_VALID_CATALOG_SERVICES,
                              REQUEST_IDENTITY,
                              ORIGINATING_IDENTITY);
