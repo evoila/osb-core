@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.controller.core.ServiceInstanceBindingControllerTest;
 
+import de.evoila.cf.broker.model.ServiceInstanceBindingResponse;
 import org.everit.json.schema.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -93,8 +94,8 @@ class BindServiceInstanceTest extends BaseTest {
         @Test
         void notCaught() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException {
             Exception[] exceptions = {
-                    new ServiceInstanceBindingExistsException("Test1", "Test2", true),
-                    new ServiceInstanceBindingExistsException("Test3", "Test4", false),
+                    new ServiceInstanceBindingExistsException("Test1", "Test2"),
+                    new ServiceInstanceBindingExistsException("Test3", "Test4", true, new ServiceInstanceBindingResponse()),
                     new ServiceBrokerException(),
                     new ServiceDefinitionDoesNotExistException("Test5"),
                     new InvalidParametersException("Test6"),

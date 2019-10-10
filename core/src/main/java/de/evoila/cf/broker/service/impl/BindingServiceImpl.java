@@ -109,10 +109,11 @@ public abstract class BindingServiceImpl implements BindingService {
 	public BaseServiceInstanceBindingResponse deleteServiceInstanceBinding(String bindingId, String planId, boolean async)
 			throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException,
             AsyncRequiredException {
-		ServiceInstance serviceInstance = getBinding(bindingId);
+		ServiceInstance serviceInstance = getServiceInstanceByBindingId(bindingId);
 		Plan plan = serviceDefinitionRepository.getPlan(planId);
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 		String operationId = randomString.nextString();
+		boolean wasExecutedAsync = false;
 
 		if (platformService.isSyncPossibleOnUnbind()){
 			syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
@@ -123,9 +124,10 @@ public abstract class BindingServiceImpl implements BindingService {
 
 			asyncBindingService.asyncDeleteServiceInstanceBinding(this, bindingId, serviceInstance,
 					plan, operationId);
+			wasExecutedAsync = true;
 		}
 
-		return new ServiceInstanceBindingOperationResponse(operationId);
+		return new ServiceInstanceBindingOperationResponse(operationId, wasExecutedAsync);
 	}
 
 	@Override
@@ -224,7 +226,8 @@ public abstract class BindingServiceImpl implements BindingService {
         }
     }
 
-	protected ServiceInstance getBinding(String bindingId) throws ServiceInstanceBindingDoesNotExistsException {
+	protected ServiceInstance getServiceInstanceByBindingId(String bindingId)
+			throws ServiceInstanceBindingDoesNotExistsException {
 		if (!bindingRepository.containsInternalBindingId(bindingId)) {
 			throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
 		}
@@ -276,9 +279,11 @@ public abstract class BindingServiceImpl implements BindingService {
 			}
             if (bindCreation && !isBindingInProgress) {
                 ServiceInstanceBinding serviceInstanceBinding = bindingRepository.findOne(bindingId);
-                boolean identical = wouldCreateIdenticalBinding(serviceInstanceBindingRequest, serviceInstanceBinding);
-
-                throw new ServiceInstanceBindingExistsException(bindingId, instanceId, identical);
+                if (wouldCreateIdenticalBinding(serviceInstanceBindingRequest, serviceInstanceBinding)) {
+                	ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(serviceInstanceBinding);
+					throw new ServiceInstanceBindingExistsException(bindingId, instanceId, true, response);
+				}
+                throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
             }
         }
     }
