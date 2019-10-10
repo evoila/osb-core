@@ -109,7 +109,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	public BaseServiceInstanceBindingResponse deleteServiceInstanceBinding(String bindingId, String planId, boolean async)
 			throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException,
             AsyncRequiredException, ServiceInstanceBindingBadRequestException {
-		ServiceInstance serviceInstance = getBinding(bindingId);
+		ServiceInstance serviceInstance = getServiceInstanceByBindingId(bindingId);
 		Plan plan = serviceDefinitionRepository.getPlan(planId);
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 		String operationId = randomString.nextString();
@@ -224,7 +224,8 @@ public abstract class BindingServiceImpl implements BindingService {
         }
     }
 
-	protected ServiceInstance getBinding(String bindingId) throws ServiceInstanceBindingDoesNotExistsException {
+	protected ServiceInstance getServiceInstanceByBindingId(String bindingId)
+			throws ServiceInstanceBindingDoesNotExistsException {
 		if (!bindingRepository.containsInternalBindingId(bindingId)) {
 			throw new ServiceInstanceBindingDoesNotExistsException(bindingId);
 		}
@@ -277,8 +278,12 @@ public abstract class BindingServiceImpl implements BindingService {
             if (bindCreation && !isBindingInProgress) {
                 ServiceInstanceBinding serviceInstanceBinding = bindingRepository.findOne(bindingId);
                 boolean identical = wouldCreateIdenticalBinding(serviceInstanceBindingRequest, serviceInstanceBinding);
+                if (identical){
 
-                throw new ServiceInstanceBindingExistsException(bindingId, instanceId, identical);
+                	ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(serviceInstanceBinding);
+					throw new ServiceInstanceBindingExistsException(bindingId, instanceId, identical, response);
+				}
+                throw new ServiceInstanceBindingExistsException(bindingId, instanceId);
             }
         }
     }
