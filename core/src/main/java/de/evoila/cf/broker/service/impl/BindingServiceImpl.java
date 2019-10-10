@@ -76,7 +76,7 @@ public abstract class BindingServiceImpl implements BindingService {
 
 		BaseServiceInstanceBindingResponse baseServiceInstanceBindingResponse;
         String operationId = randomString.nextString();
-        
+
         if (platformService.isSyncPossibleOnBind()) {
 			baseServiceInstanceBindingResponse = syncCreateBinding(bindingId, serviceInstance,
 					serviceInstanceBindingRequest, plan);
@@ -112,27 +112,20 @@ public abstract class BindingServiceImpl implements BindingService {
 		ServiceInstance serviceInstance = getBinding(bindingId);
 		Plan plan = serviceDefinitionRepository.getPlan(planId);
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
+		String operationId = randomString.nextString();
 
-		if (async) {
-			if (platformService.isSyncPossibleOnUnbind()) {
-				syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
-			} else {
-				String operationId = randomString.nextString();
-
-				asyncBindingService.asyncDeleteServiceInstanceBinding(this, bindingId, serviceInstance,
-						plan, operationId);
-
-				return new ServiceInstanceBindingOperationResponse(operationId);
-			}
+		if (platformService.isSyncPossibleOnUnbind()){
+			syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
 		} else {
-			if (!platformService.isSyncPossibleOnUnbind()) {
+			if (!async){
 				throw new AsyncRequiredException();
-			} else {
-				syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
 			}
 
+			asyncBindingService.asyncDeleteServiceInstanceBinding(this, bindingId, serviceInstance,
+					plan, operationId);
 		}
-		return null;
+
+		return new ServiceInstanceBindingOperationResponse(operationId);
 	}
 
 	@Override
@@ -216,16 +209,20 @@ public abstract class BindingServiceImpl implements BindingService {
 
 
 	public void syncDeleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance, Plan plan) {
-		try {
-			ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
-			unbindService(binding, serviceInstance, plan);
-		} catch (ServiceBrokerException | PlatformException e) {
-			log.error("Could not cleanup service binding", e);
-		} finally {
-			bindingRepository.unbindService(bindingId);
-			jobRepository.deleteJobProgress(bindingId);
-		}
-	}
+	    deleteServiceInstanceBinding(bindingId, serviceInstance, plan);
+        jobRepository.deleteJobProgressByReferenceId(bindingId);
+    }
+
+	public void deleteServiceInstanceBinding(String bindingId, ServiceInstance serviceInstance, Plan plan){
+        try {
+            ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
+            unbindService(binding, serviceInstance, plan);
+        } catch (ServiceBrokerException | PlatformException e) {
+            log.error("Could not cleanup service binding", e);
+        } finally {
+            bindingRepository.unbindService(bindingId);
+        }
+    }
 
 	protected ServiceInstance getBinding(String bindingId) throws ServiceInstanceBindingDoesNotExistsException {
 		if (!bindingRepository.containsInternalBindingId(bindingId)) {
@@ -289,7 +286,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	public ServiceInstance getServiceInstance(String instanceId) throws ServiceInstanceDoesNotExistException {
 		return serviceInstanceRepository.getServiceInstance(instanceId);
 	}
-	
+
 	private boolean wouldCreateIdenticalBinding(ServiceInstanceBindingRequest request, ServiceInstanceBinding serviceInstanceBinding) throws ServiceInstanceDoesNotExistException {
 		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceBinding.getServiceInstanceId());
 		String routeBinding = getRouteBindingFromInstanceBinding(serviceInstanceBinding.getId());
