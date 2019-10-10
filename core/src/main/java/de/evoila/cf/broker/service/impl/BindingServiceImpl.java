@@ -113,6 +113,7 @@ public abstract class BindingServiceImpl implements BindingService {
 		Plan plan = serviceDefinitionRepository.getPlan(planId);
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 		String operationId = randomString.nextString();
+		boolean wasExecutedAsync = false;
 
 		if (platformService.isSyncPossibleOnUnbind()){
 			syncDeleteServiceInstanceBinding(bindingId, serviceInstance, plan);
@@ -123,9 +124,10 @@ public abstract class BindingServiceImpl implements BindingService {
 
 			asyncBindingService.asyncDeleteServiceInstanceBinding(this, bindingId, serviceInstance,
 					plan, operationId);
+			wasExecutedAsync = true;
 		}
 
-		return new ServiceInstanceBindingOperationResponse(operationId);
+		return new ServiceInstanceBindingOperationResponse(operationId, wasExecutedAsync);
 	}
 
 	@Override

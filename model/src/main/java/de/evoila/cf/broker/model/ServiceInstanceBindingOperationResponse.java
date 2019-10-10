@@ -18,11 +18,17 @@ public class ServiceInstanceBindingOperationResponse extends BaseServiceInstance
         this.operation = operation;
     }
 
-    public ServiceInstanceBindingOperationResponse() {}
+    public ServiceInstanceBindingOperationResponse() {
+        this("");
+    }
 
     public ServiceInstanceBindingOperationResponse(String operation) {
+        this(operation, false);
+    }
+
+    public ServiceInstanceBindingOperationResponse(String operation, boolean async) {
         this.operation = operation;
-        this.async = true;
+        this.async = async;
     }
 
 }
