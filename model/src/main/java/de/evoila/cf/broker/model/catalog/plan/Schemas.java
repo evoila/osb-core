@@ -40,8 +40,8 @@ public class Schemas {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
 		Schemas schemas = (Schemas) o;
 		return Objects.equals(serviceInstance, schemas.serviceInstance) &&
 			   Objects.equals(serviceBinding, schemas.serviceBinding);

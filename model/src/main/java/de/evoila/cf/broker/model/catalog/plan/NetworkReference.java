@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NetworkReference {
@@ -46,4 +47,20 @@ public class NetworkReference {
     public List<String> getDefault() { return defaultNetwork; }
 
     public void setDefault(List<String> defaultNetwork) { this.defaultNetwork = defaultNetwork; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        NetworkReference that = (NetworkReference) o;
+        return Objects.equals(name, that.name) &&
+               Objects.equals(staticIps, that.staticIps) &&
+               Objects.equals(defaultNetwork, that.defaultNetwork);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, staticIps, defaultNetwork);
+    }
+
 }

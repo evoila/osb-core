@@ -130,8 +130,9 @@ public class Metadata extends InstanceGroupConfig {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        if (!super.equals(o)) { return false; }
         Metadata metadata = (Metadata) o;
         return active == metadata.active &&
                Objects.equals(bullets, metadata.bullets) &&
@@ -147,7 +148,7 @@ public class Metadata extends InstanceGroupConfig {
 
     @Override
     public int hashCode() {
-        return Objects.hash(bullets, costs, backup, displayName, ingressInstanceGroup, egressInstanceGroup, instanceGroupConfig, customParameters, endpointName, active);
+        return Objects.hash(super.hashCode(), bullets, costs, backup, displayName, ingressInstanceGroup, egressInstanceGroup, instanceGroupConfig, customParameters, endpointName, active);
     }
 
 }

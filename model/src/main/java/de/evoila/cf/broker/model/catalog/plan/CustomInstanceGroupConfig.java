@@ -39,8 +39,9 @@ public class CustomInstanceGroupConfig extends InstanceGroupConfig {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        if (!super.equals(o)) { return false; }
         CustomInstanceGroupConfig that = (CustomInstanceGroupConfig) o;
         return Objects.equals(name, that.name) &&
                Objects.equals(consumes, that.consumes) &&
@@ -49,7 +50,7 @@ public class CustomInstanceGroupConfig extends InstanceGroupConfig {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, consumes, provides);
+        return Objects.hash(super.hashCode(), name, consumes, provides);
     }
 
 }

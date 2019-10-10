@@ -44,8 +44,8 @@ public class Dashboard {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         Dashboard dashboard = (Dashboard) o;
         return Objects.equals(url, dashboard.url) &&
                Objects.equals(authEndpoint, dashboard.authEndpoint);

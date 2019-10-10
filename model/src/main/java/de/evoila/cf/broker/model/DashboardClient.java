@@ -55,8 +55,8 @@ public class DashboardClient {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
 		DashboardClient that = (DashboardClient) o;
 		return id.equals(that.id) &&
 			   secret.equals(that.secret) &&
@@ -67,5 +67,5 @@ public class DashboardClient {
 	public int hashCode() {
 		return Objects.hash(id, secret, redirectUri);
 	}
-	
+
 }
