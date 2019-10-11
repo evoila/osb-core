@@ -26,6 +26,7 @@ class BaseTest {
     static final String     HAPPY_PLAN_ID                   = "52f8a15b-f475-4c7a-9501-2582cb03569e";
     static final String     HAPPY_SERVICE_ID                = "59b75e6b-3754-4d39-a931-20c24bcd4380";
     static final String     HAPPY_MAINTENANCE_INFO_VERSION  = "1.0";
+    static final String     HAPPY_OPERATION                 = "05256a93-d363-4371-894b-9106416c8ff1";
 
     @Mock
     DeploymentService deploymentService;
