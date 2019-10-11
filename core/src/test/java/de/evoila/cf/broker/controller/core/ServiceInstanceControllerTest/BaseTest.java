@@ -24,6 +24,7 @@ class BaseTest {
     static final String     HAPPY_ORIGINATING_ID            = "cloudfoundry eyANCiAgInVzZXJfaWQiOiAiNjgzZWE3NDgtMzA5Mi00ZmY0LWI2NTYtMzljYWNjNGQ1MzYwIg0KfQ==";
     static final String     HAPPY_SERVICE_DEFINITION_ID     = "2a7f2bf9-eae1-4e56-b18d-dc619f4973f9";
     static final String     HAPPY_PLAN_ID                   = "52f8a15b-f475-4c7a-9501-2582cb03569e";
+    static final String     HAPPY_SERVICE_ID                = "59b75e6b-3754-4d39-a931-20c24bcd4380";
     static final String     HAPPY_MAINTENANCE_INFO_VERSION  = "1.0";
 
     @Mock
