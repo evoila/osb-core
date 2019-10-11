@@ -26,4 +26,10 @@ public interface JobRepository {
 
 	void deleteJobProgress(String id);
 
+    /**
+     * Used to delete a JobProgress Object with an instance or binding ID.
+     *
+     * @param referenceId @param referenceId the id of the object that is being created. For ServiceInstances the instanceId, for bindings th bindingId
+     */
+	void deleteJobProgressByReferenceId(String referenceId);
 }

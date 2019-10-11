@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The catalog of services offered by this broker.
@@ -25,4 +26,18 @@ public class Catalog {
 	public void setServices(List<ServiceDefinition> services) {
 		this.services = services;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		Catalog catalog = (Catalog) o;
+		return services.equals(catalog.services);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(services);
+	}
+
 }

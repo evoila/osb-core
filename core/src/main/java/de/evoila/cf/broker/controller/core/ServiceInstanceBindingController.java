@@ -7,7 +7,6 @@ import de.evoila.cf.broker.model.annotations.ApiVersion;
 import de.evoila.cf.broker.model.annotations.ResponseAdvice;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
-import de.evoila.cf.broker.util.EmptyRestResponse;
 import de.evoila.cf.broker.util.ServiceBindingUtils;
 import de.evoila.cf.broker.util.ServiceInstanceUtils;
 import org.slf4j.Logger;
@@ -48,13 +47,13 @@ public class ServiceInstanceBindingController extends BaseController {
     @ResponseAdvice
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-    public ResponseEntity<BaseServiceInstanceBindingResponse> bindServiceInstance(@PathVariable("instanceId") String instanceId,
-                                                                                  @PathVariable("bindingId") String bindingId,
-                                                                                  @RequestHeader("X-Broker-API-Version") String apiHeader,
-                                                                                  @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
-                                                                                  @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
-                                                                                  @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,
-                                                                                  @Valid @RequestBody ServiceInstanceBindingRequest request)
+    public ResponseEntity bindServiceInstance(@PathVariable("instanceId") String instanceId,
+                                              @PathVariable("bindingId") String bindingId,
+                                              @RequestHeader("X-Broker-API-Version") String apiHeader,
+                                              @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
+                                              @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
+                                              @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,
+                                              @Valid @RequestBody ServiceInstanceBindingRequest request)
             throws ServiceInstanceBindingExistsException,
             ServiceBrokerException, ServiceDefinitionDoesNotExistException,
             InvalidParametersException, AsyncRequiredException, PlatformException, UnsupportedOperationException, ConcurrencyErrorException {
@@ -66,7 +65,7 @@ public class ServiceInstanceBindingController extends BaseController {
         // https://github.com/openservicebrokerapi/servicebroker/blob/master/spec.md#bind-resource-object
         // AppGuid may not be present and empty
         if (request.getAppGuid() != null && request.getAppGuid().isEmpty())
-            return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.BAD_REQUEST);
+            return processEmptyErrorResponse(HttpStatus.BAD_REQUEST);
 
         if (acceptsIncomplete == null) {
             acceptsIncomplete = false;
@@ -100,7 +99,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @DeleteMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-    public ResponseEntity<String> unbind(@PathVariable("instanceId") String instanceId,
+    public ResponseEntity unbind(@PathVariable("instanceId") String instanceId,
                                          @PathVariable("bindingId") String bindingId, @RequestParam("service_id") String serviceId,
                                          @RequestParam("plan_id") String planId, @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
                                          @RequestHeader("X-Broker-API-Version") String apiHeader,
@@ -130,17 +129,18 @@ public class ServiceInstanceBindingController extends BaseController {
         try {
             baseServiceInstanceBindingResponse = bindingService
                     .deleteServiceInstanceBinding(bindingId, planId, acceptsIncomplete);
-        } catch (ServiceDefinitionDoesNotExistException e) {
-            return new ResponseEntity<>(EmptyRestResponse.BODY, HttpStatus.GONE);
+        } catch (ServiceInstanceBindingDoesNotExistsException | ServiceDefinitionDoesNotExistException e) {
+            return processEmptyErrorResponse(HttpStatus.GONE);
         }
 
         log.debug("ServiceInstanceBinding Deleted: " + bindingId);
 
-        if (acceptsIncomplete && baseServiceInstanceBindingResponse != null) {
-            return new ResponseEntity(baseServiceInstanceBindingResponse, HttpStatus.ACCEPTED);
-        } else {
-            return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.OK);
+        if (baseServiceInstanceBindingResponse == null ||
+            !(baseServiceInstanceBindingResponse.isAsync())) {
+
+            return processEmptyErrorResponse(HttpStatus.OK);
         }
+        return new ResponseEntity<>(baseServiceInstanceBindingResponse, HttpStatus.ACCEPTED);
     }
 
     @ApiVersion({ApiVersions.API_214, ApiVersions.API_215})
@@ -166,7 +166,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
     @ApiVersion({ApiVersions.API_214, ApiVersions.API_215})
     @GetMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-    public ResponseEntity<ServiceInstanceBindingResponse> fetch(
+    public ResponseEntity fetch(
             @PathVariable("instanceId") String instanceId,
             @PathVariable("bindingId") String bindingId,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,

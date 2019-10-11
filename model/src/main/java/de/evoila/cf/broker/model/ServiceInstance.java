@@ -183,7 +183,7 @@ public class ServiceInstance implements BaseEntity<String> {
 		return dashboardUrl;
 	}
 
-	private void setDashboardUrl(String dashboardUrl) {
+	public void setDashboardUrl(String dashboardUrl) {
 		this.dashboardUrl = dashboardUrl;
 	}
 

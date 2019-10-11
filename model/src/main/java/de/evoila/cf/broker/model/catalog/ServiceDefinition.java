@@ -9,6 +9,7 @@ import de.evoila.cf.broker.model.catalog.plan.Plan;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A service offered by this broker.
@@ -212,4 +213,31 @@ public class ServiceDefinition {
     public void setAllowContextUpdates(boolean allowContextUpdates) {
         this.allowContextUpdates = allowContextUpdates;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        ServiceDefinition that = (ServiceDefinition) o;
+        return bindable == that.bindable &&
+               instancesRetrievable == that.instancesRetrievable &&
+               bindingsRetrievable == that.bindingsRetrievable &&
+               updateable == that.updateable &&
+               allowContextUpdates == that.allowContextUpdates &&
+               id.equals(that.id) &&
+               name.equals(that.name) &&
+               description.equals(that.description) &&
+               plans.equals(that.plans) &&
+               Objects.equals(tags, that.tags) &&
+               Objects.equals(metadata, that.metadata) &&
+               Objects.equals(requires, that.requires) &&
+               Objects.equals(dashboard, that.dashboard) &&
+               Objects.equals(dashboardClient, that.dashboardClient);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, bindable, plans, tags, metadata, requires, dashboard, instancesRetrievable, bindingsRetrievable, dashboardClient, updateable, allowContextUpdates);
+    }
+
 }

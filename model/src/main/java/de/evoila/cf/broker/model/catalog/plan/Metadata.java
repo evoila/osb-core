@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by reneschollmeyer, evoila on 16.03.18.
@@ -126,4 +127,28 @@ public class Metadata extends InstanceGroupConfig {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        if (!super.equals(o)) { return false; }
+        Metadata metadata = (Metadata) o;
+        return active == metadata.active &&
+               Objects.equals(bullets, metadata.bullets) &&
+               Objects.equals(costs, metadata.costs) &&
+               Objects.equals(backup, metadata.backup) &&
+               Objects.equals(displayName, metadata.displayName) &&
+               Objects.equals(ingressInstanceGroup, metadata.ingressInstanceGroup) &&
+               Objects.equals(egressInstanceGroup, metadata.egressInstanceGroup) &&
+               Objects.equals(instanceGroupConfig, metadata.instanceGroupConfig) &&
+               Objects.equals(customParameters, metadata.customParameters) &&
+               Objects.equals(endpointName, metadata.endpointName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), bullets, costs, backup, displayName, ingressInstanceGroup, egressInstanceGroup, instanceGroupConfig, customParameters, endpointName, active);
+    }
+
 }

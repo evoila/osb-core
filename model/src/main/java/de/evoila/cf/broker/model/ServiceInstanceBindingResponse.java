@@ -9,6 +9,7 @@ import de.evoila.cf.broker.model.volume.VolumeMount;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author sgreenberg@gopivotal.com, Johannes Hiemer.
@@ -87,6 +88,23 @@ public class ServiceInstanceBindingResponse extends BaseServiceInstanceBindingRe
 
 	public void setVolumeMounts(List<VolumeMount> volumeMounts) {
 		this.volumeMounts = volumeMounts;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		if (!super.equals(o)) { return false; }
+		ServiceInstanceBindingResponse that = (ServiceInstanceBindingResponse) o;
+		return Objects.equals(credentials, that.credentials) &&
+			   Objects.equals(syslogDrainUrl, that.syslogDrainUrl) &&
+			   Objects.equals(routeServiceUrl, that.routeServiceUrl) &&
+			   Objects.equals(volumeMounts, that.volumeMounts);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), credentials, syslogDrainUrl, routeServiceUrl, volumeMounts);
 	}
 
 }
