@@ -2,6 +2,7 @@ package de.evoila.cf.broker.controller.core.ServiceInstanceBindingControllerTest
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.evoila.cf.broker.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,11 +13,6 @@ import org.springframework.http.ResponseEntity;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import de.evoila.cf.broker.exception.ServiceBrokerException;
-import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceBindingNotFoundException;
-import de.evoila.cf.broker.exception.ServiceInstanceBindingNotRetrievableException;
-import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.ServiceBrokerErrorResponse;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.ServiceInstanceBinding;
@@ -91,8 +87,30 @@ class FetchTest extends BaseTest {
                                                                                                    HAPPY_BINDING_ID,
                                                                                                    HAPPY_ORIGINATING_ID,
                                                                                                    HAPPY_REQUEST_ID));
-            assertEquals("The Service Binding could not be retrievable. You should not attempt to call this endpoint",
+            assertEquals("The Service Binding is not retrievable. You should not attempt to call this endpoint",
                          ex.getMessage());
+        }
+
+        @Test
+        void serviceInstanceBindingNotFoundException() throws ServiceInstanceBindingNotFoundException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException {
+            when(bindingService.getServiceInstance(HAPPY_INSTANCE_ID))
+                    .thenReturn(serviceInstance);
+            when(serviceInstance.getServiceDefinitionId())
+                    .thenReturn(HAPPY_SERVICE_DEFINITION_ID);
+            when(catalogService.getServiceDefinition(HAPPY_SERVICE_DEFINITION_ID))
+                    .thenReturn(serviceDefinition);
+            when(serviceDefinition.isBindingsRetrievable())
+                    .thenReturn(true);
+            when(bindingService.fetchServiceInstanceBinding(HAPPY_BINDING_ID, HAPPY_INSTANCE_ID))
+                    .thenThrow(new ServiceInstanceBindingNotFoundException());
+
+            ServiceInstanceBindingNotFoundException expectedEx = new ServiceInstanceBindingNotFoundException();
+            Exception ex = assertThrows(expectedEx.getClass(),
+                    () -> controller.fetch(HAPPY_INSTANCE_ID,
+                            HAPPY_BINDING_ID,
+                            HAPPY_ORIGINATING_ID,
+                            HAPPY_REQUEST_ID));
+            assertEquals(expectedEx.getMessage(), ex.getMessage());
         }
 
     }
