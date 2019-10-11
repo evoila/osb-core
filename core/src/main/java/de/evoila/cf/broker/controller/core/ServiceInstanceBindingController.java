@@ -75,8 +75,6 @@ public class ServiceInstanceBindingController extends BaseController {
             throw new ServiceInstanceBindingBadRequestException(bindingId);
         }
 
-
-
         BaseServiceInstanceBindingResponse serviceInstanceBindingResponse;
         try {
             if (serviceInstanceUtils.isBlocked(instanceId, JobProgress.BIND)) {
@@ -105,7 +103,7 @@ public class ServiceInstanceBindingController extends BaseController {
                                          @RequestHeader("X-Broker-API-Version") String apiHeader,
                                          @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
                                          @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity
-    ) throws ServiceBrokerException, AsyncRequiredException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException, ServiceInstanceBindingDoesNotExistsException {
+    ) throws ServiceBrokerException, AsyncRequiredException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException {
 
         log.debug("DELETE: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
                 + ", deleteServiceInstanceBinding(),  serviceInstance.id = " + instanceId + ", bindingId = " + bindingId
@@ -119,14 +117,14 @@ public class ServiceInstanceBindingController extends BaseController {
             throw new ServiceInstanceBindingBadRequestException(bindingId);
         }
 
-        if (serviceInstanceUtils.isBlocked(instanceId, JobProgress.UNBIND)) {
-            throw new ConcurrencyErrorException("Service Instance");
-        } else if (serviceBindingUtils.isBlocked(bindingId, JobProgress.UNBIND)) {
-            throw new ConcurrencyErrorException("Service Binding");
-        }
-
         BaseServiceInstanceBindingResponse baseServiceInstanceBindingResponse;
         try {
+            if (serviceInstanceUtils.isBlocked(instanceId, JobProgress.UNBIND)) {
+                throw new ConcurrencyErrorException("Service Instance");
+            } else if (serviceBindingUtils.isBlocked(bindingId, JobProgress.UNBIND)) {
+                throw new ConcurrencyErrorException("Service Binding");
+            }
+
             baseServiceInstanceBindingResponse = bindingService
                     .deleteServiceInstanceBinding(bindingId, planId, acceptsIncomplete);
         } catch (ServiceInstanceBindingDoesNotExistsException | ServiceDefinitionDoesNotExistException e) {
