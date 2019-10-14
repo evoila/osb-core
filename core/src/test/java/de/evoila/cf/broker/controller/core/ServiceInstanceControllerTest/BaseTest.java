@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.broker.controller.core.ServiceInstanceController;
+import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.ServiceInstanceOperationResponse;
 import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
@@ -38,6 +39,8 @@ class BaseTest {
     @Mock
     ServiceInstanceRepository serviceInstanceRepository;
 
+    @Mock
+    ServiceInstance serviceInstance;
     @Mock
     ServiceDefinition serviceDefinition;
     @Mock
