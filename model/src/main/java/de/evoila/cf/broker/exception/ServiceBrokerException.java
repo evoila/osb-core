@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.exception;
 
+import java.util.Objects;
+
 /**
  * General exception for underlying broker errors (like connectivity to the
  * service being brokered).
@@ -30,6 +32,19 @@ public class ServiceBrokerException extends Exception {
 	@Override
 	public String getMessage() {
 		return message;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		ServiceBrokerException that = (ServiceBrokerException) o;
+		return Objects.equals(message, that.message);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(message);
 	}
 
 }
