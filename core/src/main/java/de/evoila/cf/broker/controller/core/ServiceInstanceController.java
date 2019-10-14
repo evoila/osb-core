@@ -12,7 +12,6 @@ import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.DeploymentService;
-import de.evoila.cf.broker.util.EmptyRestResponse;
 import de.evoila.cf.broker.util.ServiceInstanceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,7 +131,7 @@ public class ServiceInstanceController extends BaseController {
             if (serviceDefinition.specificPlanIsUpdatable(serviceInstance.getPlanId())) {
                 if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request)) {
                     log.info("Update would have not effective changes.");
-                    return new ResponseEntity<>(EmptyRestResponse.BODY, HttpStatus.OK);
+                    return processEmptyErrorResponse(HttpStatus.OK);
                 }
                 if (request.isContextUpdate()) {
                     if (serviceInstance.isAllowContextUpdates()) {
