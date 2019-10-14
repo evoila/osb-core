@@ -21,6 +21,8 @@ class BaseTest {
     static final String HAPPY_REFERENCE_ID          = "7314d0bb-e142-4413-898c-f305554bb812";
     static final String HAPPY_PROGRESS_STATE        = "TestState";
     static final String HAPPY_PROGRESS_DESCRIPTION  = "TestDescription";
+    static final String HAPPY_SERVICE_INSTANCE_ID   = "79fab675-5abc-4708-9431-3c368599d8b1";
+    static final String HAPPY_JOB_PROGRESS_ID       = "d907b873-8c4f-4895-b895-e682a93b12fd";
 
     @Mock
     PlatformRepository platformRepository;
