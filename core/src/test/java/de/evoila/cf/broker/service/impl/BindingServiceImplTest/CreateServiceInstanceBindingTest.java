@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.evoila.cf.broker.exception.AsyncRequiredException;
 import de.evoila.cf.broker.exception.InvalidParametersException;
 import de.evoila.cf.broker.exception.PlatformException;
@@ -35,6 +38,56 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class CreateServiceInstanceBindingTest extends BaseTest {
+
+    @Nested
+    class protectedVariant {
+
+        private void testWithValues(String bindingId,
+                                    String serviceInstanceId,
+                                    Map<String, Object> credentials,
+                                    String syslogDrainUrl,
+                                    String appGuid) {
+
+            ServiceInstanceBinding binding = service.createServiceInstanceBinding(bindingId,
+                                                                                  serviceInstanceId,
+                                                                                  credentials,
+                                                                                  syslogDrainUrl,
+                                                                                  appGuid);
+            assertEquals(bindingId, binding.getId());
+            assertEquals(serviceInstanceId, binding.getServiceInstanceId());
+            assertEquals(credentials, binding.getCredentials());
+            assertEquals(syslogDrainUrl, binding.getSyslogDrainUrl());
+            assertEquals(appGuid, binding.getAppGuid());
+        }
+
+        @Test
+        void onlyHappyValues() {
+            testWithValues(HAPPY_BINDING_ID,
+                           HAPPY_SERVICE_INSTANCE_ID,
+                           HAPPY_CREDENTIALS,
+                           HAPPY_SYSLOG_DRAIN_URL,
+                           HAPPY_APP_GUID);
+        }
+
+        @Test
+        void allNull() {
+            testWithValues(null,
+                           null,
+                           null,
+                           null,
+                           null);
+        }
+
+        @Test
+        void allEmpty() {
+            testWithValues("",
+                           "",
+                           new HashMap<>(),
+                           "",
+                           "");
+        }
+
+    }
 
     @Test
     void validateBindingNotExistsThrows() throws ServiceInstanceBindingExistsException, ServiceInstanceDoesNotExistException {

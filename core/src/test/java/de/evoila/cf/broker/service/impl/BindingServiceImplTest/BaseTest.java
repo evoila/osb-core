@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import de.evoila.cf.broker.exception.InvalidParametersException;
@@ -70,6 +71,16 @@ public class BaseTest {
                                            instanceId);
         }
 
+        @Override
+        protected ServiceInstanceBinding createServiceInstanceBinding(String bindingId, String serviceInstanceId,
+                                                                      Map<String, Object> credentials, String syslogDrainUrl, String appGuid) {
+            return super.createServiceInstanceBinding(bindingId,
+                                                      serviceInstanceId,
+                                                      credentials,
+                                                      syslogDrainUrl,
+                                                      appGuid);
+        }
+
     }
 
     static final String     HAPPY_BINDING_ID            = "9781bcb0-a6c9-4eaf-ae4f-aebb4addbb0e";
@@ -78,6 +89,12 @@ public class BaseTest {
     static final String     HAPPY_PLAN_ID               = "dab13374-703e-442a-9e07-e8f41de54f80";
     static final Platform   HAPPY_PLATFORM              = Platform.EXISTING_SERVICE;
     static final String     HAPPY_OPERATION_ID          = "f838ba81-47e8-4f27-a3a5-e6fc720e48e8";
+    static final String     HAPPY_SYSLOG_DRAIN_URL      = "https://www.test.com/syslog";
+    static final String     HAPPY_APP_GUID              = "08fe8866-ded7-459a-95cf-67af6ec922dd";
+    static final Map<String, Object> HAPPY_CREDENTIALS  = new HashMap<>() {{
+        put("KEY1", "VALUE1");
+        put("KEY2", "VALUE2");
+    }};
 
     @Mock
     BindingRepository bindingRepository;
