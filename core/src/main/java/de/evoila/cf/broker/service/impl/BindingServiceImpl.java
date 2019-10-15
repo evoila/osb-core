@@ -73,6 +73,9 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
+		if (platformService == null) {
+			throw new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
+		}
 
 		BaseServiceInstanceBindingResponse baseServiceInstanceBindingResponse;
         String operationId = randomString.nextString();
@@ -108,10 +111,13 @@ public abstract class BindingServiceImpl implements BindingService {
 	@Override
 	public BaseServiceInstanceBindingResponse deleteServiceInstanceBinding(String bindingId, String planId, boolean async)
 			throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException,
-            AsyncRequiredException {
+				   AsyncRequiredException, ServiceBrokerException {
 		ServiceInstance serviceInstance = getServiceInstanceByBindingId(bindingId);
 		Plan plan = serviceDefinitionRepository.getPlan(planId);
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
+		if (platformService == null) {
+			throw new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
+		}
 		String operationId = randomString.nextString();
 		boolean wasExecutedAsync = false;
 
