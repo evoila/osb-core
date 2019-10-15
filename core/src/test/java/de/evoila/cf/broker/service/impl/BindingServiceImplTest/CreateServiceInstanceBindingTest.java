@@ -183,43 +183,92 @@ class CreateServiceInstanceBindingTest extends BaseTest {
                                         .thenReturn(true);
                             }
 
-                            @Test
-                            void syncCreateBindingThrows() throws ServiceBrokerException, InvalidParametersException, PlatformException {
-                                Exception[] exceptions = {
-                                        new ServiceBrokerException(),
-                                        new InvalidParametersException("Mock"),
-                                        new PlatformException("Mock")
-                                };
-                                doThrow(exceptions)
-                                        .when(service)
-                                        .syncCreateBinding(HAPPY_BINDING_ID,
-                                                           serviceInstance,
-                                                           request,
-                                                           plan);
-                                for (Exception expectedEx : exceptions) {
-                                    Exception ex = assertThrows(expectedEx.getClass(),
-                                                                () -> service.createServiceInstanceBinding(HAPPY_BINDING_ID,
-                                                                                                           HAPPY_SERVICE_INSTANCE_ID,
-                                                                                                           request,
-                                                                                                           HAPPY_ASYNC));
-                                    assertSame(expectedEx, ex);
+                            @Nested
+                            class asyncIsTrue {
+
+                                @Test
+                                void syncCreateBindingThrows() throws ServiceBrokerException, InvalidParametersException, PlatformException {
+                                    Exception[] exceptions = {
+                                            new ServiceBrokerException(),
+                                            new InvalidParametersException("Mock"),
+                                            new PlatformException("Mock")
+                                    };
+                                    doThrow(exceptions)
+                                            .when(service)
+                                            .syncCreateBinding(HAPPY_BINDING_ID,
+                                                               serviceInstance,
+                                                               request,
+                                                               plan);
+                                    for (Exception expectedEx : exceptions) {
+                                        Exception ex = assertThrows(expectedEx.getClass(),
+                                                                    () -> service.createServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                                                                               HAPPY_SERVICE_INSTANCE_ID,
+                                                                                                               request,
+                                                                                                               HAPPY_ASYNC));
+                                        assertSame(expectedEx, ex);
+                                    }
                                 }
+
+                                @Test
+                                void syncCreateBindingDoesNotThrow() throws ServiceBrokerException, InvalidParametersException, PlatformException, ServiceInstanceBindingExistsException, AsyncRequiredException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
+                                    ServiceInstanceBindingResponse expectedResponse = new ServiceInstanceBindingResponse();
+                                    doReturn(expectedResponse)
+                                            .when(service)
+                                            .syncCreateBinding(HAPPY_BINDING_ID,
+                                                               serviceInstance,
+                                                               request,
+                                                               plan);
+                                    ServiceInstanceBindingResponse response = (ServiceInstanceBindingResponse) service.createServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                                                                                                                    HAPPY_SERVICE_INSTANCE_ID,
+                                                                                                                                                    request,
+                                                                                                                                                    HAPPY_ASYNC);
+                                    assertSame(expectedResponse, response);
+                                }
+
                             }
 
-                            @Test
-                            void syncCreateBindingDoesNotThrow() throws ServiceBrokerException, InvalidParametersException, PlatformException, ServiceInstanceBindingExistsException, AsyncRequiredException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
-                                ServiceInstanceBindingResponse expectedResponse = new ServiceInstanceBindingResponse();
-                                doReturn(expectedResponse)
-                                        .when(service)
-                                        .syncCreateBinding(HAPPY_BINDING_ID,
-                                                           serviceInstance,
-                                                           request,
-                                                           plan);
-                                ServiceInstanceBindingResponse response = (ServiceInstanceBindingResponse) service.createServiceInstanceBinding(HAPPY_BINDING_ID,
-                                                                                                                                                HAPPY_SERVICE_INSTANCE_ID,
-                                                                                                                                                request,
-                                                                                                                                                HAPPY_ASYNC);
-                                assertSame(expectedResponse, response);
+                            @Nested
+                            class asyncIsFalse {
+
+                                @Test
+                                void syncCreateBindingThrows() throws ServiceBrokerException, InvalidParametersException, PlatformException {
+                                    Exception[] exceptions = {
+                                            new ServiceBrokerException(),
+                                            new InvalidParametersException("Mock"),
+                                            new PlatformException("Mock")
+                                    };
+                                    doThrow(exceptions)
+                                            .when(service)
+                                            .syncCreateBinding(HAPPY_BINDING_ID,
+                                                               serviceInstance,
+                                                               request,
+                                                               plan);
+                                    for (Exception expectedEx : exceptions) {
+                                        Exception ex = assertThrows(expectedEx.getClass(),
+                                                                    () -> service.createServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                                                                               HAPPY_SERVICE_INSTANCE_ID,
+                                                                                                               request,
+                                                                                                               false));
+                                        assertSame(expectedEx, ex);
+                                    }
+                                }
+
+                                @Test
+                                void syncCreateBindingDoesNotThrow() throws ServiceBrokerException, InvalidParametersException, PlatformException, ServiceInstanceBindingExistsException, AsyncRequiredException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
+                                    ServiceInstanceBindingResponse expectedResponse = new ServiceInstanceBindingResponse();
+                                    doReturn(expectedResponse)
+                                            .when(service)
+                                            .syncCreateBinding(HAPPY_BINDING_ID,
+                                                               serviceInstance,
+                                                               request,
+                                                               plan);
+                                    ServiceInstanceBindingResponse response = (ServiceInstanceBindingResponse) service.createServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                                                                                                                    HAPPY_SERVICE_INSTANCE_ID,
+                                                                                                                                                    request,
+                                                                                                                                                    false);
+                                    assertSame(expectedResponse, response);
+                                }
+
                             }
 
                         }
