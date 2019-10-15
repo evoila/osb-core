@@ -13,7 +13,9 @@ import de.evoila.cf.broker.model.ServiceInstanceOperationResponse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -87,87 +89,42 @@ class DeleteServiceInstanceTest extends BaseTest {
                 @Nested
                 class isSyncPossibleOnDeleteReturnsTrue {
 
+
                     @BeforeEach
                     void setUp() {
+                        service = spy(service);
                         when(platformService.isSyncPossibleOnDelete(serviceInstance))
                                 .thenReturn(true);
                     }
 
                     @Test
-                    void preDeleteInstanceThrows() throws PlatformException {
+                    void syncDeleteInstanceThrows() throws ServiceBrokerException {
                         PlatformException platformEx = new PlatformException("Mock");
-                        doThrow(platformEx)
-                                .when(platformService)
-                                .preDeleteInstance(serviceInstance);
-                        ServiceBrokerException expectedEx = new ServiceBrokerException("Error during pre service instance deletion", platformEx);
+                        ServiceBrokerException expectedEx = new ServiceBrokerException("Mock", platformEx);
+                        doThrow(expectedEx)
+                                .when(service)
+                                .syncDeleteInstance(serviceInstance,
+                                                    plan,
+                                                    platformService);
                         ServiceBrokerException ex = assertThrows(ServiceBrokerException.class,
                                                                  () -> service.deleteServiceInstance(HAPPY_SERVICE_INSTANCE_ID));
                         assertEquals(expectedEx, ex);
                         assertSame(platformEx, ex.getCause());
                     }
 
-                    @Nested
-                    class preDeleteInstanceDoesNotThrow {
-
-                        private void verifyMethodCalls() throws PlatformException {
-                            verify(platformService, times(1))
-                                    .preDeleteInstance(serviceInstance);
-                        }
-
-                        @Test
-                        void deleteInstanceThrows() throws PlatformException {
-                            PlatformException platformEx = new PlatformException("Mock");
-                            doThrow(platformEx)
-                                    .when(platformService)
-                                    .deleteInstance(serviceInstance, plan);
-                            ServiceBrokerException expectedEx = new ServiceBrokerException("Error during deletion of service", platformEx);
-                            ServiceBrokerException ex = assertThrows(ServiceBrokerException.class,
-                                                                     () -> service.deleteServiceInstance(HAPPY_SERVICE_INSTANCE_ID));
-                            verifyMethodCalls();
-                            assertEquals(expectedEx, ex);
-                            assertSame(platformEx, ex.getCause());
-                        }
-
-                        @Nested
-                        class deleteInstanceDoesNotThrow {
-
-                            private void verifyMethodCalls() throws PlatformException {
-                                preDeleteInstanceDoesNotThrow.this.verifyMethodCalls();
-                                verify(platformService, times(1))
-                                        .deleteInstance(serviceInstance, plan);
-                            }
-
-                            @Test
-                            void postDeleteInstanceThrows() throws PlatformException {
-                                PlatformException platformEx = new PlatformException("Mock");
-                                doThrow(platformEx)
-                                        .when(platformService)
-                                        .postDeleteInstance(serviceInstance);
-                                ServiceBrokerException expectedEx = new ServiceBrokerException("Error during pre service instance deletion", platformEx);
-                                ServiceBrokerException ex = assertThrows(ServiceBrokerException.class,
-                                                                         () -> service.deleteServiceInstance(HAPPY_SERVICE_INSTANCE_ID));
-                                verifyMethodCalls();
-                                assertEquals(expectedEx, ex);
-                                assertSame(platformEx, ex.getCause());
-                            }
-
-                            @Test
-                            void postDeleteInstanceDoesNotThrow() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, PlatformException {
-                                when(serviceInstance.getId())
-                                        .thenReturn(HAPPY_SERVICE_INSTANCE_ID);
-                                ServiceInstanceOperationResponse response = service.deleteServiceInstance(HAPPY_SERVICE_INSTANCE_ID);
-                                verifyMethodCalls();
-                                verify(platformService, times(1))
-                                        .postDeleteInstance(serviceInstance);
-                                verify(serviceInstanceRepository, times(1))
-                                        .deleteServiceInstance(HAPPY_SERVICE_INSTANCE_ID);
-                                verify(jobRepository, times(1))
-                                        .deleteJobProgressByReferenceId(HAPPY_SERVICE_INSTANCE_ID);
-                                assertEquals(expectedResponse, response);
-                            }
-
-                        }
-
+                    @Test
+                    void syncDeleteInstanceDoesNotThrow() throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
+                        doNothing()
+                                .when(service)
+                                .syncDeleteInstance(serviceInstance,
+                                                    plan,
+                                                    platformService);
+                        ServiceInstanceOperationResponse response = service.deleteServiceInstance(HAPPY_SERVICE_INSTANCE_ID);
+                        verify(service, times(1))
+                                .syncDeleteInstance(serviceInstance,
+                                                    plan,
+                                                    platformService);
+                        assertEquals(expectedResponse, response);
                     }
 
                 }
