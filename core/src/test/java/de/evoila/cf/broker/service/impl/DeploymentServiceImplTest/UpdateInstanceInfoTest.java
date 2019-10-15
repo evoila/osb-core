@@ -1,4 +1,4 @@
-package de.evoila.cf.broker.controller.core.DeploymentServiceImplTest;
+package de.evoila.cf.broker.service.impl.DeploymentServiceImplTest;
 
 import org.junit.jupiter.api.Test;
 
