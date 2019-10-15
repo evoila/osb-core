@@ -163,7 +163,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         }
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
-        if (platformService.isSyncPossibleOnCreate(plan)) {
+        if (platformService.isSyncPossibleOnUpdate(serviceInstance, plan)) {
             syncUpdateInstance(serviceInstance, request.getParameters(), plan, platformService);
         } else {
             String jobProgressId = randomString.nextString();
