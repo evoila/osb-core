@@ -105,6 +105,7 @@ public abstract class BindingServiceImpl implements BindingService {
 																  Map<String, Object> credentials, String syslogDrainUrl, String appGuid) {
 		ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId, serviceInstanceId, credentials,
 				syslogDrainUrl);
+		binding.setAppGuid(appGuid);
 		return binding;
 	}
 
