@@ -233,12 +233,15 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         if (jobRepository.containsJobProgress(instanceId)) {
             JobProgress job = jobRepository.getJobProgressByReferenceId(instanceId);
-            if (job.getOperation().equals(JobProgress.PROVISION) &&
-                    job.getState().equals(JobProgress.IN_PROGRESS)) {
-                throw new ServiceInstanceNotFoundException();
-            } else if (job.getOperation().equals(JobProgress.UPDATE) &&
-                    job.getState().equals(JobProgress.IN_PROGRESS)) {
-                throw new ConcurrencyErrorException();
+            if (job.getState().equals(JobProgress.IN_PROGRESS)) {
+                switch (job.getOperation()) {
+                    case JobProgress.PROVISION:
+                        throw new ServiceInstanceNotFoundException();
+                    case JobProgress.UPDATE:
+                        throw new ConcurrencyErrorException();
+                    default:
+                        break;
+                }
             }
         }
         return serviceInstance;
