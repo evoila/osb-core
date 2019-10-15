@@ -318,7 +318,7 @@ class CreateServiceInstanceTest extends BaseTest {
                         void getPlatformServiceReturnsNull() {
                             when(platformRepository.getPlatformService(HAPPY_PLATFORM))
                                     .thenReturn(null);
-                            ServiceBrokerException expectedEx = new ServiceBrokerException("Not Platform configured for " + plan.getPlatform());
+                            ServiceBrokerException expectedEx = new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
                             ServiceBrokerException ex = assertThrows(ServiceBrokerException.class,
                                                                      () -> service.createServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
                                                                                                          request));

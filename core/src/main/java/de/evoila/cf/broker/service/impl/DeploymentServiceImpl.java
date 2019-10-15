@@ -127,7 +127,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
         if (platformService == null) {
-            throw new ServiceBrokerException("Not Platform configured for " + plan.getPlatform());
+            throw new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
         }
 
         if (platformService.isSyncPossibleOnCreate(plan)) {
@@ -196,6 +196,10 @@ public class DeploymentServiceImpl implements DeploymentService {
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
         Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
+        if (platformService == null) {
+            throw new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
+        }
+
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
 
         if (platformService.isSyncPossibleOnDelete(serviceInstance)) {
