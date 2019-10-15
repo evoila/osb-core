@@ -352,8 +352,8 @@ class CreateServiceInstanceTest extends BaseTest {
                                 @Mock
                                 private DashboardClient dashboardClient;
 
-                                ServiceInstance expectedServiceInstance;
-                                ServiceInstanceOperationResponse expectedResponse;
+                                private ServiceInstance expectedServiceInstance;
+                                private ServiceInstanceOperationResponse expectedResponse;
 
                                 private void validateResponse(ServiceInstanceOperationResponse response) {
                                     verify(serviceInstanceRepository)
