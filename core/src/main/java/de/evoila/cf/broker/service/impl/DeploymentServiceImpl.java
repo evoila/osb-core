@@ -208,6 +208,7 @@ public class DeploymentServiceImpl implements DeploymentService {
             String jobProgressId = randomString.nextString();
             asyncDeploymentService.asyncDeleteInstance(this, serviceInstance, plan, platformService, jobProgressId);
             serviceInstanceOperationResponse.setOperation(jobProgressId);
+            serviceInstanceOperationResponse.setAsync(true);
         }
 
         return serviceInstanceOperationResponse;
