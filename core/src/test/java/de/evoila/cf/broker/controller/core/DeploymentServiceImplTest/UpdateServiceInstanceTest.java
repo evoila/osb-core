@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+import java.util.Map;
+
 import de.evoila.cf.broker.exception.PlatformException;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
@@ -22,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -138,16 +143,24 @@ class UpdateServiceInstanceTest extends BaseTest {
 
                         @BeforeEach
                         void setUp() {
+                            service = spy(service);
                             when(platformService.isSyncPossibleOnUpdate(serviceInstance, plan))
                                     .thenReturn(true);
                         }
 
                         @Test
-                        void preUpdateInstanceThrows() throws PlatformException {
+                        void syncUpdateInstanceThrows() throws ServiceBrokerException {
                             PlatformException platformEx = new PlatformException("Mock");
-                            when(platformService.preUpdateInstance(serviceInstance, plan))
-                                    .thenThrow(platformEx);
-                            ServiceBrokerException expectedEx = new ServiceBrokerException("Error during pre service instance update", platformEx);
+                            ServiceBrokerException expectedEx = new ServiceBrokerException("Mock", platformEx);
+                            // We have to save the parameters in a local variable, otherwise mockito
+                            // is failing with an unfished stubbing error
+                            Map<String, Object> requestParameters = request.getParameters();
+                            doThrow(expectedEx)
+                                    .when(service)
+                                    .syncUpdateInstance(serviceInstance,
+                                                        requestParameters,
+                                                        plan,
+                                                        platformService);
                             ServiceBrokerException ex = assertThrows(ServiceBrokerException.class,
                                                                      () -> service.updateServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
                                                                                                          request));
@@ -155,63 +168,25 @@ class UpdateServiceInstanceTest extends BaseTest {
                             assertSame(platformEx, ex.getCause());
                         }
 
-                        @Nested
-                        class preUpdateInstanceDoesNotThrow {
-
-                            @BeforeEach
-                            void setUp() throws PlatformException {
-                                when(platformService.preUpdateInstance(serviceInstance, plan))
-                                        .thenReturn(serviceInstance);
-                            }
-
-                            @Test
-                            void updateInstanceThrows() throws PlatformException {
-                                PlatformException platformEx = new PlatformException("Mock");
-                                when(platformService.updateInstance(serviceInstance, plan, request.getParameters()))
-                                        .thenThrow(platformEx);
-                                ServiceBrokerException expectedEx = new ServiceBrokerException("Could not update instance due to: ", platformEx);
-                                ServiceBrokerException ex = assertThrows(ServiceBrokerException.class,
-                                                                         () -> service.updateServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
-                                                                                                             request));
-                                assertEquals(expectedEx, ex);
-                                assertSame(platformEx, ex.getCause());
-                            }
-
-                            @Nested
-                            class updateInstanceDoesNotThrow {
-
-                                @BeforeEach
-                                void setUp() throws PlatformException {
-                                    when(platformService.updateInstance(serviceInstance, plan, request.getParameters()))
-                                            .thenReturn(serviceInstance);
-                                }
-
-                                @Test
-                                void postUpdateInstanceThrows() throws PlatformException {
-                                    PlatformException platformEx = new PlatformException("Mock");
-                                    when(platformService.postUpdateInstance(serviceInstance, plan))
-                                            .thenThrow(platformEx);
-                                    ServiceBrokerException expectedEx = new ServiceBrokerException("Error during post service instance update", platformEx);
-                                    ServiceBrokerException ex = assertThrows(ServiceBrokerException.class,
-                                                                             () -> service.updateServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
-                                                                                                                 request));
-                                    assertEquals(expectedEx, ex);
-                                    assertSame(platformEx, ex.getCause());
-                                }
-
-                                @Test
-                                void postUpdateInstanceDoesNotThrow() throws PlatformException, ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
-                                    when(platformService.postUpdateInstance(serviceInstance, plan))
-                                            .thenReturn(serviceInstance);
-                                    ServiceInstanceOperationResponse response = service.updateServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
-                                                                                                              request);
-                                    verify(serviceInstanceRepository, times(1))
-                                            .updateServiceInstance(serviceInstance);
-                                    assertEquals(expectedResponse, response);
-                                }
-
-                            }
-
+                        @Test
+                        void syncUpdateInstanceDoesNotThrow() throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
+                            // We have to save the parameters in a local variable, otherwise mockito
+                            // is failing with an unfished stubbing error
+                            Map<String, Object> requestParameters = request.getParameters();
+                            doReturn(null)
+                                    .when(service)
+                                    .syncUpdateInstance(serviceInstance,
+                                                        requestParameters,
+                                                        plan,
+                                                        platformService);
+                            ServiceInstanceOperationResponse response = service.updateServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
+                                                                                                      request);
+                            verify(service, times(1))
+                                    .syncUpdateInstance(serviceInstance,
+                                                        request.getParameters(),
+                                                        plan,
+                                                        platformService);
+                            assertEquals(expectedResponse, response);
                         }
 
                     }
