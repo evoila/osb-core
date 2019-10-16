@@ -15,6 +15,7 @@ import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.exception.ServiceInstanceBindingDoesNotExistsException;
 import de.evoila.cf.broker.exception.ServiceInstanceBindingExistsException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
+import de.evoila.cf.broker.model.BindResource;
 import de.evoila.cf.broker.model.JobProgress;
 import de.evoila.cf.broker.model.Platform;
 import de.evoila.cf.broker.model.RouteBinding;
@@ -89,6 +90,12 @@ public class BaseTest {
             return super.getServiceInstanceByBindingId(bindingId);
         }
 
+        @Override
+        protected ServiceInstanceBinding bindService(String bindingId, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
+                                                     ServiceInstance serviceInstance, Plan plan) throws ServiceBrokerException, InvalidParametersException, PlatformException {
+            return super.bindService(bindingId, serviceInstanceBindingRequest, serviceInstance, plan);
+        }
+
     }
 
     static final String     HAPPY_BINDING_ID            = "9781bcb0-a6c9-4eaf-ae4f-aebb4addbb0e";
@@ -100,6 +107,7 @@ public class BaseTest {
     static final String     HAPPY_SYSLOG_DRAIN_URL      = "https://www.test.com/syslog";
     static final String     HAPPY_APP_GUID              = "08fe8866-ded7-459a-95cf-67af6ec922dd";
     static final String     HAPPY_JOB_PROGRESS_ID       = "39a602d2-f34f-4a7f-9fca-cfac933bbccb";
+    static final String     HAPPY_ROUTE                 = "Route";
     static final Map<String, Object> HAPPY_CREDENTIALS  = new HashMap<>() {{
         put("KEY1", "VALUE1");
         put("KEY2", "VALUE2");
@@ -134,6 +142,10 @@ public class BaseTest {
     ServiceInstanceBinding serviceInstanceBinding;
     @Mock
     JobProgress jobProgress;
+    @Mock
+    BindResource bindResource;
+    @Mock
+    RouteBinding routeBinding;
 
     @InjectMocks
     TestBindingServiceImpl service = mock(TestBindingServiceImpl.class, Mockito.CALLS_REAL_METHODS);
