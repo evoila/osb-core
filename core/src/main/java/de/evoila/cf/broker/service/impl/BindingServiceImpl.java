@@ -229,7 +229,7 @@ public abstract class BindingServiceImpl implements BindingService {
         try {
             ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
             unbindService(binding, serviceInstance, plan);
-        } catch (ServiceBrokerException | PlatformException e) {
+        } catch (Exception e) {
             log.error("Could not cleanup service binding", e);
         } finally {
             bindingRepository.unbindService(bindingId);
