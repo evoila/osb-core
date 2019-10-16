@@ -1,10 +1,13 @@
 package de.evoila.cf.broker.service.impl.BindingServiceImplTest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.util.reflection.FieldSetter;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -114,6 +117,8 @@ public class BaseTest {
     }};
 
     @Mock
+    Logger log;
+    @Mock
     BindingRepository bindingRepository;
     @Mock
     ServiceDefinitionRepository serviceDefinitionRepository;
@@ -149,5 +154,19 @@ public class BaseTest {
 
     @InjectMocks
     TestBindingServiceImpl service = mock(TestBindingServiceImpl.class, Mockito.CALLS_REAL_METHODS);
+
+    @BeforeEach
+    void setUp() {
+        try {
+            FieldSetter.setField(service,
+                                 service.getClass()         // Mock subclass of TestBindingServiceImpl
+                                        .getSuperclass()    // TestBindingServiceImpl
+                                        .getSuperclass()    // BindingServiceImpl
+                                        .getDeclaredField("log"), //
+                                 log);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException("Setting logger failed.", e);
+        }
+    }
 
 }

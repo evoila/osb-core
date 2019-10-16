@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import de.evoila.cf.broker.exception.AsyncRequiredException;
+import de.evoila.cf.broker.exception.PlatformException;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceBindingDoesNotExistsException;
@@ -21,6 +22,78 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class DeleteServiceInstanceBindingTest extends BaseTest {
+
+    @Nested
+    class overloadedMethodVoidReturnValue {
+
+        @Test
+        void findOneThrows() {
+            RuntimeException ex = new RuntimeException("Mock");
+            when(bindingRepository.findOne(HAPPY_BINDING_ID))
+                    .thenThrow(ex);
+            service.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                 serviceInstance,
+                                                 plan);
+            verify(log, times(1))
+                    .error("Could not cleanup service binding",
+                           ex);
+            verify(bindingRepository, times(1))
+                    .unbindService(HAPPY_BINDING_ID);
+        }
+
+        @Nested
+        class findOneDoesNotThrow {
+
+            @BeforeEach
+            void setUp() {
+                when(bindingRepository.findOne(HAPPY_BINDING_ID))
+                        .thenReturn(serviceInstanceBinding);
+            }
+
+            @Test
+            void unbindServiceThrows() throws PlatformException, ServiceBrokerException {
+                Exception[] exceptions = {
+                        new ServiceBrokerException(),
+                        new PlatformException("Mock")
+                };
+                doThrow(exceptions)
+                        .when(service)
+                        .unbindService(serviceInstanceBinding,
+                                       serviceInstance,
+                                       plan);
+                for (Exception ex : exceptions) {
+                    service.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                         serviceInstance,
+                                                         plan);
+                    verify(log, times(1))
+                            .error("Could not cleanup service binding",
+                                   ex);
+                }
+                verify(bindingRepository, times(exceptions.length))
+                        .unbindService(HAPPY_BINDING_ID);
+            }
+
+            @Test
+            void unbindServiceDoesNotThrow() throws PlatformException, ServiceBrokerException {
+                doNothing()
+                        .when(service)
+                        .unbindService(serviceInstanceBinding,
+                                       serviceInstance,
+                                       plan);
+                service.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                     serviceInstance,
+                                                     plan);
+                verify(service, times(1))
+                        .unbindService(serviceInstanceBinding,
+                                       serviceInstance,
+                                       plan);
+                verify(bindingRepository, times(1))
+                        .unbindService(HAPPY_BINDING_ID);
+            }
+
+        }
+
+    }
 
     @Test
     void getServiceInstanceByBindingIdThrows() throws ServiceInstanceBindingDoesNotExistsException {
