@@ -15,6 +15,7 @@ import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.exception.ServiceInstanceBindingDoesNotExistsException;
 import de.evoila.cf.broker.exception.ServiceInstanceBindingExistsException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
+import de.evoila.cf.broker.model.JobProgress;
 import de.evoila.cf.broker.model.Platform;
 import de.evoila.cf.broker.model.RouteBinding;
 import de.evoila.cf.broker.model.ServiceInstance;
@@ -128,6 +129,10 @@ public class BaseTest {
     Plan plan;
     @Mock
     PlatformService platformService;
+    @Mock
+    ServiceInstanceBinding serviceInstanceBinding;
+    @Mock
+    JobProgress jobProgress;
 
     @InjectMocks
     TestBindingServiceImpl service = mock(TestBindingServiceImpl.class, Mockito.CALLS_REAL_METHODS);
