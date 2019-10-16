@@ -202,6 +202,9 @@ public abstract class BindingServiceImpl implements BindingService {
 		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
 				.isEmpty(serviceInstanceBindingRequest.getBindResource().getRoute())) {
 			RouteBinding routeBinding = bindRoute(serviceInstance, serviceInstanceBindingRequest.getBindResource().getRoute());
+			if (routeBinding == null) {
+				throw new ServiceBrokerException("Could not bind route.");
+			}
 			routeBindingRepository.addRouteBinding(routeBinding);
 			serviceInstanceBindingResponse = new ServiceInstanceBindingResponse(routeBinding.getRoute());
 
