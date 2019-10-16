@@ -35,8 +35,7 @@ class DeleteServiceInstanceBindingTest extends BaseTest {
                                                  serviceInstance,
                                                  plan);
             verify(log, times(1))
-                    .error("Could not cleanup service binding",
-                           ex);
+                    .error("Could not cleanup service binding", ex);
             verify(bindingRepository, times(1))
                     .unbindService(HAPPY_BINDING_ID);
         }
@@ -66,8 +65,7 @@ class DeleteServiceInstanceBindingTest extends BaseTest {
                                                          serviceInstance,
                                                          plan);
                     verify(log, times(1))
-                            .error("Could not cleanup service binding",
-                                   ex);
+                            .error("Could not cleanup service binding", ex);
                 }
                 verify(bindingRepository, times(exceptions.length))
                         .unbindService(HAPPY_BINDING_ID);
