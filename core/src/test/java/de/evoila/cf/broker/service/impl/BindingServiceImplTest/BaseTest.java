@@ -99,6 +99,7 @@ public class BaseTest {
     static final String     HAPPY_OPERATION_ID          = "f838ba81-47e8-4f27-a3a5-e6fc720e48e8";
     static final String     HAPPY_SYSLOG_DRAIN_URL      = "https://www.test.com/syslog";
     static final String     HAPPY_APP_GUID              = "08fe8866-ded7-459a-95cf-67af6ec922dd";
+    static final String     HAPPY_JOB_PROGRESS_ID       = "39a602d2-f34f-4a7f-9fca-cfac933bbccb";
     static final Map<String, Object> HAPPY_CREDENTIALS  = new HashMap<>() {{
         put("KEY1", "VALUE1");
         put("KEY2", "VALUE2");
