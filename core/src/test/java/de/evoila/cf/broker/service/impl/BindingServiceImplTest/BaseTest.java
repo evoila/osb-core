@@ -101,17 +101,18 @@ public class BaseTest {
 
     }
 
-    static final String     HAPPY_BINDING_ID            = "9781bcb0-a6c9-4eaf-ae4f-aebb4addbb0e";
-    static final String     HAPPY_SERVICE_INSTANCE_ID   = "a763ef49-d4d3-4d8e-9755-a0914a3518ca";
-    static final boolean    HAPPY_ASYNC                 = true;
-    static final String     HAPPY_PLAN_ID               = "dab13374-703e-442a-9e07-e8f41de54f80";
-    static final Platform   HAPPY_PLATFORM              = Platform.EXISTING_SERVICE;
-    static final String     HAPPY_OPERATION_ID          = "f838ba81-47e8-4f27-a3a5-e6fc720e48e8";
-    static final String     HAPPY_SYSLOG_DRAIN_URL      = "https://www.test.com/syslog";
-    static final String     HAPPY_APP_GUID              = "08fe8866-ded7-459a-95cf-67af6ec922dd";
-    static final String     HAPPY_JOB_PROGRESS_ID       = "39a602d2-f34f-4a7f-9fca-cfac933bbccb";
-    static final String     HAPPY_ROUTE                 = "Route";
-    static final Map<String, Object> HAPPY_CREDENTIALS  = new HashMap<>() {{
+    static final String     HAPPY_BINDING_ID                = "9781bcb0-a6c9-4eaf-ae4f-aebb4addbb0e";
+    static final String     HAPPY_SERVICE_INSTANCE_ID       = "a763ef49-d4d3-4d8e-9755-a0914a3518ca";
+    static final boolean    HAPPY_ASYNC                     = true;
+    static final String     HAPPY_PLAN_ID                   = "dab13374-703e-442a-9e07-e8f41de54f80";
+    static final Platform   HAPPY_PLATFORM                  = Platform.EXISTING_SERVICE;
+    static final String     HAPPY_OPERATION_ID              = "f838ba81-47e8-4f27-a3a5-e6fc720e48e8";
+    static final String     HAPPY_SYSLOG_DRAIN_URL          = "https://www.test.com/syslog";
+    static final String     HAPPY_APP_GUID                  = "08fe8866-ded7-459a-95cf-67af6ec922dd";
+    static final String     HAPPY_JOB_PROGRESS_ID           = "39a602d2-f34f-4a7f-9fca-cfac933bbccb";
+    static final String     HAPPY_ROUTE                     = "Route";
+    static final String     HAPPY_BIND_RESOURCE_APP_GUID    = "9e36ce6d-8ee8-49f4-a82f-12996640188b";
+    static final Map<String, Object> HAPPY_CREDENTIALS      = new HashMap<>() {{
         put("KEY1", "VALUE1");
         put("KEY2", "VALUE2");
     }};
