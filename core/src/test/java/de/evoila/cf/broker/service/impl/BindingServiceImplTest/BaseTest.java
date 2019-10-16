@@ -12,6 +12,7 @@ import java.util.Map;
 import de.evoila.cf.broker.exception.InvalidParametersException;
 import de.evoila.cf.broker.exception.PlatformException;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
+import de.evoila.cf.broker.exception.ServiceInstanceBindingDoesNotExistsException;
 import de.evoila.cf.broker.exception.ServiceInstanceBindingExistsException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.Platform;
@@ -79,6 +80,12 @@ public class BaseTest {
                                                       credentials,
                                                       syslogDrainUrl,
                                                       appGuid);
+        }
+
+        @Override
+        protected ServiceInstance getServiceInstanceByBindingId(String bindingId)
+                throws ServiceInstanceBindingDoesNotExistsException {
+            return super.getServiceInstanceByBindingId(bindingId);
         }
 
     }
