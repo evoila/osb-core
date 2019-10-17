@@ -2,6 +2,8 @@ package de.evoila.cf.broker.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 /**
  * Used to send errors back to the cloud controller.
  * 
@@ -25,5 +27,18 @@ public class ResponseMessage<T> {
 	public void setMessage(T message) {
 		this.message = message;
 	}
-	
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		ResponseMessage<?> that = (ResponseMessage<?>) o;
+		return Objects.equals(message, that.message);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(message);
+	}
+
 }

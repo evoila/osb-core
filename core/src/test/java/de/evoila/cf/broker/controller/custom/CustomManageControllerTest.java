@@ -6,16 +6,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import de.evoila.cf.broker.exception.ConcurrencyErrorException;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceNotFoundException;
+import de.evoila.cf.broker.model.ResponseMessage;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.ServiceInstanceUpdateRequest;
 import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
@@ -25,6 +32,9 @@ import de.evoila.cf.broker.service.DeploymentService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -163,6 +173,62 @@ class CustomManageControllerTest {
 
             }
 
+        }
+
+        @SuppressWarnings("unchecked")
+        @Test
+        void badRequestResponse() throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceBrokerException {
+            ServiceDefinitionDoesNotExistException expectedEx = new ServiceDefinitionDoesNotExistException("Mock");
+            ResponseMessage<String> expectedResponseMessage = new ResponseMessage<>(expectedEx.getMessage());
+            when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
+                    .thenReturn(serviceInstance);
+            when(serviceInstance.getServiceDefinitionId())
+                    .thenReturn(HAPPY_SERVICE_DEFINITION_ID);
+            when(serviceInstance.getPlanId())
+                    .thenReturn(HAPPY_PLAN_ID);
+            when(deploymentService.updateServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
+                                                         updateRequest))
+                    .thenThrow(expectedEx);
+            ResponseEntity<ResponseMessage<String>> response = controller.submit(HAPPY_SERVICE_INSTANCE_ID,
+                                                                                 requestParameters);
+            assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+            assertEquals(expectedResponseMessage, response.getBody());
+        }
+
+        @SuppressWarnings("unchecked")
+        @Test
+        void okResponse() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
+            when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
+                    .thenReturn(serviceInstance);
+            when(serviceInstance.getServiceDefinitionId())
+                    .thenReturn(HAPPY_SERVICE_DEFINITION_ID);
+            when(serviceInstance.getPlanId())
+                    .thenReturn(HAPPY_PLAN_ID);
+            HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+            when(httpServletRequest.getAttribute("javax.servlet.include.context_path"))
+                    .thenReturn("CONTEXT");
+            when(httpServletRequest.getAttribute("javax.servlet.include.request_uri"))
+                    .thenReturn("URI");
+            when(httpServletRequest.getAttribute("javax.servlet.include.servlet_path"))
+                    .thenReturn("SERVLET");
+            ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
+            RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+            String expectedLocation = MvcUriComponentsBuilder
+                                              .fromMethodCall(MvcUriComponentsBuilder.on(CustomManageController.class)
+                                                                                     .lastOperation(HAPPY_SERVICE_INSTANCE_ID, null))
+                                              .build()
+                                              .toUriString();
+            HttpHeaders expectedHeaders = new HttpHeaders();
+            expectedHeaders.add(HttpHeaders.LOCATION, expectedLocation);
+            ResponseEntity<ResponseMessage<String>> response = controller.submit(HAPPY_SERVICE_INSTANCE_ID,
+                                                                                 requestParameters);
+            verify(deploymentService, times(1))
+                    .updateServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
+                                           updateRequest);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(expectedHeaders, response.getHeaders());
+            assertEquals(new ResponseMessage<>("Configuration updated successfully"),
+                         response.getBody());
         }
 
     }

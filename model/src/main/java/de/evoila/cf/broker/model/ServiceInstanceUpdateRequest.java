@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.evoila.cf.broker.model.context.Context;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author sgreenberg@gopivotal.com, Johannes Hiemer.
@@ -37,4 +38,19 @@ public class ServiceInstanceUpdateRequest extends BaseServiceInstanceRequest {
     public Boolean isContextUpdate() {
 	    return (parameters == null || parameters.isEmpty()) && (context != null);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        if (!super.equals(o)) { return false; }
+        ServiceInstanceUpdateRequest that = (ServiceInstanceUpdateRequest) o;
+        return Objects.equals(previousValues, that.previousValues);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), previousValues);
+    }
+
 }
