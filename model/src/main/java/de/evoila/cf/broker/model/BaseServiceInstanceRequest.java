@@ -41,7 +41,8 @@ public class BaseServiceInstanceRequest {
     }
 
     public void setContext(Context context) {
-        context.validateContextObject();
+        if (context != null)
+            context.validateContextObject();
         this.context = context;
     }
 
