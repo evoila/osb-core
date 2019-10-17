@@ -22,6 +22,7 @@ import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceNotFoundException;
+import de.evoila.cf.broker.model.JobProgressResponse;
 import de.evoila.cf.broker.model.ResponseMessage;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.ServiceInstanceUpdateRequest;
@@ -43,6 +44,7 @@ class CustomManageControllerTest {
     private static final String HAPPY_SERVICE_INSTANCE_ID   = "72d68795-3a98-4469-879f-2f4924fa9844";
     private static final String HAPPY_SERVICE_DEFINITION_ID = "cefb9a35-3ff5-4fce-b116-9e62c1b76a1f";
     private static final String HAPPY_PLAN_ID               = "a96cb92a-640f-4425-9728-8bc9ddc2a71b";
+    private static final String HAPPY_OPERATION_ID          = "e7434e99-1923-487c-a452-bf2eae131515";
 
     @Mock
     private ServiceInstanceRepository serviceInstanceRepository;
@@ -235,6 +237,66 @@ class CustomManageControllerTest {
 
     @Nested
     class lastOperationMethod {
+
+        @Nested
+        class exceptionThrown {
+
+            @Test
+            void withGetLastOperationByIdThrowing() throws ServiceInstanceDoesNotExistException {
+                ServiceInstanceDoesNotExistException expectedEx = new ServiceInstanceDoesNotExistException("Mock");
+                when(deploymentService.getLastOperationById(HAPPY_SERVICE_INSTANCE_ID,
+                                                            HAPPY_OPERATION_ID))
+                        .thenThrow(expectedEx);
+                ServiceInstanceDoesNotExistException ex = assertThrows(ServiceInstanceDoesNotExistException.class,
+                                                                       () -> controller.lastOperation(HAPPY_SERVICE_INSTANCE_ID,
+                                                                                                      HAPPY_OPERATION_ID));
+                assertSame(expectedEx, ex);
+            }
+
+            @Test
+            void withGetLastOperationByReferenceIdThrowing() throws ServiceInstanceDoesNotExistException {
+                ServiceInstanceDoesNotExistException expectedEx = new ServiceInstanceDoesNotExistException("Mock");
+                when(deploymentService.getLastOperationByReferenceId(HAPPY_SERVICE_INSTANCE_ID))
+                        .thenThrow(expectedEx);
+                ServiceInstanceDoesNotExistException ex = assertThrows(ServiceInstanceDoesNotExistException.class,
+                                                                       () -> controller.lastOperation(HAPPY_SERVICE_INSTANCE_ID,
+                                                                                                      null));
+                assertSame(expectedEx, ex);
+            }
+
+        }
+
+        @Nested
+        class okResponse {
+
+            @Mock
+            JobProgressResponse jobProgressResponse;
+
+            private void validateResponse(ResponseEntity<JobProgressResponse> response) {
+                assertEquals(HttpStatus.OK, response.getStatusCode());
+                assertSame(jobProgressResponse, response.getBody());
+            }
+
+            @Test
+            void withOperation() throws ServiceInstanceDoesNotExistException {
+                when(deploymentService.getLastOperationById(HAPPY_SERVICE_INSTANCE_ID,
+                                                            HAPPY_OPERATION_ID))
+                        .thenReturn(jobProgressResponse);
+                ResponseEntity<JobProgressResponse> response = controller.lastOperation(HAPPY_SERVICE_INSTANCE_ID,
+                                                                                        HAPPY_OPERATION_ID);
+                validateResponse(response);
+            }
+
+            @Test
+            void withoutOperation() throws ServiceInstanceDoesNotExistException {
+                when(deploymentService.getLastOperationByReferenceId(HAPPY_SERVICE_INSTANCE_ID))
+                        .thenReturn(jobProgressResponse);
+                ResponseEntity<JobProgressResponse> response = controller.lastOperation(HAPPY_SERVICE_INSTANCE_ID,
+                                                                                        null);
+                validateResponse(response);
+            }
+
+        }
 
     }
 
