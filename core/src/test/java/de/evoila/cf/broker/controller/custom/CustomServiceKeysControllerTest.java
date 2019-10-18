@@ -22,6 +22,7 @@ import de.evoila.cf.broker.exception.PlatformException;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.exception.ServiceBrokerFeatureIsNotSupportedException;
 import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
+import de.evoila.cf.broker.exception.ServiceInstanceBindingDoesNotExistsException;
 import de.evoila.cf.broker.exception.ServiceInstanceBindingExistsException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.ServiceInstance;
@@ -32,6 +33,7 @@ import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.BindingService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -176,7 +178,6 @@ class CustomServiceKeysControllerTest {
                 assertEquals(expectedEx, ex);
             }
 
-
             @Test
             void withCreateServiceInstanceBindingThrowing() throws ServiceInstanceDoesNotExistException, ServiceBrokerFeatureIsNotSupportedException, AsyncRequiredException, ServiceInstanceBindingExistsException, ServiceBrokerException, PlatformException, ServiceDefinitionDoesNotExistException, InvalidParametersException {
                 Exception[] exceptions = {
@@ -236,6 +237,70 @@ class CustomServiceKeysControllerTest {
 
     @Nested
     class deleteMethod {
+
+        @Nested
+        class exceptionThrown {
+
+            @Test
+            void withGetServiceInstanceThrowing() throws ServiceInstanceDoesNotExistException {
+                ServiceInstanceDoesNotExistException expectedEx = new ServiceInstanceDoesNotExistException("Mock");
+                when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
+                        .thenThrow(expectedEx);
+                ServiceInstanceDoesNotExistException ex = assertThrows(ServiceInstanceDoesNotExistException.class,
+                                                                       () -> controller.createServiceKey(HAPPY_SERVICE_INSTANCE_ID));
+                assertSame(expectedEx, ex);
+            }
+
+            @Test
+            void withServiceInstanceNull() throws ServiceInstanceDoesNotExistException {
+                ServiceInstanceDoesNotExistException expectedEx = new ServiceInstanceDoesNotExistException(HAPPY_SERVICE_INSTANCE_ID);
+                when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
+                        .thenReturn(null);
+                ServiceInstanceDoesNotExistException ex = assertThrows(ServiceInstanceDoesNotExistException.class,
+                                                                       () -> controller.createServiceKey(HAPPY_SERVICE_INSTANCE_ID));
+                assertEquals(expectedEx, ex);
+            }
+
+            @Test
+            void withDeleteServiceInstanceBindingThrowing() throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException {
+                Exception[] exceptions = {
+                        new ServiceBrokerException(),
+                        new ServiceInstanceBindingDoesNotExistsException("Mock"),
+                        new ServiceDefinitionDoesNotExistException("Mock"),
+                        new AsyncRequiredException()
+                };
+                when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
+                        .thenReturn(serviceInstance);
+                when(serviceInstance.getPlanId())
+                        .thenReturn(HAPPY_PLAN_ID);
+                when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                                 HAPPY_PLAN_ID,
+                                                                 false))
+                        .thenThrow(exceptions);
+                for (Exception expectedEx : exceptions) {
+                    Exception ex = assertThrows(expectedEx.getClass(),
+                                                () -> controller.delete(HAPPY_SERVICE_INSTANCE_ID,
+                                                                        HAPPY_BINDING_ID));
+                    assertSame(expectedEx, ex);
+                }
+            }
+
+        }
+
+        @Test
+        void okResponse() throws ServiceInstanceDoesNotExistException, AsyncRequiredException, ServiceInstanceBindingDoesNotExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException {
+            when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
+                    .thenReturn(serviceInstance);
+            when(serviceInstance.getPlanId())
+                    .thenReturn(HAPPY_PLAN_ID);
+            ResponseEntity response = controller.delete(HAPPY_SERVICE_INSTANCE_ID, HAPPY_BINDING_ID);
+            verify(bindingService, times(1))
+                    .deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                  HAPPY_PLAN_ID,
+                                                  false);
+            assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+            assertNull(response.getBody());
+        }
 
     }
 
