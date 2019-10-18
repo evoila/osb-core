@@ -4,6 +4,7 @@
 package de.evoila.cf.broker.model.cpi;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author Johannes Hiemer.
@@ -61,4 +62,21 @@ public class EndpointServiceState {
 	public void setInformation(String information) {
 		this.information = information;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		EndpointServiceState that = (EndpointServiceState) o;
+		return Objects.equals(identifier, that.identifier) &&
+			   Objects.equals(date, that.date) &&
+			   state == that.state &&
+			   Objects.equals(information, that.information);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(identifier, date, state, information);
+	}
+
 }
