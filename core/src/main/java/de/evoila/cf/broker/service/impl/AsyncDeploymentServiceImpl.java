@@ -28,6 +28,9 @@ public class AsyncDeploymentServiceImpl extends AsyncOperationServiceImpl implem
                                     Map<String, Object> parameters, Plan plan, PlatformService platformService, String jobProgressId) {
         JobProgress jobProgress = progressService.startJob(jobProgressId, serviceInstance.getId(),
                 "Creating service..", JobProgress.PROVISION);
+        if (jobProgress == null) {
+            return;
+        }
 		try {
             deploymentService.syncCreateInstance(serviceInstance, parameters, plan, platformService);
 		} catch (Exception e) {
@@ -46,6 +49,9 @@ public class AsyncDeploymentServiceImpl extends AsyncOperationServiceImpl implem
                                     Map<String, Object> parameters, Plan plan, PlatformService platformService, String jobProgressId) {
         JobProgress jobProgress = progressService.startJob(jobProgressId, serviceInstance.getId(),
                 "Updating service..", JobProgress.UPDATE);
+        if (jobProgress == null) {
+            return;
+        }
         try {
             deploymentService.syncUpdateInstance(serviceInstance, parameters, plan, platformService);
         } catch (Exception e) {
@@ -64,6 +70,9 @@ public class AsyncDeploymentServiceImpl extends AsyncOperationServiceImpl implem
 			ServiceInstance serviceInstance, Plan plan, PlatformService platformService, String jobProgressId) {
         JobProgress jobProgress = progressService.startJob(jobProgressId, serviceInstance.getId(),
                 "Deleting service..", JobProgress.DELETE);
+        if (jobProgress == null) {
+            return;
+        }
 		try {
             deploymentService.syncDeleteInstance(serviceInstance, plan, platformService);
 
