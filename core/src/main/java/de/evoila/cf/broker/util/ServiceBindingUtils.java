@@ -48,7 +48,7 @@ public class ServiceBindingUtils {
     }
 
     /**
-     * Searches for the service instance bidning with the given serviceInstanceId and
+     * Searches for the service instance binding with the given serviceInstanceId and
      * then calls {@linkplain #isBlocked(ServiceInstanceBinding, String)}.
      * @param serviceBindingId id of the service instance binding to search with
      * @param action desired action to take
