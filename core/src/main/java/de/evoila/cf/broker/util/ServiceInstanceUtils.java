@@ -47,20 +47,25 @@ public class ServiceInstanceUtils {
     }
 
     public static Map<String, Object> bindingObject(List<ServerAddress> serverAddresses,
-                                             String username, String password, Map<String, Object> additionalConfigs) {
-        Map<String, Object> credentials = new HashMap<>();
+                                                    String username,
+                                                    String password,
+                                                    Map<String, Object> additionalConfigs) {
+        if (serverAddresses == null ||
+            serverAddresses.isEmpty()) {
 
+            return Collections.emptyMap();
+        }
+
+        Map<String, Object> credentials = new HashMap<>();
         if (serverAddresses.size() == 1) {
             credentials.put(HOSTNAME, serverAddresses.get(0).getIp());
             credentials.put(PORT, serverAddresses.get(0).getPort());
         } else {
             List<Map<String, Object>> hosts = new ArrayList<>();
-            serverAddresses.forEach(serverAddress -> {
-                hosts.add(new HashMap<String, Object>() {{
-                    put(HOSTNAME, serverAddress.getIp());
-                    put(PORT, serverAddress.getPort());
-                }});
-            });
+            serverAddresses.forEach(serverAddress -> hosts.add(new HashMap<>() {{
+                put(HOSTNAME, serverAddress.getIp());
+                put(PORT, serverAddress.getPort());
+            }}));
 
             credentials.put(HOSTS, hosts);
         }
@@ -71,7 +76,9 @@ public class ServiceInstanceUtils {
         if (!StringUtils.isEmpty(password))
             credentials.put(PASSWORD, password);
 
-        credentials.putAll(additionalConfigs);
+        if (additionalConfigs != null) {
+            credentials.putAll(additionalConfigs);
+        }
 
         return credentials;
     }
