@@ -87,12 +87,19 @@ public class ServiceInstanceUtils {
     }
 
     public static String hostList(List<ServerAddress> serverAddresses) {
+        if (serverAddresses == null) {
+            return "";
+        }
         String hosts = "";
         for (ServerAddress serverAddress : serverAddresses) {
+            String ip = serverAddress.getIp();
+            if (ip == null) {
+                continue;
+            }
             if (hosts.length() > 0)
                 hosts = hosts.concat(",");
 
-            hosts = hosts.concat(serverAddress.getIp());
+            hosts = hosts.concat(ip);
         }
         return hosts;
     }
