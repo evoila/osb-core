@@ -105,6 +105,9 @@ public class ServiceInstanceUtils {
     }
 
     public static String portList(List<ServerAddress> serverAddresses) {
+        if (serverAddresses == null) {
+            return "";
+        }
         String ports = "";
         for (ServerAddress serverAddress : serverAddresses) {
             if (ports.length() > 0)
