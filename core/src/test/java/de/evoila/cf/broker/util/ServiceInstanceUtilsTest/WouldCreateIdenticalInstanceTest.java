@@ -3,10 +3,12 @@ package de.evoila.cf.broker.util.ServiceInstanceUtilsTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import java.util.Collections;
 import java.util.HashMap;
 
+import de.evoila.cf.broker.model.ServiceInstanceRequest;
 import de.evoila.cf.broker.model.context.Context;
 import de.evoila.cf.broker.util.ServiceInstanceUtils;
 
@@ -16,6 +18,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class WouldCreateIdenticalInstanceTest extends BaseTest {
+
+    @Mock
+    private ServiceInstanceRequest request;
 
     @Nested
     class returnsTrue {

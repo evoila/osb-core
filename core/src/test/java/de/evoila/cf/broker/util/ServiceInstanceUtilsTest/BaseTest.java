@@ -24,8 +24,6 @@ abstract class BaseTest {
     static final String HAPPY_SPACE_GUID            = "4ec8d1c7-bba0-4da1-ad70-8ac2d0f0eb44";
 
     @Mock
-    ServiceInstanceRequest request;
-    @Mock
     ServiceInstance serviceInstance;
     @Mock
     Context context;
