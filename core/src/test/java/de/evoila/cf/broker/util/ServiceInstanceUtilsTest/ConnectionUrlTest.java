@@ -37,13 +37,13 @@ class ConnectionUrlTest extends BaseTest {
         void withOne() {
             List<ServerAddress> oneItemList = inputList.subList(0, 1);
             String result = ServiceInstanceUtils.connectionUrl(oneItemList);
-            assertEquals("null:0", result);
+            assertEquals("", result);
         }
 
         @Test
         void withThree() {
             String result = ServiceInstanceUtils.connectionUrl(inputList);
-            assertEquals("null:0,null:0,null:0", result);
+            assertEquals("", result);
         }
 
     }
