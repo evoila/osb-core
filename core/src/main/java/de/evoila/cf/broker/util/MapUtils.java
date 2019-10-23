@@ -29,6 +29,9 @@ public class MapUtils {
     }
 
     public static void deepInsert(Map<String, Object> map, String key, Object value) {
+        if ( (map == null) || (key == null) ){
+            return;
+        }
         List<String> keyElements = Arrays.asList(key.split("\\."));
 
         Map<String, Object> actualMap = map;
