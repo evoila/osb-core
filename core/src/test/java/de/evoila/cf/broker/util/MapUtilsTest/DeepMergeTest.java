@@ -8,67 +8,13 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
-class DeepMergeTest {
-
-    private Map<String, Object> destinationMap;
-    private Map<String, Object> originalDestinationMap; // immutable
+class DeepMergeTest extends BaseTest
+{
     private Map<String, Object> sourceMap;  // initialized with Map.of, so it is immutable and we don't need an explicit check that it is not changed by the deepMerge method
 
-    class ClassForTesting
-    {
-        Integer number;
-        String text;
-        Boolean flag;
-
-        ClassForTesting(Integer number, String text, Boolean flag)
-        {
-            this.number = number;
-            this.text = text;
-            this.flag = flag;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            ClassForTesting that = (ClassForTesting) o;
-            return Objects.equals(number, that.number) &&
-                    Objects.equals(text, that.text) &&
-                    Objects.equals(flag, that.flag);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(number, text, flag);
-        }
-    }
-
     @BeforeEach
-    void setUp()
+    void setUpSubClass()
     {
-        destinationMap = new HashMap<>();
-        Map<String, Object> map1 = new HashMap<>();
-        map1.put("firstSubKey", new ClassForTesting(0, "a", true) );
-        map1.put("secondSubKey", new ClassForTesting(1, "bc", false) );
-        map1.put("thirdSubKey", new ClassForTesting(2, "de", true) );
-        destinationMap.put("firstKey", map1);
-        destinationMap.put("secondKey", new HashMap<>() );
-        Map<String, Object> map3 = new HashMap<>();
-        map3.put("firstSubKey", new ClassForTesting(23, "def", true) );
-        map3.put("secondSubKey", new ClassForTesting(45, "ghi", false) );
-        map3.put("thirdSubKey" , new ClassForTesting(67, "jkl" ,false) );
-        destinationMap.put("thirdKey", map3);
-        destinationMap.put("forthKey", "StringValue");
-
-        originalDestinationMap = Map.of("firstKey", Map.of("firstSubKey", new ClassForTesting(0, "a", true),
-                                                                "secondSubKey", new ClassForTesting(1, "bc", false),
-                                                                "thirdSubKey", new ClassForTesting(2, "de", true) ),
-                                        "secondKey", Collections.EMPTY_MAP,
-                                        "thirdKey", Map.of("firstSubKey", new ClassForTesting(23, "def", true),
-                                                            "secondSubKey", new ClassForTesting(45, "ghi", false),
-                                                            "thirdSubKey" , new ClassForTesting(67, "jkl" ,false) ),
-                                        "forthKey", "StringValue");
-
         sourceMap = Map.of("firstKey", Map.of("firstSubKey", new ClassForTesting(0, "z", true),
                                                     "secondSubKey", new ClassForTesting(4, "xyz", true),
                                                     "forthSubKey", new ClassForTesting(7, "rstu", false)),
@@ -171,7 +117,7 @@ class DeepMergeTest {
 
         Map<String, Object> expectedMap = Map.of("firstKey", Map.of("firstSubKey", new ClassForTesting(0, "z", true),
                                                                         "secondSubKey", new ClassForTesting(4, "xyz", true),
-                                                                        "thirdSubKey", new ClassForTesting(2, "de", true),
+                                                                        "firstKey", new ClassForTesting(2, "de", true),
                                                                         "forthSubKey", new ClassForTesting(7, "rstu", false) ),
                                                 "secondKey", Map.of("fourthSubKey", new ClassForTesting(100, "a", true),
                                                                         "fifthSubKey", new ClassForTesting(101, "klm", false),
