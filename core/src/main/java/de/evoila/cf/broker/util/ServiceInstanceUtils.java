@@ -33,6 +33,9 @@ public class ServiceInstanceUtils {
     }
 
     public static String connectionUrl(List<ServerAddress> serverAddresses) {
+        if (serverAddresses == null) {
+            return "";
+        }
         String url = "";
         for (ServerAddress serverAddress : serverAddresses) {
             if (url.length() > 0)
