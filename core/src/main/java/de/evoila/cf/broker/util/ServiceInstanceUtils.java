@@ -21,13 +21,15 @@ public class ServiceInstanceUtils {
     private static String HOSTS = "hosts";
 
     public static List<ServerAddress> filteredServerAddress(List<ServerAddress> serverAddresses, String filter) {
+        if (serverAddresses == null) {
+            return Collections.emptyList();
+        }
+        if (filter == null) {
+            return new ArrayList<>(serverAddresses);
+        }
         return serverAddresses.stream()
-                    .filter(s -> {
-                        if (s.getName().contains(filter))
-                            return true;
-
-                        return false;
-                    }).collect(Collectors.toList());
+                              .filter(s -> s.getName().contains(filter))
+                              .collect(Collectors.toList());
     }
 
     public static String connectionUrl(List<ServerAddress> serverAddresses) {
