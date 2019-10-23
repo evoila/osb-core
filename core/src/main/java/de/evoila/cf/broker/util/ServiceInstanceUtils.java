@@ -4,6 +4,7 @@ import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.ServiceInstanceRequest;
 import de.evoila.cf.broker.model.ServiceInstanceUpdateRequest;
 import de.evoila.cf.broker.model.catalog.ServerAddress;
+
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -139,13 +140,13 @@ public class ServiceInstanceUtils {
         if (request.getContext() == null ^ serviceInstance.getContext() == null) return false;
         if (request.getParameters() == null ^ serviceInstance.getParameters() == null) return false;
 
-        return serviceInstanceId.equals(serviceInstance.getId())
-                && request.getServiceDefinitionId().equals(serviceInstance.getServiceDefinitionId())
-                && request.getPlanId().equals(serviceInstance.getPlanId())
-                && request.getOrganizationGuid().equals(serviceInstance.getOrganizationGuid())
-                && request.getSpaceGuid().equals(serviceInstance.getSpaceGuid())
-                && compareContext(request, serviceInstance)
-                && request.getParameters().equals(serviceInstance.getParameters());
+        return serviceInstanceId.equals(serviceInstance.getId()) &&
+               Objects.equals(request.getServiceDefinitionId(), serviceInstance.getServiceDefinitionId()) &&
+               Objects.equals(request.getPlanId(), serviceInstance.getPlanId()) &&
+               Objects.equals(request.getOrganizationGuid(), serviceInstance.getOrganizationGuid()) &&
+               Objects.equals(request.getSpaceGuid(), serviceInstance.getSpaceGuid()) &&
+               compareContext(request, serviceInstance) &&
+               Objects.equals(request.getParameters(), serviceInstance.getParameters());
     }
 
     /**
