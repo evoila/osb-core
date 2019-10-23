@@ -38,6 +38,9 @@ public class ServiceInstanceUtils {
         }
         String url = "";
         for (ServerAddress serverAddress : serverAddresses) {
+            if (serverAddress.getIp() == null) {
+                continue;
+            }
             if (url.length() > 0)
                 url = url.concat(",");
 
