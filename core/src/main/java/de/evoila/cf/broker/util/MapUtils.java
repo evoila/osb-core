@@ -12,6 +12,9 @@ import java.util.*;
 public class MapUtils {
 
     public static void deepMerge(Map<String, Object> map1, Map<String, Object> map2) {
+        if ( (map1 == null) || (map2 == null) ) {
+            return;
+        }
         for(String key : map2.keySet()) {
             Object value2 = map2.get(key);
             if (map1.containsKey(key)) {
