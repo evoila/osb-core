@@ -174,15 +174,15 @@ public class ServiceInstanceUtils {
      * @return true if update would have effects and false if it would not or a parameter is null
      */
     public static boolean isEffectivelyUpdating(ServiceInstance serviceInstance, ServiceInstanceUpdateRequest request) {
-        if (serviceInstance == null || request == null) return false;
-        if (request.getContext() == null ^ serviceInstance.getContext() == null) return true;
-        if (request.getParameters() == null ^ serviceInstance.getParameters() == null) return true;
+        if (serviceInstance == null || request == null) {
+            return false;
+        }
 
-        if (!request.getServiceDefinitionId().equals(serviceInstance.getServiceDefinitionId())
-            || !request.getPlanId().equals(serviceInstance.getPlanId()))
-            return true;
-
-        return !request.getContext().equals(serviceInstance.getContext())
-                || !request.getParameters().equals(serviceInstance.getParameters());
+        return (request.getContext() == null ^ serviceInstance.getContext() == null) ||
+               (request.getParameters() == null ^ serviceInstance.getParameters() == null) ||
+               !Objects.equals(request.getServiceDefinitionId(), serviceInstance.getServiceDefinitionId()) ||
+               !Objects.equals(request.getPlanId(), serviceInstance.getPlanId()) ||
+               !Objects.equals(request.getContext(), serviceInstance.getContext()) ||
+               !Objects.equals(request.getParameters(), serviceInstance.getParameters());
     }
 }
