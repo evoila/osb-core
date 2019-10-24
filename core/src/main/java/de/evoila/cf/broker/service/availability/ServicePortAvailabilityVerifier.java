@@ -3,7 +3,6 @@
  */
 package de.evoila.cf.broker.service.availability;
 
-import de.evoila.cf.broker.exception.PlatformException;
 import de.evoila.cf.broker.model.catalog.ServerAddress;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.service.ServiceInstanceAvailabilityVerifier;
@@ -31,15 +30,7 @@ public class ServicePortAvailabilityVerifier implements ServiceInstanceAvailabil
 
 	private final Logger log = LoggerFactory.getLogger(ServicePortAvailabilityVerifier.class);
 
-	public void timeout(int timeout) {
-		try {
-			Thread.sleep(timeout);
-		} catch (InterruptedException e1) {
-			log.info("Starting new timeout interval was interrupted.", e1);
-		}
-	}
-
-	private boolean execute(String ip, int port) {
+	private final AvailabilityVerifier availabilityVerifier = (ip, port) -> {
 		boolean available = false;
 
 		log.info("Verifying port availability on: {}:{}", ip, port);
@@ -56,7 +47,7 @@ public class ServicePortAvailabilityVerifier implements ServiceInstanceAvailabil
 
 			timeout(SOCKET_TIMEOUT);
 		} finally {
-			if (socket != null && socket.isConnected()) {
+			if (socket.isConnected()) {
 				try {
 					socket.close();
 				} catch (IOException e) {
@@ -65,16 +56,24 @@ public class ServicePortAvailabilityVerifier implements ServiceInstanceAvailabil
 			}
 		}
 		return available;
+	};
+
+	public void timeout(int timeout) {
+		try {
+			Thread.sleep(timeout);
+		} catch (InterruptedException e1) {
+			log.info("Starting new timeout interval was interrupted.", e1);
+		}
 	}
 
-	private boolean verifyServiceAvailability(String ip, int port, boolean useInitialTimeout) throws PlatformException {
+	private boolean verifyServiceAvailability(String ip, int port, boolean useInitialTimeout) {
 		boolean available = false;
 
 		if (useInitialTimeout)
 			this.timeout(INITIAL_TIMEOUT);
 		
 		for (int i = 0; i < connectionTimeouts; i++) {
-			available = this.execute(ip, port);
+			available = availabilityVerifier.verify(ip, port);
 
 			log.info("Service Port availability: {}", available);
 
@@ -86,7 +85,7 @@ public class ServicePortAvailabilityVerifier implements ServiceInstanceAvailabil
 		return available;
 	}
 
-	public boolean verifyServiceAvailability(ServiceInstance serviceInstance, boolean useInitialTimeout) throws PlatformException {
+	public boolean verifyServiceAvailability(ServiceInstance serviceInstance, boolean useInitialTimeout) {
 		List<ServerAddress> serverAddresses = serviceInstance.getHosts();
 		for (ServerAddress serverAddress : serverAddresses) {
 			if (!verifyServiceAvailability(serverAddress.getIp(), serverAddress.getPort(), useInitialTimeout)) {
