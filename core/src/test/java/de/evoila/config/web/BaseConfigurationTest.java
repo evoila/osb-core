@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,6 +58,8 @@ class BaseConfigurationTest {
             when(corsRegistration.allowCredentials(true))
                     .thenReturn(corsRegistration);
             configuration.addCorsMappings(corsRegistry);
+            verifyNoMoreInteractions(corsRegistry,
+                                     corsRegistration);
         }
 
     }
@@ -85,6 +88,8 @@ class BaseConfigurationTest {
             ArgumentCaptor<HandlerInterceptor> interceptorCaptor = ArgumentCaptor.forClass(HandlerInterceptor.class);
             verify(interceptorRegistry, times(3))
                     .addInterceptor(interceptorCaptor.capture());
+            verifyNoMoreInteractions(interceptorRegistry,
+                                     interceptorRegistration);
             List<HandlerInterceptor> capturedValues = interceptorCaptor.getAllValues();
             assertSame(ApiVersionInterceptor.class, capturedValues.get(0).getClass());
             assertSame(OriginatingIdentityInterceptor.class, capturedValues.get(1).getClass());
