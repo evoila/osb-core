@@ -21,10 +21,12 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import de.evoila.cf.security.uaa.UaaRelyingPartyFilter;
+import de.evoila.cf.security.uaa.handler.CommonCorsAuthenticationEntryPoint;
 import de.evoila.cf.security.uaa.handler.UaaRelyingPartyAuthenticationFailureHandler;
 import de.evoila.cf.security.uaa.handler.UaaRelyingPartyAuthenticationSuccessHandler;
 import de.evoila.cf.security.uaa.provider.UaaRelyingPartyAuthenticationProvider;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -248,6 +250,17 @@ class UaaSecurityConfigurationTest {
             assertSame(failureHandlerCaptor.getValue().getClass(), UaaRelyingPartyAuthenticationFailureHandler.class);
             verify(csrfConfigurer, times(1))
                     .disable();
+        }
+
+    }
+
+    @Nested
+    class authenticationEntryPoint {
+
+        @Test
+        void validObjectReturned() {
+            CommonCorsAuthenticationEntryPoint result = (CommonCorsAuthenticationEntryPoint) configuration.authenticationEntryPoint();
+            assertEquals("uaaEndpointRealm", result.getRealmName());
         }
 
     }
