@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 
 import de.evoila.cf.security.uaa.provider.UaaRelyingPartyAuthenticationProvider;
 
@@ -16,6 +18,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UaaSecurityConfigurationTest {
@@ -24,6 +27,10 @@ class UaaSecurityConfigurationTest {
     private AuthenticationManagerBuilder authenticationManagerBuilder;
     @Mock
     private UaaRelyingPartyAuthenticationProvider uaaRelyingPartyAuthenticationProvider;
+    @Mock
+    private WebSecurity webSecurity;
+    @Mock
+    private WebSecurity.IgnoredRequestConfigurer ignoredRequestConfigurer;
 
     private UaaSecurityConfiguration configuration;
 
@@ -54,6 +61,24 @@ class UaaSecurityConfigurationTest {
             verify(authenticationManagerBuilder, times(1))
                     .authenticationProvider(uaaRelyingPartyAuthenticationProvider);
             verifyNoMoreInteractions(authenticationManagerBuilder);
+        }
+
+    }
+
+    @Nested
+    class configureWebSecurity {
+
+        @Test
+        void allMethodCallsVerified() {
+            when(webSecurity.ignoring())
+                    .thenReturn(ignoredRequestConfigurer);
+            when(ignoredRequestConfigurer.antMatchers(HttpMethod.GET, "/custom/v2/authentication/{serviceInstanceId}"))
+                    .thenReturn(ignoredRequestConfigurer);
+            when(ignoredRequestConfigurer.antMatchers(HttpMethod.GET, "/custom/v2/authentication/{serviceInstanceId}/confirm"))
+                    .thenReturn(ignoredRequestConfigurer);
+            configuration.configure(webSecurity);
+            verifyNoMoreInteractions(webSecurity);
+            verifyNoMoreInteractions(ignoredRequestConfigurer);
         }
 
     }
