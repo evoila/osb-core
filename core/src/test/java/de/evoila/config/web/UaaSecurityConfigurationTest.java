@@ -37,6 +37,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -85,7 +86,7 @@ class UaaSecurityConfigurationTest {
             configuration.configure(authenticationManagerBuilder);
             verify(authenticationManagerBuilder, times(1))
                     .authenticationProvider(uaaRelyingPartyAuthenticationProvider);
-            verifyNoMoreInteractions(authenticationManagerBuilder);
+            verifyZeroInteractions(authenticationManagerBuilder);
         }
 
     }
@@ -107,8 +108,8 @@ class UaaSecurityConfigurationTest {
             when(ignoredRequestConfigurer.antMatchers(HttpMethod.GET, "/custom/v2/authentication/{serviceInstanceId}/confirm"))
                     .thenReturn(ignoredRequestConfigurer);
             configuration.configure(webSecurity);
-            verifyNoMoreInteractions(webSecurity);
-            verifyNoMoreInteractions(ignoredRequestConfigurer);
+            verifyNoMoreInteractions(webSecurity,
+                                     ignoredRequestConfigurer);
         }
 
     }
@@ -181,7 +182,9 @@ class UaaSecurityConfigurationTest {
                 ArgumentCaptor<UaaRelyingPartyAuthenticationFailureHandler> failureHandlerCaptor = ArgumentCaptor.forClass(UaaRelyingPartyAuthenticationFailureHandler.class);
                 verify(uaaRelyingPartyFilter, times(1))
                         .setFailureHandler(failureHandlerCaptor.capture());
-                verifyNoMoreInteractions(uaaRelyingPartyFilter);
+                verifyNoMoreInteractions(authenticationManager,
+                                         uaaRelyingPartyFilter,
+                                         httpSecurity);
                 assertSame(successHandlerCaptor.getValue().getClass(), UaaRelyingPartyAuthenticationSuccessHandler.class);
                 assertSame(failureHandlerCaptor.getValue().getClass(), UaaRelyingPartyAuthenticationFailureHandler.class);
                 assertSame(expectedE, e);
@@ -245,11 +248,22 @@ class UaaSecurityConfigurationTest {
             ArgumentCaptor<UaaRelyingPartyAuthenticationFailureHandler> failureHandlerCaptor = ArgumentCaptor.forClass(UaaRelyingPartyAuthenticationFailureHandler.class);
             verify(uaaRelyingPartyFilter, times(1))
                     .setFailureHandler(failureHandlerCaptor.capture());
-            verifyNoMoreInteractions(uaaRelyingPartyFilter);
-            assertSame(successHandlerCaptor.getValue().getClass(), UaaRelyingPartyAuthenticationSuccessHandler.class);
-            assertSame(failureHandlerCaptor.getValue().getClass(), UaaRelyingPartyAuthenticationFailureHandler.class);
             verify(csrfConfigurer, times(1))
                     .disable();
+            verifyNoMoreInteractions(authenticationManager,
+                                     uaaRelyingPartyFilter,
+                                     httpSecurity,
+                                     requestMatcherConfigurer,
+                                     corsConfigurer,
+                                     expressionInterceptUrlRegistry,
+                                     authorizedUrl,
+                                     sessionManagementConfigurer,
+                                     exceptionHandlingConfigurer,
+                                     authenticationEntryPoint,
+                                     csrfConfigurer);
+            assertSame(successHandlerCaptor.getValue().getClass(), UaaRelyingPartyAuthenticationSuccessHandler.class);
+            assertSame(failureHandlerCaptor.getValue().getClass(), UaaRelyingPartyAuthenticationFailureHandler.class);
+
         }
 
     }
