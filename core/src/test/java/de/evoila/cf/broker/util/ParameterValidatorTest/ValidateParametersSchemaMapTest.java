@@ -1,9 +1,10 @@
-package de.evoila.cf.broker.util;
+package de.evoila.cf.broker.util.ParameterValidatorTest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.model.json.schema.JsonSchema;
+import de.evoila.cf.broker.util.ParameterValidator;
 import org.everit.json.schema.ValidationException;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,16 +25,13 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class ParameterValidatorValidateParametersSchemaMapTest
+class ValidateParametersSchemaMapTest extends BaseTest
 {
     // paths to resource files
     private final String SCHEMA_PATH = Path.of(".", "src", "test", "resources", "ParameterValidator", "testJsonSchema.json").toString();
     private final String VALID_JSON_PATH = Path.of(".", "src", "test", "resources", "ParameterValidator", "validJson.json").toString();
     private final String INVALID_JSON_PATH = Path.of(".", "src", "test", "resources", "ParameterValidator", "invalidJson.json").toString();
 
-    // mock objects
-    private ObjectMapper mockedObjectMapper;
     // data read from resource files
     private JsonSchema schema;
     private String schemaString;
@@ -61,21 +59,6 @@ class ParameterValidatorValidateParametersSchemaMapTest
         }
 
         return fileAsString;
-    }
-
-    /**
-     * Replaces the object mapper in the class that is tested with a Mockito.spy object.
-     */
-    private void replaceObjectMapperWithSpy()
-    {
-        mockedObjectMapper = spy(new ObjectMapper());
-        try {
-            FieldSetter.setField(ParameterValidator.class,
-                                    ParameterValidator.class.getDeclaredField("objectMapper"),
-                                    mockedObjectMapper);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException("Setting field failed", e);
-        }
     }
 
     /**
