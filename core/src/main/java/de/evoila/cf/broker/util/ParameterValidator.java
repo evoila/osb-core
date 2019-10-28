@@ -81,13 +81,16 @@ public class ParameterValidator {
 
     public static void validateParameters(Map<String, Object> input, Plan plan,
                                           boolean isUpdate) throws ValidationException, ServiceBrokerException {
+        if (planHasInstanceSchema(plan, isUpdate) == false) {
+            return;
+        }
         JsonSchema jsonSchema = null;
-        if (!isUpdate && planHasInstanceSchema(plan, isUpdate)) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getCreate().getParameters();
-        } else if (planHasInstanceSchema(plan, isUpdate)) {
+        if (isUpdate) {
             jsonSchema = plan.getSchemas()
                     .getServiceInstance().getUpdate().getParameters();
+        } else {
+            jsonSchema = plan.getSchemas()
+                    .getServiceInstance().getCreate().getParameters();
         }
 
         if (jsonSchema != null) {
