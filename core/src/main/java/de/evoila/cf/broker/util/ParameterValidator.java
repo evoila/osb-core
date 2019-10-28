@@ -25,7 +25,7 @@ public class ParameterValidator {
     static ObjectMapper objectMapper = new ObjectMapper();
 
     public static void validateParameters(ServiceInstanceBindingRequest serviceInstanceBindingRequest, Plan plan,
-                                          boolean isUpdate) throws ValidationException, ServiceBrokerException {
+                                          boolean isUpdate) throws ValidationException, ServiceBrokerException, IllegalArgumentException {
         if (serviceInstanceBindingRequest == null) {
             throw new IllegalArgumentException("Parameter ServiceInstanceBindingRequest is null");
         }
