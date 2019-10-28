@@ -61,7 +61,10 @@ public class ParameterValidator {
     }
 
     public static void validateParameters(ServiceInstanceUpdateRequest serviceInstanceUpdateRequest, Plan plan,
-                                          boolean isUpdate) throws ValidationException, ServiceBrokerException {
+                                          boolean isUpdate) throws ValidationException, ServiceBrokerException, IllegalArgumentException {
+        if (serviceInstanceUpdateRequest == null) {
+            throw new IllegalArgumentException("Parameter ServiceInstanceUpdateRequest is null");
+        }
         Map<String, Object> serviceInstanceRequestParams = serviceInstanceUpdateRequest.getParameters();
 
         JsonSchema jsonSchema = null;
