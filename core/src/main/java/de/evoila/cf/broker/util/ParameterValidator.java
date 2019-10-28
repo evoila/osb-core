@@ -29,18 +29,20 @@ public class ParameterValidator {
         if (serviceInstanceBindingRequest == null) {
             throw new IllegalArgumentException("Parameter ServiceInstanceBindingRequest is null");
         }
-        Map<String, Object> serviceInstanceRequestParams = serviceInstanceBindingRequest.getParameters();
-
-        JsonSchema jsonSchema = null;
-        if (!isUpdate && planHasBindingSchema(plan, isUpdate)) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceBinding().getCreate().getParameters();
-        } else if (planHasBindingSchema(plan, isUpdate)) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceBinding().getUpdate().getParameters();
+        if (planHasBindingSchema(plan, isUpdate) == false) {
+            return;
         }
+        JsonSchema jsonSchema = null;
+        if (isUpdate) {
+            jsonSchema = plan.getSchemas()
+                             .getServiceBinding().getUpdate().getParameters();
+        } else {
+            jsonSchema = plan.getSchemas()
+                             .getServiceBinding().getCreate().getParameters();
+        }
+
         if (jsonSchema != null) {
-            validateParameters(jsonSchema, serviceInstanceRequestParams);
+            validateParameters(jsonSchema, serviceInstanceBindingRequest.getParameters());
         }
     }
 
