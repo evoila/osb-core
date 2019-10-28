@@ -38,7 +38,7 @@ public class ValidateParametersServiceInstanceRequestPlanBooleanTest extends Bas
     }
 
     @Test
-    void serviceInstanceUpdateRequestNull()
+    void serviceInstanceRequestNull()
     {
         // isUpdate true
         assertThrows(IllegalArgumentException.class, () -> {
@@ -53,13 +53,13 @@ public class ValidateParametersServiceInstanceRequestPlanBooleanTest extends Bas
     }
 
     @Nested
-    class serviceInstanceUpdateRequestNotNull
+    class serviceInstanceRequestNotNull
     {
         @Mock
         private SchemaServiceCreate mockedServiceCreate;
 
         @BeforeEach
-        void setUpServiceInstanceUpdateRequestNotNull()
+        void setUpServiceInstanceRequestNotNull()
         {
             when(mockedServiceInstanceRequest.getParameters())
                     .thenReturn(inputMap);
