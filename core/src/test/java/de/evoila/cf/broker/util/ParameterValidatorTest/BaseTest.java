@@ -35,7 +35,7 @@ public class BaseTest
     String     invalidJsonString;
 
     // input data for methods under testing
-    Map<String, Object> inputMap;
+    Map<String, Object> parametersMap;
 
     /**
      * Reads a file and stores its content as a string.
@@ -67,7 +67,8 @@ public class BaseTest
         File file = new File(SCHEMA_PATH);
         ObjectMapper mapper = new ObjectMapper();
         try {
-            schema = mapper.readValue(file, JsonSchema.class);
+            schema = mapper.readValue(file,
+                                      JsonSchema.class);
         } catch (IOException e) {
             throw new RuntimeException("Loading test JSON schema failed", e);
         }
@@ -86,13 +87,13 @@ public class BaseTest
     }
 
     /**
-     * Initializes the member 'inputMap'. It contains the data from validJson.json.
+     * Initializes the member 'parametersMap'. It contains the data from validJson.json.
      */
-    void initializeInputMap()
+    void initializeParametersMap()
     {
-        inputMap = new HashMap<>();
-        inputMap.put("price", 2);
-        inputMap.put("name", "randomName");
+        parametersMap = new HashMap<>();
+        parametersMap.put("price", 2);
+        parametersMap.put("name", "randomName");
     }
 
     /**

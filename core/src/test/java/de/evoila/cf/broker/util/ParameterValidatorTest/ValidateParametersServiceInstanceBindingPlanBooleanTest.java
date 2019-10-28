@@ -21,323 +21,262 @@ public class ValidateParametersServiceInstanceBindingPlanBooleanTest extends Bas
     @Mock
     private Plan                          mockedPlan;
     @Mock
-    private Schemas                       mockedSchemas;
-    @Mock
-    private SchemaServiceBinding          mockedServiceBinding;
-    @Mock
     private ServiceInstanceBindingRequest mockedServiceInstanceBindingRequest;
 
-    @BeforeEach
-    void setUpValidateParameters()
-    {
-        readJsonSchema();
-        initializeInputMap();
-    }
-
     @Nested
-    class isUpdateFalse
+    class inputParameterNull
     {
         @Test
-        void serviceInstanceBindingRequestNull()
-        {
-            assertThrows(IllegalArgumentException.class, () -> {
-                     ParameterValidator.validateParameters((ServiceInstanceBindingRequest) null, mockedPlan, false);
-                 }
-            );
-        }
-
-        @Test
-        void planNull() throws ServiceBrokerException
-        {
-            ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, null, false);
-        }
-
-        @Nested
-        class mocksOfGettersOnPlan
-        {
-            @Mock
-            private SchemaServiceCreate mockedServiceCreate;
-
-            @Nested
-            class gettersReturnNull
-            {
-                @Test
-                void getSchemasReturnsNull() throws ServiceBrokerException
-                {
-                    when(mockedPlan.getSchemas())
-                            .thenReturn(null);
-
-                    ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, false);
-                }
-
-                @Test
-                void getServiceInstanceReturnsNull() throws ServiceBrokerException
-                {
-                    when(mockedPlan.getSchemas())
-                            .thenReturn(mockedSchemas);
-                    when(mockedSchemas.getServiceBinding())
-                            .thenReturn(null);
-
-                    ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, false);
-                }
-
-                @Test
-                void getCreateReturnsNull() throws ServiceBrokerException
-                {
-                    when(mockedPlan.getSchemas())
-                            .thenReturn(mockedSchemas);
-                    when(mockedSchemas.getServiceBinding())
-                            .thenReturn(mockedServiceBinding);
-                    when(mockedServiceBinding.getCreate())
-                            .thenReturn(null);
-
-                    ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, false);
-                }
-
-                @Test
-                void getParametersReturnsNull() throws ServiceBrokerException
-                {
-                    when(mockedPlan.getSchemas())
-                            .thenReturn(mockedSchemas);
-                    when(mockedSchemas.getServiceBinding())
-                            .thenReturn(mockedServiceBinding);
-                    when(mockedServiceBinding.getCreate())
-                            .thenReturn(mockedServiceCreate);
-                    when(mockedServiceCreate.getParameters())
-                            .thenReturn(null);
-
-                    ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, false);
-                }
-
-            }
-
-            @Nested
-            class gettersReturnNotNull
-            {
-                @BeforeEach
-                void setUpGettersReturnNotNull()
-                {
-                    replaceObjectMapperWithSpy();
-                    readJsonFiles();
-
-                    when(mockedPlan.getSchemas())
-                            .thenReturn(mockedSchemas);
-                    when(mockedSchemas.getServiceBinding())
-                            .thenReturn(mockedServiceBinding);
-                    when(mockedServiceBinding.getCreate())
-                            .thenReturn(mockedServiceCreate);
-                    when(mockedServiceCreate.getParameters())
-                            .thenReturn(schema);
-                }
-
-                @Test
-                void serviceInstanceBindingRequestParametersNull()
-                {
-                    when(mockedServiceInstanceBindingRequest.getParameters() )
-                            .thenReturn(null);
-
-                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                                                                        ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, false);
-                                                                    }
-                                                                   );
-                    assertSame(JSONException.class, exception.getCause().getClass());
-                }
-
-                @Test
-                void validateParametersThrowsServiceBrokerException() throws JsonProcessingException
-                {
-                    JSONException mockedException = new JSONException("Test"){};
-                    doThrow(mockedException)
-                            .when(mockedObjectMapper)
-                            .writeValueAsString(schema);
-
-                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                                                                        ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, false);
-                                                                    }
-                                                                   );
-                    assertSame(mockedException, exception.getCause());
-                }
-
-                @Test
-                void validateParametersThrowsValidationException() throws JsonProcessingException
-                {
-                    when(mockedServiceInstanceBindingRequest.getParameters())
-                            .thenReturn(inputMap);
-                    doReturn(schemaString)
-                            .when(mockedObjectMapper)
-                            .writeValueAsString(schema);
-                    doReturn(invalidJsonString)
-                            .when(mockedObjectMapper)
-                            .writeValueAsString(inputMap);
-
-                    assertThrows(ValidationException.class, () -> {
-                             ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, false);
+        void serviceInstanceBindingRequestNull() {
+            assertThrows(IllegalArgumentException.class,
+                         () -> {
+                             ParameterValidator.validateParameters((ServiceInstanceBindingRequest) null,
+                                                                   mockedPlan,
+                                                                   false);
                          }
-                    );
-                }
+                        );
 
-                @Test
-                void validateParametersDoesNotThrow() throws ServiceBrokerException
-                {
-                    when(mockedServiceInstanceBindingRequest.getParameters())
-                            .thenReturn(inputMap);
-                    
-                    ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, false);
-                }
-            }
+            assertThrows(IllegalArgumentException.class,
+                         () -> {
+                             ParameterValidator.validateParameters((ServiceInstanceBindingRequest) null,
+                                                                   mockedPlan,
+                                                                   true);
+                         }
+                        );
+        }
+
+        @Test
+        void planNull() throws ServiceBrokerException {
+            ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                  null,
+                                                  false);
+
+            ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                  null,
+                                                  false);
         }
     }
 
     @Nested
-    class isUpdateTrue
+    class mocksOfGettersOnPlan
     {
-        @Test
-        void serviceInstanceBindingRequestNull()
-        {
-            assertThrows(IllegalArgumentException.class, () -> {
-                     ParameterValidator.validateParameters((ServiceInstanceBindingRequest) null, mockedPlan, true);
-                 }
-            );
-        }
+        @Mock
+        private Schemas              mockedSchemas;
+        @Mock
+        private SchemaServiceBinding mockedServiceBinding;
+        @Mock
+        private SchemaServiceCreate  mockedServiceCreate;
+        @Mock
+        private SchemaServiceUpdate  mockedServiceUpdate;
 
-        @Test
-        void planNull() throws ServiceBrokerException
+        @Nested
+        class gettersReturnNull
         {
-            ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, null, true);
+            @Test
+            void getSchemasReturnsNull() throws ServiceBrokerException
+            {
+                when(mockedPlan.getSchemas())
+                        .thenReturn(null);
+
+                ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                      mockedPlan,
+                                                      false);
+
+                ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                      mockedPlan,
+                                                      true);
+            }
+
+            @Test
+            void getServiceInstanceReturnsNull() throws ServiceBrokerException
+            {
+                when(mockedPlan.getSchemas())
+                        .thenReturn(mockedSchemas);
+                when(mockedSchemas.getServiceBinding())
+                        .thenReturn(null);
+
+                ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                      mockedPlan,
+                                                      false);
+
+                ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                      mockedPlan,
+                                                      true);
+            }
+
+            @Test
+            void getCreateReturnsNull() throws ServiceBrokerException
+            {
+                when(mockedPlan.getSchemas())
+                        .thenReturn(mockedSchemas);
+                when(mockedSchemas.getServiceBinding())
+                        .thenReturn(mockedServiceBinding);
+                when(mockedServiceBinding.getCreate())
+                        .thenReturn(null);
+                when(mockedServiceBinding.getUpdate())
+                        .thenReturn(null);
+
+                ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                      mockedPlan,
+                                                      false);
+
+                ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                      mockedPlan,
+                                                      true);
+            }
+
+            @Test
+            void getParametersReturnsNull() throws ServiceBrokerException
+            {
+                when(mockedPlan.getSchemas())
+                        .thenReturn(mockedSchemas);
+                when(mockedSchemas.getServiceBinding())
+                        .thenReturn(mockedServiceBinding);
+                when(mockedServiceBinding.getCreate())
+                        .thenReturn(mockedServiceCreate);
+                when(mockedServiceCreate.getParameters())
+                        .thenReturn(null);
+                when(mockedServiceBinding.getUpdate())
+                        .thenReturn(mockedServiceUpdate);
+                when(mockedServiceUpdate.getParameters())
+                        .thenReturn(null);
+
+                ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                      mockedPlan,
+                                                      false);
+
+                ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                      mockedPlan,
+                                                      true);
+            }
+
         }
 
         @Nested
-        class mocksOfGettersOnPlan
+        class gettersReturnNotNull
         {
-            @Mock
-            private SchemaServiceUpdate   mockedServiceUpdate;
-
-            @Nested
-            class gettersReturnNull
+            @BeforeEach
+            void setUpGettersReturnNotNull()
             {
-                @Test
-                void getSchemasReturnsNull() throws ServiceBrokerException
-                {
-                    when(mockedPlan.getSchemas())
-                            .thenReturn(null);
+                replaceObjectMapperWithSpy();
+                readJsonFiles();
+                readJsonSchema();
+                initializeParametersMap();
 
-                    ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, true);
-                }
-
-                @Test
-                void getServiceInstanceReturnsNull() throws ServiceBrokerException
-                {
-                    when(mockedPlan.getSchemas())
-                            .thenReturn(mockedSchemas);
-                    when(mockedSchemas.getServiceBinding())
-                            .thenReturn(null);
-
-                    ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, true);
-                }
-
-                @Test
-                void getCreateReturnsNull() throws ServiceBrokerException
-                {
-                    when(mockedPlan.getSchemas())
-                            .thenReturn(mockedSchemas);
-                    when(mockedSchemas.getServiceBinding())
-                            .thenReturn(mockedServiceBinding);
-                    when(mockedServiceBinding.getUpdate())
-                            .thenReturn(null);
-
-                    ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, true);
-                }
-
-                @Test
-                void getParametersReturnsNull() throws ServiceBrokerException
-                {
-                    when(mockedPlan.getSchemas())
-                            .thenReturn(mockedSchemas);
-                    when(mockedSchemas.getServiceBinding())
-                            .thenReturn(mockedServiceBinding);
-                    when(mockedServiceBinding.getUpdate())
-                            .thenReturn(mockedServiceUpdate);
-                    when(mockedServiceUpdate.getParameters())
-                            .thenReturn(null);
-
-                    ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, true);
-                }
-
+                when(mockedPlan.getSchemas())
+                        .thenReturn(mockedSchemas);
+                when(mockedSchemas.getServiceBinding())
+                        .thenReturn(mockedServiceBinding);
+                when(mockedServiceBinding.getCreate())
+                        .thenReturn(mockedServiceCreate);
+                when(mockedServiceCreate.getParameters())
+                        .thenReturn(schema);
+                when(mockedServiceBinding.getUpdate())
+                        .thenReturn(mockedServiceUpdate);
+                when(mockedServiceUpdate.getParameters())
+                        .thenReturn(schema);
             }
 
-            @Nested
-            class gettersReturnNotNull
+            @Test
+            void serviceInstanceBindingRequestParametersNull()
             {
-                @BeforeEach
-                void setUpGettersReturnNotNull()
-                {
-                    replaceObjectMapperWithSpy();
-                    readJsonFiles();
+                when(mockedServiceInstanceBindingRequest.getParameters() )
+                        .thenReturn(null);
 
-                    when(mockedPlan.getSchemas())
-                            .thenReturn(mockedSchemas);
-                    when(mockedSchemas.getServiceBinding())
-                            .thenReturn(mockedServiceBinding);
-                    when(mockedServiceBinding.getUpdate())
-                            .thenReturn(mockedServiceUpdate);
-                    when(mockedServiceUpdate.getParameters())
-                            .thenReturn(schema);
-                }
-
-                @Test
-                void serviceInstanceBindingRequestParametersNull()
-                {
-                    when(mockedServiceInstanceBindingRequest.getParameters() )
-                            .thenReturn(null);
-
-                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                                                                        ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, true);
+                ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
+                                                                () -> {
+                                                                        ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                                                                              mockedPlan,
+                                                                                                              false);
                                                                     }
-                                                                   );
-                    assertSame(JSONException.class, exception.getCause().getClass());
-                }
+                                                                );
+                assertSame(JSONException.class,
+                           exception.getCause()
+                                    .getClass());
 
-                @Test
-                void validateParametersThrowsServiceBrokerException() throws JsonProcessingException
-                {
-                    JSONException mockedException = new JSONException("Test"){};
-                    doThrow(mockedException)
-                            .when(mockedObjectMapper)
-                            .writeValueAsString(schema);
+                exception = assertThrows(ServiceBrokerException.class,
+                                         () -> {
+                                                ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                                                      mockedPlan,
+                                                                                      true);
+                                            }
+                                       );
+                assertSame(JSONException.class,
+                           exception.getCause()
+                                    .getClass());
+            }
 
-                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                                                                        ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, true);
+            @Test
+            void validateParametersThrowsServiceBrokerException() throws JsonProcessingException
+            {
+                JSONException mockedException = new JSONException("Test"){};
+                doThrow(mockedException)
+                        .when(mockedObjectMapper)
+                        .writeValueAsString(schema);
+
+                ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
+                                                                () -> {
+                                                                        ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                                                                              mockedPlan,
+                                                                                                              false);
                                                                     }
-                                                                   );
-                    assertSame(mockedException, exception.getCause());
-                }
+                                                               );
+                assertSame(mockedException,
+                           exception.getCause());
 
-                @Test
-                void validateParametersThrowsValidationException() throws JsonProcessingException
-                {
-                    when(mockedServiceInstanceBindingRequest.getParameters())
-                            .thenReturn(inputMap);
-                    doReturn(schemaString)
-                            .when(mockedObjectMapper)
-                            .writeValueAsString(schema);
-                    doReturn(invalidJsonString)
-                            .when(mockedObjectMapper)
-                            .writeValueAsString(inputMap);
+                exception = assertThrows(ServiceBrokerException.class,
+                                         () -> {
+                                                ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                                                      mockedPlan,
+                                                                                      true);
+                                            }
+                                        );
+                assertSame(mockedException,
+                           exception.getCause());
+            }
 
-                    assertThrows(ValidationException.class, () -> {
-                            ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, true);
-                        }
-                    );
-                }
+            @Test
+            void validateParametersThrowsValidationException() throws JsonProcessingException
+            {
+                when(mockedServiceInstanceBindingRequest.getParameters())
+                        .thenReturn(parametersMap);
+                doReturn(schemaString)
+                        .when(mockedObjectMapper)
+                        .writeValueAsString(schema);
+                doReturn(invalidJsonString)
+                        .when(mockedObjectMapper)
+                        .writeValueAsString(parametersMap);
 
-                @Test
-                void validateParametersDoesNotThrow() throws ServiceBrokerException
-                {
-                    when(mockedServiceInstanceBindingRequest.getParameters())
-                            .thenReturn(inputMap);
+                assertThrows(ValidationException.class,
+                             () -> {
+                                    ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                                          mockedPlan,
+                                                                          false);
+                                }
+                            );
 
-                    ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest, mockedPlan, true);
-                }
+                assertThrows(ValidationException.class,
+                             () -> {
+                                 ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                                       mockedPlan,
+                                                                       true);
+                             }
+                            );
+            }
+
+            @Test
+            void validateParametersDoesNotThrow() throws ServiceBrokerException
+            {
+                when(mockedServiceInstanceBindingRequest.getParameters())
+                        .thenReturn(parametersMap);
+
+                ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                      mockedPlan,
+                                                      false);
+
+                ParameterValidator.validateParameters(mockedServiceInstanceBindingRequest,
+                                                      mockedPlan,
+                                                      true);
             }
         }
     }

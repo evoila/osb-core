@@ -20,120 +20,160 @@ class ValidateParametersSchemaMapTest extends BaseTest
     {
         replaceObjectMapperWithSpy();
         readJsonSchema();
-        initializeInputMap();
-        readJsonFiles();
+        initializeParametersMap();
     }
 
     @Nested
-    class inputValidator {
+    class inputValidator
+    {
         @Test
-        void schemaNull() {
-            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                        ParameterValidator.validateParameters(null, inputMap);
-                    }
-            );
-            assertSame(JSONException.class, exception.getCause().getClass());
+        void schemaNull()
+        {
+            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
+                                                            () -> {
+                                                                    ParameterValidator.validateParameters(null,
+                                                                                                          parametersMap);
+                                                                }
+                                                            );
+            assertSame(JSONException.class,
+                       exception.getCause()
+                                .getClass());
         }
 
         @Test
-        void inputNull() {
-            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                        ParameterValidator.validateParameters(schema, null);
-                    }
-            );
-            assertSame(JSONException.class, exception.getCause().getClass());
+        void inputNull()
+        {
+            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
+                                                            () -> {
+                                                                    ParameterValidator.validateParameters(schema,
+                                                                                                          null);
+                                                                }
+                                                            );
+            assertSame(JSONException.class,
+                       exception.getCause()
+                                .getClass());
         }
     }
 
     @Nested
-    class writeValueAsStringThrows {
+    class writeValueAsStringThrows
+    {
         @Test
-        void jsonExceptionForSchema() throws JsonProcessingException {
+        void jsonExceptionForSchema() throws JsonProcessingException
+        {
             JSONException mockedException = new JSONException("Test"){};
             when(mockedObjectMapper.writeValueAsString(schema))
                     .thenThrow(mockedException);
 
-            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                        ParameterValidator.validateParameters(schema, inputMap);
-                    }
-            );
-            assertSame(mockedException, exception.getCause());
+            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
+                                                            () -> {
+                                                                    ParameterValidator.validateParameters(schema,
+                                                                                                          parametersMap);
+                                                                }
+                                                            );
+            assertSame(mockedException,
+                       exception.getCause());
         }
 
         @Test
-        void jsonExceptionForInput() throws JsonProcessingException {
+        void jsonExceptionForInput() throws JsonProcessingException
+        {
             JSONException mockedException = new JSONException("Test"){};
             doReturn("{}")
                     .when(mockedObjectMapper)
                     .writeValueAsString(schema);
-            when(mockedObjectMapper.writeValueAsString(inputMap))
+            when(mockedObjectMapper.writeValueAsString(parametersMap))
                     .thenThrow(mockedException);
 
-            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                        ParameterValidator.validateParameters(schema, inputMap);
-                    }
-            );
-            assertSame(mockedException, exception.getCause());
+            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
+                                                            () -> {
+                                                                    ParameterValidator.validateParameters(schema,
+                                                                                                          parametersMap);
+                                                                }
+                                                            );
+            assertSame(mockedException,
+                       exception.getCause());
         }
 
         @Test
-        void jsonProcessingExceptionForSchema() throws JsonProcessingException {
+        void jsonProcessingExceptionForSchema() throws JsonProcessingException
+        {
             JsonProcessingException mockedException = new JsonProcessingException("Test") {};
             when(mockedObjectMapper.writeValueAsString(schema))
                     .thenThrow(mockedException);
 
-            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                        ParameterValidator.validateParameters(schema, inputMap);
-                    }
-            );
-            assertSame(mockedException, exception.getCause());
+            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
+                                                            () -> {
+                                                                    ParameterValidator.validateParameters(schema,
+                                                                                                          parametersMap);
+                                                                }
+                                                            );
+            assertSame(mockedException,
+                       exception.getCause());
         }
 
         @Test
-        void jsonProcessingExceptionForInput() throws JsonProcessingException {
+        void jsonProcessingExceptionForInput() throws JsonProcessingException
+        {
             JsonProcessingException mockedException = new JsonProcessingException("Test") {};
             doReturn("{}")
                     .when(mockedObjectMapper)
                     .writeValueAsString(schema);
-            when(mockedObjectMapper.writeValueAsString(inputMap))
+            when(mockedObjectMapper.writeValueAsString(parametersMap))
                     .thenThrow(mockedException);
 
-            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                        ParameterValidator.validateParameters(schema, inputMap);
-                    }
-            );
-            assertSame(mockedException, exception.getCause());
+            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
+                                                            () -> {
+                                                                    ParameterValidator.validateParameters(schema,
+                                                                                                          parametersMap);
+                                                                }
+                                                            );
+            assertSame(mockedException,
+                       exception.getCause());
         }
     }
 
     @Nested
     class CasesForPerformValidation
     {
+        @BeforeEach
+        void setUpCasesForPerformValidation()
+        {
+            readJsonFiles();
+        }
+
         @Test
-        void performValidationThrows() throws JsonProcessingException {
+        void performValidationThrows() throws JsonProcessingException
+        {
             doReturn(schemaString)
                     .when(mockedObjectMapper)
                     .writeValueAsString(schema);
             doReturn(invalidJsonString)
                     .when(mockedObjectMapper)
-                    .writeValueAsString(inputMap);
+                    .writeValueAsString(parametersMap);
 
-            assertThrows(ValidationException.class, () -> {
-                        ParameterValidator.validateParameters(schema, inputMap);
-                    }
-            );
+            assertThrows(ValidationException.class,
+                         () -> {
+                                ParameterValidator.validateParameters(schema,
+                                                                      parametersMap);
+                            }
+                        );
         }
 
         @Test
-        void performValidationDoesNotThrow() throws JsonProcessingException {
+        void performValidationDoesNotThrow() throws JsonProcessingException
+        {
             doReturn(schemaString)
                     .when(mockedObjectMapper)
                     .writeValueAsString(schema);
             doReturn(validJsonString)
                     .when(mockedObjectMapper)
-                    .writeValueAsString(inputMap);
+                    .writeValueAsString(parametersMap);
 
-            assertDoesNotThrow(() -> {ParameterValidator.validateParameters(schema, inputMap);} );
+            assertDoesNotThrow(() -> {
+                    ParameterValidator.validateParameters(schema, parametersMap);
+                }
+            );
         }
     }
 }

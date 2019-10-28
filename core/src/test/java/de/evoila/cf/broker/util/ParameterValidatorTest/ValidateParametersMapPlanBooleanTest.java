@@ -29,8 +29,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
     @BeforeEach
     void setUpValidateParameters()
     {
-        readJsonSchema();
-        initializeInputMap();
+        initializeParametersMap();
     }
 
     @Nested
@@ -39,7 +38,9 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
         @Test
         void planNull() throws ServiceBrokerException
         {
-            ParameterValidator.validateParameters(inputMap, null, false);
+            ParameterValidator.validateParameters(parametersMap,
+                                                  null,
+                                                  false);
         }
 
         @Nested
@@ -57,7 +58,9 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedPlan.getSchemas())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, false);
+                    ParameterValidator.validateParameters(parametersMap,
+                                                          mockedPlan,
+                                                          false);
                 }
 
                 @Test
@@ -68,7 +71,9 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedSchemas.getServiceInstance())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, false);
+                    ParameterValidator.validateParameters(parametersMap,
+                                                          mockedPlan,
+                                                          false);
                 }
 
                 @Test
@@ -81,7 +86,9 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedServiceInstance.getCreate())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, false);
+                    ParameterValidator.validateParameters(parametersMap,
+                                                          mockedPlan,
+                                                          false);
                 }
 
                 @Test
@@ -96,7 +103,9 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedServiceCreate.getParameters())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, false);
+                    ParameterValidator.validateParameters(parametersMap,
+                                                          mockedPlan,
+                                                          false);
                 }
 
             }
@@ -109,6 +118,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                 {
                     replaceObjectMapperWithSpy();
                     readJsonFiles();
+                    readJsonSchema();
 
                     when(mockedPlan.getSchemas())
                             .thenReturn(mockedSchemas);
@@ -123,11 +133,16 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                 @Test
                 void inputMapNull()
                 {
-                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                                                                        ParameterValidator.validateParameters((Map<String, Object>)null, mockedPlan, false);
-                                                                    }
+                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
+                                                                    () -> {
+                                                                            ParameterValidator.validateParameters((Map<String, Object>)null,
+                                                                                                                  mockedPlan,
+                                                                                                                  false);
+                                                                        }
                                                                    );
-                    assertSame(JSONException.class, exception.getCause().getClass());
+                    assertSame(JSONException.class,
+                               exception.getCause()
+                                        .getClass());
                 }
 
                 @Test
@@ -138,11 +153,15 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                             .when(mockedObjectMapper)
                             .writeValueAsString(schema);
 
-                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                                                                        ParameterValidator.validateParameters(inputMap, mockedPlan, false);
-                                                                    }
+                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
+                                                                    () -> {
+                                                                        ParameterValidator.validateParameters(parametersMap,
+                                                                                                              mockedPlan,
+                                                                                                              false);
+                                                                            }
                                                                    );
-                    assertSame(mockedException, exception.getCause());
+                    assertSame(mockedException,
+                               exception.getCause());
                 }
 
                 @Test
@@ -153,18 +172,22 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                             .writeValueAsString(schema);
                     doReturn(invalidJsonString)
                             .when(mockedObjectMapper)
-                            .writeValueAsString(inputMap);
+                            .writeValueAsString(parametersMap);
 
                     assertThrows(ValidationException.class, () -> {
-                                     ParameterValidator.validateParameters(inputMap, mockedPlan, false);
-                                 }
-                                );
+                             ParameterValidator.validateParameters(parametersMap,
+                                                                   mockedPlan,
+                                                                   false);
+                         }
+                    );
                 }
 
                 @Test
                 void validateParametersDoesNotThrow() throws ServiceBrokerException
                 {
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, false);
+                    ParameterValidator.validateParameters(parametersMap,
+                                                          mockedPlan,
+                                                          false);
                 }
             }
         }
@@ -176,7 +199,9 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
         @Test
         void planNull() throws ServiceBrokerException
         {
-            ParameterValidator.validateParameters(inputMap, null, true);
+            ParameterValidator.validateParameters(parametersMap,
+                                                  null,
+                                                  true);
         }
 
         @Nested
@@ -194,7 +219,9 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedPlan.getSchemas())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, true);
+                    ParameterValidator.validateParameters(parametersMap,
+                                                          mockedPlan,
+                                                          true);
                 }
 
                 @Test
@@ -205,11 +232,13 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedSchemas.getServiceInstance())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, true);
+                    ParameterValidator.validateParameters(parametersMap,
+                                                          mockedPlan,
+                                                          true);
                 }
 
                 @Test
-                void getCreateReturnsNull() throws ServiceBrokerException
+                void getUpdateReturnsNull() throws ServiceBrokerException
                 {
                     when(mockedPlan.getSchemas())
                             .thenReturn(mockedSchemas);
@@ -218,7 +247,9 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedServiceInstance.getUpdate())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, true);
+                    ParameterValidator.validateParameters(parametersMap,
+                                                          mockedPlan,
+                                                          true);
                 }
 
                 @Test
@@ -233,7 +264,9 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedServiceUpdate.getParameters())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, true);
+                    ParameterValidator.validateParameters(parametersMap,
+                                                          mockedPlan,
+                                                          true);
                 }
 
             }
@@ -246,6 +279,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                 {
                     replaceObjectMapperWithSpy();
                     readJsonFiles();
+                    readJsonSchema();
 
                     when(mockedPlan.getSchemas())
                             .thenReturn(mockedSchemas);
@@ -260,11 +294,16 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                 @Test
                 void inputMapNull()
                 {
-                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                                                                        ParameterValidator.validateParameters((Map<String, Object>)null, mockedPlan, true);
-                                                                    }
+                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
+                                                                    () -> {
+                                                                            ParameterValidator.validateParameters((Map<String, Object>)null,
+                                                                                                                  mockedPlan,
+                                                                                                                  true);
+                                                                        }
                                                                    );
-                    assertSame(JSONException.class, exception.getCause().getClass());
+                    assertSame(JSONException.class,
+                               exception.getCause()
+                                        .getClass());
                 }
 
                 @Test
@@ -275,11 +314,15 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                             .when(mockedObjectMapper)
                             .writeValueAsString(schema);
 
-                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                                                                        ParameterValidator.validateParameters(inputMap, mockedPlan, true);
-                                                                    }
+                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
+                                                                    () -> {
+                                                                            ParameterValidator.validateParameters(parametersMap,
+                                                                                                                  mockedPlan,
+                                                                                                                  true);
+                                                                        }
                                                                    );
-                    assertSame(mockedException, exception.getCause());
+                    assertSame(mockedException,
+                               exception.getCause());
                 }
 
                 @Test
@@ -290,18 +333,23 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                             .writeValueAsString(schema);
                     doReturn(invalidJsonString)
                             .when(mockedObjectMapper)
-                            .writeValueAsString(inputMap);
+                            .writeValueAsString(parametersMap);
 
-                    assertThrows(ValidationException.class, () -> {
-                                     ParameterValidator.validateParameters(inputMap, mockedPlan, true);
-                                 }
+                    assertThrows(ValidationException.class,
+                                 () -> {
+                                        ParameterValidator.validateParameters(parametersMap,
+                                                                              mockedPlan,
+                                                                              true);
+                                    }
                                 );
                 }
 
                 @Test
                 void validateParametersDoesNotThrow() throws ServiceBrokerException
                 {
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, true);
+                    ParameterValidator.validateParameters(parametersMap,
+                                                          mockedPlan,
+                                                          true);
                 }
             }
         }

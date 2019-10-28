@@ -22,50 +22,51 @@ import static org.mockito.Mockito.*;
 public class ValidateParametersServiceInstanceUpdateRequestPlanBooleanTest extends BaseTest
 {
     @Mock
-    private Plan                         mockedPlan;
-    @Mock
-    private Schemas                      mockedSchemas;
-    @Mock
-    private SchemaServiceInstance        mockedServiceInstance;
-    @Mock
-    private ServiceInstanceUpdateRequest mockedServiceInstanceUpdateRequest;
-
-    @BeforeEach
-    void setUpValidateParameters()
-    {
-        readJsonSchema();
-        initializeInputMap();
-    }
+    private Plan mockedPlan;
 
     @Test
     void serviceInstanceUpdateRequestNull()
     {
         // isUpdate true
-        assertThrows(IllegalArgumentException.class, () -> {
-                ParameterValidator.validateParameters((ServiceInstanceUpdateRequest) null, mockedPlan, true);
-            }
-        );
+        assertThrows(IllegalArgumentException.class,
+                     () -> {
+                            ParameterValidator.validateParameters((ServiceInstanceUpdateRequest) null,
+                                                                  mockedPlan,
+                                                                  true);
+                        }
+                    );
         // isUpdate false
-        assertThrows(IllegalArgumentException.class, () -> {
-                 ParameterValidator.validateParameters((ServiceInstanceUpdateRequest) null, mockedPlan, false);
-             }
-        );
+        assertThrows(IllegalArgumentException.class,
+                     () -> {
+                            ParameterValidator.validateParameters((ServiceInstanceUpdateRequest) null,
+                                                                  mockedPlan,
+                                                                  false);
+                        }
+                    );
     }
 
     @Nested
     class serviceInstanceUpdateRequestNotNull
     {
         @Mock
-        private SchemaServiceCreate mockedServiceCreate;
+        private Schemas                      mockedSchemas;
+        @Mock
+        private SchemaServiceInstance        mockedServiceInstance;
+        @Mock
+        private SchemaServiceCreate          mockedServiceCreate;
+        @Mock
+        private ServiceInstanceUpdateRequest mockedServiceInstanceUpdateRequest;
 
         @BeforeEach
         void setUpServiceInstanceUpdateRequestNotNull()
         {
-            when(mockedServiceInstanceUpdateRequest.getParameters() )
-                    .thenReturn(inputMap);
-
             replaceObjectMapperWithSpy();
             readJsonFiles();
+            readJsonSchema();
+            initializeParametersMap();
+
+            when(mockedServiceInstanceUpdateRequest.getParameters() )
+                    .thenReturn(parametersMap);
 
             when(mockedPlan.getSchemas())
                     .thenReturn(mockedSchemas);
@@ -85,11 +86,14 @@ public class ValidateParametersServiceInstanceUpdateRequestPlanBooleanTest exten
                     .writeValueAsString(schema);
             doReturn(invalidJsonString)
                     .when(mockedObjectMapper)
-                    .writeValueAsString(inputMap);
+                    .writeValueAsString(parametersMap);
 
-            assertThrows(ValidationException.class, () -> {
-                             ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false);
-                         }
+            assertThrows(ValidationException.class,
+                         () -> {
+                                ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest,
+                                                                      mockedPlan,
+                                                                      false);
+                            }
                         );
         }
 
@@ -101,17 +105,21 @@ public class ValidateParametersServiceInstanceUpdateRequestPlanBooleanTest exten
                     .when(mockedObjectMapper)
                     .writeValueAsString(schema);
 
-            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                                                                ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false);
-                                                            }
+            ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
+                                                            () -> {
+                                                                    ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false);
+                                                                }
                                                            );
-            assertSame(mockedException, exception.getCause());
+            assertSame(mockedException,
+                       exception.getCause());
         }
 
         @Test
         void validateParametersDoesNotThrow() throws ServiceBrokerException
         {
-            ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false);
+            ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest,
+                                                  mockedPlan,
+                                                  false);
         }
     }
 }

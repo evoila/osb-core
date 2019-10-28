@@ -26,10 +26,11 @@ public class SerializeObjectToJsonObjectTest extends BaseTest
         JsonProcessingException mockedException = new JsonProcessingException("Test"){};
         when(mockedObjectMapper.writeValueAsString(any(Object.class)))
                 .thenThrow(mockedException);
-        JsonProcessingException thrownException = assertThrows(JsonProcessingException.class, () -> {
-                ParameterValidator.serializeObjectToJSONObject(new Object());
-            }
-        );
+        JsonProcessingException thrownException = assertThrows(JsonProcessingException.class,
+                                                               () -> {
+                                                                        ParameterValidator.serializeObjectToJSONObject(new Object());
+                                                                    }
+                                                                );
         assertSame(mockedException, thrownException);
     }
 
@@ -39,10 +40,11 @@ public class SerializeObjectToJsonObjectTest extends BaseTest
         JSONException mockedException = new JSONException("Test"){};
         when(mockedObjectMapper.writeValueAsString(any(Object.class)))
                 .thenThrow(mockedException);
-        JSONException thrownException = assertThrows(JSONException.class, () -> {
-                ParameterValidator.serializeObjectToJSONObject(new Object());
-            }
-        );
+        JSONException thrownException = assertThrows(JSONException.class,
+                                                     () -> {
+                                                            ParameterValidator.serializeObjectToJSONObject(new Object());
+                                                        }
+                                                    );
         assertSame(mockedException, thrownException);
     }
 
