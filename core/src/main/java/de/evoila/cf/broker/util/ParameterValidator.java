@@ -65,21 +65,8 @@ public class ParameterValidator {
         if (serviceInstanceUpdateRequest == null) {
             throw new IllegalArgumentException("Parameter ServiceInstanceUpdateRequest is null");
         }
-        Map<String, Object> serviceInstanceRequestParams = serviceInstanceUpdateRequest.getParameters();
 
-        JsonSchema jsonSchema = null;
-
-        if (!isUpdate && planHasInstanceSchema(plan, isUpdate)) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getCreate().getParameters();
-        } else if (planHasInstanceSchema(plan, isUpdate)) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getUpdate().getParameters();
-        }
-
-        if (jsonSchema != null) {
-            validateParameters(jsonSchema, serviceInstanceRequestParams);
-        }
+        validateParameters(serviceInstanceUpdateRequest.getParameters(), plan, isUpdate);
     }
 
     public static void validateParameters(Map<String, Object> input, Plan plan,
