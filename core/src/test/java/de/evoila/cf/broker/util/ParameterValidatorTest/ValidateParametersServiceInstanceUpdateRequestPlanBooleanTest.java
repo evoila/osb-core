@@ -2,6 +2,7 @@ package de.evoila.cf.broker.util.ParameterValidatorTest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
+import de.evoila.cf.broker.model.ServiceInstanceUpdateRequest;
 import de.evoila.cf.broker.model.catalog.plan.*;
 import de.evoila.cf.broker.util.ParameterValidator;
 import org.everit.json.schema.ValidationException;
@@ -11,20 +12,20 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-public class ValidateParametersMapPlanBooleanTest extends BaseTest
+public class ValidateParametersServiceInstanceUpdateRequestPlanBooleanTest extends BaseTest
 {
     @Mock
-    private Plan                  mockedPlan;
+    private Plan                         mockedPlan;
     @Mock
-    private Schemas               mockedSchemas;
+    private Schemas                      mockedSchemas;
     @Mock
-    private SchemaServiceInstance mockedServiceInstance;
+    private SchemaServiceInstance        mockedServiceInstance;
+    @Mock
+    private ServiceInstanceUpdateRequest mockedServiceInstanceUpdateRequest;
 
     @BeforeEach
     void setUpValidateParameters()
@@ -33,13 +34,35 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
         initializeInputMap();
     }
 
+    @Test
+    void serviceInstanceUpdateRequestNull()
+    {
+        // isUpdate true
+        assertThrows(IllegalArgumentException.class, () -> {
+                ParameterValidator.validateParameters((ServiceInstanceUpdateRequest) null, mockedPlan, true);
+            }
+        );
+        // isUpdate false
+        assertThrows(IllegalArgumentException.class, () -> {
+                 ParameterValidator.validateParameters((ServiceInstanceUpdateRequest) null, mockedPlan, false);
+             }
+        );
+    }
+
     @Nested
     class isUpdateFalse
     {
+        @BeforeEach
+        void setUpIsUpdateFalse()
+        {
+            when(mockedServiceInstanceUpdateRequest.getParameters() )
+                    .thenReturn(inputMap);
+        }
+
         @Test
         void planNull() throws ServiceBrokerException
         {
-            ParameterValidator.validateParameters(inputMap, null, false);
+            ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, null, false);
         }
 
         @Nested
@@ -57,7 +80,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedPlan.getSchemas())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, false);
+                    ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false);
                 }
 
                 @Test
@@ -68,7 +91,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedSchemas.getServiceInstance())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, false);
+                    ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false);
                 }
 
                 @Test
@@ -81,7 +104,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedServiceInstance.getCreate())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, false);
+                    ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false);
                 }
 
                 @Test
@@ -96,7 +119,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedServiceCreate.getParameters())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, false);
+                    ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false);
                 }
 
             }
@@ -121,16 +144,6 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                 }
 
                 @Test
-                void inputMapNull()
-                {
-                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                                                                        ParameterValidator.validateParameters((Map<String, Object>)null, mockedPlan, false);
-                                                                    }
-                                                                   );
-                    assertSame(JSONException.class, exception.getCause().getClass());
-                }
-
-                @Test
                 void validateParametersThrowsServiceBrokerException() throws JsonProcessingException
                 {
                     JSONException mockedException = new JSONException("Test"){};
@@ -139,7 +152,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                             .writeValueAsString(schema);
 
                     ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                                                                        ParameterValidator.validateParameters(inputMap, mockedPlan, false);
+                                                                        ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false);
                                                                     }
                                                                    );
                     assertSame(mockedException, exception.getCause());
@@ -156,7 +169,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                             .writeValueAsString(inputMap);
 
                     assertThrows(ValidationException.class, () -> {
-                                     ParameterValidator.validateParameters(inputMap, mockedPlan, false);
+                                     ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false);
                                  }
                                 );
                 }
@@ -164,7 +177,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                 @Test
                 void validateParametersDoesNotThrow() throws ServiceBrokerException
                 {
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, false);
+                    ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false);
                 }
             }
         }
@@ -176,7 +189,14 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
         @Test
         void planNull() throws ServiceBrokerException
         {
-            ParameterValidator.validateParameters(inputMap, null, true);
+            ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, null, true);
+        }
+
+        @BeforeEach
+        void setUpIsUpdateTrue()
+        {
+            when(mockedServiceInstanceUpdateRequest.getParameters() )
+                    .thenReturn(inputMap);
         }
 
         @Nested
@@ -194,7 +214,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedPlan.getSchemas())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, true);
+                    ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, true);
                 }
 
                 @Test
@@ -205,7 +225,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedSchemas.getServiceInstance())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, true);
+                    ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, true);
                 }
 
                 @Test
@@ -218,7 +238,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedServiceInstance.getUpdate())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, true);
+                    ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, true);
                 }
 
                 @Test
@@ -233,7 +253,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                     when(mockedServiceUpdate.getParameters())
                             .thenReturn(null);
 
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, true);
+                    ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, true);
                 }
 
             }
@@ -258,16 +278,6 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                 }
 
                 @Test
-                void inputMapNull()
-                {
-                    ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                                                                        ParameterValidator.validateParameters((Map<String, Object>)null, mockedPlan, true);
-                                                                    }
-                                                                   );
-                    assertSame(JSONException.class, exception.getCause().getClass());
-                }
-
-                @Test
                 void validateParametersThrowsServiceBrokerException() throws JsonProcessingException
                 {
                     JSONException mockedException = new JSONException("Test"){};
@@ -276,7 +286,7 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                             .writeValueAsString(schema);
 
                     ServiceBrokerException exception = assertThrows(ServiceBrokerException.class, () -> {
-                                                                        ParameterValidator.validateParameters(inputMap, mockedPlan, true);
+                                                                        ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, true);
                                                                     }
                                                                    );
                     assertSame(mockedException, exception.getCause());
@@ -293,15 +303,15 @@ public class ValidateParametersMapPlanBooleanTest extends BaseTest
                             .writeValueAsString(inputMap);
 
                     assertThrows(ValidationException.class, () -> {
-                                     ParameterValidator.validateParameters(inputMap, mockedPlan, true);
-                                 }
-                                );
+                             ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, true);
+                         }
+                    );
                 }
 
                 @Test
                 void validateParametersDoesNotThrow() throws ServiceBrokerException
                 {
-                    ParameterValidator.validateParameters(inputMap, mockedPlan, true);
+                    ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, true);
                 }
             }
         }
