@@ -1,6 +1,5 @@
 package de.evoila.cf.broker.interceptor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.evoila.cf.broker.model.annotations.ApiVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,19 +56,12 @@ public class ApiVersionInterceptor implements HandlerInterceptor {
     }
 
     private boolean checkApiVersion(ArrayList<String> apis, HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        String headerValueNotAllowed = "Header X-Broker-API-Version with value " + request.getHeader(XBrokerAPIVersion ) + " is not allowed on this request";
-        String noHeaderFound = "Requests to Service Broker must contain header that declares API-version";
-
-
         String requestApiVersion = request.getHeader(XBrokerAPIVersion);
-
         if (requestApiVersion == null){
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
-            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, mapper.writeValueAsString(noHeaderFound));
+            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
+                               "\"Requests to Service Broker must contain header that declares API-version\"");
             log.info("Intercepted a request without an X-Broker-API-Version header.");
             return false;
         }
@@ -77,7 +69,8 @@ public class ApiVersionInterceptor implements HandlerInterceptor {
         if (!(apis.contains(requestApiVersion))) {
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
-            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED, mapper.writeValueAsString(headerValueNotAllowed));
+            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED,
+                               "\"Header X-Broker-API-Version with value " + request.getHeader(XBrokerAPIVersion ) + " is not allowed on this request\"");
             log.info("Intercepted a request with a non-matching X-Broker-API-Version header (received "+requestApiVersion+" but method supports "+apis.toString()+").");
             return false;
         }
