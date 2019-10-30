@@ -19,7 +19,7 @@ class RandomStringTest {
     private Random mockRandom;
 
     @Test
-    void RandomString_onlyLowerCase() {
+    void onlyLowerCase() {
         when(mockRandom.nextInt(52))
                 .thenAnswer(new Answer() {
                                 int index = 0;
@@ -39,7 +39,7 @@ class RandomStringTest {
     }
 
     @Test
-    void RandomString_LowerAndUpperCase() {
+    void lowerAndUpperCase() {
         when(mockRandom.nextInt(52))
                 .thenAnswer(new Answer() {
                                 int index = 0;
@@ -60,7 +60,7 @@ class RandomStringTest {
     }
 
     @Test
-    void RandomString_LowerCaseAndNumbers() {
+    void lowerCaseAndNumbers() {
         when(mockRandom.nextInt(62))
                 .thenAnswer(new Answer() {
                                 int index = 0;
@@ -81,7 +81,7 @@ class RandomStringTest {
     }
 
     @Test
-    void RandomString_LowerAndUpperCaseAndNumbers() {
+    void lowerAndUpperCaseAndNumbers() {
         when(mockRandom.nextInt(62))
                 .thenAnswer(new Answer() {
                                 int index = 0;
@@ -102,17 +102,17 @@ class RandomStringTest {
     }
 
     @Test
-    void RandomString_lengthTooSmall() {
+    void lengthTooSmall() {
         assertThrows(IllegalArgumentException.class, () -> new RandomString(0));
     }
 
     @Test
-    void RandomString_lengthNegativ() {
+    void lengthNegative() {
         assertThrows(IllegalArgumentException.class, () -> new RandomString(-3));
     }
 
     @Test
-    void RandomString_randomNull() {
+    void randomNull() {
         assertThrows(NullPointerException.class, () -> new RandomString(12, null, false, false));
     }
 }
