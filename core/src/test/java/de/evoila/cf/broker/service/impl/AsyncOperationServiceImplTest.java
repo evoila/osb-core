@@ -26,7 +26,7 @@ class AsyncOperationServiceImplTest {
     @Mock
     private JobProgress jobProgress;
 
-    AsyncOperationServiceImpl service;
+    private AsyncOperationServiceImpl service;
 
     @BeforeEach
     void setUp() {
