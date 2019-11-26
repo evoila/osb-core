@@ -52,9 +52,9 @@ public class JobProgressResponse {
 	public boolean equals(Object o) {
 		if (this == o) { return true; }
 		if (o == null || getClass() != o.getClass()) { return false; }
-		JobProgressResponse response = (JobProgressResponse) o;
-		return Objects.equals(state, response.state) &&
-			   Objects.equals(description, response.description);
+		JobProgressResponse that = (JobProgressResponse) o;
+		return Objects.equals(state, that.state) &&
+			   Objects.equals(description, that.description);
 	}
 
 	@Override
