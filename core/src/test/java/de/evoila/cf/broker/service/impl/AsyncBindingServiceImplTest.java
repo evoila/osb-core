@@ -15,7 +15,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.internal.util.reflection.FieldSetter;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
 
 import static org.mockito.Mockito.*;
 
@@ -24,6 +26,8 @@ class AsyncBindingServiceImplTest {
 
     private AsyncBindingServiceImpl asyncBindingService;
 
+    @Mock
+    Logger log;
     @Mock
     JobProgressService jobProgressService;
     @Mock
@@ -38,6 +42,15 @@ class AsyncBindingServiceImplTest {
     @BeforeEach
     void setUp() {
         asyncBindingService = new AsyncBindingServiceImpl(jobProgressService);
+
+        try {
+            FieldSetter.setField(asyncBindingService,
+                                 asyncBindingService.getClass()
+                                                    .getDeclaredField("log"),
+                                 log);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException("Setting logger failed.", e);
+        }
     }
 
     @Nested
@@ -49,7 +62,7 @@ class AsyncBindingServiceImplTest {
         @Test
         void syncCreateBindingThrowsException () throws ServiceBrokerException, InvalidParametersException, PlatformException {
             when(jobProgressService.startJob("Id3", "123456", "Creating binding..", JobProgress.BIND)).thenReturn(jobProgress);
-            when(bindingService.syncCreateBinding("123456", serviceInstance, serviceInstanceBindingRequest, plan)).thenThrow(ServiceBrokerException.class);
+            when(bindingService.createBinding("123456", serviceInstance, serviceInstanceBindingRequest, plan)).thenThrow(ServiceBrokerException.class);
             when(jobProgress.getId()).thenReturn("Id3");
 
             asyncBindingService.asyncCreateServiceInstanceBinding(bindingService, "123456", serviceInstance, serviceInstanceBindingRequest, plan, true, "Id3");
@@ -61,7 +74,7 @@ class AsyncBindingServiceImplTest {
         @Test
         void syncCreateBindingSucceeds () throws ServiceBrokerException, InvalidParametersException, PlatformException {
             when(jobProgressService.startJob("Id3", "123456", "Creating binding..", JobProgress.BIND)).thenReturn(jobProgress);
-            when(bindingService.syncCreateBinding("123456", serviceInstance, serviceInstanceBindingRequest, plan)).thenReturn(new ServiceInstanceBindingResponse());
+            when(bindingService.createBinding("123456", serviceInstance, serviceInstanceBindingRequest, plan)).thenReturn(new ServiceInstanceBindingResponse());
             when(jobProgress.getId()).thenReturn("Id3");
 
             asyncBindingService.asyncCreateServiceInstanceBinding(bindingService, "123456", serviceInstance, serviceInstanceBindingRequest, plan, true, "Id3");
@@ -77,7 +90,7 @@ class AsyncBindingServiceImplTest {
         @Test
         void syncDeleteServiceInstanceBindingThrowsException() {
             when(jobProgressService.startJob("Id3", "123456", "Deleting binding..", JobProgress.UNBIND)).thenReturn(jobProgress);
-            doThrow(new NullPointerException()).when(bindingService).syncDeleteServiceInstanceBinding("123456", serviceInstance, plan);
+            doThrow(new NullPointerException()).when(bindingService).deleteServiceInstanceBinding("123456", serviceInstance, plan);
             when(jobProgress.getId()).thenReturn("Id3");
 
             asyncBindingService.asyncDeleteServiceInstanceBinding(bindingService, "123456", serviceInstance, plan, "Id3");
@@ -91,6 +104,8 @@ class AsyncBindingServiceImplTest {
 
             asyncBindingService.asyncDeleteServiceInstanceBinding(bindingService, "123456", serviceInstance, plan, "Id3");
 
+            verify(bindingService, times(1))
+                    .deleteServiceInstanceBinding("123456", serviceInstance, plan);
             verify(jobProgressService, never()).failJob("Id3", "Internal error during binding deletion, please contact our support.");
         }
     }
