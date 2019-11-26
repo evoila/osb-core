@@ -187,7 +187,7 @@ class DeleteServiceInstanceBindingTest extends BaseTest {
                     }
 
                     @Test
-                    void asnyIsTrue() throws ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException {
+                    void asyncIsTrue() throws ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException {
                         ServiceInstanceBindingOperationResponse response = (ServiceInstanceBindingOperationResponse) service.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
                                                                                                                                                           HAPPY_PLAN_ID,
                                                                                                                                                           HAPPY_ASYNC);
@@ -195,7 +195,7 @@ class DeleteServiceInstanceBindingTest extends BaseTest {
                     }
 
                     @Test
-                    void asnyIsFalse() throws ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException {
+                    void asyncIsFalse() throws ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException {
                         ServiceInstanceBindingOperationResponse response = (ServiceInstanceBindingOperationResponse) service.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
                                                                                                                                                           HAPPY_PLAN_ID,
                                                                                                                                                           false);
