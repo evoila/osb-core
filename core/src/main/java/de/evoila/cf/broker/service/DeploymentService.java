@@ -19,7 +19,10 @@ public interface DeploymentService {
     ServiceInstanceOperationResponse updateServiceInstance(String serviceInstanceId, ServiceInstanceUpdateRequest serviceInstanceUpdateRequest)
             throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException;
 
-    ServiceInstanceOperationResponse deleteServiceInstance(String instanceId) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
+	ServiceInstanceOperationResponse updateServiceInstanceContext(String serviceInstanceId, ServiceInstanceUpdateRequest serviceInstanceUpdateRequest)
+			throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException;
+
+	ServiceInstanceOperationResponse deleteServiceInstance(String instanceId) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
             ServiceInstanceDoesNotExistException;
 
 	ServiceInstance fetchServiceInstance(String instanceId) throws UnsupportedOperationException, ServiceBrokerException,

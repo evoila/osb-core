@@ -3,6 +3,9 @@ package de.evoila.cf.broker.model.catalog.plan;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Objects;
+
 import de.evoila.cf.broker.model.Platform;
 import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
 
@@ -27,6 +30,8 @@ public class Plan {
 
 	private Schemas schemas;
 
+    @JsonProperty("plan_updateable") // misspelling of attribute kept, do not change it
+    private Boolean planUpdateable;
 
 	@JsonProperty("maintenance_info")
 	private MaintenanceInfo maintenanceInfo;
@@ -125,4 +130,34 @@ public class Plan {
 	public void setMaintenanceInfo(MaintenanceInfo maintenanceInfo) {
 		this.maintenanceInfo = maintenanceInfo;
 	}
+
+    public Boolean isPlanUpdateable() {
+        return this.planUpdateable;
+    }
+
+    public void setPlanUpdateable(Boolean planUpdateable) {
+        this.planUpdateable = planUpdateable;
+    }
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		Plan plan = (Plan) o;
+		return free == plan.free &&
+			   id.equals(plan.id) &&
+			   name.equals(plan.name) &&
+			   description.equals(plan.description) &&
+			   Objects.equals(metadata, plan.metadata) &&
+			   Objects.equals(schemas, plan.schemas) &&
+			   Objects.equals(planUpdateable, plan.planUpdateable) &&
+			   Objects.equals(maintenanceInfo, plan.maintenanceInfo) &&
+			   platform == plan.platform;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, name, description, metadata, free, schemas, planUpdateable, maintenanceInfo, platform);
+	}
+
 }

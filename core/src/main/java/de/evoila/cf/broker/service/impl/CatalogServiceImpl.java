@@ -2,6 +2,7 @@ package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.broker.exception.CatalogIsNotValidException;
+import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.interfaces.TranformCatalog;
 import de.evoila.cf.broker.model.catalog.Catalog;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
@@ -59,14 +60,11 @@ public class CatalogServiceImpl implements CatalogService {
 	}
 
 	@Override
-	public ServiceDefinition getServiceDefinition(String serviceId) {
+	public ServiceDefinition getServiceDefinition(String serviceId) throws ServiceDefinitionDoesNotExistException {
+
 		return catalog.getServices().stream()
-                .filter(serviceDefinition -> {
-                    if (serviceDefinition.getId().equals(serviceId))
-                        return true;
-                    else
-                        return false;
-                }).findFirst().orElse(null);
+				.filter(serviceDefinition -> serviceDefinition.getId().equals(serviceId))
+				.findFirst().orElseThrow(() -> new ServiceDefinitionDoesNotExistException(serviceId));
 	}
 
 	private Catalog prepareCatalogIfTesting(Catalog catalog) {
@@ -138,7 +136,10 @@ public class CatalogServiceImpl implements CatalogService {
 	}
 
 	public void filterActivePlans(Catalog catalog) {
-		catalog.getServices().stream().forEach(serviceDefinition ->
+		if (catalog == null) {
+			return;
+		}
+		catalog.getServices().forEach(serviceDefinition ->
 		{
 			serviceDefinition.setPlans(
 					serviceDefinition.getPlans().stream().filter(plan ->

@@ -22,7 +22,9 @@ public abstract class BaseController {
         return new ResponseEntity(status);
     }
 
-    protected ResponseEntity<String> processEmptyErrorResponse(HttpStatus status) { return new ResponseEntity<>(EmptyRestResponse.BODY, status);}
+    protected ResponseEntity<String> processEmptyErrorResponse(HttpStatus status) { 
+      return new ResponseEntity<>(EmptyRestResponse.BODY, status);
+    }
 
     protected ResponseEntity<ResponseMessage<String> > processErrorResponse(String message, HttpStatus status) {
         return new ResponseEntity<>(new ResponseMessage<>(message), status);
@@ -66,7 +68,7 @@ public abstract class BaseController {
     @ExceptionHandler(ServiceInstanceExistsException.class)
     public ResponseEntity handleException(ServiceInstanceExistsException ex) {
         if (ex.isIdenticalInstance())
-            return processEmptyErrorResponse(HttpStatus.OK);
+            return ResponseEntity.ok(ex.getResponse());
         return processErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
@@ -77,11 +79,14 @@ public abstract class BaseController {
 
     @ExceptionHandler(ServiceInstanceNotFoundException.class)
     public ResponseEntity handleException(ServiceInstanceNotFoundException ex) {
-        return processErrorResponse(HttpStatus.NOT_FOUND);
+        return processErrorResponse(ex.getError(), ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ServiceInstanceBindingExistsException.class)
     public ResponseEntity handleException(ServiceInstanceBindingExistsException ex) {
+        if (ex.isIdenticalBinding()) {
+            return ResponseEntity.ok(ex.getResponse());
+        }
         return processErrorResponse(HttpStatus.CONFLICT);
     }
 

@@ -7,7 +7,6 @@ import de.evoila.cf.broker.model.annotations.ApiVersion;
 import de.evoila.cf.broker.model.annotations.ResponseAdvice;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
-import de.evoila.cf.broker.util.EmptyRestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -40,14 +39,14 @@ public class ServiceInstanceBindingController extends BaseController {
     @ResponseAdvice
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-    public ResponseEntity<BaseServiceInstanceBindingResponse> bindServiceInstance(@PathVariable("instanceId") String instanceId,
-                                                                                  @PathVariable("bindingId") String bindingId,
-                                                                                  @RequestHeader("X-Broker-API-Version") String apiHeader,
-                                                                                  @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
-                                                                                  @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
-                                                                                  @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,
-                                                                                  @Valid @RequestBody ServiceInstanceBindingRequest request)
-            throws ServiceInstanceDoesNotExistException, ServiceInstanceBindingExistsException,
+    public ResponseEntity bindServiceInstance(@PathVariable("instanceId") String instanceId,
+                                              @PathVariable("bindingId") String bindingId,
+                                              @RequestHeader("X-Broker-API-Version") String apiHeader,
+                                              @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
+                                              @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
+                                              @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,
+                                              @Valid @RequestBody ServiceInstanceBindingRequest request)
+            throws ServiceInstanceBindingExistsException,
             ServiceBrokerException, ServiceDefinitionDoesNotExistException,
             InvalidParametersException, AsyncRequiredException, PlatformException, UnsupportedOperationException {
 
@@ -58,7 +57,7 @@ public class ServiceInstanceBindingController extends BaseController {
         // https://github.com/openservicebrokerapi/servicebroker/blob/master/spec.md#bind-resource-object
         // AppGuid may not be present and empty
         if (request.getAppGuid() != null && request.getAppGuid().isEmpty())
-            return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.BAD_REQUEST);
+            return processEmptyErrorResponse(HttpStatus.BAD_REQUEST);
 
         if (acceptsIncomplete == null) {
             acceptsIncomplete = false;
@@ -67,9 +66,13 @@ public class ServiceInstanceBindingController extends BaseController {
         if (acceptsIncomplete && apiHeader.equals("2.13")) {
             throw new ServiceInstanceBindingBadRequestException(bindingId);
         }
-
-        BaseServiceInstanceBindingResponse serviceInstanceBindingResponse = bindingService.createServiceInstanceBinding(bindingId,
-                instanceId, request, acceptsIncomplete);
+        BaseServiceInstanceBindingResponse serviceInstanceBindingResponse;
+        try {
+            serviceInstanceBindingResponse = bindingService.createServiceInstanceBinding(bindingId,
+                    instanceId, request, acceptsIncomplete);
+        } catch (ServiceInstanceDoesNotExistException ex) {
+            return processErrorResponse(ex.getError(), ex.getMessage(), HttpStatus.NOT_FOUND);
+        }
 
         log.debug("ServiceInstanceBinding Created: " + bindingId);
 
@@ -82,12 +85,12 @@ public class ServiceInstanceBindingController extends BaseController {
 
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @DeleteMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-    public ResponseEntity<String> unbind(@PathVariable("instanceId") String instanceId,
-                                         @PathVariable("bindingId") String bindingId, @RequestParam("service_id") String serviceId,
-                                         @RequestParam("plan_id") String planId, @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
-                                         @RequestHeader("X-Broker-API-Version") String apiHeader,
-                                         @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
-                                         @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity
+    public ResponseEntity unbind(@PathVariable("instanceId") String instanceId,
+                                 @PathVariable("bindingId") String bindingId, @RequestParam("service_id") String serviceId,
+                                 @RequestParam("plan_id") String planId, @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
+                                 @RequestHeader("X-Broker-API-Version") String apiHeader,
+                                 @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
+                                 @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity
     ) throws ServiceBrokerException, AsyncRequiredException {
 
         log.debug("DELETE: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
@@ -107,16 +110,17 @@ public class ServiceInstanceBindingController extends BaseController {
             baseServiceInstanceBindingResponse = bindingService
                     .deleteServiceInstanceBinding(bindingId, planId, acceptsIncomplete);
         } catch (ServiceInstanceBindingDoesNotExistsException | ServiceDefinitionDoesNotExistException e) {
-            return new ResponseEntity<>(EmptyRestResponse.BODY, HttpStatus.GONE);
+            return processEmptyErrorResponse(HttpStatus.GONE);
         }
 
         log.debug("ServiceInstanceBinding Deleted: " + bindingId);
 
-        if (acceptsIncomplete && baseServiceInstanceBindingResponse != null) {
-            return new ResponseEntity(baseServiceInstanceBindingResponse, HttpStatus.ACCEPTED);
-        } else {
-            return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.OK);
+        if (baseServiceInstanceBindingResponse == null ||
+            !(baseServiceInstanceBindingResponse.isAsync())) {
+
+            return processEmptyErrorResponse(HttpStatus.OK);
         }
+        return new ResponseEntity<>(baseServiceInstanceBindingResponse, HttpStatus.ACCEPTED);
     }
 
     @ApiVersion({ApiVersions.API_214, ApiVersions.API_215})
@@ -147,17 +151,13 @@ public class ServiceInstanceBindingController extends BaseController {
             @PathVariable("bindingId") String bindingId,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity) throws
-            ServiceInstanceBindingNotFoundException, ServiceBrokerException {
+            ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceDefinitionDoesNotExistException {
 
         ServiceInstance serviceInstance;
         try {
             serviceInstance = bindingService.getServiceInstance(instanceId);
         } catch (ServiceInstanceDoesNotExistException ex) {
-            // Has to return different status code instead of 404, because 404 is reserved for when the binding does not exist
-            // 400 was chosen, because the id of the service instance is defined as "MUST be the ID of a previously provisioned Service Instance"
-            return processErrorResponse("ServiceInstanceNotFound",
-                    "No service instance was found for the given id. This could be caused by a desynchronization between broker and platform.",
-                    HttpStatus.BAD_REQUEST);
+            return processErrorResponse(ex.getError(), ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
         if (!(catalogService.getServiceDefinition(serviceInstance.getServiceDefinitionId()).isBindingsRetrievable())) {
@@ -168,5 +168,4 @@ public class ServiceInstanceBindingController extends BaseController {
         ServiceInstanceBindingResponse response = new ServiceInstanceBindingResponse(binding);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 }
