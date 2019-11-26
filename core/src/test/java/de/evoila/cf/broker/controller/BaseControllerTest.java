@@ -3,6 +3,7 @@ package de.evoila.cf.broker.controller;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.ResponseMessage;
 import de.evoila.cf.broker.model.ServiceBrokerErrorResponse;
+import de.evoila.cf.broker.model.ServiceInstanceBindingResponse;
 import org.everit.json.schema.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -19,7 +20,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class BaseControllerTest {
 
-    private class TestBaseController extends BaseController {}
+    private static class TestBaseController extends BaseController {}
 
     private BaseController baseController;
 
@@ -36,6 +37,7 @@ class BaseControllerTest {
             for (HttpStatus status : HttpStatus.values()) {
                 ResponseEntity response = baseController.processErrorResponse(status);
                 assertEquals(status, response.getStatusCode());
+                assertNull(response.getBody());
             }
         }
 
@@ -118,6 +120,7 @@ class BaseControllerTest {
             ServiceBrokerFeatureIsNotSupportedException ex = Mockito.mock(ServiceBrokerFeatureIsNotSupportedException.class);
             ResponseEntity response = baseController.handleException(ex);
             assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
+            assertNull(response.getBody());
         }
 
         @Test
@@ -135,6 +138,7 @@ class BaseControllerTest {
             when(ex.isIdenticalInstance()).thenReturn(true);
             ResponseEntity response = baseController.handleException(ex);
             assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNull(response.getBody());
         }
 
         @SuppressWarnings("unchecked")
@@ -153,20 +157,47 @@ class BaseControllerTest {
             ServiceInstanceDoesNotExistException ex = Mockito.mock(ServiceInstanceDoesNotExistException.class);
             ResponseEntity response = baseController.handleException(ex);
             assertEquals(HttpStatus.GONE, response.getStatusCode());
+            assertNull(response.getBody());
         }
 
         @Test
         void ServiceInstanceNotFoundException() {
+            ServiceBrokerErrorResponse expectedErrorResponse = new ServiceBrokerErrorResponse("Error", "Message");
             ServiceInstanceNotFoundException ex = Mockito.mock(ServiceInstanceNotFoundException.class);
+            when(ex.getError())
+                    .thenReturn("Error");
+            when(ex.getMessage())
+                    .thenReturn("Message");
             ResponseEntity response = baseController.handleException(ex);
             assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertEquals(expectedErrorResponse, response.getBody());
         }
 
-        @Test
-        void ServiceInstanceBindingExistsException() {
-            ServiceInstanceBindingExistsException ex = Mockito.mock(ServiceInstanceBindingExistsException.class);
-            ResponseEntity response = baseController.handleException(ex);
-            assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        @Nested
+        class withServiceInstanceBindingExistsException {
+
+            @Test
+            void returningOkResponse() {
+                ServiceInstanceBindingExistsException ex = Mockito.mock(ServiceInstanceBindingExistsException.class);
+                ServiceInstanceBindingResponse bindingResponse = Mockito.mock(ServiceInstanceBindingResponse.class);
+                when(ex.isIdenticalBinding())
+                        .thenReturn(true);
+                when(ex.getResponse())
+                        .thenReturn(bindingResponse);
+                ResponseEntity response = baseController.handleException(ex);
+                assertEquals(HttpStatus.OK, response.getStatusCode());
+                assertSame(bindingResponse, response.getBody());
+            }
+
+            @Test
+            void returningConflictResponse() {
+                ServiceInstanceBindingExistsException ex = Mockito.mock(ServiceInstanceBindingExistsException.class);
+                when(ex.isIdenticalBinding())
+                        .thenReturn(false);
+                ResponseEntity response = baseController.handleException(ex);
+                assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+                assertNull(response.getBody());
+            }
         }
 
         @Test
@@ -174,6 +205,7 @@ class BaseControllerTest {
             ServiceInstanceBindingNotFoundException ex = Mockito.mock(ServiceInstanceBindingNotFoundException.class);
             ResponseEntity response = baseController.handleException(ex);
             assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertNull(response.getBody());
         }
 
         @Test
@@ -181,6 +213,7 @@ class BaseControllerTest {
             ServiceInstanceBindingDoesNotExistsException ex = Mockito.mock(ServiceInstanceBindingDoesNotExistsException.class);
             ResponseEntity response = baseController.handleException(ex);
             assertEquals(HttpStatus.GONE, response.getStatusCode());
+            assertNull(response.getBody());
         }
     }
 }
