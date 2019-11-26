@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.exception;
 
+import java.util.Objects;
+
 /**
  * Thrown when a request is received for an unknown ServiceInstance.
  * 
@@ -23,4 +25,18 @@ public class ServiceInstanceDoesNotExistException extends Exception {
 	public String getError() {
 		return "ServiceInstanceDoesNotExistException";
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		ServiceInstanceDoesNotExistException that = (ServiceInstanceDoesNotExistException) o;
+		return Objects.equals(serviceInstanceId, that.serviceInstanceId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(serviceInstanceId);
+	}
+
 }
