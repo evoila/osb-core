@@ -2,75 +2,85 @@ package de.evoila.cf.broker.service.impl.AsyncDeploymentServiceImplTest;
 
 import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.model.JobProgress;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 class AsyncUpdateInstanceTest extends BaseTest {
 
-    private void whensForsyncUpdateInstanceThrowsException(JobProgress returnOfFailJob) throws ServiceBrokerException
-    {
+    private final static String JOB_PROGRESS_DESCRIPTION = "Updating service..";
+
+    private void whensForSyncUpdateInstanceThrowsException(Exception expectedException) throws ServiceBrokerException {
         mockSuccessfulStartJob(JobProgress.UPDATE);
-        ServiceBrokerException expectedException = new ServiceBrokerException("Test");
         when(deploymentService.syncUpdateInstance(serviceInstance, parameters, plan, platformService))
                 .thenThrow(expectedException);
-        when(startedJob.getId())
-                .thenReturn(JOB_PROGRESS_ID);
-        when(jobProgressService.failJob(eq(JOB_PROGRESS_ID), anyString()))
-                .thenReturn(returnOfFailJob);
     }
 
-    private void whensForSyncUpdateInstanceSucceeds(JobProgress returnOfSucceedProgress) throws ServiceBrokerException
-    {
+    private void whensForSyncUpdateInstanceThrowsServiceBrokerException() throws ServiceBrokerException {
+        whensForSyncUpdateInstanceThrowsException(new ServiceBrokerException("Test"));
+    }
+
+    private void whensForSyncUpdateInstanceThrowsRuntimeException() throws ServiceBrokerException {
+        whensForSyncUpdateInstanceThrowsException(new RuntimeException("Test"));
+    }
+
+    private void whensForSyncUpdateInstanceSucceeds() throws ServiceBrokerException {
         mockSuccessfulStartJob(JobProgress.UPDATE);
         when(deploymentService.syncUpdateInstance(serviceInstance, parameters, plan, platformService))
                 .thenReturn(serviceInstance);
-        when(startedJob.getId())
-                .thenReturn(JOB_PROGRESS_ID);
-        when(jobProgressService.succeedProgress(eq(JOB_PROGRESS_ID), anyString()))
-                .thenReturn(returnOfSucceedProgress);
     }
 
     @Test
-    void startJobReturnsNull()
-    {
-        when(serviceInstance.getId())
-                .thenReturn(SERVICE_INSTANCE_ID);
-        when(jobProgressService.startJob(eq(JOB_PROGRESS_ID), eq(SERVICE_INSTANCE_ID), anyString(), eq(JobProgress.UPDATE)))
-                .thenReturn(null);
-
+    @DisplayName("Should log exception, when startJob(...) throws ServiceBrokerException")
+    void startJobThrowsServiceBrokerException() throws ServiceBrokerException {
+        super.mockStartJobThrowsServiceBrokerException(JobProgress.UPDATE, JOB_PROGRESS_DESCRIPTION);
         asyncDeploymentService.asyncUpdateInstance(null, serviceInstance, null, null, null, JOB_PROGRESS_ID);
     }
 
     @Test
-    void syncUpdateInstanceThrowsExceptionFailJobReturnsNull() throws ServiceBrokerException {
-        whensForsyncUpdateInstanceThrowsException(null);
+    @DisplayName("Should log exception and update JobProgress object, when startJob(...) throws RuntimeException")
+    void startJobThrowsRuntimeException() throws ServiceBrokerException {
+        mockStartJobThrowsRuntimeException(JobProgress.UPDATE, JOB_PROGRESS_DESCRIPTION);
+        asyncDeploymentService.asyncUpdateInstance(null, serviceInstance, null, null, null, JOB_PROGRESS_ID);
+    }
+
+
+    @Test
+    @DisplayName("Should log exception, when syncUpdateInstance(...) throws ServiceBrokerException")
+    void syncUpdateInstanceThrowsServiceBrokerException() throws ServiceBrokerException {
+        whensForSyncUpdateInstanceThrowsServiceBrokerException();
 
         asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
 
     @Test
-    void syncUpdateInstanceThrowsExceptionFailJobReturnsObject() throws ServiceBrokerException
-    {
-        whensForsyncUpdateInstanceThrowsException(completedJob);
+    @DisplayName("Should log exception, when syncUpdateInstance(...) throws RuntimeException")
+    void syncUpdateInstanceThrowsRuntimeException() throws ServiceBrokerException {
+        whensForSyncUpdateInstanceThrowsRuntimeException();
+
+        asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
+    }
+
+
+    @Test
+    void syncUpdateInstanceThrowsExceptionFailJobReturnsObject() throws ServiceBrokerException {
+        whensForSyncUpdateInstanceThrowsServiceBrokerException();
 
         asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
 
     @Test
-    void syncUpdateInstanceSucceedsReturnsNull() throws ServiceBrokerException
-    {
-        whensForSyncUpdateInstanceSucceeds(null);
+    void syncUpdateInstanceSucceedsReturnsNull() throws ServiceBrokerException {
+        whensForSyncUpdateInstanceSucceeds();
 
         asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
 
     @Test
-    void syncUpdateInstanceSucceedsReturnsObject() throws ServiceBrokerException
-    {
-        whensForSyncUpdateInstanceSucceeds(completedJob);
+    void syncUpdateInstanceSucceedsReturnsObject() throws ServiceBrokerException {
+        whensForSyncUpdateInstanceSucceeds();
 
         asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
