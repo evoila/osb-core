@@ -32,7 +32,6 @@ public class AsyncDeploymentServiceImpl extends AsyncOperationServiceImpl implem
                     "Creating service..", JobProgress.PROVISION);
             deploymentService.syncCreateInstance(serviceInstance, parameters, plan, platformService);
             progressService.succeedProgress(jobProgress.getId(), "Instance successfully created");
-        } catch (ServiceBrokerException e){
         } catch (ServiceBrokerException e) {
             log.error("Exception during Instance creation", e);
         } catch (Exception e) {
