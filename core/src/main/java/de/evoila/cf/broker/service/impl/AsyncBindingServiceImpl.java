@@ -1,14 +1,12 @@
 package de.evoila.cf.broker.service.impl;
 
+import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.model.JobProgress;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.ServiceInstanceBindingRequest;
-import de.evoila.cf.broker.model.ServiceInstanceBindingResponse;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.service.AsyncBindingService;
 import de.evoila.cf.broker.service.JobProgressService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -18,49 +16,42 @@ import org.springframework.stereotype.Service;
 @Service
 public class AsyncBindingServiceImpl extends AsyncOperationServiceImpl implements AsyncBindingService {
 
-    Logger log = LoggerFactory.getLogger(AsyncBindingServiceImpl.class);
-
     private JobProgressService jobProgressService;
 
     public AsyncBindingServiceImpl(JobProgressService jobProgressService) {
         super(jobProgressService);
-        this.jobProgressService= jobProgressService;
+        this.jobProgressService = jobProgressService;
     }
 
     @Async
     @Override
     public void asyncCreateServiceInstanceBinding(BindingServiceImpl bindingService, String bindingId,
-                    ServiceInstance serviceInstance, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
-                    Plan plan, boolean async, String jobProgressId)  {
-        JobProgress jobProgress = jobProgressService.startJob(jobProgressId, bindingId,
-                "Creating binding..", JobProgress.BIND);
-        ServiceInstanceBindingResponse response;
+                                                  ServiceInstance serviceInstance, ServiceInstanceBindingRequest serviceInstanceBindingRequest,
+                                                  Plan plan, boolean async, String jobProgressId) {
         try {
-            response = bindingService.createBinding(bindingId, serviceInstance, serviceInstanceBindingRequest, plan);
+            JobProgress jobProgress = jobProgressService.startJob(jobProgressId, bindingId,
+                    "Creating binding..", JobProgress.BIND);
+            bindingService.createBinding(bindingId, serviceInstance, serviceInstanceBindingRequest, plan);
+            jobProgressService.succeedProgress(jobProgress.getId(), "Instance Binding successfully created");
+        } catch (ServiceBrokerException e) {
+            log.error("Exception during instance binding creation, while saving new JobProgress object.", e);
         } catch (Exception e) {
-            jobProgressService.failJob(jobProgress.getId(),
-                    "Internal error during binding creation, please contact our support.");
-
-            log.error("Exception during Binding creation", e);
-            return;
+            logUnexpectedException(jobProgressId, "binding creation", e);
         }
-        jobProgressService.succeedProgress(jobProgress.getId(), "Instance Binding successfully created");
     }
 
     @Async
     @Override
     public void asyncDeleteServiceInstanceBinding(BindingServiceImpl bindingServiceImpl, String bindingId,
                                                   ServiceInstance serviceInstance, Plan plan, String jobProgressId) {
-        JobProgress jobProgress = jobProgressService.startJob(jobProgressId, bindingId,
-                "Deleting binding..", JobProgress.UNBIND);
         try {
+            jobProgressService.startJob(jobProgressId, bindingId,
+                    "Deleting binding..", JobProgress.UNBIND);
             bindingServiceImpl.deleteServiceInstanceBinding(bindingId, serviceInstance, plan);
-
+        } catch (ServiceBrokerException e) {
+            log.error("Exception during instance binding deletion, while saving new JobProgress object.", e);
         } catch (Exception e) {
-            jobProgressService.failJob(jobProgress.getId(),
-                    "Internal error during binding deletion, please contact our support.");
-
-            log.error("Exception during binding deletion", e);
+            logUnexpectedException(jobProgressId, "binding deletion",  e);
         }
     }
 

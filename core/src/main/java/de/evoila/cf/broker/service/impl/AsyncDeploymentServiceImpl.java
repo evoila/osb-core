@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.service.impl;
 
+import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.model.JobProgress;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
@@ -26,63 +27,48 @@ public class AsyncDeploymentServiceImpl extends AsyncOperationServiceImpl implem
 	@Override
 	public void asyncCreateInstance(DeploymentServiceImpl deploymentService, ServiceInstance serviceInstance,
                                     Map<String, Object> parameters, Plan plan, PlatformService platformService, String jobProgressId) {
-        JobProgress jobProgress = progressService.startJob(jobProgressId, serviceInstance.getId(),
-                "Creating service..", JobProgress.PROVISION);
-        if (jobProgress == null) {
-            return;
-        }
-		try {
+        try {
+            JobProgress jobProgress = progressService.startJob(jobProgressId, serviceInstance.getId(),
+                    "Creating service..", JobProgress.PROVISION);
             deploymentService.syncCreateInstance(serviceInstance, parameters, plan, platformService);
-		} catch (Exception e) {
-            progressService.failJob(jobProgress.getId(),
-                    "Internal error during Instance creation, please contact our support.");
-
+            progressService.succeedProgress(jobProgress.getId(), "Instance successfully created");
+        } catch (ServiceBrokerException e){
             log.error("Exception during Instance creation", e);
-            return;
+        } catch (Exception e) {
+            logUnexpectedException(jobProgressId, "creation", e);
         }
-		progressService.succeedProgress(jobProgress.getId(), "Instance successfully created");
 	}
 
     @Async
     @Override
     public void asyncUpdateInstance(DeploymentServiceImpl deploymentService, ServiceInstance serviceInstance,
                                     Map<String, Object> parameters, Plan plan, PlatformService platformService, String jobProgressId) {
-        JobProgress jobProgress = progressService.startJob(jobProgressId, serviceInstance.getId(),
-                "Updating service..", JobProgress.UPDATE);
-        if (jobProgress == null) {
-            return;
-        }
         try {
+            progressService.startJob(jobProgressId, serviceInstance.getId(),
+                    "Updating service..", JobProgress.UPDATE);
             deploymentService.syncUpdateInstance(serviceInstance, parameters, plan, platformService);
+        } catch (ServiceBrokerException e){
+            log.error("Exception during instance update", e);
         } catch (Exception e) {
-            progressService.failJob(jobProgress.getId(),
-                    "Internal error during Instance creation, please contact our support.");
-
-            log.error("Exception during Instance creation", e);
-            return;
+            logUnexpectedException(jobProgressId, "update", e);
         }
-        progressService.succeedProgress(jobProgress.getId(), "Instance successfully updated");
+        progressService.succeedProgress(jobProgressId, "Instance successfully updated");
     }
 
 	@Async
 	@Override
 	public void asyncDeleteInstance(DeploymentServiceImpl deploymentService,
 			ServiceInstance serviceInstance, Plan plan, PlatformService platformService, String jobProgressId) {
-        JobProgress jobProgress = progressService.startJob(jobProgressId, serviceInstance.getId(),
-                "Deleting service..", JobProgress.DELETE);
-        if (jobProgress == null) {
-            return;
-        }
-		try {
+        try {
+            progressService.startJob(jobProgressId, serviceInstance.getId(),
+                    "Deleting service..", JobProgress.DELETE);
             deploymentService.syncDeleteInstance(serviceInstance, plan, platformService);
 
-		} catch(Exception e) {
-			progressService.failJob(jobProgress.getId(),
-					"Internal error during Instance deletion, please contact our support.");
-
-			log.error("Exception during Instance deletion", e);
-			return;
-		}
-	}
+        } catch (ServiceBrokerException e) {
+            log.error("Exception during instance deletion, while saving new JobProgress object.", e);
+        } catch (Exception e) {
+            logUnexpectedException(jobProgressId, "deletion", e);
+        }
+    }
 
 }

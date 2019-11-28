@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
  */
 public class AsyncOperationServiceImpl implements AsyncOperationService {
 
-    Logger log = LoggerFactory.getLogger(AsyncDeploymentServiceImpl.class);
+    static Logger log = LoggerFactory.getLogger(AsyncDeploymentServiceImpl.class);
 
-    protected JobProgressService progressService;
+    JobProgressService progressService;
 
     public AsyncOperationServiceImpl(JobProgressService progressService) {
         this.progressService = progressService;
@@ -39,4 +39,11 @@ public class AsyncOperationServiceImpl implements AsyncOperationService {
             return new JobProgress(JobProgress.UNKNOWN, JobProgress.UNKNOWN, JobProgress.UNKNOWN, "Error during job progress retrieval");
         }
     }
+
+    void logUnexpectedException(String jobProgressId, String operation, Exception e){
+        progressService.failJob(jobProgressId,
+                "Internal error during Instance " + operation +", please contact our support.");
+        log.error("Exception during Instance " + operation, e);
+    }
+
 }
