@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.service.impl.AsyncDeploymentServiceImplTest;
 
+import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.model.JobProgress;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
@@ -42,16 +43,30 @@ abstract class BaseTest {
     AsyncDeploymentServiceImpl asyncDeploymentService;
 
     @BeforeEach
-    void setUp()
-    {
+    void setUp() {
         asyncDeploymentService = new AsyncDeploymentServiceImpl(jobProgressService);
     }
 
-    void mockSuccessfulStartJob(String jobProgress)
-    {
+    void mockSuccessfulStartJob(String jobProgress) throws ServiceBrokerException {
         when(serviceInstance.getId())
                 .thenReturn(SERVICE_INSTANCE_ID);
         when(jobProgressService.startJob(eq(JOB_PROGRESS_ID), eq(SERVICE_INSTANCE_ID), anyString(), eq(jobProgress)))
                 .thenReturn(startedJob);
+    }
+
+    void mockStartJobThrowsServiceBrokerException(String jobProgress, String description) throws ServiceBrokerException {
+        ServiceBrokerException serviceBrokerException = new ServiceBrokerException("Test");
+        when(serviceInstance.getId())
+                .thenReturn(SERVICE_INSTANCE_ID);
+        when(jobProgressService.startJob(JOB_PROGRESS_ID, SERVICE_INSTANCE_ID, description, jobProgress))
+                .thenThrow(serviceBrokerException);
+    }
+
+    void mockStartJobThrowsRuntimeException(String jobProgress, String description) throws ServiceBrokerException {
+        RuntimeException runtimeException = new RuntimeException("Test");
+        when(serviceInstance.getId())
+                .thenReturn(SERVICE_INSTANCE_ID);
+        when(jobProgressService.startJob(JOB_PROGRESS_ID, SERVICE_INSTANCE_ID, description, jobProgress))
+                .thenThrow(runtimeException);
     }
 }
