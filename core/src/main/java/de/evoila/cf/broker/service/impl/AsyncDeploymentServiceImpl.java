@@ -47,12 +47,12 @@ public class AsyncDeploymentServiceImpl extends AsyncOperationServiceImpl implem
             progressService.startJob(jobProgressId, serviceInstance.getId(),
                     "Updating service..", JobProgress.UPDATE);
             deploymentService.syncUpdateInstance(serviceInstance, parameters, plan, platformService);
+            progressService.succeedProgress(jobProgressId, "Instance successfully updated");
         } catch (ServiceBrokerException e){
             log.error("Exception during instance update", e);
         } catch (Exception e) {
             logUnexpectedException(jobProgressId, "update", e);
         }
-        progressService.succeedProgress(jobProgressId, "Instance successfully updated");
     }
 
 	@Async

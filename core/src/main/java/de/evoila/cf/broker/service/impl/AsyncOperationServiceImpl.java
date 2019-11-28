@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.service.impl;
 
+import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.model.JobProgress;
 import de.evoila.cf.broker.service.AsyncOperationService;
 import de.evoila.cf.broker.service.JobProgressService;
@@ -41,8 +42,11 @@ public class AsyncOperationServiceImpl implements AsyncOperationService {
     }
 
     void logUnexpectedException(String jobProgressId, String operation, Exception e){
-        progressService.failJob(jobProgressId,
-                "Internal error during Instance " + operation +", please contact our support.");
+        try {
+            progressService.failJob(jobProgressId, "Internal error during Instance " + operation +", please contact our support.");
+        } catch (ServiceBrokerException ex) {
+            log.error("Exception during error logging.", e);
+        }
         log.error("Exception during Instance " + operation, e);
     }
 
