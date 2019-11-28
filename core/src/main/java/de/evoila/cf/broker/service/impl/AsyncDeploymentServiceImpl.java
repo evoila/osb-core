@@ -33,6 +33,7 @@ public class AsyncDeploymentServiceImpl extends AsyncOperationServiceImpl implem
             deploymentService.syncCreateInstance(serviceInstance, parameters, plan, platformService);
             progressService.succeedProgress(jobProgress.getId(), "Instance successfully created");
         } catch (ServiceBrokerException e){
+        } catch (ServiceBrokerException e) {
             log.error("Exception during Instance creation", e);
         } catch (Exception e) {
             logUnexpectedException(jobProgressId, "creation", e);
@@ -48,7 +49,7 @@ public class AsyncDeploymentServiceImpl extends AsyncOperationServiceImpl implem
                     "Updating service..", JobProgress.UPDATE);
             deploymentService.syncUpdateInstance(serviceInstance, parameters, plan, platformService);
             progressService.succeedProgress(jobProgressId, "Instance successfully updated");
-        } catch (ServiceBrokerException e){
+        } catch (ServiceBrokerException e) {
             log.error("Exception during instance update", e);
         } catch (Exception e) {
             logUnexpectedException(jobProgressId, "update", e);
