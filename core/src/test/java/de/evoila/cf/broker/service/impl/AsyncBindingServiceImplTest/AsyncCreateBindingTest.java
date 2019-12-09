@@ -54,7 +54,6 @@ class AsyncCreateBindingTest extends BaseTest {
                 .failJob(JOB_PROGRESS_ID, "Internal error during instance binding creation, please contact our support.");
     }
 
-
     @Test
     @DisplayName("Should not fail, when no exceptions occurs.")
     void syncCreateBindingSucceedsReturnsObject() throws ServiceBrokerException, PlatformException, InvalidParametersException {
