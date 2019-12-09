@@ -23,7 +23,8 @@ import static org.mockito.Mockito.when;
 abstract class BaseTest {
 
     static final String JOB_PROGRESS_ID = "da8a0796-39af-459f-94c9-0ca056a69462";
-    static final String SERVICE_INSTANCE_ID = "6bf78c87-01a2-4450-8030-7f7a6d95530d";
+    private static final String SERVICE_INSTANCE_ID = "6bf78c87-01a2-4450-8030-7f7a6d95530d";
+
     @Mock
     JobProgressService jobProgressService;
     @Mock

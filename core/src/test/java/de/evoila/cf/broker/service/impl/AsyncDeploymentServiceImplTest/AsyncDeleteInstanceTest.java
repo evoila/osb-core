@@ -31,7 +31,7 @@ class AsyncDeleteInstanceTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("Should log exception and update JobProgress, when jobStart(...) throws ServiceBrokerException.")
+    @DisplayName("Should log exception and update JobProgress, when jobStart(...) throws RuntimeException.")
     void startJobThrowsRuntimeException() throws ServiceBrokerException {
         mockStartJobThrowsRuntimeException(JobProgress.DELETE, JOB_PROGRESS_DESCRIPTION);
         asyncDeploymentService.asyncDeleteInstance(null, serviceInstance, null, null, JOB_PROGRESS_ID);
@@ -52,7 +52,7 @@ class AsyncDeleteInstanceTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("Should finish properly, when exception occurs.")
+    @DisplayName("Should finish properly, when no exception is thrown.")
     void syncDeleteInstanceSucceeds() throws ServiceBrokerException {
         mockSuccessfulStartJob(JobProgress.DELETE);
         doNothing().when(deploymentService).syncDeleteInstance(serviceInstance, plan, platformService);

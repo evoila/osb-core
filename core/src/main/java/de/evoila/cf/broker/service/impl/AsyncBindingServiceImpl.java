@@ -45,8 +45,7 @@ public class AsyncBindingServiceImpl extends AsyncOperationServiceImpl implement
     public void asyncDeleteServiceInstanceBinding(BindingServiceImpl bindingServiceImpl, String bindingId,
                                                   ServiceInstance serviceInstance, Plan plan, String jobProgressId) {
         try {
-            jobProgressService.startJob(jobProgressId, bindingId,
-                    "Deleting binding..", JobProgress.UNBIND);
+            jobProgressService.startJob(jobProgressId, bindingId, "Deleting binding..", JobProgress.UNBIND);
             bindingServiceImpl.deleteServiceInstanceBinding(bindingId, serviceInstance, plan);
         } catch (ServiceBrokerException e) {
             log.error("Exception during instance binding deletion, while saving new JobProgress object.", e);
@@ -54,5 +53,4 @@ public class AsyncBindingServiceImpl extends AsyncOperationServiceImpl implement
             logUnexpectedException(jobProgressId, "binding deletion",  e);
         }
     }
-
 }
