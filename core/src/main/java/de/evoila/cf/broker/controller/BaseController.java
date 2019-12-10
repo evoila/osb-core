@@ -61,7 +61,7 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler({ServiceDefinitionDoesNotExistException.class, ServiceDefinitionPlanDoesNotExistException.class, ServiceInstanceNotRetrievableException.class})
-    public ResponseEntity<ResponseMessage<String>> handleException(Exception ex) {
+    public ResponseEntity handleException(Exception ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
