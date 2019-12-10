@@ -22,11 +22,11 @@ public abstract class BaseController {
         return new ResponseEntity(status);
     }
 
-    protected ResponseEntity<String> processEmptyErrorResponse(HttpStatus status) { 
+    protected ResponseEntity processEmptyErrorResponse(HttpStatus status) {
       return new ResponseEntity<>(EmptyRestResponse.BODY, status);
     }
 
-    protected ResponseEntity<ResponseMessage<String>> processErrorResponse(String message, HttpStatus status) {
+    protected ResponseEntity processErrorResponse(String message, HttpStatus status) {
         return new ResponseEntity<>(new ResponseMessage<>(message), status);
     }
 
@@ -36,22 +36,22 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler({ValidationException.class})
-    public ResponseEntity<ResponseMessage<String>> handleException(ValidationException ex) {
+    public ResponseEntity handleException(ValidationException ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({MaintenanceInfoVersionsDontMatchException.class})
-    public ResponseEntity<ServiceBrokerErrorResponse> handleException(MaintenanceInfoVersionsDontMatchException ex) {
+    public ResponseEntity handleException(MaintenanceInfoVersionsDontMatchException ex) {
         return processErrorResponse(ex.getError(), ex.getDescription(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler({ConcurrencyErrorException.class})
-    public ResponseEntity<ServiceBrokerErrorResponse> handleException(ConcurrencyErrorException ex) {
+    public ResponseEntity handleException(ConcurrencyErrorException ex) {
         return processErrorResponse(ex.getError(), ex.getDescription(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler({AsyncRequiredException.class})
-    public ResponseEntity<ServiceBrokerErrorResponse> handleException(AsyncRequiredException ex) {
+    public ResponseEntity handleException(AsyncRequiredException ex) {
         return processErrorResponse(ex.getError(), ex.getDescription(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
