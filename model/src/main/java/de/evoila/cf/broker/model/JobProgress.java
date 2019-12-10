@@ -4,6 +4,7 @@
 package de.evoila.cf.broker.model;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author Johannes Hiemer, Marco Di Martino
@@ -146,4 +147,23 @@ public class JobProgress implements BaseEntity<String> {
 	public boolean isUnbinding() {
 		return UNBIND.equals(operation);
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		JobProgress that = (JobProgress) o;
+		return Objects.equals(id, that.id) &&
+			   Objects.equals(state, that.state) &&
+			   Objects.equals(date, that.date) &&
+			   Objects.equals(description, that.description) &&
+			   Objects.equals(operation, that.operation) &&
+			   Objects.equals(referenceId, that.referenceId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, state, date, description, operation, referenceId);
+	}
+
 }

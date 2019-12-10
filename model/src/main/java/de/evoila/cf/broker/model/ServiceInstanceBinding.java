@@ -6,6 +6,7 @@ import de.evoila.cf.broker.model.volume.VolumeMount;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A binding to a service instance
@@ -86,4 +87,24 @@ public class ServiceInstanceBinding implements BaseEntity<String> {
 	public void setVolumeMounts(List<VolumeMount> volumeMounts) {
 		this.volumeMounts = volumeMounts;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		ServiceInstanceBinding that = (ServiceInstanceBinding) o;
+		return Objects.equals(id, that.id) &&
+			   Objects.equals(serviceInstanceId, that.serviceInstanceId) &&
+			   Objects.equals(credentials, that.credentials) &&
+			   Objects.equals(syslogDrainUrl, that.syslogDrainUrl) &&
+			   Objects.equals(appGuid, that.appGuid) &&
+			   Objects.equals(parameters, that.parameters) &&
+			   Objects.equals(volumeMounts, that.volumeMounts);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, serviceInstanceId, credentials, syslogDrainUrl, appGuid, parameters, volumeMounts);
+	}
+
 }
