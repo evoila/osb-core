@@ -26,7 +26,7 @@ public abstract class BaseController {
       return new ResponseEntity<>(EmptyRestResponse.BODY, status);
     }
 
-    protected ResponseEntity<ResponseMessage<String> > processErrorResponse(String message, HttpStatus status) {
+    protected ResponseEntity<ResponseMessage<String>> processErrorResponse(String message, HttpStatus status) {
         return new ResponseEntity<>(new ResponseMessage<>(message), status);
     }
 
@@ -36,7 +36,7 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler({ValidationException.class})
-    public ResponseEntity<ResponseMessage<String> > handleException(ValidationException ex) {
+    public ResponseEntity<ResponseMessage<String>> handleException(ValidationException ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
@@ -61,7 +61,7 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler({ServiceDefinitionDoesNotExistException.class, ServiceDefinitionPlanDoesNotExistException.class, ServiceInstanceNotRetrievableException.class})
-    public ResponseEntity<ResponseMessage<String> > handleException(Exception ex) {
+    public ResponseEntity<ResponseMessage<String>> handleException(Exception ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
