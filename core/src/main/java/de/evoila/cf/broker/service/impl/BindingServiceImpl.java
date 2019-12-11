@@ -73,6 +73,9 @@ public abstract class BindingServiceImpl implements BindingService {
 		}
 
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
+		if (platformService == null) {
+			throw new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
+		}
 
 		BaseServiceInstanceBindingResponse baseServiceInstanceBindingResponse;
         String operationId = randomString.nextString();
@@ -102,16 +105,20 @@ public abstract class BindingServiceImpl implements BindingService {
 																  Map<String, Object> credentials, String syslogDrainUrl, String appGuid) {
 		ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId, serviceInstanceId, credentials,
 				syslogDrainUrl);
+		binding.setAppGuid(appGuid);
 		return binding;
 	}
 
 	@Override
 	public BaseServiceInstanceBindingResponse deleteServiceInstanceBinding(String bindingId, String planId, boolean async)
 			throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException,
-            AsyncRequiredException {
+				   AsyncRequiredException, ServiceBrokerException {
 		ServiceInstance serviceInstance = getServiceInstanceByBindingId(bindingId);
 		Plan plan = serviceDefinitionRepository.getPlan(planId);
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
+		if (platformService == null) {
+			throw new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
+		}
 		String operationId = randomString.nextString();
 		boolean wasExecutedAsync = false;
 
@@ -195,6 +202,9 @@ public abstract class BindingServiceImpl implements BindingService {
 		if (serviceInstanceBindingRequest.getBindResource() != null && !StringUtils
 				.isEmpty(serviceInstanceBindingRequest.getBindResource().getRoute())) {
 			RouteBinding routeBinding = bindRoute(serviceInstance, serviceInstanceBindingRequest.getBindResource().getRoute());
+			if (routeBinding == null) {
+				throw new ServiceBrokerException("Could not bind route.");
+			}
 			routeBindingRepository.addRouteBinding(routeBinding);
 			serviceInstanceBindingResponse = new ServiceInstanceBindingResponse(routeBinding.getRoute());
 
@@ -219,7 +229,7 @@ public abstract class BindingServiceImpl implements BindingService {
         try {
             ServiceInstanceBinding binding = bindingRepository.findOne(bindingId);
             unbindService(binding, serviceInstance, plan);
-        } catch (ServiceBrokerException | PlatformException e) {
+        } catch (Exception e) {
             log.error("Could not cleanup service binding", e);
         } finally {
             bindingRepository.unbindService(bindingId);
