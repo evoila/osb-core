@@ -35,8 +35,6 @@ public class Metadata extends InstanceGroupConfig {
 
     private boolean active = true;
 
-    private boolean shareable = true;
-
     public Metadata() {}
 
     public Metadata(int connections, int nodes, String vmType, String persistentDiskType, List<NetworkReference> networks,
@@ -128,15 +126,6 @@ public class Metadata extends InstanceGroupConfig {
 
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-
-    public boolean isShareable() {
-        return shareable;
-    }
-
-    public void setShareable(boolean shareable) {
-        this.shareable = shareable;
     }
 
     @Override
