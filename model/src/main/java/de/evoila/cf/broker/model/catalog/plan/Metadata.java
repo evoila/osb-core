@@ -35,6 +35,8 @@ public class Metadata extends InstanceGroupConfig {
 
     private boolean active = true;
 
+    private boolean shareable = true;
+
     public Metadata() {}
 
     public Metadata(int connections, int nodes, String vmType, String persistentDiskType, List<NetworkReference> networks,
@@ -128,6 +130,15 @@ public class Metadata extends InstanceGroupConfig {
         this.active = active;
     }
 
+
+    public boolean isShareable() {
+        return shareable;
+    }
+
+    public void setShareable(boolean shareable) {
+        this.shareable = shareable;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
@@ -150,5 +161,4 @@ public class Metadata extends InstanceGroupConfig {
     public int hashCode() {
         return Objects.hash(super.hashCode(), bullets, costs, backup, displayName, ingressInstanceGroup, egressInstanceGroup, instanceGroupConfig, customParameters, endpointName, active);
     }
-
 }
