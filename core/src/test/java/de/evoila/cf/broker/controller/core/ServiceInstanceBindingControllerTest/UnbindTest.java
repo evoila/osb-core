@@ -78,15 +78,13 @@ class UnbindTest extends BaseTest {
             assertEquals(EmptyRestResponse.BODY, response.getBody());
         }
 
-        @Nested
-        class notCaught {
 
             @Test
-            void asyncRequiredException() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException {
+            void asyncRequiredException() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException {
                 AsyncRequiredException exception = new AsyncRequiredException();
                 when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
-                                                                 HAPPY_PLAN_ID,
-                                                                 HAPPY_ACCEPTS_INCOMPLETE))
+                        HAPPY_PLAN_ID,
+                        HAPPY_ACCEPTS_INCOMPLETE))
                         .thenThrow(exception);
                 Exception ex = assertThrows(exception.getClass(),
                         () -> controller.unbind(HAPPY_INSTANCE_ID,
@@ -99,6 +97,30 @@ class UnbindTest extends BaseTest {
                                 HAPPY_ORIGINATING_ID));
                 assertSame(ex, exception);
             }
+
+        @Test
+        void notCaught() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException {
+                    Exception[] exceptions = {
+                            new AsyncRequiredException(),
+                            new ServiceBrokerException()
+                    };
+                    when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                            HAPPY_PLAN_ID,
+                            HAPPY_ACCEPTS_INCOMPLETE))
+                            .thenThrow(exceptions);
+                    for (Exception expectedEx : exceptions) {
+                        Exception ex = assertThrows(expectedEx.getClass(),
+                                () -> controller.unbind(HAPPY_INSTANCE_ID,
+                                        HAPPY_BINDING_ID,
+                                        HAPPY_SERVICE_ID,
+                                        HAPPY_PLAN_ID,
+                                        HAPPY_ACCEPTS_INCOMPLETE,
+                                        HAPPY_API_HEADER,
+                                        HAPPY_REQUEST_ID,
+                                        HAPPY_ORIGINATING_ID));
+                        assertSame(expectedEx, ex);
+                    }
+                }
 
             @Test
             void serviceInstanceDoesNotExist() throws ServiceInstanceDoesNotExistException {
@@ -157,7 +179,6 @@ class UnbindTest extends BaseTest {
                 assertEquals(ex.getDescription(), exception.getDescription());
                 assertEquals(ex.getError(), exception.getError());
             }
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -167,7 +188,7 @@ class UnbindTest extends BaseTest {
         private ResponseEntity<BaseServiceInstanceBindingResponse> response;
 
         @BeforeEach
-        void setUp() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException {
+        void setUp() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException {
             when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
                                                              HAPPY_PLAN_ID,
                                                              HAPPY_ACCEPTS_INCOMPLETE))
@@ -181,7 +202,7 @@ class UnbindTest extends BaseTest {
         }
 
         @Test
-        void validIdentityHeaders() throws AsyncRequiredException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException, ServiceInstanceBindingDoesNotExistsException {
+        void validIdentityHeaders() throws AsyncRequiredException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException {
             response = controller.unbind(HAPPY_INSTANCE_ID,
                                          HAPPY_BINDING_ID,
                                          HAPPY_SERVICE_ID,

@@ -127,7 +127,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
         if (platformService == null) {
-            throw new ServiceBrokerException("Not Platform configured for " + plan.getPlatform());
+            throw new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
         }
 
         if (platformService.isSyncPossibleOnCreate(plan)) {
@@ -163,7 +163,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         }
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
-        if (platformService.isSyncPossibleOnCreate(plan)) {
+        if (platformService.isSyncPossibleOnUpdate(serviceInstance, plan)) {
             syncUpdateInstance(serviceInstance, request.getParameters(), plan, platformService);
         } else {
             String jobProgressId = randomString.nextString();
@@ -182,7 +182,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     @Override
     public ServiceInstanceOperationResponse updateServiceInstanceContext(String serviceInstanceId,
                                                                          ServiceInstanceUpdateRequest serviceInstanceUpdateRequest)
-            throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
+            throws ServiceInstanceDoesNotExistException {
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
         serviceInstance.setContext(serviceInstanceUpdateRequest.getContext());
         serviceInstanceRepository.updateServiceInstance(serviceInstance);
@@ -196,6 +196,10 @@ public class DeploymentServiceImpl implements DeploymentService {
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
         Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
+        if (platformService == null) {
+            throw new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
+        }
+
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
 
         // Will cause a NPE, if there is no JobProgress object. To fix this, the JobRepository has to be touched.
