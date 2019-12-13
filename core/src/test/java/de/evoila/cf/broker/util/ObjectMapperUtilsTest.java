@@ -17,11 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ObjectMapperUtilsTest {
     private static final Path resourcePath = Path.of(".",
-                                                     "src",
-                                                     "test",
-                                                     "resources",
-                                                     "ObjectMapperUtils");
-    private static final String FILE_PLAN                       = "plan.json";
+            "src",
+            "test",
+            "resources",
+            "ObjectMapperUtils");
+    private static final String FILE_PLAN = "plan.json";
     private static final String FILE_SERVICE_INSTANCE_BINDING = "serviceInstanceBinding.json";
 
     @SuppressWarnings("InnerClassMayBeStatic")
@@ -37,7 +37,7 @@ class ObjectMapperUtilsTest {
         private <T> void testConversion(String fileName, Class<T> clazz) throws IOException {
             ObjectMapper objectMapper = new ObjectMapper();
             T object = objectMapper.readValue(resourcePath.resolve(fileName).toFile(),
-                                              clazz);
+                    clazz);
             Map expectedResult = objectMapper.convertValue(object, Map.class);
             Map<String, Object> result = ObjectMapperUtils.convertObjectToMap(object);
             assertEquals(expectedResult, result);
