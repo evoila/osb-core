@@ -8,7 +8,7 @@ import de.evoila.cf.broker.model.catalog.Catalog;
 /**
  * @author Patrick Weber.
  */
-public interface TranformCatalog {
-    void tranform(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration);
+public interface TransformCatalog {
+    void transform(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration);
     void clean(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration);
 }
