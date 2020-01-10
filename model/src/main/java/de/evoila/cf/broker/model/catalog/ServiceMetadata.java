@@ -1,9 +1,12 @@
 package de.evoila.cf.broker.model.catalog;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.Objects;
 
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ServiceMetadata {
 
     @JsonProperty("displayName")
@@ -23,6 +26,8 @@ public class ServiceMetadata {
 
     @JsonProperty("supportUrl")
     private String supportUrl;
+
+    private boolean shareable = true;
 
     public ServiceMetadata() {
     }
@@ -82,6 +87,14 @@ public class ServiceMetadata {
 
     public void setSupportUrl(String supportUrl) {
         this.supportUrl = supportUrl;
+    }
+
+    public void setShareable(boolean shareable) {
+        this.shareable = shareable;
+    }
+
+    public boolean isShareable() {
+        return shareable;
     }
 
     @Override
