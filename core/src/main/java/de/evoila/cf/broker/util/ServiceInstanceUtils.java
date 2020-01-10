@@ -29,8 +29,8 @@ public class ServiceInstanceUtils {
             return new ArrayList<>(serverAddresses);
         }
         return serverAddresses.stream()
-                              .filter(s -> s.getName().contains(filter))
-                              .collect(Collectors.toList());
+                .filter(s -> s.getName().contains(filter))
+                .collect(Collectors.toList());
     }
 
     public static String connectionUrl(List<ServerAddress> serverAddresses) {
@@ -39,15 +39,19 @@ public class ServiceInstanceUtils {
         }
         String url = "";
         for (ServerAddress serverAddress : serverAddresses) {
-            if (serverAddress.getIp() == null) {
-                continue;
+            if (serverAddress.getIp() != null) {
+                url = method(url, serverAddress);
             }
-            if (url.length() > 0)
-                url = url.concat(",");
-
-            url = url.concat(serverAddress.getIp() + ":" + serverAddress.getPort());
         }
         return url;
+    }
+
+    private static String method(String url, ServerAddress serverAddress) {
+        if (url.length() > 0)
+            url = url.concat(",");
+
+        return url.concat(serverAddress.getIp() + ":" + serverAddress.getPort());
+
     }
 
     public static Map<String, Object> bindingObject(List<ServerAddress> serverAddresses,
@@ -55,7 +59,7 @@ public class ServiceInstanceUtils {
                                                     String password,
                                                     Map<String, Object> additionalConfigs) {
         if (serverAddresses == null ||
-            serverAddresses.isEmpty()) {
+                serverAddresses.isEmpty()) {
 
             return Collections.emptyMap();
         }
@@ -125,14 +129,14 @@ public class ServiceInstanceUtils {
 
     /**
      * Checks whether a service creation with the given ServiceInstanceRequest would provision an identical service instance.
-     *
+     * <p>
      * This method heavily relies on the {@linkplain Object#equals(Object)} method to check for equality
      * and resulting non-effective changes to a field. So it is mandatory for all objects contained in
      * {@linkplain ServiceInstance#getParameters()} to have an overwritten equals method or can ensure equality by identity.
      *
      * @param serviceInstanceId the service instance object to compare with the provision request
-     * @param request the provision request object to compare with the service instance
-     * @param serviceInstance the service instance object to compare with the provision request
+     * @param request           the provision request object to compare with the service instance
+     * @param serviceInstance   the service instance object to compare with the provision request
      * @return true if provisioning would create an identical instance and false if it would not
      */
     public static boolean wouldCreateIdenticalInstance(String serviceInstanceId, ServiceInstanceRequest request, ServiceInstance serviceInstance) {
@@ -141,18 +145,18 @@ public class ServiceInstanceUtils {
         if (request.getParameters() == null ^ serviceInstance.getParameters() == null) return false;
 
         return serviceInstanceId.equals(serviceInstance.getId()) &&
-               Objects.equals(request.getServiceDefinitionId(), serviceInstance.getServiceDefinitionId()) &&
-               Objects.equals(request.getPlanId(), serviceInstance.getPlanId()) &&
-               Objects.equals(request.getOrganizationGuid(), serviceInstance.getOrganizationGuid()) &&
-               Objects.equals(request.getSpaceGuid(), serviceInstance.getSpaceGuid()) &&
-               compareContext(request, serviceInstance) &&
-               Objects.equals(request.getParameters(), serviceInstance.getParameters());
+                Objects.equals(request.getServiceDefinitionId(), serviceInstance.getServiceDefinitionId()) &&
+                Objects.equals(request.getPlanId(), serviceInstance.getPlanId()) &&
+                Objects.equals(request.getOrganizationGuid(), serviceInstance.getOrganizationGuid()) &&
+                Objects.equals(request.getSpaceGuid(), serviceInstance.getSpaceGuid()) &&
+                compareContext(request, serviceInstance) &&
+                Objects.equals(request.getParameters(), serviceInstance.getParameters());
     }
 
     /**
      * A null safe comparison of context objects from a request and service instance.
      *
-     * @param request The ServiceInstanceRequest that may holds a context object
+     * @param request         The ServiceInstanceRequest that may holds a context object
      * @param serviceInstance The ServiceInstance that may holds a context objects
      * @return true if both context objects are null or they are equal.
      */
@@ -161,16 +165,17 @@ public class ServiceInstanceUtils {
                 : request.getContext().equals(serviceInstance.getContext());
     }
 
-     /**
+    /**
      * Checks whether an update with the given ServiceInstanceUpdateRequest would effectively change the service instance.
-     *
+     * <p>
      * This method heavily relies on the {@linkplain Object#equals(Object)} method to check for equality
      * and resulting non-effective changes to a field. So it is mandatory for all objects contained in
      * {@linkplain ServiceInstance#getParameters()} to have an overwritten equals method or can ensure equality by identity.
-     *
+     * <p>
      * If either of the two values is null, the return value is always false.
+     *
      * @param serviceInstance the service instance object to compare with the update request
-     * @param request the update request object to compare with the service instance
+     * @param request         the update request object to compare with the service instance
      * @return true if update would have effects and false if it would not or a parameter is null
      */
     public static boolean isEffectivelyUpdating(ServiceInstance serviceInstance, ServiceInstanceUpdateRequest request) {
@@ -179,10 +184,10 @@ public class ServiceInstanceUtils {
         }
 
         return (request.getContext() == null ^ serviceInstance.getContext() == null) ||
-               (request.getParameters() == null ^ serviceInstance.getParameters() == null) ||
-               !Objects.equals(request.getServiceDefinitionId(), serviceInstance.getServiceDefinitionId()) ||
-               !Objects.equals(request.getPlanId(), serviceInstance.getPlanId()) ||
-               !Objects.equals(request.getContext(), serviceInstance.getContext()) ||
-               !Objects.equals(request.getParameters(), serviceInstance.getParameters());
+                (request.getParameters() == null ^ serviceInstance.getParameters() == null) ||
+                !Objects.equals(request.getServiceDefinitionId(), serviceInstance.getServiceDefinitionId()) ||
+                !Objects.equals(request.getPlanId(), serviceInstance.getPlanId()) ||
+                !Objects.equals(request.getContext(), serviceInstance.getContext()) ||
+                !Objects.equals(request.getParameters(), serviceInstance.getParameters());
     }
 }
