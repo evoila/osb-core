@@ -1,7 +1,6 @@
 package de.evoila.cf.broker.service.impl.DeploymentServiceImplTest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
+import org.everit.json.schema.SchemaException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,6 @@ import de.evoila.cf.broker.model.json.schema.JsonSchema;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -299,10 +297,9 @@ class CreateServiceInstanceTest extends BaseTest {
                                 .thenReturn(schemaServiceCreate);
                         when(schemaServiceCreate.getParameters())
                                 .thenReturn(jsonSchema);
-                        ServiceBrokerException ex = assertThrows(ServiceBrokerException.class,
-                                                                 () -> service.createServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
-                                                                                                     request));
-                        assertTrue(ex.getCause() instanceof JsonProcessingException);
+                        assertThrows(SchemaException.class,
+                                     () -> service.createServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
+                                                                         request));
                     }
 
                     @Nested

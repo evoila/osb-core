@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Map;
@@ -16,6 +17,6 @@ public class ObjectMapperUtils {
     }
 
     public static Map<String, Object> convertObjectToMap(Object object) {
-        return objectMapper.convertValue(object, Map.class);
+        return objectMapper.convertValue(object, new TypeReference<Map<String, Object>>() {});
     }
 }

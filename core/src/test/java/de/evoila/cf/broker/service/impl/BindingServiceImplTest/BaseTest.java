@@ -160,8 +160,7 @@ public class BaseTest {
     void setUp() {
         try {
             FieldSetter.setField(service,
-                                 service.getClass()         // Mock subclass of TestBindingServiceImpl
-                                        .getSuperclass()    // TestBindingServiceImpl
+                                 service.getClass()         // TestBindingServiceImpl
                                         .getSuperclass()    // BindingServiceImpl
                                         .getDeclaredField("log"), //
                                  log);
