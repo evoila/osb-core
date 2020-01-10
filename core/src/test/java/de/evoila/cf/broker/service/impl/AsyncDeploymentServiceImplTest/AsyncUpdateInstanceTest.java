@@ -35,14 +35,14 @@ class AsyncUpdateInstanceTest extends BaseTest {
     @DisplayName("Should log exception, when startJob(...) throws ServiceBrokerException")
     void startJobThrowsServiceBrokerException() throws ServiceBrokerException {
         super.mockStartJobThrowsException(JobProgress.UPDATE, new ServiceBrokerException("Test"), JOB_PROGRESS_DESCRIPTION);
-        asyncDeploymentService.asyncUpdateInstance(null, serviceInstance, null, null, null, JOB_PROGRESS_ID);
+        asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
 
     @Test
     @DisplayName("Should log exception and update JobProgress object, when startJob(...) throws RuntimeException")
     void startJobThrowsRuntimeException() throws ServiceBrokerException {
         mockStartJobThrowsException(JobProgress.UPDATE, new RuntimeException("Test"), JOB_PROGRESS_DESCRIPTION);
-        asyncDeploymentService.asyncUpdateInstance(null, serviceInstance, null, null, null, JOB_PROGRESS_ID);
+        asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
 
 
