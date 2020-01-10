@@ -14,18 +14,10 @@ class AsyncCreateInstanceTest extends BaseTest {
     private static final String JOB_PROGRESS_DESCRIPTION = "Creating service..";
 
 
-    private void createInstanceThrowsException(Exception expectedException) throws ServiceBrokerException {
+    private void whensForSyncCreateInstanceThrowsException(Exception expectedException) throws ServiceBrokerException {
         mockSuccessfulStartJob(JobProgress.PROVISION);
         when(deploymentService.syncCreateInstance(serviceInstance, parameters, plan, platformService))
                 .thenThrow(expectedException);
-    }
-
-    private void whensForSyncCreateInstanceThrowsServiceBrokerException() throws ServiceBrokerException {
-        createInstanceThrowsException(new ServiceBrokerException("Test"));
-    }
-
-    private void whensForSyncCreateInstanceThrowsRuntimeException() throws ServiceBrokerException {
-        createInstanceThrowsException(new RuntimeException("Test"));
     }
 
     private void whensForSyncCreateInstanceSucceeds(JobProgress returnOfSucceedProgress) throws ServiceBrokerException {
@@ -57,7 +49,7 @@ class AsyncCreateInstanceTest extends BaseTest {
     @Test
     @DisplayName("Should log exception, when syncCreateInstance(...) fails with ServiceBrokerException.")
     void syncCreateInstanceThrowsServiceBrokerException() throws ServiceBrokerException {
-        whensForSyncCreateInstanceThrowsServiceBrokerException();
+        whensForSyncCreateInstanceThrowsException(new ServiceBrokerException("Test"));
 
         asyncDeploymentService.asyncCreateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
@@ -65,7 +57,7 @@ class AsyncCreateInstanceTest extends BaseTest {
     @Test
     @DisplayName("Should log exception and update JobProgress object, when syncCreateInstance(...) fails with RuntimeException.")
     void syncCreateInstanceThrowsRuntimeException() throws ServiceBrokerException {
-        whensForSyncCreateInstanceThrowsRuntimeException();
+        whensForSyncCreateInstanceThrowsException(new RuntimeException("Test"));
 
         asyncDeploymentService.asyncCreateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
