@@ -55,19 +55,10 @@ abstract class BaseTest {
                 .thenReturn(startedJob);
     }
 
-    void mockStartJobThrowsServiceBrokerException(String jobProgress, String description) throws ServiceBrokerException {
-        ServiceBrokerException serviceBrokerException = new ServiceBrokerException("Test");
+    void mockStartJobThrowsException(String jobProgress, Exception e, String description) throws ServiceBrokerException {
         when(serviceInstance.getId())
                 .thenReturn(SERVICE_INSTANCE_ID);
         when(jobProgressService.startJob(JOB_PROGRESS_ID, SERVICE_INSTANCE_ID, description, jobProgress))
-                .thenThrow(serviceBrokerException);
-    }
-
-    void mockStartJobThrowsRuntimeException(String jobProgress, String description) throws ServiceBrokerException {
-        RuntimeException runtimeException = new RuntimeException("Test");
-        when(serviceInstance.getId())
-                .thenReturn(SERVICE_INSTANCE_ID);
-        when(jobProgressService.startJob(JOB_PROGRESS_ID, SERVICE_INSTANCE_ID, description, jobProgress))
-                .thenThrow(runtimeException);
+                .thenThrow(e);
     }
 }

@@ -4,6 +4,7 @@ import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.model.JobProgress;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import static org.mockito.Mockito.*;
 
 class AsyncDeleteInstanceTest extends BaseTest {
@@ -15,39 +16,31 @@ class AsyncDeleteInstanceTest extends BaseTest {
         doThrow(expectedException).when(deploymentService).syncDeleteInstance(serviceInstance, plan, platformService);
     }
 
-    private void whenSyncDeleteInstanceThrowsServiceBrokerException() throws ServiceBrokerException {
-        whenSyncDeleteInstanceThrowsException(new ServiceBrokerException("Test"));
-    }
-
-    private void whenSyncDeleteInstanceThrowsRuntimeException() throws ServiceBrokerException {
-        whenSyncDeleteInstanceThrowsException(new RuntimeException("Test"));
-    }
-
     @Test
     @DisplayName("Should log exception, when jobStart(...) throws ServiceBrokerException.")
     void startJobThrowsServiceBrokerException() throws ServiceBrokerException {
-        mockStartJobThrowsServiceBrokerException(JobProgress.DELETE, JOB_PROGRESS_DESCRIPTION);
-        asyncDeploymentService.asyncDeleteInstance(null, serviceInstance, null, null, JOB_PROGRESS_ID);
+        mockStartJobThrowsException(JobProgress.DELETE, new ServiceBrokerException("Test"), JOB_PROGRESS_DESCRIPTION);
+        asyncDeploymentService.asyncDeleteInstance(deploymentService, serviceInstance, plan, platformService, JOB_PROGRESS_ID);
     }
 
     @Test
     @DisplayName("Should log exception and update JobProgress, when jobStart(...) throws RuntimeException.")
     void startJobThrowsRuntimeException() throws ServiceBrokerException {
-        mockStartJobThrowsRuntimeException(JobProgress.DELETE, JOB_PROGRESS_DESCRIPTION);
-        asyncDeploymentService.asyncDeleteInstance(null, serviceInstance, null, null, JOB_PROGRESS_ID);
+        mockStartJobThrowsException(JobProgress.DELETE, new ServiceBrokerException("Test"), JOB_PROGRESS_DESCRIPTION);
+        asyncDeploymentService.asyncDeleteInstance(deploymentService, serviceInstance, plan, platformService, JOB_PROGRESS_ID);
     }
 
     @Test
     @DisplayName("Should log exception, when syncDeleteInstance(...) throws ServiceBrokerException.")
     void syncDeleteInstanceThrowsServiceBrokerException() throws ServiceBrokerException {
-        whenSyncDeleteInstanceThrowsServiceBrokerException();
+        whenSyncDeleteInstanceThrowsException(new ServiceBrokerException("Test"));
         asyncDeploymentService.asyncDeleteInstance(deploymentService, serviceInstance, plan, platformService, JOB_PROGRESS_ID);
     }
 
     @Test
     @DisplayName("Should log exception and update JobProgress, when syncDeleteInstance(...) throws RuntimeException.")
     void syncDeleteInstanceThrowsRuntimeException() throws ServiceBrokerException {
-        whenSyncDeleteInstanceThrowsRuntimeException();
+        whenSyncDeleteInstanceThrowsException(new RuntimeException("Test"));
         asyncDeploymentService.asyncDeleteInstance(deploymentService, serviceInstance, plan, platformService, JOB_PROGRESS_ID);
     }
 

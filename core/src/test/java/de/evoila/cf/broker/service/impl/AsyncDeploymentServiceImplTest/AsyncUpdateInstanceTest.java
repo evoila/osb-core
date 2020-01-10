@@ -5,7 +5,6 @@ import de.evoila.cf.broker.model.JobProgress;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 class AsyncUpdateInstanceTest extends BaseTest {
@@ -35,14 +34,14 @@ class AsyncUpdateInstanceTest extends BaseTest {
     @Test
     @DisplayName("Should log exception, when startJob(...) throws ServiceBrokerException")
     void startJobThrowsServiceBrokerException() throws ServiceBrokerException {
-        super.mockStartJobThrowsServiceBrokerException(JobProgress.UPDATE, JOB_PROGRESS_DESCRIPTION);
+        super.mockStartJobThrowsException(JobProgress.UPDATE, new ServiceBrokerException("Test"), JOB_PROGRESS_DESCRIPTION);
         asyncDeploymentService.asyncUpdateInstance(null, serviceInstance, null, null, null, JOB_PROGRESS_ID);
     }
 
     @Test
     @DisplayName("Should log exception and update JobProgress object, when startJob(...) throws RuntimeException")
     void startJobThrowsRuntimeException() throws ServiceBrokerException {
-        mockStartJobThrowsRuntimeException(JobProgress.UPDATE, JOB_PROGRESS_DESCRIPTION);
+        mockStartJobThrowsException(JobProgress.UPDATE, new RuntimeException("Test"), JOB_PROGRESS_DESCRIPTION);
         asyncDeploymentService.asyncUpdateInstance(null, serviceInstance, null, null, null, JOB_PROGRESS_ID);
     }
 

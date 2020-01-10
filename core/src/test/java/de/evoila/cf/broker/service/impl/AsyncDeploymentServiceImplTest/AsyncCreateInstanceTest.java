@@ -14,7 +14,7 @@ class AsyncCreateInstanceTest extends BaseTest {
     private static final String JOB_PROGRESS_DESCRIPTION = "Creating service..";
 
 
-    private void createInstanceThrowsException(Exception expectedException) throws ServiceBrokerException{
+    private void createInstanceThrowsException(Exception expectedException) throws ServiceBrokerException {
         mockSuccessfulStartJob(JobProgress.PROVISION);
         when(deploymentService.syncCreateInstance(serviceInstance, parameters, plan, platformService))
                 .thenThrow(expectedException);
@@ -41,7 +41,7 @@ class AsyncCreateInstanceTest extends BaseTest {
     @Test
     @DisplayName("Should log exception and update JobProgress object, when startJob(...) throws runtime exception.")
     void startJobThrowsRuntimeException() throws ServiceBrokerException {
-        mockStartJobThrowsRuntimeException(JobProgress.PROVISION, JOB_PROGRESS_DESCRIPTION);
+        mockStartJobThrowsException(JobProgress.PROVISION, new RuntimeException("Test"), JOB_PROGRESS_DESCRIPTION);
         asyncDeploymentService.asyncCreateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
 
     }
@@ -49,7 +49,7 @@ class AsyncCreateInstanceTest extends BaseTest {
     @Test
     @DisplayName("Should log exception, when startJob(...) fails with ServiceBrokerException.")
     void startJobThrowsServiceBrokerException() throws ServiceBrokerException {
-        mockStartJobThrowsServiceBrokerException(JobProgress.PROVISION, JOB_PROGRESS_DESCRIPTION);
+        mockStartJobThrowsException(JobProgress.PROVISION, new ServiceBrokerException("Test"), JOB_PROGRESS_DESCRIPTION);
 
         asyncDeploymentService.asyncCreateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }

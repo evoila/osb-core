@@ -38,8 +38,7 @@ class AsyncCreateBindingTest extends BaseTest {
     @DisplayName("Should log exception, when createBinding(...) throws ServiceBrokerException")
     void createBindingThrowsServiceBrokerException() throws ServiceBrokerException, InvalidParametersException, PlatformException {
         mockStartJobReturnsJobProgress(JobProgress.BIND, DESCRIPTION);
-        when(bindingService.createBinding(SERVICE_BINDING_ID, serviceInstance, serviceInstanceBindingRequest, plan))
-                .thenThrow(new ServiceBrokerException("Test"));
+        mockCreateBindingThrowsException(new ServiceBrokerException("Test"));
         runCreateBinding();
     }
 
@@ -47,8 +46,7 @@ class AsyncCreateBindingTest extends BaseTest {
     @DisplayName("Should log exception, when createBinding(...) throws RuntimeException")
     void createBindingThrowsRuntimeException() throws ServiceBrokerException, InvalidParametersException, PlatformException {
         mockStartJobReturnsJobProgress(JobProgress.BIND, DESCRIPTION);
-        when(bindingService.createBinding(SERVICE_BINDING_ID, serviceInstance, serviceInstanceBindingRequest, plan))
-                .thenThrow(new RuntimeException("Test"));
+        mockCreateBindingThrowsException(new RuntimeException("Test"));
         runCreateBinding();
         verify(jobProgressService, times(1))
                 .failJob(JOB_PROGRESS_ID, "Internal error during instance binding creation, please contact our support.");
@@ -56,12 +54,17 @@ class AsyncCreateBindingTest extends BaseTest {
 
     @Test
     @DisplayName("Should not fail, when no exceptions occurs.")
-    void syncCreateBindingSucceedsReturnsObject() throws ServiceBrokerException, PlatformException, InvalidParametersException {
+    void createBindingSucceeds() throws ServiceBrokerException, PlatformException, InvalidParametersException {
         mockStartJobReturnsJobProgress(JobProgress.BIND, DESCRIPTION);
         runCreateBinding();
         verify(bindingService, times(1)).createBinding(
                 SERVICE_BINDING_ID, serviceInstance, serviceInstanceBindingRequest, plan);
         verify(jobProgressService, times(1)).succeedProgress(JOB_PROGRESS_ID, "Instance Binding successfully created");
+    }
+
+    private void mockCreateBindingThrowsException(Exception ex) throws RuntimeException, ServiceBrokerException, InvalidParametersException, PlatformException {
+        when(bindingService.createBinding(SERVICE_BINDING_ID, serviceInstance, serviceInstanceBindingRequest, plan))
+                .thenThrow(ex);
     }
 
     private void runCreateBinding() {
