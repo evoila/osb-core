@@ -17,14 +17,6 @@ class AsyncUpdateInstanceTest extends BaseTest {
                 .thenThrow(expectedException);
     }
 
-    private void whensForSyncUpdateInstanceThrowsServiceBrokerException() throws ServiceBrokerException {
-        whensForSyncUpdateInstanceThrowsException(new ServiceBrokerException("Test"));
-    }
-
-    private void whensForSyncUpdateInstanceThrowsRuntimeException() throws ServiceBrokerException {
-        whensForSyncUpdateInstanceThrowsException(new RuntimeException("Test"));
-    }
-
     private void whensForSyncUpdateInstanceSucceeds() throws ServiceBrokerException {
         mockSuccessfulStartJob(JobProgress.UPDATE);
         when(deploymentService.syncUpdateInstance(serviceInstance, parameters, plan, platformService))
@@ -49,15 +41,14 @@ class AsyncUpdateInstanceTest extends BaseTest {
     @Test
     @DisplayName("Should log exception, when syncUpdateInstance(...) throws ServiceBrokerException")
     void syncUpdateInstanceThrowsServiceBrokerException() throws ServiceBrokerException {
-        whensForSyncUpdateInstanceThrowsServiceBrokerException();
-
+        whensForSyncUpdateInstanceThrowsException(new ServiceBrokerException("Test"));
         asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
 
     @Test
     @DisplayName("Should log exception, when syncUpdateInstance(...) throws RuntimeException")
     void syncUpdateInstanceThrowsRuntimeException() throws ServiceBrokerException {
-        whensForSyncUpdateInstanceThrowsRuntimeException();
+        whensForSyncUpdateInstanceThrowsException(new RuntimeException("Test"));
 
         asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
@@ -65,7 +56,7 @@ class AsyncUpdateInstanceTest extends BaseTest {
 
     @Test
     void syncUpdateInstanceThrowsExceptionFailJobReturnsObject() throws ServiceBrokerException {
-        whensForSyncUpdateInstanceThrowsServiceBrokerException();
+        whensForSyncUpdateInstanceThrowsException(new ServiceBrokerException("Test"));
 
         asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
