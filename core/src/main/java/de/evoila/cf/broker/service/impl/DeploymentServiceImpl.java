@@ -1,6 +1,4 @@
-/**
- *
- */
+
 package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
@@ -33,7 +31,7 @@ import java.util.Optional;
 @Service
 public class DeploymentServiceImpl implements DeploymentService {
 
-    Logger log = LoggerFactory.getLogger(getClass());
+    private Logger log = LoggerFactory.getLogger(getClass());
 
     private PlatformRepository platformRepository;
 
