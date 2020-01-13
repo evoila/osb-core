@@ -33,6 +33,15 @@ public class ServiceInstanceUtils {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Takes a List of ServerAddress and returns their IPs and Ports as a String each separated with a comma.
+     * <p>
+     * Example: 192.168.254.1:8080, 192.168.254.1:8080
+     *
+     * @param serverAddresses ServerAddress objects as a List
+     * @return A String containing the ServerAddresses as Ips and ports separated with a comma.
+     * If the list is null or empty, it returns an empty String.
+     */
     public static String connectionUrl(List<ServerAddress> serverAddresses) {
         if (serverAddressesNullOrEmpty(serverAddresses)) {
             return "";
@@ -46,9 +55,18 @@ public class ServiceInstanceUtils {
         return url;
     }
 
-    private static String method(String url, ServerAddress serverAddress) {
-        if (url.length() > 0)
+    /**
+     * Takes a single ServerAddress object and adds it's Ip and Port to the provided url string separated by a comma. if
+     *
+     * @param url           the URL as a String
+     * @param serverAddress the ServerAddress containing the IP and Port that are supposed to be concat to the URL
+     * @return the initial url with the added server address, separated by a comma. If the url is an empty String it returns the
+     * Ip and port of the ServerAddress object.
+     */
+    private static String concatServerAddressToUrl(String url, ServerAddress serverAddress) {
+        if (!url.isEmpty()) {
             url = url.concat(",");
+        }
 
         return url.concat(serverAddress.getIp() + ":" + serverAddress.getPort());
     }
