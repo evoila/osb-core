@@ -2,6 +2,8 @@ package de.evoila.cf.broker.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Objects;
+
 /**
  * @author Johannes Hiemer.
  */
@@ -29,6 +31,20 @@ public class ServiceInstanceBindingOperationResponse extends BaseServiceInstance
     public ServiceInstanceBindingOperationResponse(String operation, boolean async) {
         this.operation = operation;
         this.async = async;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        if (!super.equals(o)) { return false; }
+        ServiceInstanceBindingOperationResponse that = (ServiceInstanceBindingOperationResponse) o;
+        return Objects.equals(operation, that.operation);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), operation);
     }
 
 }
