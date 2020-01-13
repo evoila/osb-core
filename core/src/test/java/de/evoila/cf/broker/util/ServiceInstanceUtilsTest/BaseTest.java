@@ -1,12 +1,10 @@
 package de.evoila.cf.broker.util.ServiceInstanceUtilsTest;
 
+import de.evoila.cf.broker.model.ServiceInstance;
+import de.evoila.cf.broker.model.context.Context;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import de.evoila.cf.broker.model.ServiceInstance;
-import de.evoila.cf.broker.model.ServiceInstanceRequest;
-import de.evoila.cf.broker.model.context.Context;
 
 @ExtendWith(MockitoExtension.class)
 abstract class BaseTest {

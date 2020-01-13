@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Map;
 
 import de.evoila.cf.broker.model.ServiceInstanceUpdateRequest;
 import de.evoila.cf.broker.model.context.Context;
@@ -21,6 +21,8 @@ class IsEffectivelyUpdatingTest extends BaseTest {
     @Mock
     private ServiceInstanceUpdateRequest request;
 
+    private Map<String, Object> parameters = Map.of("Key", "Value");
+
     @Nested
     class returnsTrue {
 
@@ -34,22 +36,17 @@ class IsEffectivelyUpdatingTest extends BaseTest {
 
             @Test
             void withRequestContextNull() {
-                when(request.getContext())
-                        .thenReturn(null);
-                when(serviceInstance.getContext())
-                        .thenReturn(context);
+                when(request.getContext()).thenReturn(null);
+                when(serviceInstance.getContext()).thenReturn(context);
                 testForTrue();
             }
 
             @Test
             void withServiceInstanceContextNull() {
-                when(request.getContext())
-                        .thenReturn(context);
-                when(serviceInstance.getContext())
-                        .thenReturn(null);
+                when(request.getContext()).thenReturn(context);
+                when(serviceInstance.getContext()).thenReturn(null);
                 testForTrue();
             }
-
         }
 
         @Nested
@@ -57,22 +54,17 @@ class IsEffectivelyUpdatingTest extends BaseTest {
 
             @Test
             void withRequestParametersNull() {
-                when(request.getParameters())
-                        .thenReturn(null);
-                when(serviceInstance.getParameters())
-                        .thenReturn(Collections.emptyMap());
+                when(request.getParameters()).thenReturn(null);
+                when(serviceInstance.getParameters()).thenReturn(Collections.emptyMap());
                 testForTrue();
             }
 
             @Test
             void withServiceInstanceParametersNull() {
-                when(request.getParameters())
-                        .thenReturn(Collections.emptyMap());
-                when(serviceInstance.getParameters())
-                        .thenReturn(null);
+                when(request.getParameters()).thenReturn(Collections.emptyMap());
+                when(serviceInstance.getParameters()).thenReturn(null);
                 testForTrue();
             }
-
         }
 
         @Nested
@@ -83,22 +75,17 @@ class IsEffectivelyUpdatingTest extends BaseTest {
 
                 @Test
                 void withRequestIdNull() {
-                    when(request.getServiceDefinitionId())
-                            .thenReturn(null);
-                    when(serviceInstance.getServiceDefinitionId())
-                            .thenReturn(HAPPY_SERVICE_DEFINITION_ID);
+                    when(request.getServiceDefinitionId()).thenReturn(null);
+                    when(serviceInstance.getServiceDefinitionId()).thenReturn(HAPPY_SERVICE_DEFINITION_ID);
                     testForTrue();
                 }
 
                 @Test
                 void withServiceInstanceIdNull() {
-                    when(request.getServiceDefinitionId())
-                            .thenReturn(HAPPY_SERVICE_DEFINITION_ID);
-                    when(serviceInstance.getServiceDefinitionId())
-                            .thenReturn(null);
+                    when(request.getServiceDefinitionId()).thenReturn(HAPPY_SERVICE_DEFINITION_ID);
+                    when(serviceInstance.getServiceDefinitionId()).thenReturn(null);
                     testForTrue();
                 }
-
             }
 
             @Nested
@@ -106,33 +93,25 @@ class IsEffectivelyUpdatingTest extends BaseTest {
 
                 @Test
                 void withRequestIdEmpty() {
-                    when(request.getServiceDefinitionId())
-                            .thenReturn("");
-                    when(serviceInstance.getServiceDefinitionId())
-                            .thenReturn(HAPPY_SERVICE_DEFINITION_ID);
+                    when(request.getServiceDefinitionId()).thenReturn("");
+                    when(serviceInstance.getServiceDefinitionId()).thenReturn(HAPPY_SERVICE_DEFINITION_ID);
                     testForTrue();
                 }
 
                 @Test
                 void withServiceInstanceIdEmpty() {
-                    when(request.getServiceDefinitionId())
-                            .thenReturn(HAPPY_SERVICE_DEFINITION_ID);
-                    when(serviceInstance.getServiceDefinitionId())
-                            .thenReturn("");
+                    when(request.getServiceDefinitionId()).thenReturn(HAPPY_SERVICE_DEFINITION_ID);
+                    when(serviceInstance.getServiceDefinitionId()).thenReturn("");
                     testForTrue();
                 }
-
             }
 
             @Test
             void withRequestIdOtherId() {
-                when(request.getServiceDefinitionId())
-                        .thenReturn("Mock");
-                when(serviceInstance.getServiceDefinitionId())
-                        .thenReturn(HAPPY_SERVICE_DEFINITION_ID);
+                when(request.getServiceDefinitionId()).thenReturn("Mock");
+                when(serviceInstance.getServiceDefinitionId()).thenReturn(HAPPY_SERVICE_DEFINITION_ID);
                 testForTrue();
             }
-
         }
 
         @Nested
@@ -143,22 +122,17 @@ class IsEffectivelyUpdatingTest extends BaseTest {
 
                 @Test
                 void withRequestIdNull() {
-                    when(request.getPlanId())
-                            .thenReturn(null);
-                    when(serviceInstance.getPlanId())
-                            .thenReturn(HAPPY_PLAN_ID);
+                    when(request.getPlanId()).thenReturn(null);
+                    when(serviceInstance.getPlanId()).thenReturn(HAPPY_PLAN_ID);
                     testForTrue();
                 }
 
                 @Test
                 void withServiceInstanceIdNull() {
-                    when(request.getPlanId())
-                            .thenReturn(HAPPY_PLAN_ID);
-                    when(serviceInstance.getPlanId())
-                            .thenReturn(null);
+                    when(request.getPlanId()).thenReturn(HAPPY_PLAN_ID);
+                    when(serviceInstance.getPlanId()).thenReturn(null);
                     testForTrue();
                 }
-
             }
 
             @Nested
@@ -166,57 +140,42 @@ class IsEffectivelyUpdatingTest extends BaseTest {
 
                 @Test
                 void withRequestIdEmpty() {
-                    when(request.getPlanId())
-                            .thenReturn("");
-                    when(serviceInstance.getPlanId())
-                            .thenReturn(HAPPY_PLAN_ID);
+                    when(request.getPlanId()).thenReturn("");
+                    when(serviceInstance.getPlanId()).thenReturn(HAPPY_PLAN_ID);
                     testForTrue();
                 }
 
                 @Test
                 void withServiceInstanceIdEmpty() {
-                    when(request.getPlanId())
-                            .thenReturn(HAPPY_PLAN_ID);
-                    when(serviceInstance.getPlanId())
-                            .thenReturn("");
+                    when(request.getPlanId()).thenReturn(HAPPY_PLAN_ID);
+                    when(serviceInstance.getPlanId()).thenReturn("");
                     testForTrue();
                 }
-
             }
 
             @Test
             void withRequestIdOtherId() {
-                when(request.getPlanId())
-                        .thenReturn("Mock");
-                when(serviceInstance.getPlanId())
-                        .thenReturn(HAPPY_PLAN_ID);
+                when(request.getPlanId()).thenReturn("Mock");
+                when(serviceInstance.getPlanId()).thenReturn(HAPPY_PLAN_ID);
                 testForTrue();
             }
-
         }
 
         @Test
         void withDifferentContexts() {
             Context secondContext = mock(Context.class);
-            when(request.getContext())
-                    .thenReturn(context);
-            when(serviceInstance.getContext())
-                    .thenReturn(secondContext);
+            when(request.getContext()).thenReturn(context);
+            when(serviceInstance.getContext()).thenReturn(secondContext);
             // By default mocked objects only test equality over references, which is ok here
             testForTrue();
         }
 
         @Test
         void withDifferentParameters() {
-            when(request.getParameters())
-                    .thenReturn(Collections.emptyMap());
-            when(serviceInstance.getParameters())
-                    .thenReturn(new HashMap<>() {{
-                        put("Key", "Value");
-                    }});
+            when(request.getParameters()).thenReturn(Collections.emptyMap());
+            when(serviceInstance.getParameters()).thenReturn(parameters);
             testForTrue();
         }
-
     }
 
     @Nested
@@ -238,30 +197,16 @@ class IsEffectivelyUpdatingTest extends BaseTest {
 
         @Test
         void withAllValid() {
-            when(request.getServiceDefinitionId())
-                    .thenReturn(HAPPY_SERVICE_INSTANCE_ID);
-            when(serviceInstance.getServiceDefinitionId())
-                    .thenReturn(HAPPY_SERVICE_INSTANCE_ID);
-            when(request.getPlanId())
-                    .thenReturn(HAPPY_SERVICE_INSTANCE_ID);
-            when(serviceInstance.getPlanId())
-                    .thenReturn(HAPPY_SERVICE_INSTANCE_ID);
-            when(request.getContext())
-                    .thenReturn(context);
-            when(serviceInstance.getContext())
-                    .thenReturn(context);
-            when(request.getParameters())
-                    .thenReturn(new HashMap<>() {{
-                        put("Key", "Value");
-                    }});
-            when(serviceInstance.getParameters())
-                    .thenReturn(new HashMap<>() {{
-                        put("Key", "Value");
-                    }});
+            when(request.getServiceDefinitionId()).thenReturn(HAPPY_SERVICE_INSTANCE_ID);
+            when(serviceInstance.getServiceDefinitionId()).thenReturn(HAPPY_SERVICE_INSTANCE_ID);
+            when(request.getPlanId()).thenReturn(HAPPY_SERVICE_INSTANCE_ID);
+            when(serviceInstance.getPlanId()).thenReturn(HAPPY_SERVICE_INSTANCE_ID);
+            when(request.getContext()).thenReturn(context);
+            when(serviceInstance.getContext()).thenReturn(context);
+            when(request.getParameters()).thenReturn(parameters);
+            when(serviceInstance.getParameters()).thenReturn(parameters);
             boolean result = ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request);
             assertFalse(result);
         }
-
     }
-
 }

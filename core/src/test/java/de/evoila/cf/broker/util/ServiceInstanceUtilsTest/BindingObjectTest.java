@@ -22,10 +22,7 @@ class BindingObjectTest extends BaseTest {
     @Test
     void withNullList() {
         Map<String, Object> expectedResult = Collections.emptyMap();
-        Map<String, Object> result = ServiceInstanceUtils.bindingObject(null,
-                                                                        null,
-                                                                        null,
-                                                                        null);
+        Map<String, Object> result = ServiceInstanceUtils.bindingObject(null, null, null, null);
         assertEquals(expectedResult, result);
     }
 
@@ -34,8 +31,8 @@ class BindingObjectTest extends BaseTest {
     class withNotFullySetServerAddresses {
 
         private List<ServerAddress> inputList = List.of(new ServerAddress("OnlyName1"),
-                                                        new ServerAddress("OnlyName2"),
-                                                        new ServerAddress("OnlyName3"));
+                new ServerAddress("OnlyName2"),
+                new ServerAddress("OnlyName3"));
 
         @Test
         void withOne() {
@@ -45,9 +42,9 @@ class BindingObjectTest extends BaseTest {
             }};
             List<ServerAddress> oneItemList = inputList.subList(0, 1);
             Map<String, Object> result = ServiceInstanceUtils.bindingObject(oneItemList,
-                                                                            null,
-                                                                            null,
-                                                                            null);
+                    null,
+                    null,
+                    null);
             assertEquals(expectedResult, result);
         }
 
@@ -70,9 +67,9 @@ class BindingObjectTest extends BaseTest {
                 }});
             }};
             Map<String, Object> result = ServiceInstanceUtils.bindingObject(inputList,
-                                                                            null,
-                                                                            null,
-                                                                            null);
+                    null,
+                    null,
+                    null);
             assertEquals(expectedResult, result);
         }
 
@@ -83,8 +80,8 @@ class BindingObjectTest extends BaseTest {
     class withFullySetServerAddresses {
 
         private List<ServerAddress> inputList = List.of(new ServerAddress("Name1", "ip1", 1),
-                                                        new ServerAddress("Name2", "ip2", 2),
-                                                        new ServerAddress("Name3", "ip3", 3));
+                new ServerAddress("Name2", "ip2", 2),
+                new ServerAddress("Name3", "ip3", 3));
 
         @Nested
         class withOne {
@@ -98,9 +95,9 @@ class BindingObjectTest extends BaseTest {
                     put(PORT, inputList.get(0).getPort());
                 }};
                 Map<String, Object> result = ServiceInstanceUtils.bindingObject(oneItemList,
-                                                                                null,
-                                                                                null,
-                                                                                null);
+                        null,
+                        null,
+                        null);
                 assertEquals(expectedResult, result);
             }
 
@@ -116,9 +113,9 @@ class BindingObjectTest extends BaseTest {
                         put(PASSWORD, HAPPY_PASSWORD);
                     }};
                     Map<String, Object> result = ServiceInstanceUtils.bindingObject(oneItemList,
-                                                                                    HAPPY_USERNAME,
-                                                                                    HAPPY_PASSWORD,
-                                                                                    null);
+                            HAPPY_USERNAME,
+                            HAPPY_PASSWORD,
+                            null);
                     assertEquals(expectedResult, result);
                 }
 
@@ -135,9 +132,9 @@ class BindingObjectTest extends BaseTest {
                             put(PASSWORD, HAPPY_PASSWORD);
                         }};
                         Map<String, Object> result = ServiceInstanceUtils.bindingObject(oneItemList,
-                                                                                        HAPPY_USERNAME,
-                                                                                        HAPPY_PASSWORD,
-                                                                                        additionalConfig);
+                                HAPPY_USERNAME,
+                                HAPPY_PASSWORD,
+                                additionalConfig);
                         assertEquals(expectedResult, result);
                     }
 
@@ -156,9 +153,9 @@ class BindingObjectTest extends BaseTest {
                             put("additional2", "value2");
                         }};
                         Map<String, Object> result = ServiceInstanceUtils.bindingObject(oneItemList,
-                                                                                        HAPPY_USERNAME,
-                                                                                        HAPPY_PASSWORD,
-                                                                                        additionalConfig);
+                                HAPPY_USERNAME,
+                                HAPPY_PASSWORD,
+                                additionalConfig);
                         assertEquals(expectedResult, result);
                     }
 
@@ -171,9 +168,9 @@ class BindingObjectTest extends BaseTest {
                             put(PASSWORD, "OverriddenPassword");
                         }};
                         Map<String, Object> result = ServiceInstanceUtils.bindingObject(oneItemList,
-                                                                                        HAPPY_USERNAME,
-                                                                                        HAPPY_PASSWORD,
-                                                                                        additionalConfig);
+                                HAPPY_USERNAME,
+                                HAPPY_PASSWORD,
+                                additionalConfig);
                         assertEquals(additionalConfig, result);
                     }
 
@@ -199,9 +196,9 @@ class BindingObjectTest extends BaseTest {
                     }});
                 }};
                 Map<String, Object> result = ServiceInstanceUtils.bindingObject(inputList,
-                                                                                null,
-                                                                                null,
-                                                                                null);
+                        null,
+                        null,
+                        null);
                 assertEquals(expectedResult, result);
             }
 
@@ -223,9 +220,9 @@ class BindingObjectTest extends BaseTest {
                         put(PASSWORD, HAPPY_PASSWORD);
                     }};
                     Map<String, Object> result = ServiceInstanceUtils.bindingObject(inputList,
-                                                                                    HAPPY_USERNAME,
-                                                                                    HAPPY_PASSWORD,
-                                                                                    null);
+                            HAPPY_USERNAME,
+                            HAPPY_PASSWORD,
+                            null);
                     assertEquals(expectedResult, result);
                 }
 
@@ -248,9 +245,9 @@ class BindingObjectTest extends BaseTest {
                             put(PASSWORD, HAPPY_PASSWORD);
                         }};
                         Map<String, Object> result = ServiceInstanceUtils.bindingObject(inputList,
-                                                                                        HAPPY_USERNAME,
-                                                                                        HAPPY_PASSWORD,
-                                                                                        additionalConfig);
+                                HAPPY_USERNAME,
+                                HAPPY_PASSWORD,
+                                additionalConfig);
                         assertEquals(expectedResult, result);
                     }
 
@@ -275,9 +272,9 @@ class BindingObjectTest extends BaseTest {
                             put("additional2", "value2");
                         }};
                         Map<String, Object> result = ServiceInstanceUtils.bindingObject(inputList,
-                                                                                        HAPPY_USERNAME,
-                                                                                        HAPPY_PASSWORD,
-                                                                                        additionalConfig);
+                                HAPPY_USERNAME,
+                                HAPPY_PASSWORD,
+                                additionalConfig);
                         assertEquals(expectedResult, result);
                     }
 
@@ -290,9 +287,9 @@ class BindingObjectTest extends BaseTest {
                             put(PASSWORD, "OverriddenPassword");
                         }};
                         Map<String, Object> result = ServiceInstanceUtils.bindingObject(inputList,
-                                                                                        HAPPY_USERNAME,
-                                                                                        HAPPY_PASSWORD,
-                                                                                        additionalConfig);
+                                HAPPY_USERNAME,
+                                HAPPY_PASSWORD,
+                                additionalConfig);
                         assertEquals(additionalConfig, result);
                     }
 

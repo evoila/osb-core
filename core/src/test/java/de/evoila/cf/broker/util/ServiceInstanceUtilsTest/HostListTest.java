@@ -29,9 +29,10 @@ class HostListTest extends BaseTest {
     @Nested
     class withNotFullySetServerAddresses {
 
-        private List<ServerAddress> inputList = List.of(new ServerAddress("OnlyName1"),
-                                                        new ServerAddress("OnlyName2"),
-                                                        new ServerAddress("OnlyName3"));
+        private List<ServerAddress> inputList = List.of(
+                new ServerAddress("OnlyName1"),
+                new ServerAddress("OnlyName2"),
+                new ServerAddress("OnlyName3"));
 
         @Test
         void withOne() {
@@ -53,8 +54,8 @@ class HostListTest extends BaseTest {
     class withFullySetServerAddresses {
 
         private List<ServerAddress> inputList = List.of(new ServerAddress("Name1", "ip1", 1),
-                                                        new ServerAddress("Name2", "ip2", 2),
-                                                        new ServerAddress("Name3", "ip3", 3));
+                new ServerAddress("Name2", "ip2", 2),
+                new ServerAddress("Name3", "ip3", 3));
 
         @Test
         void withOne() {
