@@ -6,7 +6,7 @@ import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.model.ServiceInstanceBindingRequest;
 import de.evoila.cf.broker.model.ServiceInstanceRequest;
 import de.evoila.cf.broker.model.ServiceInstanceUpdateRequest;
-import de.evoila.cf.broker.model.catalog.plan.Plan;
+import de.evoila.cf.broker.model.catalog.plan.*;
 import de.evoila.cf.broker.model.json.schema.JsonSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
@@ -22,76 +22,61 @@ import java.util.Map;
  */
 public class ParameterValidator {
 
-    static ObjectMapper objectMapper = new ObjectMapper();
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     public static void validateParameters(ServiceInstanceBindingRequest serviceInstanceBindingRequest, Plan plan,
-                                          boolean isUpdate) throws ValidationException, ServiceBrokerException {
-        Map<String, Object> serviceInstanceRequestParams = serviceInstanceBindingRequest.getParameters();
-
-        JsonSchema jsonSchema = null;
-        if (!isUpdate && planHasBindingSchema(plan, isUpdate)) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceBinding().getCreate().getParameters();
-        } else if (planHasBindingSchema(plan, isUpdate)) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceBinding().getUpdate().getParameters();
+                                          boolean isUpdate) throws ValidationException, ServiceBrokerException, IllegalArgumentException {
+        if (serviceInstanceBindingRequest == null) {
+            throw new IllegalArgumentException("Parameter ServiceInstanceBindingRequest is null");
         }
-        if (jsonSchema != null) {
-            validateParameters(jsonSchema, serviceInstanceRequestParams);
+        if (planHasBindingSchema(plan, isUpdate)) {
+
+            JsonSchema jsonSchema;
+            if (isUpdate) {
+                jsonSchema = plan.getSchemas().getServiceBinding().getUpdate().getParameters();
+            } else {
+                jsonSchema = plan.getSchemas().getServiceBinding().getCreate().getParameters();
+            }
+
+            if (jsonSchema != null) {
+                validateParameters(jsonSchema, serviceInstanceBindingRequest.getParameters());
+            }
         }
     }
 
     public static void validateParameters(ServiceInstanceRequest serviceInstanceRequest, Plan plan,
-                                          boolean isUpdate) throws ValidationException, ServiceBrokerException {
-        Map<String, Object> serviceInstanceRequestParams = serviceInstanceRequest.getParameters();
-
-        JsonSchema jsonSchema = null;
-
-        if (!isUpdate && planHasInstanceSchema(plan, isUpdate)) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getCreate().getParameters();
-        } else if (planHasInstanceSchema(plan, isUpdate)) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getUpdate().getParameters();
+                                          boolean isUpdate) throws ValidationException, ServiceBrokerException, IllegalArgumentException {
+        if (serviceInstanceRequest == null) {
+            throw new IllegalArgumentException("Parameter ServiceInstanceRequest is null");
         }
 
-        if (jsonSchema != null) {
-            validateParameters(jsonSchema, serviceInstanceRequestParams);
-        }
+        validateParameters(serviceInstanceRequest.getParameters(), plan, isUpdate);
     }
 
     public static void validateParameters(ServiceInstanceUpdateRequest serviceInstanceUpdateRequest, Plan plan,
-                                          boolean isUpdate) throws ValidationException, ServiceBrokerException {
-        Map<String, Object> serviceInstanceRequestParams = serviceInstanceUpdateRequest.getParameters();
-
-        JsonSchema jsonSchema = null;
-
-        if (!isUpdate && planHasInstanceSchema(plan, isUpdate)) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getCreate().getParameters();
-        } else if (planHasInstanceSchema(plan, isUpdate)) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getUpdate().getParameters();
+                                          boolean isUpdate) throws ValidationException, ServiceBrokerException, IllegalArgumentException {
+        if (serviceInstanceUpdateRequest == null) {
+            throw new IllegalArgumentException("Parameter ServiceInstanceUpdateRequest is null");
         }
 
-        if (jsonSchema != null) {
-            validateParameters(jsonSchema, serviceInstanceRequestParams);
-        }
+        validateParameters(serviceInstanceUpdateRequest.getParameters(), plan, isUpdate);
     }
 
     public static void validateParameters(Map<String, Object> input, Plan plan,
                                           boolean isUpdate) throws ValidationException, ServiceBrokerException {
-        JsonSchema jsonSchema = null;
-        if (!isUpdate && planHasInstanceSchema(plan, isUpdate)) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getCreate().getParameters();
-        } else if (planHasInstanceSchema(plan, isUpdate)) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getUpdate().getParameters();
-        }
+        if (planHasInstanceSchema(plan, isUpdate)) {
+            JsonSchema jsonSchema;
+            if (isUpdate) {
+                jsonSchema = plan.getSchemas()
+                        .getServiceInstance().getUpdate().getParameters();
+            } else {
+                jsonSchema = plan.getSchemas()
+                        .getServiceInstance().getCreate().getParameters();
+            }
 
-        if (jsonSchema != null) {
-            validateParameters(jsonSchema, input);
+            if (jsonSchema != null) {
+                validateParameters(jsonSchema, input);
+            }
         }
     }
 
@@ -106,7 +91,7 @@ public class ParameterValidator {
             Validator validator = Validator.builder()
                     .build();
             validator.performValidation(schema, serializeObjectToJSONObject(input));
-        } catch(JsonProcessingException | JSONException ex) {
+        } catch (JsonProcessingException | JSONException ex) {
             throw new ServiceBrokerException("Could not read objects from jsonSchema or input, malformed JSON", ex);
         }
     }
@@ -116,30 +101,34 @@ public class ParameterValidator {
     }
 
     private static boolean planHasBindingSchema(Plan plan, boolean isUpdate) {
-        try {
-            if (isUpdate) {
-                plan.getSchemas().getServiceBinding().getUpdate().getParameters();
-            } else {
-                plan.getSchemas().getServiceBinding().getCreate().getParameters();
+        if (plan != null && plan.getSchemas() != null) {
+            Schemas schemas = plan.getSchemas();
+            if (schemas.getServiceBinding() != null) {
+                SchemaServiceBinding schemaServiceBinding = schemas.getServiceBinding();
+                if (isUpdate) {
+                    SchemaServiceUpdate serviceUpdate = schemaServiceBinding.getUpdate();
+                    return serviceUpdate != null && serviceUpdate.getParameters() != null;
+                } else {
+                    SchemaServiceCreate serviceCreate = schemaServiceBinding.getCreate();
+                    return serviceCreate != null && serviceCreate.getParameters() != null;
+                }
             }
-        } catch(Exception e) {
-            return false;
         }
-
-        return true;
+        return false;
     }
 
     private static boolean planHasInstanceSchema(Plan plan, boolean isUpdate) {
-        try {
-            if (isUpdate) {
-                plan.getSchemas().getServiceInstance().getUpdate().getParameters();
-            } else {
-                plan.getSchemas().getServiceInstance().getCreate().getParameters();
+        if (plan != null && plan.getSchemas() != null) {
+            Schemas schemas = plan.getSchemas();
+            if (schemas.getServiceInstance() != null) {
+                SchemaServiceInstance serviceInstance = schemas.getServiceInstance();
+                if (isUpdate) {
+                    return serviceInstance.getUpdate() != null && serviceInstance.getUpdate().getParameters() != null;
+                } else {
+                    return serviceInstance.getCreate() != null && serviceInstance.getCreate().getParameters() != null;
+                }
             }
-        } catch(Exception e) {
-            return false;
         }
-
-        return true;
+        return false;
     }
 }
