@@ -1,7 +1,6 @@
 package de.evoila.cf.broker.service.impl.BindingServiceImplTest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
+import org.everit.json.schema.SchemaException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,6 @@ import de.evoila.cf.broker.model.json.schema.JsonSchema;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -186,12 +184,11 @@ class CreateServiceInstanceBindingTest extends BaseTest {
                             .thenReturn(schemaServiceCreate);
                     when(schemaServiceCreate.getParameters())
                             .thenReturn(jsonSchema);
-                    ServiceBrokerException ex = assertThrows(ServiceBrokerException.class,
-                                                             () -> service.createServiceInstanceBinding(HAPPY_BINDING_ID,
-                                                                                                        HAPPY_SERVICE_INSTANCE_ID,
-                                                                                                        request,
-                                                                                                        HAPPY_ASYNC));
-                    assertTrue(ex.getCause() instanceof JsonProcessingException);
+                    assertThrows(SchemaException.class,
+                                 () -> service.createServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                                            HAPPY_SERVICE_INSTANCE_ID,
+                                                                            request,
+                                                                            HAPPY_ASYNC));
                 }
 
                 @Nested
