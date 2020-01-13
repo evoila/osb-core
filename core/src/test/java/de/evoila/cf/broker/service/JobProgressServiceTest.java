@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.service;
 
+import de.evoila.cf.broker.exception.ServiceBrokerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,9 +13,7 @@ import java.util.NoSuchElementException;
 import de.evoila.cf.broker.model.JobProgress;
 import de.evoila.cf.broker.repository.JobRepository;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -114,21 +113,23 @@ class JobProgressServiceTest {
 
         @Test
         void returnsNull() {
+            ServiceBrokerException expectedE = new ServiceBrokerException("An exception occurred while saving new JobProgress object with Id: " + HAPPY_ID);
             when(jobRepository.saveJobProgress(HAPPY_ID,
                                                HAPPY_REFERENCE_ID,
                                                JobProgress.IN_PROGRESS,
                                                HAPPY_DESCRIPTION,
                                                HAPPY_OPERATION))
                     .thenReturn(null);
-            JobProgress result = service.startJob(HAPPY_ID,
-                                                  HAPPY_REFERENCE_ID,
-                                                  HAPPY_DESCRIPTION,
-                                                  HAPPY_OPERATION);
-            assertNull(result);
+            ServiceBrokerException e  = assertThrows(ServiceBrokerException.class,
+                                                     () ->  service.startJob(HAPPY_ID,
+                                                                             HAPPY_REFERENCE_ID,
+                                                                             HAPPY_DESCRIPTION,
+                                                                             HAPPY_OPERATION));
+            assertEquals(expectedE, e);
         }
 
         @Test
-        void returnsJobProgress() {
+        void returnsJobProgress() throws ServiceBrokerException {
             when(jobRepository.saveJobProgress(HAPPY_ID,
                                                HAPPY_REFERENCE_ID,
                                                JobProgress.IN_PROGRESS,
@@ -170,7 +171,7 @@ class JobProgressServiceTest {
     class failJobMethod {
 
         @Test
-        void returnsNull() {
+        void returnsNull() throws ServiceBrokerException {
             when(jobRepository.updateJobProgress(HAPPY_ID,
                                                  JobProgress.FAILED,
                                                  HAPPY_DESCRIPTION))
@@ -181,7 +182,7 @@ class JobProgressServiceTest {
         }
 
         @Test
-        void returnsJobProgress() {
+        void returnsJobProgress() throws ServiceBrokerException {
             when(jobRepository.updateJobProgress(HAPPY_ID,
                                                  JobProgress.FAILED,
                                                  HAPPY_DESCRIPTION))
@@ -215,7 +216,7 @@ class JobProgressServiceTest {
     class succeedProgressMethod {
 
         @Test
-        void returnsNull() {
+        void returnsNull() throws ServiceBrokerException {
             when(jobRepository.updateJobProgress(HAPPY_ID,
                                                  JobProgress.SUCCESS,
                                                  HAPPY_DESCRIPTION))
@@ -226,7 +227,7 @@ class JobProgressServiceTest {
         }
 
         @Test
-        void returnsJobProgress() {
+        void returnsJobProgress() throws ServiceBrokerException {
             when(jobRepository.updateJobProgress(HAPPY_ID,
                                                  JobProgress.SUCCESS,
                                                  HAPPY_DESCRIPTION))
