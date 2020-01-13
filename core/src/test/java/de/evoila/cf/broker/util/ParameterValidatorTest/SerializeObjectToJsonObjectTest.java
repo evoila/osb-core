@@ -12,50 +12,36 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
-public class SerializeObjectToJsonObjectTest extends BaseTest
-{
+class SerializeObjectToJsonObjectTest extends BaseTest {
+
     @BeforeEach
-    void setUp()
-    {
+    void setUp() {
         replaceObjectMapperWithSpy();
     }
 
     @Test
-    void writeValuesAsStringThrowsJsonProcessingException() throws JsonProcessingException
-    {
-        JsonProcessingException mockedException = new JsonProcessingException("Test"){};
-        when(mockedObjectMapper.writeValueAsString(any(Object.class)))
-                .thenThrow(mockedException);
+    void writeValuesAsStringThrowsJsonProcessingException() throws JsonProcessingException {
+        JsonProcessingException mockedException = new JsonProcessingException("Test") {
+        };
+        when(mockedObjectMapper.writeValueAsString(any(Object.class))).thenThrow(mockedException);
         JsonProcessingException thrownException = assertThrows(JsonProcessingException.class,
-                                                               () -> {
-                                                                        ParameterValidator.serializeObjectToJSONObject(new Object());
-                                                                    }
-                                                                );
+                () -> ParameterValidator.serializeObjectToJSONObject(new Object()));
         assertSame(mockedException, thrownException);
     }
 
     @Test
-    void writeValuesAsStringThrowsJsonException() throws JsonProcessingException
-    {
-        JSONException mockedException = new JSONException("Test"){};
-        when(mockedObjectMapper.writeValueAsString(any(Object.class)))
-                .thenThrow(mockedException);
+    void writeValuesAsStringThrowsJsonException() throws JsonProcessingException {
+        JSONException mockedException = new JSONException("Test");
+        when(mockedObjectMapper.writeValueAsString(any(Object.class))).thenThrow(mockedException);
         JSONException thrownException = assertThrows(JSONException.class,
-                                                     () -> {
-                                                            ParameterValidator.serializeObjectToJSONObject(new Object());
-                                                        }
-                                                    );
+                () -> ParameterValidator.serializeObjectToJSONObject(new Object()));
         assertSame(mockedException, thrownException);
     }
 
     @Test
-    void writeValueAsStringDoesNotThrow() throws JsonProcessingException
-    {
-        doReturn("{}")
-                .when(mockedObjectMapper)
-                .writeValueAsString(any(Object.class));
-
-        JSONObject newObject = ParameterValidator.serializeObjectToJSONObject(new Object() );
+    void writeValueAsStringDoesNotThrow() throws JsonProcessingException {
+        doReturn("{}").when(mockedObjectMapper).writeValueAsString(any(Object.class));
+        JSONObject newObject = ParameterValidator.serializeObjectToJSONObject(new Object());
         assertNotNull(newObject);
     }
 }

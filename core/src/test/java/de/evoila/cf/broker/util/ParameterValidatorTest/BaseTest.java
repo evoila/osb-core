@@ -18,8 +18,7 @@ import java.util.Map;
 import static org.mockito.Mockito.spy;
 
 @ExtendWith(MockitoExtension.class)
-public class BaseTest
-{
+public class BaseTest {
     // paths to resource files
     private final String SCHEMA_PATH = Path.of(".", "src", "test", "resources", "ParameterValidator", "testJsonSchema.json").toString();
     private final String VALID_JSON_PATH = Path.of(".", "src", "test", "resources", "ParameterValidator", "validJson.json").toString();
@@ -30,45 +29,44 @@ public class BaseTest
 
     // data read from resource files
     JsonSchema schema;
-    String     schemaString;
-    String     validJsonString;
-    String     invalidJsonString;
+    String schemaString;
+    String validJsonString;
+    String invalidJsonString;
 
     // input data for methods under testing
     Map<String, Object> parametersMap;
 
     /**
      * Reads a file and stores its content as a string.
-     * @param file  The file that shall be read.
-     * @return  A string containing the data read from the file. Never returns null.
+     *
+     * @param file The file that shall be read.
+     * @return A string containing the data read from the file. Never returns null.
      */
-    String readFileAsString(File file)
-    {
-        String fileAsString = new String();
+    private String readFileAsString(File file) {
+        StringBuilder fileAsString = new StringBuilder();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(file));
-            String         line;
+            String line;
             while ((line = reader.readLine()) != null) {
-                fileAsString += line;
+                fileAsString.append(line);
             }
         } catch (IOException e) {
             throw new RuntimeException("Loading test JSON schema failed", e);
         }
 
-        return fileAsString;
+        return fileAsString.toString();
     }
 
     /**
      * Reads the JSON schema that is used for testing and stores it as JsonSchema object and as string.
      */
-    void readJsonSchema()
-    {
+    void readJsonSchema() {
         // store Json schema in JsonSchema object
         File file = new File(SCHEMA_PATH);
         ObjectMapper mapper = new ObjectMapper();
         try {
             schema = mapper.readValue(file,
-                                      JsonSchema.class);
+                    JsonSchema.class);
         } catch (IOException e) {
             throw new RuntimeException("Loading test JSON schema failed", e);
         }
@@ -80,8 +78,7 @@ public class BaseTest
     /**
      * Reads the JSON files that are used for these tests and stores them as strings.
      */
-    void readJsonFiles()
-    {
+    void readJsonFiles() {
         validJsonString = readFileAsString(new File(VALID_JSON_PATH));
         invalidJsonString = readFileAsString(new File(INVALID_JSON_PATH));
     }
@@ -89,8 +86,7 @@ public class BaseTest
     /**
      * Initializes the member 'parametersMap'. It contains the data from validJson.json.
      */
-    void initializeParametersMap()
-    {
+    void initializeParametersMap() {
         parametersMap = new HashMap<>();
         parametersMap.put("price", 2);
         parametersMap.put("name", "randomName");
@@ -99,13 +95,12 @@ public class BaseTest
     /**
      * Replaces the object mapper in the class that is tested with a Mockito.spy object.
      */
-    void replaceObjectMapperWithSpy()
-    {
+    void replaceObjectMapperWithSpy() {
         mockedObjectMapper = spy(new ObjectMapper());
         try {
             FieldSetter.setField(ParameterValidator.class,
-                                 ParameterValidator.class.getDeclaredField("objectMapper"),
-                                 mockedObjectMapper);
+                    ParameterValidator.class.getDeclaredField("objectMapper"),
+                    mockedObjectMapper);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException("Setting field failed", e);
         }

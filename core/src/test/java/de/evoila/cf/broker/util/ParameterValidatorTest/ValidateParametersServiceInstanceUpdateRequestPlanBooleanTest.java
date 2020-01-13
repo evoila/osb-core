@@ -19,107 +19,65 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-public class ValidateParametersServiceInstanceUpdateRequestPlanBooleanTest extends BaseTest
-{
+class ValidateParametersServiceInstanceUpdateRequestPlanBooleanTest extends BaseTest {
     @Mock
     private Plan mockedPlan;
 
     @Test
-    void serviceInstanceUpdateRequestNull()
-    {
+    void serviceInstanceUpdateRequestNull() {
         // isUpdate true
         assertThrows(IllegalArgumentException.class,
-                     () -> {
-                            ParameterValidator.validateParameters((ServiceInstanceUpdateRequest) null,
-                                                                  mockedPlan,
-                                                                  true);
-                        }
-                    );
+                () -> ParameterValidator.validateParameters((ServiceInstanceUpdateRequest) null, mockedPlan, true));
         // isUpdate false
         assertThrows(IllegalArgumentException.class,
-                     () -> {
-                            ParameterValidator.validateParameters((ServiceInstanceUpdateRequest) null,
-                                                                  mockedPlan,
-                                                                  false);
-                        }
-                    );
+                () -> ParameterValidator.validateParameters((ServiceInstanceUpdateRequest) null, mockedPlan, false));
     }
 
     @Nested
-    class serviceInstanceUpdateRequestNotNull
-    {
+    class serviceInstanceUpdateRequestNotNull {
         @Mock
-        private Schemas                      mockedSchemas;
+        private Schemas mockedSchemas;
         @Mock
-        private SchemaServiceInstance        mockedServiceInstance;
+        private SchemaServiceInstance mockedServiceInstance;
         @Mock
-        private SchemaServiceCreate          mockedServiceCreate;
+        private SchemaServiceCreate mockedServiceCreate;
         @Mock
         private ServiceInstanceUpdateRequest mockedServiceInstanceUpdateRequest;
 
         @BeforeEach
-        void setUpServiceInstanceUpdateRequestNotNull()
-        {
+        void setUpServiceInstanceUpdateRequestNotNull() {
             replaceObjectMapperWithSpy();
             readJsonFiles();
             readJsonSchema();
             initializeParametersMap();
 
-            when(mockedServiceInstanceUpdateRequest.getParameters() )
-                    .thenReturn(parametersMap);
-
-            when(mockedPlan.getSchemas())
-                    .thenReturn(mockedSchemas);
-            when(mockedSchemas.getServiceInstance())
-                    .thenReturn(mockedServiceInstance);
-            when(mockedServiceInstance.getCreate())
-                    .thenReturn(mockedServiceCreate);
-            when(mockedServiceCreate.getParameters())
-                    .thenReturn(schema);
+            when(mockedServiceInstanceUpdateRequest.getParameters()).thenReturn(parametersMap);
+            when(mockedPlan.getSchemas()).thenReturn(mockedSchemas);
+            when(mockedSchemas.getServiceInstance()).thenReturn(mockedServiceInstance);
+            when(mockedServiceInstance.getCreate()).thenReturn(mockedServiceCreate);
+            when(mockedServiceCreate.getParameters()).thenReturn(schema);
         }
 
         @Test
-        void validateParametersThrowsValidationException() throws JsonProcessingException
-        {
-            doReturn(schemaString)
-                    .when(mockedObjectMapper)
-                    .writeValueAsString(schema);
-            doReturn(invalidJsonString)
-                    .when(mockedObjectMapper)
-                    .writeValueAsString(parametersMap);
-
+        void validateParametersThrowsValidationException() throws JsonProcessingException {
+            doReturn(schemaString).when(mockedObjectMapper).writeValueAsString(schema);
+            doReturn(invalidJsonString).when(mockedObjectMapper).writeValueAsString(parametersMap);
             assertThrows(ValidationException.class,
-                         () -> {
-                                ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest,
-                                                                      mockedPlan,
-                                                                      false);
-                            }
-                        );
+                    () -> ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false));
         }
 
         @Test
-        void validateParametersThrowsServiceBrokerException() throws JsonProcessingException
-        {
-            JSONException mockedException = new JSONException("Test"){};
-            doThrow(mockedException)
-                    .when(mockedObjectMapper)
-                    .writeValueAsString(schema);
-
+        void validateParametersThrowsServiceBrokerException() throws JsonProcessingException {
+            JSONException mockedException = new JSONException("Test");
+            doThrow(mockedException).when(mockedObjectMapper).writeValueAsString(schema);
             ServiceBrokerException exception = assertThrows(ServiceBrokerException.class,
-                                                            () -> {
-                                                                    ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false);
-                                                                }
-                                                           );
-            assertSame(mockedException,
-                       exception.getCause());
+                    () -> ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false));
+            assertSame(mockedException, exception.getCause());
         }
 
         @Test
-        void validateParametersDoesNotThrow() throws ServiceBrokerException
-        {
-            ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest,
-                                                  mockedPlan,
-                                                  false);
+        void validateParametersDoesNotThrow() throws ServiceBrokerException {
+            ParameterValidator.validateParameters(mockedServiceInstanceUpdateRequest, mockedPlan, false);
         }
     }
 }
