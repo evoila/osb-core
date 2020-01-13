@@ -6,7 +6,7 @@ import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.model.ServiceInstanceBindingRequest;
 import de.evoila.cf.broker.model.ServiceInstanceRequest;
 import de.evoila.cf.broker.model.ServiceInstanceUpdateRequest;
-import de.evoila.cf.broker.model.catalog.plan.Plan;
+import de.evoila.cf.broker.model.catalog.plan.*;
 import de.evoila.cf.broker.model.json.schema.JsonSchema;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
@@ -22,27 +22,25 @@ import java.util.Map;
  */
 public class ParameterValidator {
 
-    static ObjectMapper objectMapper = new ObjectMapper();
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     public static void validateParameters(ServiceInstanceBindingRequest serviceInstanceBindingRequest, Plan plan,
                                           boolean isUpdate) throws ValidationException, ServiceBrokerException, IllegalArgumentException {
         if (serviceInstanceBindingRequest == null) {
             throw new IllegalArgumentException("Parameter ServiceInstanceBindingRequest is null");
         }
-        if (planHasBindingSchema(plan, isUpdate) == false) {
-            return;
-        }
-        JsonSchema jsonSchema = null;
-        if (isUpdate) {
-            jsonSchema = plan.getSchemas()
-                             .getServiceBinding().getUpdate().getParameters();
-        } else {
-            jsonSchema = plan.getSchemas()
-                             .getServiceBinding().getCreate().getParameters();
-        }
+        if (planHasBindingSchema(plan, isUpdate)) {
 
-        if (jsonSchema != null) {
-            validateParameters(jsonSchema, serviceInstanceBindingRequest.getParameters());
+            JsonSchema jsonSchema;
+            if (isUpdate) {
+                jsonSchema = plan.getSchemas().getServiceBinding().getUpdate().getParameters();
+            } else {
+                jsonSchema = plan.getSchemas().getServiceBinding().getCreate().getParameters();
+            }
+
+            if (jsonSchema != null) {
+                validateParameters(jsonSchema, serviceInstanceBindingRequest.getParameters());
+            }
         }
     }
 
@@ -66,20 +64,19 @@ public class ParameterValidator {
 
     public static void validateParameters(Map<String, Object> input, Plan plan,
                                           boolean isUpdate) throws ValidationException, ServiceBrokerException {
-        if (planHasInstanceSchema(plan, isUpdate) == false) {
-            return;
-        }
-        JsonSchema jsonSchema = null;
-        if (isUpdate) {
-            jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getUpdate().getParameters();
-        } else {
-            jsonSchema = plan.getSchemas()
-                    .getServiceInstance().getCreate().getParameters();
-        }
+        if (planHasInstanceSchema(plan, isUpdate)) {
+            JsonSchema jsonSchema;
+            if (isUpdate) {
+                jsonSchema = plan.getSchemas()
+                        .getServiceInstance().getUpdate().getParameters();
+            } else {
+                jsonSchema = plan.getSchemas()
+                        .getServiceInstance().getCreate().getParameters();
+            }
 
-        if (jsonSchema != null) {
-            validateParameters(jsonSchema, input);
+            if (jsonSchema != null) {
+                validateParameters(jsonSchema, input);
+            }
         }
     }
 
@@ -94,7 +91,7 @@ public class ParameterValidator {
             Validator validator = Validator.builder()
                     .build();
             validator.performValidation(schema, serializeObjectToJSONObject(input));
-        } catch(JsonProcessingException | JSONException ex) {
+        } catch (JsonProcessingException | JSONException ex) {
             throw new ServiceBrokerException("Could not read objects from jsonSchema or input, malformed JSON", ex);
         }
     }
