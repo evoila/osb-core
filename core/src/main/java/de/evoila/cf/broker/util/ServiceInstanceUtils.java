@@ -34,13 +34,13 @@ public class ServiceInstanceUtils {
     }
 
     public static String connectionUrl(List<ServerAddress> serverAddresses) {
-        if (serverAddresses == null) {
+        if (serverAddressesNullOrEmpty(serverAddresses)) {
             return "";
         }
         String url = "";
         for (ServerAddress serverAddress : serverAddresses) {
             if (serverAddress.getIp() != null) {
-                url = method(url, serverAddress);
+                url = concatServerAddressToUrl(url, serverAddress);
             }
         }
         return url;
@@ -51,16 +51,14 @@ public class ServiceInstanceUtils {
             url = url.concat(",");
 
         return url.concat(serverAddress.getIp() + ":" + serverAddress.getPort());
-
     }
+
 
     public static Map<String, Object> bindingObject(List<ServerAddress> serverAddresses,
                                                     String username,
                                                     String password,
                                                     Map<String, Object> additionalConfigs) {
-        if (serverAddresses == null ||
-                serverAddresses.isEmpty()) {
-
+        if (serverAddressesNullOrEmpty(serverAddresses)) {
             return Collections.emptyMap();
         }
 
@@ -92,7 +90,7 @@ public class ServiceInstanceUtils {
     }
 
     public static String hostList(List<ServerAddress> serverAddresses) {
-        if (serverAddresses == null) {
+        if (serverAddressesNullOrEmpty(serverAddresses)) {
             return "";
         }
         String hosts = "";
@@ -110,7 +108,7 @@ public class ServiceInstanceUtils {
     }
 
     public static String portList(List<ServerAddress> serverAddresses) {
-        if (serverAddresses == null) {
+        if (serverAddressesNullOrEmpty(serverAddresses)) {
             return "";
         }
         String ports = "";
@@ -190,4 +188,9 @@ public class ServiceInstanceUtils {
                 !Objects.equals(request.getContext(), serviceInstance.getContext()) ||
                 !Objects.equals(request.getParameters(), serviceInstance.getParameters());
     }
+
+    private static boolean serverAddressesNullOrEmpty(List<ServerAddress> serverAddresses) {
+        return serverAddresses == null || serverAddresses.isEmpty();
+    }
 }
+
