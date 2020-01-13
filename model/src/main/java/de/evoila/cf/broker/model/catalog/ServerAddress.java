@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.model.catalog;
 
+import java.util.Objects;
+
 /**
  * @author Christian Brinker.
  */
@@ -70,4 +72,21 @@ public class ServerAddress {
     public void setBackup(boolean backup) {
         this.backup = backup;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        ServerAddress that = (ServerAddress) o;
+        return port == that.port &&
+               backup == that.backup &&
+               Objects.equals(name, that.name) &&
+               Objects.equals(ip, that.ip);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, ip, port, backup);
+    }
+
 }
