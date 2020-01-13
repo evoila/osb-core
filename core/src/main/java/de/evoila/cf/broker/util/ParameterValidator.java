@@ -104,30 +104,34 @@ public class ParameterValidator {
     }
 
     private static boolean planHasBindingSchema(Plan plan, boolean isUpdate) {
-        try {
-            if (isUpdate) {
-                plan.getSchemas().getServiceBinding().getUpdate().getParameters();
-            } else {
-                plan.getSchemas().getServiceBinding().getCreate().getParameters();
+        if (plan != null && plan.getSchemas() != null) {
+            Schemas schemas = plan.getSchemas();
+            if (schemas.getServiceBinding() != null) {
+                SchemaServiceBinding schemaServiceBinding = schemas.getServiceBinding();
+                if (isUpdate) {
+                    SchemaServiceUpdate serviceUpdate = schemaServiceBinding.getUpdate();
+                    return serviceUpdate != null && serviceUpdate.getParameters() != null;
+                } else {
+                    SchemaServiceCreate serviceCreate = schemaServiceBinding.getCreate();
+                    return serviceCreate != null && serviceCreate.getParameters() != null;
+                }
             }
-        } catch(Exception e) {
-            return false;
         }
-
-        return true;
+        return false;
     }
 
     private static boolean planHasInstanceSchema(Plan plan, boolean isUpdate) {
-        try {
-            if (isUpdate) {
-                plan.getSchemas().getServiceInstance().getUpdate().getParameters();
-            } else {
-                plan.getSchemas().getServiceInstance().getCreate().getParameters();
+        if (plan != null && plan.getSchemas() != null) {
+            Schemas schemas = plan.getSchemas();
+            if (schemas.getServiceInstance() != null) {
+                SchemaServiceInstance serviceInstance = schemas.getServiceInstance();
+                if (isUpdate) {
+                    return serviceInstance.getUpdate() != null && serviceInstance.getUpdate().getParameters() != null;
+                } else {
+                    return serviceInstance.getCreate() != null && serviceInstance.getCreate().getParameters() != null;
+                }
             }
-        } catch(Exception e) {
-            return false;
         }
-
-        return true;
+        return false;
     }
 }
