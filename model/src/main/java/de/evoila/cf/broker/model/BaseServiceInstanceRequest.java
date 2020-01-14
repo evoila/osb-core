@@ -8,6 +8,7 @@ import de.evoila.cf.broker.model.context.Context;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Johannes Hiemer.
@@ -77,4 +78,22 @@ public class BaseServiceInstanceRequest {
     public void setMaintenanceInfo(MaintenanceInfo maintenanceInfo) {
         this.maintenanceInfo = maintenanceInfo;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        BaseServiceInstanceRequest that = (BaseServiceInstanceRequest) o;
+        return Objects.equals(context, that.context) &&
+               Objects.equals(serviceDefinitionId, that.serviceDefinitionId) &&
+               Objects.equals(planId, that.planId) &&
+               Objects.equals(parameters, that.parameters) &&
+               Objects.equals(maintenanceInfo, that.maintenanceInfo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(context, serviceDefinitionId, planId, parameters, maintenanceInfo);
+    }
+
 }
