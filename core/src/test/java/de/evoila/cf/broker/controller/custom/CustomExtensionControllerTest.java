@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.controller.custom;
 
+import de.evoila.cf.broker.bean.EndpointConfiguration;
+import de.evoila.cf.broker.model.Server;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,13 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import de.evoila.cf.broker.bean.EndpointConfiguration;
-import de.evoila.cf.broker.model.Server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -42,11 +39,8 @@ class CustomExtensionControllerTest {
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     private void callPostConstructWithServers(List<Server> servers) {
-        when(endpointConfiguration.getCustom())
-                .thenReturn(servers);
-        Method initMethod = ReflectionUtils.findMethod(controller.getClass(),
-                                                       "init")
-                                           .get();
+        when(endpointConfiguration.getCustom()).thenReturn(servers);
+        Method initMethod = ReflectionUtils.findMethod(controller.getClass(), "init").get();
         ReflectionUtils.invokeMethod(initMethod, controller);
     }
 
@@ -54,31 +48,24 @@ class CustomExtensionControllerTest {
     void customEndpointsNull() {
         callPostConstructWithServers(null);
         ResponseEntity<Map<String, List<Server>>> response = controller.getExtensions();
-        validateResponse(new HashMap<>(), response);
+        validateResponse(Map.of(), response);
     }
 
     @Test
     void customEndpointsEmpty() {
-        List<Server> customEndpoints = new ArrayList<>();
+        List<Server> customEndpoints = List.of();
         callPostConstructWithServers(customEndpoints);
         ResponseEntity<Map<String, List<Server>>> response = controller.getExtensions();
-        validateResponse(new HashMap<>(){{
-            put("servers", customEndpoints);
-        }}, response);
+        validateResponse(Map.of("servers", customEndpoints), response);
     }
 
     @Test
     void customEndpointsNotEmpty() {
-        List<Server> customEndpoints = new ArrayList<>(){{
-            add(new Server("URL1", "IDENTIFIER1"));
-            add(new Server("URL2", "IDENTIFIER2"));
-            add(new Server("URL3", "IDENTIFIER3"));
-        }};
+        List<Server> customEndpoints = List.of(new Server("URL1", "IDENTIFIER1"),
+                new Server("URL2", "IDENTIFIER2"), new Server("URL3", "IDENTIFIER3"));
         callPostConstructWithServers(customEndpoints);
         ResponseEntity<Map<String, List<Server>>> response = controller.getExtensions();
-        validateResponse(new HashMap<>(){{
-            put("servers", customEndpoints);
-        }}, response);
+        validateResponse(Map.of("servers", customEndpoints), response);
     }
 
 }
