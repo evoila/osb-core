@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.util.Objects;
+
 /**
  * The response from the broker sent back to the cloud controller on a
  * successful service instance creation request
@@ -45,4 +47,19 @@ public class JobProgressResponse {
 	public String getDescription() {
 		return description;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		JobProgressResponse that = (JobProgressResponse) o;
+		return Objects.equals(state, that.state) &&
+			   Objects.equals(description, that.description);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(state, description);
+	}
+
 }
