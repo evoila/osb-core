@@ -77,8 +77,7 @@ class CustomBackupControllerTest {
                                                               .map(e -> new BackupItem(e.getKey(), e.getValue()))
                                                               .collect(Collectors.toList());
             Page<BackupItem> expectedPage = new PageImpl<>(expectedBackupItems);
-            when(backupCustomService.getItems(HAPPY_SERVICE_INSTANCE_ID))
-                    .thenReturn(backupItems);
+            when(backupCustomService.getItems(HAPPY_SERVICE_INSTANCE_ID)).thenReturn(backupItems);
             ResponseEntity<Page<BackupItem>> response = controller.items(HAPPY_SERVICE_INSTANCE_ID, null);
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals(expectedPage, response.getBody());
