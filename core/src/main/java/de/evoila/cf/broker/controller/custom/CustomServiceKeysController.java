@@ -29,11 +29,11 @@ import java.util.UUID;
 @ConditionalOnProperty(prefix = "service-keys", name = "enabled", havingValue = "true")
 public class CustomServiceKeysController extends BaseController {
 
-    static Logger log = LoggerFactory.getLogger(CustomServiceKeysController.class);
+    private static final Logger log = LoggerFactory.getLogger(CustomServiceKeysController.class);
 
-    BindingRepository bindingRepository;
-    BindingService bindingService;
-    ServiceInstanceRepository serviceInstanceRepository;
+    private BindingRepository bindingRepository;
+    private BindingService bindingService;
+    private ServiceInstanceRepository serviceInstanceRepository;
 
     public CustomServiceKeysController(BindingRepository repository, BindingService service, ServiceInstanceRepository serviceInstanceRepository) {
         Assert.notNull(repository, "BindingRepository should not be null");
