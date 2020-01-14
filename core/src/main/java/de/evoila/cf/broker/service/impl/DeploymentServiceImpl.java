@@ -1,6 +1,4 @@
-/**
- *
- */
+
 package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
@@ -33,7 +31,7 @@ import java.util.Optional;
 @Service
 public class DeploymentServiceImpl implements DeploymentService {
 
-    Logger log = LoggerFactory.getLogger(getClass());
+    private Logger log = LoggerFactory.getLogger(getClass());
 
     private PlatformRepository platformRepository;
 
@@ -127,7 +125,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
         if (platformService == null) {
-            throw new ServiceBrokerException("Not Platform configured for " + plan.getPlatform());
+            throw new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
         }
 
         if (platformService.isSyncPossibleOnCreate(plan)) {
@@ -163,7 +161,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         }
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
-        if (platformService.isSyncPossibleOnCreate(plan)) {
+        if (platformService.isSyncPossibleOnUpdate(serviceInstance, plan)) {
             syncUpdateInstance(serviceInstance, request.getParameters(), plan, platformService);
         } else {
             String jobProgressId = randomString.nextString();
@@ -182,7 +180,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     @Override
     public ServiceInstanceOperationResponse updateServiceInstanceContext(String serviceInstanceId,
                                                                          ServiceInstanceUpdateRequest serviceInstanceUpdateRequest)
-            throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
+            throws ServiceInstanceDoesNotExistException {
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
         serviceInstance.setContext(serviceInstanceUpdateRequest.getContext());
         serviceInstanceRepository.updateServiceInstance(serviceInstance);
@@ -196,6 +194,10 @@ public class DeploymentServiceImpl implements DeploymentService {
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
         Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
+        if (platformService == null) {
+            throw new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
+        }
+
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
 
         if (platformService.isSyncPossibleOnDelete(serviceInstance)) {
@@ -204,6 +206,7 @@ public class DeploymentServiceImpl implements DeploymentService {
             String jobProgressId = randomString.nextString();
             asyncDeploymentService.asyncDeleteInstance(this, serviceInstance, plan, platformService, jobProgressId);
             serviceInstanceOperationResponse.setOperation(jobProgressId);
+            serviceInstanceOperationResponse.setAsync(true);
         }
 
         return serviceInstanceOperationResponse;
@@ -228,12 +231,15 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         if (jobRepository.containsJobProgress(instanceId)) {
             JobProgress job = jobRepository.getJobProgressByReferenceId(instanceId);
-            if (job.getOperation().equals(JobProgress.PROVISION) &&
-                    job.getState().equals(JobProgress.IN_PROGRESS)) {
-                throw new ServiceInstanceNotFoundException();
-            } else if (job.getOperation().equals(JobProgress.UPDATE) &&
-                    job.getState().equals(JobProgress.IN_PROGRESS)) {
-                throw new ConcurrencyErrorException();
+            if (job.getState().equals(JobProgress.IN_PROGRESS)) {
+                switch (job.getOperation()) {
+                    case JobProgress.PROVISION:
+                        throw new ServiceInstanceNotFoundException();
+                    case JobProgress.UPDATE:
+                        throw new ConcurrencyErrorException();
+                    default:
+                        break;
+                }
             }
         }
         return serviceInstance;
