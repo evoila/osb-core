@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.exception;
 
+import java.util.Objects;
+
 import de.evoila.cf.broker.model.ServiceInstanceOperationResponse;
 
 /**
@@ -58,4 +60,21 @@ public class ServiceInstanceExistsException extends Exception {
     public ServiceInstanceOperationResponse getResponse() {
         return response;
     }
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		ServiceInstanceExistsException that = (ServiceInstanceExistsException) o;
+		return identicalInstance == that.identicalInstance &&
+			   Objects.equals(instanceId, that.instanceId) &&
+			   Objects.equals(serviceId, that.serviceId) &&
+			   Objects.equals(response, that.response);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(instanceId, serviceId, response, identicalInstance);
+	}
+
 }

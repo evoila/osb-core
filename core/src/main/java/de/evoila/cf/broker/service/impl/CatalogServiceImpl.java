@@ -1,15 +1,12 @@
 package de.evoila.cf.broker.service.impl;
 
 import de.evoila.cf.broker.bean.EndpointConfiguration;
-import de.evoila.cf.broker.exception.CatalogIsNotValidException;
 import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
-import de.evoila.cf.broker.interfaces.TranformCatalog;
+import de.evoila.cf.broker.interfaces.TransformCatalog;
+import de.evoila.cf.broker.model.GlobalConstants;
 import de.evoila.cf.broker.model.catalog.Catalog;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
-import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.service.CatalogService;
-import de.evoila.cf.broker.model.GlobalConstants;
-import de.evoila.cf.broker.service.CatalogValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +16,7 @@ import org.springframework.stereotype.Service;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -41,15 +36,15 @@ public class CatalogServiceImpl implements CatalogService {
 
 	private EndpointConfiguration endpointConfiguration;
 
-	public CatalogServiceImpl(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration, @Autowired(required = false ) List<TranformCatalog> tranformCatalog) {
+	public CatalogServiceImpl(Catalog catalog, Environment environment, EndpointConfiguration endpointConfiguration, @Autowired(required = false ) List<TransformCatalog> transformCatalog) {
 		this.catalog = catalog;
 		this.environment = environment;
 		this.endpointConfiguration = endpointConfiguration;
 
 		filterActivePlans(catalog);
-		if (tranformCatalog != null) {
-			tranformCatalog.forEach(e -> e.tranform(catalog, environment, endpointConfiguration));
-			tranformCatalog.forEach(e -> e.clean(catalog, environment, endpointConfiguration));
+		if (transformCatalog != null) {
+			transformCatalog.forEach(e -> e.transform(catalog, environment, endpointConfiguration));
+			transformCatalog.forEach(e -> e.clean(catalog, environment, endpointConfiguration));
 		}
 		prepareCatalogIfTesting(catalog);
 	}

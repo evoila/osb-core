@@ -12,20 +12,36 @@ import java.util.Map;
  */
 public class JsonSchemaUtils {
 
-    public static Map<String, Object> mergeMaps(Map<String, JsonSchema> schemaProperties, Map<String, Object> instanceGroupProperties,
-                                          Map<String, Object> result) {
+    public static Map<String, Object> mergeMaps(Map<String, JsonSchema> schemaProperties,
+                                                Map<String, Object> instanceGroupProperties,
+                                                Map<String, Object> result)
+            throws IllegalArgumentException {
 
+        if (schemaProperties == null) {
+            throw new IllegalArgumentException("schemaProperties is null");
+        }
+        if (instanceGroupProperties == null) {
+            throw new IllegalArgumentException("instanceGroupProperties is null");
+        }
+        if (result == null) {
+            throw new IllegalArgumentException("result is null");
+        }
         for (Map.Entry<String, JsonSchema> schemaProperty : schemaProperties.entrySet()) {
             if (schemaProperty.getValue().getProperties() != null && !schemaProperty.getValue().getProperties().isEmpty()) {
-                result.put(schemaProperty.getKey(), new HashMap<String, Object>());
-
-                Map<String, Object> instanceGroupProperty = (Map<String, Object>) instanceGroupProperties.get(schemaProperty.getKey());
-                if (instanceGroupProperty == null)
+                Map<String, Object> instanceGroupProperty = null;
+                try {
+                    instanceGroupProperty = (Map<String, Object>) instanceGroupProperties.get(schemaProperty.getKey());
+                } catch (ClassCastException e) {
+                    // ignore it
+                }
+                if (instanceGroupProperty == null) {
                     instanceGroupProperty = new HashMap<>();
-
+                }
+                Map<String, Object> innerResultMap = new HashMap<>();
+                result.put(schemaProperty.getKey(), innerResultMap);
                 mergeMaps(schemaProperty.getValue().getProperties(),
-                        instanceGroupProperty,
-                        (Map<String, Object>) result.get(schemaProperty.getKey()));
+                          instanceGroupProperty,
+                          innerResultMap);
             } else {
                 if (!instanceGroupProperties.containsKey(schemaProperty.getKey())) {
                     JsonFormatTypes type = schemaProperty.getValue().getType();
@@ -40,10 +56,10 @@ public class JsonSchemaUtils {
                             result.put(schemaProperty.getKey(), false);
                             break;
                         case NUMBER:
-                            result.put(schemaProperty.getKey(), 0);
-                            break;
                         case INTEGER:
                             result.put(schemaProperty.getKey(), 0);
+                            break;
+                        default:
                             break;
                     }
                 } else {

@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.exception;
 
+import java.util.Objects;
+
 /**
  * Exception denoting an unknown ServiceDefintion
  * 
@@ -19,5 +21,18 @@ public class ServiceDefinitionDoesNotExistException extends Exception {
 	public String getMessage() {
 		return "ServiceDefinition does not exist: id = " + serviceDefinitionId;
 	}
-	
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		ServiceDefinitionDoesNotExistException that = (ServiceDefinitionDoesNotExistException) o;
+		return Objects.equals(serviceDefinitionId, that.serviceDefinitionId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(serviceDefinitionId);
+	}
+
 }
