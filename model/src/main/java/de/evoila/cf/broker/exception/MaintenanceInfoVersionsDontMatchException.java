@@ -1,7 +1,8 @@
 package de.evoila.cf.broker.exception;
 
 import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
-import org.springframework.http.HttpStatus;
+
+import java.util.Objects;
 
 public class MaintenanceInfoVersionsDontMatchException extends ServiceBrokerErrorException {
 
@@ -44,4 +45,20 @@ public class MaintenanceInfoVersionsDontMatchException extends ServiceBrokerErro
     public String getDescription() {
         return description;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        MaintenanceInfoVersionsDontMatchException that = (MaintenanceInfoVersionsDontMatchException) o;
+        return Objects.equals(requestVersion, that.requestVersion) &&
+               Objects.equals(actualVersion, that.actualVersion) &&
+               Objects.equals(description, that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(requestVersion, actualVersion, description);
+    }
+
 }

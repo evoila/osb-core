@@ -3,6 +3,8 @@ package de.evoila.cf.broker.model.volume;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.util.Objects;
+
 /**
  * @author Jannik Heyl, Johannes Hiemer.
  */
@@ -76,4 +78,22 @@ public class VolumeMount {
     public void setDevice(Device device) {
         this.device = device;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        VolumeMount that = (VolumeMount) o;
+        return Objects.equals(driver, that.driver) &&
+               Objects.equals(containerDir, that.containerDir) &&
+               mode == that.mode &&
+               deviceType == that.deviceType &&
+               Objects.equals(device, that.device);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(driver, containerDir, mode, deviceType, device);
+    }
+
 }

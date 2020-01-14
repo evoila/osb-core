@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Request sent from the cloud controller to bind to a service instance.
@@ -119,6 +120,23 @@ public class ServiceInstanceBindingRequest {
 
 	public void setBindResource(BindResource bindResource) {
 		this.bindResource = bindResource;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		ServiceInstanceBindingRequest that = (ServiceInstanceBindingRequest) o;
+		return Objects.equals(serviceDefinitionId, that.serviceDefinitionId) &&
+			   Objects.equals(planId, that.planId) &&
+			   Objects.equals(appGuid, that.appGuid) &&
+			   Objects.equals(parameters, that.parameters) &&
+			   Objects.equals(bindResource, that.bindResource);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(serviceDefinitionId, planId, appGuid, parameters, bindResource);
 	}
 
 }
