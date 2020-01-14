@@ -30,16 +30,14 @@ public class UaaSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
-        authenticationManagerBuilder
-                .authenticationProvider(openIDRelyingPartyAuthenticationProvider());
+        authenticationManagerBuilder.authenticationProvider(openIDRelyingPartyAuthenticationProvider());
     }
 
     @Override
     public void configure(WebSecurity web) {
-        web
-                .ignoring()
-                .antMatchers(HttpMethod.GET,"/custom/v2/authentication/{serviceInstanceId}")
-                .antMatchers(HttpMethod.GET,"/custom/v2/authentication/{serviceInstanceId}/confirm");
+        web.ignoring()
+                .antMatchers(HttpMethod.GET, "/custom/v2/authentication/{serviceInstanceId}")
+                .antMatchers(HttpMethod.GET, "/custom/v2/authentication/{serviceInstanceId}/confirm");
     }
 
     protected UaaRelyingPartyFilter createNewUaaRelyingPartyFilter(AuthenticationManager authenticationManager) {
@@ -71,10 +69,9 @@ public class UaaSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf().disable();
     }
 
-    @Bean(name = "uaaAuthencationEntryPoint")
+    @Bean(name = "uaaAuthenticationEntryPoint")
     public AuthenticationEntryPoint authenticationEntryPoint() {
-        CommonCorsAuthenticationEntryPoint entryPoint =
-                new CommonCorsAuthenticationEntryPoint();
+        CommonCorsAuthenticationEntryPoint entryPoint = new CommonCorsAuthenticationEntryPoint();
         entryPoint.setRealmName("uaaEndpointRealm");
         return entryPoint;
     }
