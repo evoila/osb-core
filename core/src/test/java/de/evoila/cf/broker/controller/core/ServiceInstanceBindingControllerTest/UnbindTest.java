@@ -69,9 +69,10 @@ class UnbindTest extends BaseTest {
         }
 
         @Test
-        void notCaught() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException {
+        void notCaught() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException {
             Exception[] exceptions = {
-                    new AsyncRequiredException()
+                    new AsyncRequiredException(),
+                    new ServiceBrokerException()
             };
             when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
                                                              HAPPY_PLAN_ID,
@@ -100,7 +101,7 @@ class UnbindTest extends BaseTest {
         private ResponseEntity<BaseServiceInstanceBindingResponse> response;
 
         @BeforeEach
-        void setUp() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException {
+        void setUp() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException {
             when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
                                                              HAPPY_PLAN_ID,
                                                              HAPPY_ACCEPTS_INCOMPLETE))

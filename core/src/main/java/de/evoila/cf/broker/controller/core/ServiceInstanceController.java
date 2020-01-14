@@ -12,7 +12,6 @@ import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.DeploymentService;
-import de.evoila.cf.broker.util.EmptyRestResponse;
 import de.evoila.cf.broker.util.ServiceInstanceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,7 +102,7 @@ public class ServiceInstanceController extends BaseController {
 
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @PatchMapping(value = "/{serviceInstanceId}")
-    public ResponseEntity<ServiceInstanceOperationResponse> update(
+    public ResponseEntity update(
             @PathVariable("serviceInstanceId") String serviceInstanceId,
             @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
             @RequestBody ServiceInstanceUpdateRequest request,
@@ -113,7 +112,7 @@ public class ServiceInstanceController extends BaseController {
             MaintenanceInfoVersionsDontMatchException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException {
 
         if (request.getServiceDefinitionId() == null) {
-            return new ResponseEntity("Missing required fields: service_id", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Missing required fields: service_id", HttpStatus.BAD_REQUEST);
         }
         checkMaintenanceInfo(request);
 
@@ -132,28 +131,28 @@ public class ServiceInstanceController extends BaseController {
             if (serviceDefinition.specificPlanIsUpdatable(serviceInstance.getPlanId())) {
                 if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request)) {
                     log.info("Update would have not effective changes.");
-                    return new ResponseEntity(EmptyRestResponse.BODY, HttpStatus.OK);
+                    return processEmptyErrorResponse(HttpStatus.OK);
                 }
                 if (request.isContextUpdate()) {
                     if (serviceInstance.isAllowContextUpdates()) {
                         serviceInstanceOperationResponse = deploymentService.updateServiceInstanceContext(serviceInstanceId, request);
-                        return new ResponseEntity(serviceInstanceOperationResponse, HttpStatus.OK);
+                        return new ResponseEntity<>(serviceInstanceOperationResponse, HttpStatus.OK);
                     } else {
-                        return new ResponseEntity(new ServiceBrokerErrorResponse("ContextUpdateNotAllowed",
+                        return new ResponseEntity<>(new ServiceBrokerErrorResponse("ContextUpdateNotAllowed",
                                 "It is not allowed to alter the context of the requested service instance"),
                                 HttpStatus.UNPROCESSABLE_ENTITY);
                     }
                 }
                 serviceInstanceOperationResponse = deploymentService.updateServiceInstance(serviceInstanceId, request);
             } else {
-                return new ResponseEntity(new ServiceBrokerErrorResponse("NotUpdatable", "An update on the requested service instance is not supported."), HttpStatus.UNPROCESSABLE_ENTITY);
+                return new ResponseEntity<>(new ServiceBrokerErrorResponse("NotUpdatable", "An update on the requested service instance is not supported."), HttpStatus.UNPROCESSABLE_ENTITY);
             }
         } catch (ServiceInstanceDoesNotExistException e) {
             log.error("Service Instance has not been found!", e);
             throw new ServiceInstanceNotFoundException();
         }
 
-        return new ResponseEntity(serviceInstanceOperationResponse, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(serviceInstanceOperationResponse, HttpStatus.ACCEPTED);
     }
 
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
