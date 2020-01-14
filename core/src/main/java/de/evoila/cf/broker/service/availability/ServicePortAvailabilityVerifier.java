@@ -1,6 +1,4 @@
-/**
- *
- */
+
 package de.evoila.cf.broker.service.availability;
 
 import de.evoila.cf.broker.model.catalog.ServerAddress;
@@ -71,16 +69,12 @@ public class ServicePortAvailabilityVerifier implements ServiceInstanceAvailabil
 
 		if (useInitialTimeout)
 			this.timeout(INITIAL_TIMEOUT);
-		
-		for (int i = 0; i < connectionTimeouts; i++) {
+
+		for (int i = 0; i < connectionTimeouts && !available; i++) {
 			available = availabilityVerifier.verify(ip, port);
-
 			log.info("Service Port availability: {}", available);
-
-			if (available) {
-				break;
-			}
 		}
+
 		log.info("Service Port availability (last status during request): {}", available);
 		return available;
 	}
