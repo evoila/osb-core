@@ -23,45 +23,45 @@ public abstract class BaseController {
     }
 
     protected ResponseEntity processEmptyErrorResponse(HttpStatus status) {
-        return new ResponseEntity<String>(EmptyRestResponse.BODY, status);
+      return new ResponseEntity<>(EmptyRestResponse.BODY, status);
     }
 
     protected ResponseEntity processErrorResponse(String message, HttpStatus status) {
-        return new ResponseEntity(new ResponseMessage(message), status);
+        return new ResponseEntity<>(new ResponseMessage<>(message), status);
     }
 
-    protected ResponseEntity processErrorResponse(String error, String description, HttpStatus status) {
+    protected ResponseEntity<ServiceBrokerErrorResponse> processErrorResponse(String error, String description, HttpStatus status) {
         log.debug("Handled following service broker error: " + error + " - " + description);
-        return new ResponseEntity(new ServiceBrokerErrorResponse(error, description), status);
+        return new ResponseEntity<>(new ServiceBrokerErrorResponse(error, description), status);
     }
 
     @ExceptionHandler({ValidationException.class})
-    public ResponseEntity<ResponseMessage> handleException(ValidationException ex) {
+    public ResponseEntity handleException(ValidationException ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({MaintenanceInfoVersionsDontMatchException.class})
-    public ResponseEntity<ResponseMessage> handleException(MaintenanceInfoVersionsDontMatchException ex) {
+    public ResponseEntity handleException(MaintenanceInfoVersionsDontMatchException ex) {
         return processErrorResponse(ex.getError(), ex.getDescription(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler({ConcurrencyErrorException.class})
-    public ResponseEntity<ResponseMessage> handleException(ConcurrencyErrorException ex) {
+    public ResponseEntity handleException(ConcurrencyErrorException ex) {
         return processErrorResponse(ex.getError(), ex.getDescription(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler({AsyncRequiredException.class})
-    public ResponseEntity<ResponseMessage> handleException(AsyncRequiredException ex) {
+    public ResponseEntity handleException(AsyncRequiredException ex) {
         return processErrorResponse(ex.getError(), ex.getDescription(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(ServiceBrokerFeatureIsNotSupportedException.class)
-    public ResponseEntity<ResponseMessage> handleException(ServiceBrokerFeatureIsNotSupportedException ex) {
+    public ResponseEntity handleException(ServiceBrokerFeatureIsNotSupportedException ex) {
         return processErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler({ServiceDefinitionDoesNotExistException.class, ServiceDefinitionPlanDoesNotExistException.class, ServiceInstanceNotRetrievableException.class})
-    public ResponseEntity<ResponseMessage> handleException(Exception ex) {
+    public ResponseEntity handleException(Exception ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
@@ -73,12 +73,12 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler(ServiceInstanceDoesNotExistException.class)
-    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceDoesNotExistException ex) {
+    public ResponseEntity handleException(ServiceInstanceDoesNotExistException ex) {
         return processErrorResponse(HttpStatus.GONE);
     }
 
     @ExceptionHandler(ServiceInstanceNotFoundException.class)
-    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceNotFoundException ex) {
+    public ResponseEntity handleException(ServiceInstanceNotFoundException ex) {
         return processErrorResponse(ex.getError(), ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
@@ -91,12 +91,12 @@ public abstract class BaseController {
     }
 
     @ExceptionHandler(ServiceInstanceBindingNotFoundException.class)
-    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceBindingNotFoundException ex) {
+    public ResponseEntity handleException(ServiceInstanceBindingNotFoundException ex) {
         return processErrorResponse(HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ServiceInstanceBindingDoesNotExistsException.class)
-    public ResponseEntity<ResponseMessage> handleException(ServiceInstanceBindingDoesNotExistsException ex) {
+    public ResponseEntity handleException(ServiceInstanceBindingDoesNotExistsException ex) {
         return processErrorResponse(HttpStatus.GONE);
     }
 
