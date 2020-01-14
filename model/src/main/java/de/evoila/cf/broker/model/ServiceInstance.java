@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author sgreenberg@gopivotal.com, Johannes Hiemer.
@@ -242,4 +243,32 @@ public class ServiceInstance implements BaseEntity<String> {
 	public void setAllowContextUpdates(boolean allowContextUpdates) {
 		this.allowContextUpdates = allowContextUpdates;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		ServiceInstance that = (ServiceInstance) o;
+		return allowContextUpdates == that.allowContextUpdates &&
+			   Objects.equals(id, that.id) &&
+			   Objects.equals(serviceDefinitionId, that.serviceDefinitionId) &&
+			   Objects.equals(planId, that.planId) &&
+			   Objects.equals(organizationGuid, that.organizationGuid) &&
+			   Objects.equals(spaceGuid, that.spaceGuid) &&
+			   Objects.equals(dashboardUrl, that.dashboardUrl) &&
+			   Objects.equals(parameters, that.parameters) &&
+			   Objects.equals(internalId, that.internalId) &&
+			   Objects.equals(hosts, that.hosts) &&
+			   Objects.equals(context, that.context) &&
+			   Objects.equals(floatingIpId, that.floatingIpId) &&
+			   Objects.equals(username, that.username) &&
+			   Objects.equals(password, that.password) &&
+			   Objects.equals(usergroup, that.usergroup);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, serviceDefinitionId, planId, organizationGuid, spaceGuid, dashboardUrl, parameters, internalId, hosts, context, floatingIpId, username, password, usergroup, allowContextUpdates);
+	}
+
 }
