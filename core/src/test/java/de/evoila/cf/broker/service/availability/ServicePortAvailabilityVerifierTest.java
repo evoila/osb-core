@@ -49,11 +49,11 @@ class ServicePortAvailabilityVerifierTest {
         verifier = new ServicePortAvailabilityVerifier();
         try {
             FieldSetter.setField(verifier,
-                                 verifier.getClass().getDeclaredField("log"),
-                                 log);
+                    verifier.getClass().getDeclaredField("log"),
+                    log);
             FieldSetter.setField(verifier,
-                                 verifier.getClass().getDeclaredField("availabilityVerifier"),
-                                 availabilityVerifier);
+                    verifier.getClass().getDeclaredField("availabilityVerifier"),
+                    availabilityVerifier);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException("Setting field failed", e);
         }
@@ -63,8 +63,8 @@ class ServicePortAvailabilityVerifierTest {
     class verifyServiceAvailability {
 
         private List<ServerAddress> hosts = List.of(new ServerAddress("Dummy1", "ip1", 1),
-                                                    new ServerAddress("Dummy2", "ip2", 2),
-                                                    new ServerAddress("Dummy3", "ip3", 3));
+                new ServerAddress("Dummy2", "ip2", 2),
+                new ServerAddress("Dummy3", "ip3", 3));
 
         @Nested
         class returnsTrue {
@@ -107,9 +107,9 @@ class ServicePortAvailabilityVerifierTest {
                                     ServerAddress serverAddress = hosts.get(index);
                                     ++index;
                                     if (!invocationOnMock.getArgument(0).equals(serverAddress.getIp()) ||
-                                        !invocationOnMock.getArgument(1).equals(serverAddress.getPort())) {
+                                            !invocationOnMock.getArgument(1).equals(serverAddress.getPort())) {
                                         throw new InvalidUseOfMatchersException("Arguments do not match: " +
-                                                                                Arrays.toString(invocationOnMock.getArguments()));
+                                                Arrays.toString(invocationOnMock.getArguments()));
                                     }
                                     return true;
                                 }
@@ -136,9 +136,9 @@ class ServicePortAvailabilityVerifierTest {
                                 public Boolean answer(InvocationOnMock invocationOnMock) {
                                     ServerAddress serverAddress = hosts.get(0);
                                     if (!invocationOnMock.getArgument(0).equals(serverAddress.getIp()) ||
-                                        !invocationOnMock.getArgument(1).equals(serverAddress.getPort())) {
+                                            !invocationOnMock.getArgument(1).equals(serverAddress.getPort())) {
                                         throw new InvalidUseOfMatchersException("Arguments do not match: " +
-                                                                                Arrays.toString(invocationOnMock.getArguments()));
+                                                Arrays.toString(invocationOnMock.getArguments()));
                                     }
                                     return (timeouts++ % MAX_CONNECTION_TIMEOUTS) == 9;
                                 }
@@ -160,9 +160,9 @@ class ServicePortAvailabilityVerifierTest {
                                 public Boolean answer(InvocationOnMock invocationOnMock) {
                                     ServerAddress serverAddress = hosts.get(timeouts / MAX_CONNECTION_TIMEOUTS);
                                     if (!invocationOnMock.getArgument(0).equals(serverAddress.getIp()) ||
-                                        !invocationOnMock.getArgument(1).equals(serverAddress.getPort())) {
+                                            !invocationOnMock.getArgument(1).equals(serverAddress.getPort())) {
                                         throw new InvalidUseOfMatchersException("Arguments do not match: " +
-                                                                                Arrays.toString(invocationOnMock.getArguments()));
+                                                Arrays.toString(invocationOnMock.getArguments()));
                                     }
                                     return (timeouts++ % MAX_CONNECTION_TIMEOUTS) == 9;
                                 }
@@ -199,9 +199,9 @@ class ServicePortAvailabilityVerifierTest {
                                 }
                                 ServerAddress serverAddress = hosts.get(0);
                                 if (!invocationOnMock.getArgument(0).equals(serverAddress.getIp()) ||
-                                    !invocationOnMock.getArgument(1).equals(serverAddress.getPort())) {
+                                        !invocationOnMock.getArgument(1).equals(serverAddress.getPort())) {
                                     throw new InvalidUseOfMatchersException("Arguments do not match: " +
-                                                                            Arrays.toString(invocationOnMock.getArguments()));
+                                            Arrays.toString(invocationOnMock.getArguments()));
                                 }
 
                                 ++timeouts;
@@ -225,9 +225,9 @@ class ServicePortAvailabilityVerifierTest {
                             public Boolean answer(InvocationOnMock invocationOnMock) {
                                 ServerAddress serverAddress = hosts.get(timeouts / MAX_CONNECTION_TIMEOUTS);
                                 if (!invocationOnMock.getArgument(0).equals(serverAddress.getIp()) ||
-                                    !invocationOnMock.getArgument(1).equals(serverAddress.getPort())) {
+                                        !invocationOnMock.getArgument(1).equals(serverAddress.getPort())) {
                                     throw new InvalidUseOfMatchersException("Arguments do not match: " +
-                                                                            Arrays.toString(invocationOnMock.getArguments()));
+                                            Arrays.toString(invocationOnMock.getArguments()));
                                 }
                                 ++timeouts;
                                 return false;
