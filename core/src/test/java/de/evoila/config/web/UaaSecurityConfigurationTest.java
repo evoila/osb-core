@@ -109,7 +109,7 @@ class UaaSecurityConfigurationTest {
                     .thenReturn(ignoredRequestConfigurer);
             configuration.configure(webSecurity);
             verifyNoMoreInteractions(webSecurity,
-                                     ignoredRequestConfigurer);
+                    ignoredRequestConfigurer);
         }
 
     }
@@ -150,7 +150,7 @@ class UaaSecurityConfigurationTest {
                         .when(configuration)
                         .authenticationManager();
                 Exception e = assertThrows(Exception.class,
-                                           () -> configuration.configure(httpSecurity));
+                        () -> configuration.configure(httpSecurity));
                 assertSame(expectedE, e);
             }
 
@@ -174,7 +174,7 @@ class UaaSecurityConfigurationTest {
                         .thenThrow(expectedE);
                 // Method Call
                 Exception e = assertThrows(Exception.class,
-                                           () -> configuration.configure(httpSecurity));
+                        () -> configuration.configure(httpSecurity));
                 // Verification
                 ArgumentCaptor<UaaRelyingPartyAuthenticationSuccessHandler> successHandlerCaptor = ArgumentCaptor.forClass(UaaRelyingPartyAuthenticationSuccessHandler.class);
                 verify(uaaRelyingPartyFilter, times(1))
@@ -183,8 +183,8 @@ class UaaSecurityConfigurationTest {
                 verify(uaaRelyingPartyFilter, times(1))
                         .setFailureHandler(failureHandlerCaptor.capture());
                 verifyNoMoreInteractions(authenticationManager,
-                                         uaaRelyingPartyFilter,
-                                         httpSecurity);
+                        uaaRelyingPartyFilter,
+                        httpSecurity);
                 assertSame(successHandlerCaptor.getValue().getClass(), UaaRelyingPartyAuthenticationSuccessHandler.class);
                 assertSame(failureHandlerCaptor.getValue().getClass(), UaaRelyingPartyAuthenticationFailureHandler.class);
                 assertSame(expectedE, e);
@@ -212,7 +212,7 @@ class UaaSecurityConfigurationTest {
             when(corsConfigurer.and())
                     .thenReturn(httpSecurity);
             when(httpSecurity.addFilterBefore(uaaRelyingPartyFilter,
-                                              UsernamePasswordAuthenticationFilter.class))
+                    UsernamePasswordAuthenticationFilter.class))
                     .thenReturn(httpSecurity);
             when(httpSecurity.authorizeRequests())
                     .thenReturn(expressionInterceptUrlRegistry);
@@ -251,16 +251,16 @@ class UaaSecurityConfigurationTest {
             verify(csrfConfigurer, times(1))
                     .disable();
             verifyNoMoreInteractions(authenticationManager,
-                                     uaaRelyingPartyFilter,
-                                     httpSecurity,
-                                     requestMatcherConfigurer,
-                                     corsConfigurer,
-                                     expressionInterceptUrlRegistry,
-                                     authorizedUrl,
-                                     sessionManagementConfigurer,
-                                     exceptionHandlingConfigurer,
-                                     authenticationEntryPoint,
-                                     csrfConfigurer);
+                    uaaRelyingPartyFilter,
+                    httpSecurity,
+                    requestMatcherConfigurer,
+                    corsConfigurer,
+                    expressionInterceptUrlRegistry,
+                    authorizedUrl,
+                    sessionManagementConfigurer,
+                    exceptionHandlingConfigurer,
+                    authenticationEntryPoint,
+                    csrfConfigurer);
             assertSame(successHandlerCaptor.getValue().getClass(), UaaRelyingPartyAuthenticationSuccessHandler.class);
             assertSame(failureHandlerCaptor.getValue().getClass(), UaaRelyingPartyAuthenticationFailureHandler.class);
 
