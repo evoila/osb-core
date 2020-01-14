@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * The response from the broker sent back to the cloud controller on a
@@ -89,4 +90,23 @@ public class ServiceInstanceResponse {
 	public void setExtensionApis(List<Map<String, Object>> extensionApis) {
 		this.extensionApis = extensionApis;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) { return true; }
+		if (o == null || getClass() != o.getClass()) { return false; }
+		ServiceInstanceResponse that = (ServiceInstanceResponse) o;
+		return isAsync == that.isAsync &&
+			   Objects.equals(dashboardUrl, that.dashboardUrl) &&
+			   Objects.equals(extensionApis, that.extensionApis) &&
+			   serviceId.equals(that.serviceId) &&
+			   planId.equals(that.planId) &&
+			   Objects.equals(parameters, that.parameters);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(dashboardUrl, isAsync, extensionApis, serviceId, planId, parameters);
+	}
+
 }

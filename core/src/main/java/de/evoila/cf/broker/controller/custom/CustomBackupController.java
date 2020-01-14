@@ -48,7 +48,7 @@ public class CustomBackupController extends BaseController {
                 .map(x -> new BackupItem(x.getKey(), x.getValue()))
                 .collect(Collectors.toList());
 
-        return new ResponseEntity(new PageImpl<>(backupItems), HttpStatus.OK);
+        return ResponseEntity.ok(new PageImpl<>(backupItems));
     }
 
 }
