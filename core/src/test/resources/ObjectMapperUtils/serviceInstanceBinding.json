@@ -1,0 +1,32 @@
+{
+  "id": "TestId",
+  "serviceInstanceId": "TestServiceInstanceId",
+  "credentials": {},
+  "syslogDrainUrl": "TestURL",
+  "appGuid": "21a8ba3a-4d85-41de-aa57-96afed2c3986",
+  "parameters": {
+    "key1": "value1",
+    "key2": "value2"
+  },
+  "volumeMounts": [
+    {
+      "driver": "TestDriver",
+      "container_dir": "Testcontainer_dir",
+      "mode": "r",
+      "device_type": "shared",
+      "device": {
+        "volume_id": "TestVolumeId",
+        "mount_config": {
+          "uid": "TestUId",
+          "gid": "TestGId",
+          "file_mode": "TestFileMode",
+          "dir_mode": "TestDirMode",
+          "username": "TestUsername",
+          "password": "TestPassword",
+          "source": "TestSource",
+          "target": "TestTarget"
+        }
+      }
+    }
+  ]
+}

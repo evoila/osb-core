@@ -33,7 +33,7 @@ public class ServiceDefinition {
 
     private List<String> tags = new ArrayList<>();
 
-    private ServiceMetadata metadata;
+    private ServiceMetadata metadata = new ServiceMetadata();
 
     private List<String> requires = new ArrayList<>();
 
