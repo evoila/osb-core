@@ -35,10 +35,6 @@ class EndpointControllerTest {
         endpointController = new EndpointController(endpointAvailabilityService);
     }
 
-    @AfterEach
-    void tearDown() {
-    }
-
     @Test
     void getCatalog() {
         when(endpointAvailabilityService.getServices())
