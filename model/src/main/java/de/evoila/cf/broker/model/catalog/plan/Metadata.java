@@ -150,5 +150,4 @@ public class Metadata extends InstanceGroupConfig {
     public int hashCode() {
         return Objects.hash(super.hashCode(), bullets, costs, backup, displayName, ingressInstanceGroup, egressInstanceGroup, instanceGroupConfig, customParameters, endpointName, active);
     }
-
 }

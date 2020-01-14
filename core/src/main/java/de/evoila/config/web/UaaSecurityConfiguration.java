@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -29,21 +30,23 @@ public class UaaSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
-        authenticationManagerBuilder
-                .authenticationProvider(openIDRelyingPartyAuthenticationProvider());
+        authenticationManagerBuilder.authenticationProvider(openIDRelyingPartyAuthenticationProvider());
     }
 
     @Override
     public void configure(WebSecurity web) {
-        web
-                .ignoring()
-                .antMatchers(HttpMethod.GET,"/custom/v2/authentication/{serviceInstanceId}")
-                .antMatchers(HttpMethod.GET,"/custom/v2/authentication/{serviceInstanceId}/confirm");
+        web.ignoring()
+                .antMatchers(HttpMethod.GET, "/custom/v2/authentication/{serviceInstanceId}")
+                .antMatchers(HttpMethod.GET, "/custom/v2/authentication/{serviceInstanceId}/confirm");
+    }
+
+    protected UaaRelyingPartyFilter createNewUaaRelyingPartyFilter(AuthenticationManager authenticationManager) {
+        return new UaaRelyingPartyFilter(authenticationManager);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        UaaRelyingPartyFilter uaaRelyingPartyFilter = new UaaRelyingPartyFilter(authenticationManager());
+        UaaRelyingPartyFilter uaaRelyingPartyFilter = createNewUaaRelyingPartyFilter(authenticationManager());
         uaaRelyingPartyFilter.setSuccessHandler(new UaaRelyingPartyAuthenticationSuccessHandler());
         uaaRelyingPartyFilter.setFailureHandler(new UaaRelyingPartyAuthenticationFailureHandler());
 
@@ -66,10 +69,9 @@ public class UaaSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf().disable();
     }
 
-    @Bean(name = "uaaAuthencationEntryPoint")
+    @Bean(name = "uaaAuthenticationEntryPoint")
     public AuthenticationEntryPoint authenticationEntryPoint() {
-        CommonCorsAuthenticationEntryPoint entryPoint =
-                new CommonCorsAuthenticationEntryPoint();
+        CommonCorsAuthenticationEntryPoint entryPoint = new CommonCorsAuthenticationEntryPoint();
         entryPoint.setRealmName("uaaEndpointRealm");
         return entryPoint;
     }

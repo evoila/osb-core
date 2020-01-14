@@ -12,6 +12,9 @@ import java.util.*;
 public class MapUtils {
 
     public static void deepMerge(Map<String, Object> map1, Map<String, Object> map2) {
+        if ( (map1 == null) || (map2 == null) ) {
+            return;
+        }
         for(String key : map2.keySet()) {
             Object value2 = map2.get(key);
             if (map1.containsKey(key)) {
@@ -26,6 +29,9 @@ public class MapUtils {
     }
 
     public static void deepInsert(Map<String, Object> map, String key, Object value) {
+        if ( (map == null) || (key == null) ){
+            return;
+        }
         List<String> keyElements = Arrays.asList(key.split("\\."));
 
         Map<String, Object> actualMap = map;

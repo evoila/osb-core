@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 /**
  * @author Christian Brinker, Johannes Hiemer.
  */
@@ -60,4 +62,20 @@ public class ServiceInstanceOperationResponse {
     public void setAsync(boolean async) {
         this.async = async;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        ServiceInstanceOperationResponse that = (ServiceInstanceOperationResponse) o;
+        return async == that.async &&
+               Objects.equals(operation, that.operation) &&
+               Objects.equals(dashboardUrl, that.dashboardUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(operation, dashboardUrl, async);
+    }
+
 }

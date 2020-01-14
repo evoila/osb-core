@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "connections": 50,
+    "customParameters": {
+      "key": "This is a test value.",
+      "parameter": "This is another test value."
+    }
+  },
+  "description": "Deployment of a large example service to an existing shared instance.",
+  "free": false,
+  "id": "602917BA-A0FE-4B75-ACA5-6FEACE29EFF0",
+  "name": "l",
+  "platform": "EXISTING_SERVICE"
+}
