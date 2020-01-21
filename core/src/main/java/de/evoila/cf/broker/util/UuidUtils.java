@@ -1,8 +1,10 @@
 package de.evoila.cf.broker.util;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * author Johannes Strauß
+ */
 public class UuidUtils {
 
     public static final String UUID_REGEX = "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$";
