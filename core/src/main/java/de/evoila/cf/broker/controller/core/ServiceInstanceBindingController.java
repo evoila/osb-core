@@ -7,6 +7,8 @@ import de.evoila.cf.broker.model.annotations.ApiVersion;
 import de.evoila.cf.broker.model.annotations.ResponseAdvice;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
+import de.evoila.cf.broker.util.ParameterValidator;
+import de.evoila.cf.broker.util.UuidUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 
 /**
  * @author Marco Di Martino, Johannes Hiemer
@@ -25,7 +28,7 @@ public class ServiceInstanceBindingController extends BaseController {
 
     private final Logger log = LoggerFactory.getLogger(ServiceInstanceBindingController.class);
 
-    public static final String SERVICE_INSTANCE_BINDING_BASE_PATH = "/core/service_instances/{instanceId}/service_bindings";
+    private static final String SERVICE_INSTANCE_BINDING_BASE_PATH = "/core/service_instances/{instanceId}/service_bindings";
 
     private BindingServiceImpl bindingService;
 
@@ -39,13 +42,16 @@ public class ServiceInstanceBindingController extends BaseController {
     @ResponseAdvice
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-    public ResponseEntity bindServiceInstance(@PathVariable("instanceId") String instanceId,
-                                              @PathVariable("bindingId") String bindingId,
-                                              @RequestHeader("X-Broker-API-Version") String apiHeader,
-                                              @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
-                                              @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
-                                              @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,
-                                              @Valid @RequestBody ServiceInstanceBindingRequest request)
+    public ResponseEntity bindServiceInstance(
+            @Pattern(regexp = UuidUtils.UUID_REGEX, message = UuidUtils.NOT_A_UUID_MESSAGE)
+            @PathVariable("instanceId") String instanceId,
+            @Pattern(regexp = UuidUtils.UUID_REGEX, message = UuidUtils.NOT_A_UUID_MESSAGE)
+            @PathVariable("bindingId") String bindingId,
+            @RequestHeader("X-Broker-API-Version") String apiHeader,
+            @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
+            @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
+            @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,
+            @Valid @RequestBody ServiceInstanceBindingRequest request)
             throws ServiceInstanceBindingExistsException,
             ServiceBrokerException, ServiceDefinitionDoesNotExistException,
             InvalidParametersException, AsyncRequiredException, PlatformException, UnsupportedOperationException {
