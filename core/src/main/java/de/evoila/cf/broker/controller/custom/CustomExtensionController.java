@@ -23,7 +23,7 @@ import java.util.Map;
 @RequestMapping(value = "/custom/v2/extensions")
 public class CustomExtensionController extends BaseController {
 
-    private final Logger log = LoggerFactory.getLogger(CustomExtensionController.class);
+    private final static Logger log = LoggerFactory.getLogger(CustomExtensionController.class);
 
     private Map<String, List<Server>> servers;
 

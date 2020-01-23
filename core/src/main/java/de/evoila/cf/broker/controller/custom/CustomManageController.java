@@ -25,11 +25,11 @@ import java.util.Map;
 @RequestMapping(value = "/custom/v2/manage/service_instances")
 public class CustomManageController extends BaseController {
 
-    ServiceInstanceRepository serviceInstanceRepository;
+    private ServiceInstanceRepository serviceInstanceRepository;
 
-    ServiceDefinitionRepository serviceDefinitionRepository;
+    private ServiceDefinitionRepository serviceDefinitionRepository;
 
-    DeploymentService deploymentService;
+    private DeploymentService deploymentService;
 
     CustomManageController(ServiceInstanceRepository serviceInstanceRepository,
                            ServiceDefinitionRepository serviceDefinitionRepository,
