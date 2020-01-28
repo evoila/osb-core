@@ -9,11 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 /**
  * @author Johannes Hiemer, Marco Di Martino.
  **/
+@Validated
 public abstract class BaseController {
 
     private final Logger log = LoggerFactory.getLogger(BaseController.class);
@@ -23,7 +25,7 @@ public abstract class BaseController {
     }
 
     protected ResponseEntity processEmptyErrorResponse(HttpStatus status) {
-      return new ResponseEntity<>(EmptyRestResponse.BODY, status);
+        return new ResponseEntity<>(EmptyRestResponse.BODY, status);
     }
 
     protected ResponseEntity processErrorResponse(String message, HttpStatus status) {
@@ -33,6 +35,11 @@ public abstract class BaseController {
     protected ResponseEntity<ServiceBrokerErrorResponse> processErrorResponse(String error, String description, HttpStatus status) {
         log.debug("Handled following service broker error: " + error + " - " + description);
         return new ResponseEntity<>(new ServiceBrokerErrorResponse(error, description), status);
+    }
+
+    @ExceptionHandler({javax.validation.ValidationException.class})
+    public ResponseEntity handleException(javax.validation.ValidationException ex) {
+        return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({ValidationException.class})

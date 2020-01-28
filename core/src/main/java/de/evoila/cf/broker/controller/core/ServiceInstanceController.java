@@ -14,6 +14,7 @@ import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.DeploymentService;
 import de.evoila.cf.broker.util.EmptyRestResponse;
 import de.evoila.cf.broker.util.ServiceInstanceUtils;
+import de.evoila.cf.broker.util.UuidUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 
 /**
  * @author Johannes Hiemer, Christian Brinker, Marco Di Martino.
@@ -31,7 +33,7 @@ public class ServiceInstanceController extends BaseController {
 
     private final Logger log = LoggerFactory.getLogger(ServiceInstanceController.class);
 
-    public static final String SERVICE_INSTANCE_BASE_PATH = "/v2/service_instances";
+    private static final String SERVICE_INSTANCE_BASE_PATH = "/v2/service_instances";
 
     private DeploymentService deploymentService;
 
@@ -58,7 +60,8 @@ public class ServiceInstanceController extends BaseController {
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @PutMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<ServiceInstanceOperationResponse> create(
-            @PathVariable("serviceInstanceId") String serviceInstanceId,
+            @PathVariable("serviceInstanceId")
+            @Pattern(regexp = UuidUtils.UUID_REGEX, message = UuidUtils.NOT_A_UUID_MESSAGE) String serviceInstanceId,
             @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
             @Valid @RequestBody ServiceInstanceRequest request,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
@@ -238,5 +241,4 @@ public class ServiceInstanceController extends BaseController {
 
         return new ResponseEntity<>(serviceInstanceResponse, HttpStatus.OK);
     }
-
 }
