@@ -33,10 +33,8 @@ public class AsyncBindingServiceImpl extends AsyncOperationServiceImpl implement
                     "Creating binding..", JobProgress.BIND);
             bindingService.createBinding(bindingId, serviceInstance, serviceInstanceBindingRequest, plan);
             jobProgressService.succeedProgress(jobProgress.getId(), "Instance Binding successfully created");
-        } catch (ServiceBrokerException e) {
-            log.error("Exception during instance binding creation, while saving new JobProgress object.", e);
         } catch (Exception e) {
-            logUnexpectedException(jobProgressId, "binding creation", e);
+            logException(jobProgressId, "binding creation", e);
         }
     }
 
@@ -47,10 +45,8 @@ public class AsyncBindingServiceImpl extends AsyncOperationServiceImpl implement
         try {
             jobProgressService.startJob(jobProgressId, bindingId, "Deleting binding..", JobProgress.UNBIND);
             bindingServiceImpl.deleteServiceInstanceBinding(bindingId, serviceInstance, plan);
-        } catch (ServiceBrokerException e) {
-            log.error("Exception during instance binding deletion, while saving new JobProgress object.", e);
         } catch (Exception e) {
-            logUnexpectedException(jobProgressId, "binding deletion",  e);
+            logException(jobProgressId, "binding deletion", e);
         }
     }
 }

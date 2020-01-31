@@ -27,7 +27,7 @@ class AsyncDeleteBindingTest extends BaseTest {
         mockStartJobThrowsException(JobProgress.UNBIND, DESCRIPTION, runtimeException);
         runDeleteBinding();
         verify(jobProgressService, times(1))
-                .failJob(JOB_PROGRESS_ID, "Internal error during instance binding deletion, please contact our support.");
+                .failJob(JOB_PROGRESS_ID, "Internal error during instance binding deletion, with message \"Test\". Please contact our support.");
     }
 
     @Test

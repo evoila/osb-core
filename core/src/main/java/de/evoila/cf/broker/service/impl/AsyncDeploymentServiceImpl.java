@@ -32,12 +32,10 @@ public class AsyncDeploymentServiceImpl extends AsyncOperationServiceImpl implem
                     "Creating service..", JobProgress.PROVISION);
             deploymentService.syncCreateInstance(serviceInstance, parameters, plan, platformService);
             progressService.succeedProgress(jobProgress.getId(), "Instance successfully created");
-        } catch (ServiceBrokerException e) {
-            log.error("Exception during Instance creation", e);
         } catch (Exception e) {
-            logUnexpectedException(jobProgressId, "creation", e);
+            logException(jobProgressId, "creation", e);
         }
-	}
+    }
 
     @Async
     @Override
@@ -48,10 +46,8 @@ public class AsyncDeploymentServiceImpl extends AsyncOperationServiceImpl implem
                     "Updating service..", JobProgress.UPDATE);
             deploymentService.syncUpdateInstance(serviceInstance, parameters, plan, platformService);
             progressService.succeedProgress(jobProgressId, "Instance successfully updated");
-        } catch (ServiceBrokerException e) {
-            log.error("Exception during instance update", e);
         } catch (Exception e) {
-            logUnexpectedException(jobProgressId, "update", e);
+            logException(jobProgressId, "update", e);
         }
     }
 
@@ -63,12 +59,8 @@ public class AsyncDeploymentServiceImpl extends AsyncOperationServiceImpl implem
             progressService.startJob(jobProgressId, serviceInstance.getId(),
                     "Deleting service..", JobProgress.DELETE);
             deploymentService.syncDeleteInstance(serviceInstance, plan, platformService);
-
-        } catch (ServiceBrokerException e) {
-            log.error("Exception during instance deletion, while saving new JobProgress object.", e);
         } catch (Exception e) {
-            logUnexpectedException(jobProgressId, "deletion", e);
+            logException(jobProgressId, "deletion", e);
         }
     }
-
 }
