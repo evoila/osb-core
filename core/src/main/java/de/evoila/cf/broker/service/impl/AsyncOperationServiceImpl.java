@@ -41,9 +41,10 @@ public class AsyncOperationServiceImpl implements AsyncOperationService {
         }
     }
 
-    void logUnexpectedException(String jobProgressId, String operation, Exception e){
+    void logException(String jobProgressId, String operation, Exception e){
         try {
-            progressService.failJob(jobProgressId, "Internal error during instance " + operation +", please contact our support.");
+            progressService.failJob(jobProgressId, "Internal error during instance " + operation +
+                    ", with message \"" + e.getMessage() + "\". Please contact our support.");
         } catch (ServiceBrokerException ex) {
             log.error("Exception during error logging.", e);
         }
