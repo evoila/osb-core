@@ -31,7 +31,7 @@ class AsyncCreateBindingTest extends BaseTest {
         mockStartJobThrowsException(JobProgress.BIND, DESCRIPTION, runtimeException);
         runCreateBinding();
         verify(jobProgressService, times(1))
-                .failJob(JOB_PROGRESS_ID, "Internal error during instance binding creation, please contact our support.");
+                .failJob(JOB_PROGRESS_ID, "Internal error during instance binding creation, with message \"Test\". Please contact our support.");
     }
 
     @Test
@@ -40,6 +40,8 @@ class AsyncCreateBindingTest extends BaseTest {
         mockStartJobReturnsJobProgress(JobProgress.BIND, DESCRIPTION);
         mockCreateBindingThrowsException(new ServiceBrokerException("Test"));
         runCreateBinding();
+        verify(jobProgressService, times(1))
+                .failJob(JOB_PROGRESS_ID, "Internal error during instance binding creation, with message \"Test\". Please contact our support.");
     }
 
     @Test
@@ -49,7 +51,7 @@ class AsyncCreateBindingTest extends BaseTest {
         mockCreateBindingThrowsException(new RuntimeException("Test"));
         runCreateBinding();
         verify(jobProgressService, times(1))
-                .failJob(JOB_PROGRESS_ID, "Internal error during instance binding creation, please contact our support.");
+                .failJob(JOB_PROGRESS_ID, "Internal error during instance binding creation, with message \"Test\". Please contact our support.");
     }
 
     @Test
