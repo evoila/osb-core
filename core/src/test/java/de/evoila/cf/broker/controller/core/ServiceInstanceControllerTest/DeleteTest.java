@@ -1,13 +1,12 @@
 package de.evoila.cf.broker.controller.core.ServiceInstanceControllerTest;
 
+import de.evoila.cf.broker.exception.*;
+import de.evoila.cf.broker.util.EmptyRestResponse;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import de.evoila.cf.broker.exception.AsyncRequiredException;
-import de.evoila.cf.broker.exception.ServiceBrokerException;
-import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.ServiceInstanceOperationResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,7 +60,8 @@ class DeleteTest extends BaseTest {
     }
 
     @Test
-    void serviceInstanceOperationResponse() throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException {
+    @DisplayName("Should return StatusCode 200, if the response is not async.")
+    void serviceInstanceOperationResponseOk() throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ConcurrencyErrorException {
         when(deploymentService.deleteServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
                 .thenReturn(operationResponse);
         ResponseEntity<ServiceInstanceOperationResponse> response = controller.delete(HAPPY_ORIGINATING_ID,
@@ -70,6 +70,22 @@ class DeleteTest extends BaseTest {
                                                                                       HAPPY_ACCEPTS_INCOMPLETE,
                                                                                       HAPPY_SERVICE_ID,
                                                                                       HAPPY_PLAN_ID);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertSame(EmptyRestResponse.BODY, response.getBody());
+    }
+
+    @Test
+    @DisplayName("Should return StatusCode 202, if the response is async.")
+    void serviceInstanceOperationResponseAccepted() throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ConcurrencyErrorException {
+        when(deploymentService.deleteServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
+                .thenReturn(operationResponse);
+        when(operationResponse.isAsync()).thenReturn(true);
+        ResponseEntity<ServiceInstanceOperationResponse> response = controller.delete(HAPPY_ORIGINATING_ID,
+                HAPPY_REQUEST_ID,
+                HAPPY_SERVICE_INSTANCE_ID,
+                HAPPY_ACCEPTS_INCOMPLETE,
+                HAPPY_SERVICE_ID,
+                HAPPY_PLAN_ID);
         assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
         assertSame(operationResponse, response.getBody());
     }

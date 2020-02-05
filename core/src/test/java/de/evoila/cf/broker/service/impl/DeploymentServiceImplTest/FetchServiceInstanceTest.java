@@ -144,14 +144,19 @@ class FetchServiceInstanceTest extends BaseTest {
                         @Test
                         void operationStateIsNotInProgress() throws ConcurrencyErrorException, ServiceInstanceNotFoundException {
                             String[] states = {JobProgress.SUCCESS, JobProgress.FAILED, JobProgress.UNKNOWN};
+                            String[] operations = { JobProgress.PROVISION, JobProgress.UPDATE};
+
                             for (String state : states) {
-                                when(jobProgress.getState())
-                                        .thenReturn(state);
-                                ServiceInstance result = service.fetchServiceInstance(HAPPY_SERVICE_INSTANCE_ID);
-                                assertSame(serviceInstance, result);
+                                for (String operation : operations) {
+                                    when(jobProgress.getOperation())
+                                            .thenReturn(operation);
+                                    when(jobProgress.getState())
+                                            .thenReturn(state);
+                                    ServiceInstance result = service.fetchServiceInstance(HAPPY_SERVICE_INSTANCE_ID);
+                                    assertSame(serviceInstance, result);
+                                }
                             }
                         }
-
                     }
 
                     @Test

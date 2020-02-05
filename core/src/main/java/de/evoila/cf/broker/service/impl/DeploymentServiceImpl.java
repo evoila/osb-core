@@ -200,6 +200,14 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
 
+        // Will cause a NPE, if there is no JobProgress object. To fix this, the JobRepository has to be touched.
+        JobProgress jobProgress = jobRepository.getJobProgressByReferenceId(instanceId);
+        if (jobProgress != null && jobProgress.isDeleting() && jobProgress.isInProgress()) {
+            serviceInstanceOperationResponse.setOperation(jobProgress.getId());
+            serviceInstanceOperationResponse.setAsync(true);
+            return serviceInstanceOperationResponse;
+        }
+
         if (platformService.isSyncPossibleOnDelete(serviceInstance)) {
             syncDeleteInstance(serviceInstance, plan, platformService);
         } else {
@@ -231,15 +239,12 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         if (jobRepository.containsJobProgress(instanceId)) {
             JobProgress job = jobRepository.getJobProgressByReferenceId(instanceId);
-            if (job.getState().equals(JobProgress.IN_PROGRESS)) {
-                switch (job.getOperation()) {
-                    case JobProgress.PROVISION:
-                        throw new ServiceInstanceNotFoundException();
-                    case JobProgress.UPDATE:
-                        throw new ConcurrencyErrorException();
-                    default:
-                        break;
-                }
+            if (job.getOperation().equals(JobProgress.PROVISION) &&
+                    job.getState().equals(JobProgress.IN_PROGRESS)) {
+                throw new ServiceInstanceNotFoundException();
+            } else if (job.getOperation().equals(JobProgress.UPDATE) &&
+                    job.getState().equals(JobProgress.IN_PROGRESS)) {
+                throw new ConcurrencyErrorException("Service Instance");
             }
         }
         return serviceInstance;

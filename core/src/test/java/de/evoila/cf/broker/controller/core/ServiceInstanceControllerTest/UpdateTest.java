@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.controller.core.ServiceInstanceControllerTest;
 
+import de.evoila.cf.broker.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,13 +11,6 @@ import org.springframework.http.ResponseEntity;
 import java.util.ArrayList;
 import java.util.Map;
 
-import de.evoila.cf.broker.exception.AsyncRequiredException;
-import de.evoila.cf.broker.exception.MaintenanceInfoVersionsDontMatchException;
-import de.evoila.cf.broker.exception.ServiceBrokerException;
-import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceDefinitionPlanDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceNotFoundException;
 import de.evoila.cf.broker.model.ServiceBrokerErrorResponse;
 import de.evoila.cf.broker.model.ServiceInstanceOperationResponse;
 import de.evoila.cf.broker.model.ServiceInstanceUpdateRequest;
@@ -43,7 +37,7 @@ class UpdateTest extends BaseTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    void getServiceDefinitionIdReturnsNull() throws AsyncRequiredException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException, ServiceBrokerException, MaintenanceInfoVersionsDontMatchException, ServiceDefinitionDoesNotExistException {
+    void getServiceDefinitionIdReturnsNull() throws AsyncRequiredException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException, ServiceBrokerException, MaintenanceInfoVersionsDontMatchException, ServiceDefinitionDoesNotExistException, ConcurrencyErrorException {
         when(request.getServiceDefinitionId())
                 .thenReturn(null);
         ResponseEntity<String> response = controller.update(HAPPY_SERVICE_INSTANCE_ID,
@@ -132,7 +126,7 @@ class UpdateTest extends BaseTest {
 
         @SuppressWarnings("unchecked")
         @Test
-        void specificPlanIsUpdatableReturnsFalse() throws ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException, AsyncRequiredException, ServiceInstanceNotFoundException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, MaintenanceInfoVersionsDontMatchException {
+        void specificPlanIsUpdatableReturnsFalse() throws ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException, AsyncRequiredException, ServiceInstanceNotFoundException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, MaintenanceInfoVersionsDontMatchException, ConcurrencyErrorException {
             when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
                     .thenReturn(serviceInstance);
             when(serviceInstance.getPlanId())
@@ -170,7 +164,7 @@ class UpdateTest extends BaseTest {
 
             @SuppressWarnings("unchecked")
             @Test
-            void isEffectivelyUpdatingReturnsFalse() throws AsyncRequiredException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException, ServiceBrokerException, MaintenanceInfoVersionsDontMatchException, ServiceDefinitionDoesNotExistException {
+            void isEffectivelyUpdatingReturnsFalse() throws AsyncRequiredException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException, ServiceBrokerException, MaintenanceInfoVersionsDontMatchException, ServiceDefinitionDoesNotExistException, ConcurrencyErrorException {
                 when(request.getContext())
                         .thenReturn(context);
                 when(serviceInstance.getContext())
@@ -258,7 +252,7 @@ class UpdateTest extends BaseTest {
 
                         @SuppressWarnings("unchecked")
                         @Test
-                        void updateServiceInstanceContextDoesNotThrow() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, AsyncRequiredException, ServiceInstanceNotFoundException, ServiceDefinitionPlanDoesNotExistException, MaintenanceInfoVersionsDontMatchException {
+                        void updateServiceInstanceContextDoesNotThrow() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, AsyncRequiredException, ServiceInstanceNotFoundException, ServiceDefinitionPlanDoesNotExistException, MaintenanceInfoVersionsDontMatchException, ConcurrencyErrorException {
                             when(serviceInstance.isAllowContextUpdates())
                                     .thenReturn(true);
                             when(deploymentService.updateServiceInstanceContext(HAPPY_SERVICE_INSTANCE_ID, request))
@@ -276,7 +270,7 @@ class UpdateTest extends BaseTest {
 
                     @SuppressWarnings("unchecked")
                     @Test
-                    void isAllowContextUpdatesReturnsFalse() throws AsyncRequiredException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException, ServiceBrokerException, MaintenanceInfoVersionsDontMatchException, ServiceDefinitionDoesNotExistException {
+                    void isAllowContextUpdatesReturnsFalse() throws AsyncRequiredException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException, ServiceBrokerException, MaintenanceInfoVersionsDontMatchException, ServiceDefinitionDoesNotExistException, ConcurrencyErrorException {
                         when(serviceInstance.isAllowContextUpdates())
                                 .thenReturn(false);
                         ServiceBrokerErrorResponse expectedResponse = new ServiceBrokerErrorResponse("ContextUpdateNotAllowed",
@@ -339,7 +333,7 @@ class UpdateTest extends BaseTest {
 
                     @SuppressWarnings("unchecked")
                     @Test
-                    void updateServiceInstanceDoesNotThrow() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, AsyncRequiredException, ServiceInstanceNotFoundException, ServiceDefinitionPlanDoesNotExistException, MaintenanceInfoVersionsDontMatchException {
+                    void updateServiceInstanceDoesNotThrow() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, AsyncRequiredException, ServiceInstanceNotFoundException, ServiceDefinitionPlanDoesNotExistException, MaintenanceInfoVersionsDontMatchException, ConcurrencyErrorException {
                         when(deploymentService.updateServiceInstance(HAPPY_SERVICE_INSTANCE_ID, request))
                                 .thenReturn(operationResponse);
                         ResponseEntity<ServiceInstanceOperationResponse> response = controller.update(HAPPY_SERVICE_INSTANCE_ID,
