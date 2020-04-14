@@ -1,42 +1,59 @@
 package de.evoila.cf.security.utils;
 
 import de.evoila.cf.security.keystore.KeyStoreHandler;
-import org.junit.Before;
+
+
 import org.junit.Test;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CustomTrustManagerTest {
 
-    private CustomTrustManager customTrustManager;
-
-    @Before
-    public void setUpCustomTrustManager() throws GeneralSecurityException, IOException {
-        Certificate certificate = KeyStoreHandler.loadCertificate(ca);
-        customTrustManager = new CustomTrustManager(List.of(certificate));
+    private CustomTrustManager setUpCustomTrustManager(String ca) throws GeneralSecurityException, IOException {
+        Collection<Certificate> certificates;
+        if (ca != null) {
+            certificates = List.of(KeyStoreHandler.loadCertificate(ca));
+        } else {
+            certificates = Collections.emptyList();
+        }
+        return new CustomTrustManager(certificates);
     }
 
     @Test
     public void getAcceptedIssuersReturnsArray() throws IOException, GeneralSecurityException {
+        CustomTrustManager customTrustManager = setUpCustomTrustManager(ca);
         X509Certificate[] result = customTrustManager.getAcceptedIssuers();
-
-        assert result.length > 0;
+        assertTrue(result.length > 0);
     }
 
     @Test
-    public void checkClientTrustedDoesNotThrowException() {
+    public void checkClientTrustedDoesNotThrowException() throws GeneralSecurityException, IOException {
     }
 
     @Test
-    public void checkServerTrustedDoesNotThrowException() {
-
+    public void checkServerTrustedDoesNotThrowException() throws IOException, GeneralSecurityException {
+        CustomTrustManager customTrustManager = setUpCustomTrustManager(ca);
+        X509Certificate[] chain = new X509Certificate[]{(X509Certificate) KeyStoreHandler.loadCertificate(serverCertificate)};
+        assertDoesNotThrow(() -> customTrustManager.checkServerTrusted(chain, "ECDHE_RSA"));
     }
 
-    private final static String serverCertificat = "-----BEGIN CERTIFICATE-----\n" +
+    @Test
+    public void checkServerTrustedDoesThrowException() throws IOException, GeneralSecurityException {
+        CustomTrustManager customTrustManager = setUpCustomTrustManager(null);
+        X509Certificate[] chain = new X509Certificate[]{(X509Certificate) KeyStoreHandler.loadCertificate(serverCertificate)};
+        assertThrows(GeneralSecurityException.class, () -> customTrustManager.checkServerTrusted(chain, "ECDHE_RSA"));
+    }
+
+
+    private final static String serverCertificate = "-----BEGIN CERTIFICATE-----\n" +
             "MIIEgzCCAuugAwIBAgIRAKizEXy4dr0Nc8NOJGTkYiUwDQYJKoZIhvcNAQELBQAw\n" +
             "MzEMMAoGA1UEBhMDVVNBMRYwFAYDVQQKEw1DbG91ZCBGb3VuZHJ5MQswCQYDVQQD\n" +
             "EwJjYTAeFw0yMDAzMjYxMDUwMjVaFw0yMTAzMjYxMDUwMjVaMD0xDDAKBgNVBAYT\n" +
