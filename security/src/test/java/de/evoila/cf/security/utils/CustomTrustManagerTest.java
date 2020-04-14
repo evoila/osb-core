@@ -33,11 +33,7 @@ public class CustomTrustManagerTest {
         X509Certificate[] result = customTrustManager.getAcceptedIssuers();
         assertTrue(result.length > 0);
     }
-
-    @Test
-    public void checkClientTrustedDoesNotThrowException() throws GeneralSecurityException, IOException {
-    }
-
+    
     @Test
     public void checkServerTrustedDoesNotThrowException() throws IOException, GeneralSecurityException {
         CustomTrustManager customTrustManager = setUpCustomTrustManager(ca);

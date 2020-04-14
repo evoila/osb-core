@@ -38,7 +38,6 @@ public class CustomTrustManager implements X509TrustManager {
     private X509TrustManager getTrustManager(KeyStore keyStore) throws GeneralSecurityException {
         TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init(keyStore);
-
         TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
         Stream<TrustManager> trustManagerStream = Arrays.stream(trustManagers);
 
@@ -115,7 +114,6 @@ public class CustomTrustManager implements X509TrustManager {
         if (defaultTrustManager != null) {
             allIssuers.addAll(Arrays.asList(defaultTrustManager.getAcceptedIssuers()));
         }
-
         if (customTrustManager != null) {
             allIssuers.addAll(Arrays.asList(customTrustManager.getAcceptedIssuers()));
         }
