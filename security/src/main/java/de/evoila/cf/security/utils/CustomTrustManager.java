@@ -25,10 +25,14 @@ public class CustomTrustManager implements X509TrustManager {
     private X509TrustManager defaultTrustManager;
     private X509TrustManager customTrustManager;
 
-    CustomTrustManager(Collection<Certificate> certificate) throws GeneralSecurityException {
+    CustomTrustManager(Collection<Certificate> certificates) throws GeneralSecurityException {
         defaultTrustManager = getTrustManager(null);
-        KeyStore customKeystore = createKeyStore(certificate);
-        customTrustManager = getTrustManager(customKeystore);
+        KeyStore customKeystore = createKeyStore(certificates);
+
+        // If no certificates got provided, only the default trust manager will be used.
+        if (certificates.size() > 0) {
+            customTrustManager = getTrustManager(customKeystore);
+        }
     }
 
     private X509TrustManager getTrustManager(KeyStore keyStore) throws GeneralSecurityException {
@@ -39,7 +43,9 @@ public class CustomTrustManager implements X509TrustManager {
         Stream<TrustManager> trustManagerStream = Arrays.stream(trustManagers);
 
         return trustManagerStream.filter(X509TrustManager.class::isInstance)
-                .map(X509TrustManager.class::cast).findFirst().orElseThrow(GeneralSecurityException::new);
+                .map(X509TrustManager.class::cast).findFirst()
+                //This should never happen
+                .orElseThrow(GeneralSecurityException::new);
     }
 
     @Override
@@ -50,7 +56,7 @@ public class CustomTrustManager implements X509TrustManager {
                 defaultTrustManager.checkClientTrusted(chain, authType);
                 return;
             } catch (CertificateException e) {
-                log.trace("Default trust manager did not know the certificate", e);
+                log.trace("Default trust manager did not know the certificate ", e);
                 defaultCertificateException = e;
             }
         }
@@ -60,8 +66,8 @@ public class CustomTrustManager implements X509TrustManager {
                 customTrustManager.checkClientTrusted(chain, authType);
                 return;
             } catch (CertificateException e) {
-                log.trace("Custom trust manager did not know the certificate", e);
-                throw new CertificateException("default and custom truststore trust the Certificate.", e);
+                log.trace("Custom trust manager did not know the certificate ", e);
+                throw new CertificateException("Default and custom trust manager don't trust certificate ", e);
             }
         }
 
@@ -69,6 +75,7 @@ public class CustomTrustManager implements X509TrustManager {
             throw defaultCertificateException;
         }
 
+        //This should never happen, as a default truststore should always be present.
         throw new CertificateException("Both trust managers are null");
     }
 
@@ -89,8 +96,8 @@ public class CustomTrustManager implements X509TrustManager {
                 customTrustManager.checkServerTrusted(chain, authType);
                 return;
             } catch (CertificateException e) {
-                log.trace("Custom trust manager did not know the certificate", e);
-                throw new CertificateException("default and custom truststore trust the Certificate.", e);
+                log.trace("Custom trust manager did not know the certificate ", e);
+                throw new CertificateException("Default and custom truststore trust the certificate ", e);
             }
         }
 
@@ -98,6 +105,7 @@ public class CustomTrustManager implements X509TrustManager {
             throw defaultCertificateException;
         }
 
+        //This should never happen, as a default truststore should always be present.
         throw new CertificateException("Both trust managers are null");
     }
 
