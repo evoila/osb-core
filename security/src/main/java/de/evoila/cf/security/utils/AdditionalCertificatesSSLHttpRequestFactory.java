@@ -1,6 +1,8 @@
 package de.evoila.cf.security.utils;
 
 import de.evoila.cf.security.keystore.KeyStoreHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +19,13 @@ import java.util.List;
 @ConditionalOnProperty(name = "spring.ssl.certificates")
 public class AdditionalCertificatesSSLHttpRequestFactory extends CustomClientHttpRequestFactory {
 
+    private static Logger log = LoggerFactory.getLogger(AdditionalCertificatesSSLHttpRequestFactory.class);
+
     private AdditionalCertificatesSSLHttpRequestFactory(CustomCertificates customCertificates) {
-        try {
-            loadCerts(customCertificates.getCertificates());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        loadCerts(customCertificates.getCertificates());
     }
 
-    private static void loadCerts(Collection<String> certificates) throws IOException {
+    private static void loadCerts(Collection<String> certificates) {
         try {
             List<Certificate> certs = new ArrayList<>(List.of());
             for (String cert : certificates) {
@@ -36,8 +36,8 @@ public class AdditionalCertificatesSSLHttpRequestFactory extends CustomClientHtt
             SSLContext sslContext = SSLContext.getInstance("SSL");
             sslContext.init(null, new TrustManager[]{cta}, new java.security.SecureRandom());
             SSLContext.setDefault(sslContext);
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
+        } catch (GeneralSecurityException | IOException e) {
+            log.error("failed to set up customized ssl context with cause ", e);
         }
     }
 }
