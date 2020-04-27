@@ -168,8 +168,6 @@ public class CredhubClient implements CredentialStore {
 
     @Override
     public UsernamePasswordCredential getUser(String instanceId, String valueName) {
-        log.info("Getting credentials " + this.identifier(instanceId, valueName).getName());
-
         CredentialDetails<UserCredential> user = credHubTemplate.credentials()
                 .getByName(this.identifier(instanceId, valueName), UserCredential.class);
 
