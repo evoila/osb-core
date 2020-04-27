@@ -7,12 +7,13 @@ import de.evoila.cf.broker.model.credential.CertificateCredential;
 import de.evoila.cf.broker.model.credential.PasswordCredential;
 import de.evoila.cf.broker.model.credential.UsernamePasswordCredential;
 import de.evoila.cf.security.credentials.CredentialStore;
+import de.evoila.cf.security.utils.CustomClientHttpRequestFactory;
 import de.evoila.cf.security.utils.RandomString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.env.Environment;
-import org.springframework.credhub.core.CredHubTemplate;
+import org.springframework.credhub.core.CredHubOperations;
 import org.springframework.credhub.support.CredentialDetails;
 import org.springframework.credhub.support.SimpleCredentialName;
 import org.springframework.credhub.support.certificate.CertificateParameters;
@@ -24,13 +25,9 @@ import org.springframework.credhub.support.password.PasswordParametersRequest;
 import org.springframework.credhub.support.user.UserCredential;
 import org.springframework.credhub.support.user.UserCredentialRequest;
 import org.springframework.credhub.support.user.UserParametersRequest;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 
-import javax.naming.ConfigurationException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.Map;
 
 /**
@@ -44,31 +41,25 @@ public class CredhubClient implements CredentialStore {
 
     private CredhubBean credhubBean;
 
-    private CredHubTemplate credHubTemplate;
-
-    private Environment environment;
-
-    private CredhubConnection credhubConnection;
+    private CredHubOperations credHubOperations;
 
     private static String SERVICE_BROKER_PREFIX = "sb-";
 
-    public CredhubClient(CredhubBean credhubBean, Environment environment, CredhubConnection credhubConnection) {
+    public CredhubClient(
+            /*
+            This is here, to ensure the HttpClient gets created BEFORE any rest calls are being fired, to ensure
+            no unnecessary certificate errors occur.
+             */
+            SimpleClientHttpRequestFactory clientHttpRequestFactory,
+            CredhubBean credhubBean, Environment environment, CredHubOperations credHubOperations) {
         this.credhubBean = credhubBean;
-        this.environment = environment;
+        this.credHubOperations = credHubOperations;
 
         if (EnvironmentUtils.isTestEnvironment(environment)) {
             SERVICE_BROKER_PREFIX += "test-";
         }
 
-        try {
-            this.credHubTemplate = credhubConnection.createCredhubTemplate();
-        } catch (KeyStoreException | NoSuchAlgorithmException | ConfigurationException | UnrecoverableKeyException | KeyManagementException e) {
-            log.error(e.getMessage());
-        }
-
-        if (this.credHubTemplate != null) {
-            log.info("Successfully established a connection to Credhub.");
-        }
+        log.trace("Credhub Version is: " + this.credHubOperations.info().version().getVersion());
     }
 
     private SimpleCredentialName identifier(String instanceId, String valueName) {
@@ -106,13 +97,11 @@ public class CredhubClient implements CredentialStore {
     }
 
     /**
-     *
      * @param instanceId
      * @param valueName
      * @param username
      * @param passwordLength
-     * @return
-     * The createUser method returns the interpolated values of the User and Password Creation. That means it
+     * @return The createUser method returns the interpolated values of the User and Password Creation. That means it
      * does not return the created Username and Password itself but it returns:
      * * ((valueName.username)) for the username
      * * ((valueName.password)) for the password
@@ -135,7 +124,7 @@ public class CredhubClient implements CredentialStore {
 
         log.info("Creating user credentials for instance with id = " + instanceId);
 
-        CredentialDetails<UserCredential> user = credHubTemplate.credentials().generate(request);
+        CredentialDetails<UserCredential> user = credHubOperations.credentials().generate(request);
 
         return new UsernamePasswordCredential(buildManifestPlaceHolder(valueName + ".username"),
                 buildManifestPlaceHolder(valueName + ".password"));
@@ -155,7 +144,7 @@ public class CredhubClient implements CredentialStore {
 
         log.info("Creating user credentials for instance with id = " + instanceId);
 
-        CredentialDetails<UserCredential> user = credHubTemplate.credentials().write(request);
+        CredentialDetails<UserCredential> user = credHubOperations.credentials().write(request);
 
         return new UsernamePasswordCredential(buildManifestPlaceHolder(valueName + ".username"),
                 buildManifestPlaceHolder(valueName + ".password"));
@@ -168,7 +157,7 @@ public class CredhubClient implements CredentialStore {
 
     @Override
     public UsernamePasswordCredential getUser(String instanceId, String valueName) {
-        CredentialDetails<UserCredential> user = credHubTemplate.credentials()
+        CredentialDetails<UserCredential> user = credHubOperations.credentials()
                 .getByName(this.identifier(instanceId, valueName), UserCredential.class);
 
         return new UsernamePasswordCredential(user.getValue().getUsername(), user.getValue().getPassword());
@@ -190,15 +179,13 @@ public class CredhubClient implements CredentialStore {
     }
 
     /**
-     *
      * @param instanceId
      * @param valueName
-     * @param passwordLength
-     * The createPassword method returns the interpolated value of the Password Creation. That means it
-     * does not return the created Password itself but it returns:
-     * * ((valueName)) for the password
-     * If you want to get the value itself, please run getPassword(serviceInstance, valueName) after you have
-     * created the Password.
+     * @param passwordLength The createPassword method returns the interpolated value of the Password Creation. That means it
+     *                       does not return the created Password itself but it returns:
+     *                       * ((valueName)) for the password
+     *                       If you want to get the value itself, please run getPassword(serviceInstance, valueName) after you have
+     *                       created the Password.
      */
     @Override
     public PasswordCredential createPassword(String instanceId, String valueName, int passwordLength) {
@@ -215,7 +202,7 @@ public class CredhubClient implements CredentialStore {
 
         log.info("Creating password credentials for instance with id = " + instanceId);
 
-        credHubTemplate.credentials().generate(request);
+        credHubOperations.credentials().generate(request);
 
         return new PasswordCredential(buildManifestPlaceHolder(valueName));
     }
@@ -227,7 +214,7 @@ public class CredhubClient implements CredentialStore {
 
     @Override
     public String getPassword(String instanceId, String valueName) {
-        CredentialDetails<org.springframework.credhub.support.password.PasswordCredential> password = credHubTemplate.credentials()
+        CredentialDetails<org.springframework.credhub.support.password.PasswordCredential> password = credHubOperations.credentials()
                 .getByName(this.identifier(instanceId, valueName), org.springframework.credhub.support.password.PasswordCredential.class);
         return password.getValue().getPassword();
     }
@@ -238,15 +225,13 @@ public class CredhubClient implements CredentialStore {
     }
 
     /**
-     *
      * @param instanceId
      * @param valueName
-     * @param values
-     * The createJson method returns the interpolated value of the JSON Creation. That means it
-     * does not return the created JSON itself but it returns:
-     * * ((valueName.<value>)) for the JSON, where <value> is the key in the Map<String, Object> of values
-     * If you want to get the value itself, please run getJson(serviceInstance, valueName) after you have
-     * created the JSON.
+     * @param values     The createJson method returns the interpolated value of the JSON Creation. That means it
+     *                   does not return the created JSON itself but it returns:
+     *                   * ((valueName.<value>)) for the JSON, where <value> is the key in the Map<String, Object> of values
+     *                   If you want to get the value itself, please run getJson(serviceInstance, valueName) after you have
+     *                   created the JSON.
      */
     @Override
     public Map<String, Object> createJson(String instanceId, String valueName, Map<String, Object> values) {
@@ -257,7 +242,7 @@ public class CredhubClient implements CredentialStore {
 
         log.info("Creating json credentials for instance with id = " + instanceId);
 
-        CredentialDetails<JsonCredential> json = credHubTemplate.credentials().write(request);
+        CredentialDetails<JsonCredential> json = credHubOperations.credentials().write(request);
 
         return json.getValue();
     }
@@ -269,7 +254,7 @@ public class CredhubClient implements CredentialStore {
 
     @Override
     public Map<String, Object> getJson(String instanceId, String valueName, String key) {
-        CredentialDetails<JsonCredential> json = credHubTemplate.credentials()
+        CredentialDetails<JsonCredential> json = credHubOperations.credentials()
                 .getByName(this.identifier(instanceId, valueName), JsonCredential.class);
         return json.getValue();
     }
@@ -281,7 +266,7 @@ public class CredhubClient implements CredentialStore {
 
     @Override
     public void deleteCredentials(String instanceId, String valueName) {
-        credHubTemplate.credentials().deleteByName(this.identifier(instanceId, valueName));
+        credHubOperations.credentials().deleteByName(this.identifier(instanceId, valueName));
     }
 
     @Override
@@ -298,7 +283,7 @@ public class CredhubClient implements CredentialStore {
 
         log.info("Creating certificate for instance with id = " + instanceId);
 
-        CredentialDetails<CertificateCredential> certificate = credHubTemplate.credentials().generate(request);
+        CredentialDetails<CertificateCredential> certificate = credHubOperations.credentials().generate(request);
 
         return new CertificateCredential(buildManifestPlaceHolder(valueName + ".ca"),
                 buildManifestPlaceHolder(valueName + ".certificate"),
@@ -323,7 +308,7 @@ public class CredhubClient implements CredentialStore {
 
     @Override
     public CertificateCredential getCertificate(String instanceId, String valueName) {
-        CredentialDetails<CertificateCredential> certificate = credHubTemplate.credentials()
+        CredentialDetails<CertificateCredential> certificate = credHubOperations.credentials()
                 .getByName(this.identifier(instanceId, valueName), CertificateCredential.class);
 
         return new CertificateCredential(certificate.getValue().getCertificateAuthority(),

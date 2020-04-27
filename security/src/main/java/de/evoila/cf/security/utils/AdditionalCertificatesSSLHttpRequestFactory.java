@@ -3,7 +3,7 @@ package de.evoila.cf.security.utils;
 import de.evoila.cf.security.keystore.KeyStoreHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 import javax.net.ssl.SSLContext;
@@ -16,13 +16,13 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
-@ConditionalOnProperty(name = "spring.ssl.certificates")
+@ConditionalOnMissingBean(AcceptSelfSignedClientHttpRequestFactory.class)
 public class AdditionalCertificatesSSLHttpRequestFactory extends CustomClientHttpRequestFactory {
 
     private static Logger log = LoggerFactory.getLogger(AdditionalCertificatesSSLHttpRequestFactory.class);
 
     private AdditionalCertificatesSSLHttpRequestFactory(CustomCertificates customCertificates) {
-        loadCerts(customCertificates.getCertificates());
+        loadCerts(customCertificates.getCertificatesAsString());
     }
 
     private static void loadCerts(Collection<String> certificates) {
