@@ -11,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 
 public abstract class CustomClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
 
+    //TODO: why overwrite this method?
     @Override
     protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
         if (connection instanceof HttpsURLConnection) {

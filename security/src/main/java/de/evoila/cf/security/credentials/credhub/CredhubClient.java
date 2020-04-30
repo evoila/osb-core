@@ -7,7 +7,6 @@ import de.evoila.cf.broker.model.credential.CertificateCredential;
 import de.evoila.cf.broker.model.credential.PasswordCredential;
 import de.evoila.cf.broker.model.credential.UsernamePasswordCredential;
 import de.evoila.cf.security.credentials.CredentialStore;
-import de.evoila.cf.security.utils.CustomClientHttpRequestFactory;
 import de.evoila.cf.security.utils.RandomString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,8 +46,9 @@ public class CredhubClient implements CredentialStore {
 
     public CredhubClient(
             /*
-            This is here, to ensure the HttpClient gets created BEFORE any rest calls are being fired, to ensure
-            no unnecessary certificate errors occur.
+            This is here, to ensure the HttpClientFactory gets created BEFORE any rest calls are being fired, to ensure
+            no unnecessary certificate errors occur. Spring will initialize either AcceptSelfSignedClientHttpRequestFactory,
+            or AcceptSelfSignedClientHttpRequestFactory, based upon configuration.
              */
             SimpleClientHttpRequestFactory clientHttpRequestFactory,
             CredhubBean credhubBean, Environment environment, CredHubOperations credHubOperations) {
