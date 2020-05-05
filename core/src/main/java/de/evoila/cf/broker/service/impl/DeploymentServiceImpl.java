@@ -234,6 +234,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
             platformService.getInstance(serviceInstance, plan);
         } catch (Exception e) {
+            log.info("HIER: " + e.getMessage());
             throw new ServiceInstanceNotFoundException();
         }
 
