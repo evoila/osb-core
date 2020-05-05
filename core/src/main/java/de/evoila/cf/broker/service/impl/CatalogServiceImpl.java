@@ -70,11 +70,6 @@ public class CatalogServiceImpl implements CatalogService {
 				if (!service.getName().contains(GlobalConstants.TEST_PROFILE))
 					service.setName(service.getName() + "-" + GlobalConstants.TEST_PROFILE);
 
-				service.setId(replaceLastChar(service.getId()));
-				service.getDashboardClient()
-						.setSecret(replaceLastChar(service.getDashboardClient().getSecret()));
-
-
 				if (!service.getDashboardClient().getId().contains(GlobalConstants.TEST_PROFILE))
 					service.getDashboardClient().setId(
 							service.getDashboardClient().getId() + "-" + GlobalConstants.TEST_PROFILE
@@ -86,12 +81,6 @@ public class CatalogServiceImpl implements CatalogService {
 				service.getDashboardClient().setRedirectUri(
 						replaceUrl(service.getDashboardClient().getRedirectUri())
 				);
-
-				service.getPlans().stream().map(plan -> {
-					plan.setId(replaceLastChar(plan.getId()));
-
-					return plan;
-				}).collect(Collectors.toList());
 				return service;
 			}).collect(Collectors.toList());
 
@@ -104,13 +93,6 @@ public class CatalogServiceImpl implements CatalogService {
             });
 		}
 		return catalog;
-	}
-
-	private String replaceLastChar(String value) {
-		if (value != null && value.length() > 1)
-			return value.substring(0, value.length() - 1).concat("T");
-
-		return value;
 	}
 
 	private String replaceUrl(String urlStr) {
