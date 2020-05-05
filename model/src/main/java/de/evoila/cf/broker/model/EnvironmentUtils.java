@@ -28,14 +28,7 @@ public class EnvironmentUtils {
 
         return isConfiguredEnvironment;
     }
-
-    public static String replaceLastChar(String value) {
-        if (value != null && value.length() > 1)
-            return value.substring(0, value.length() - 1).concat("T");
-
-        return value;
-    }
-
+    
     public static String replaceUrl(String urlStr) {
         try {
             URL url = new URL(urlStr);
