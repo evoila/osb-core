@@ -43,7 +43,7 @@ public class KeyStoreHandler {
         }
     }
 
-    private Certificate loadCertificate(String certificatePem) throws IOException, GeneralSecurityException {
+    public static Certificate loadCertificate(String certificatePem) throws IOException, GeneralSecurityException {
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
         final byte[] content = readPemContent(certificatePem);
         return certificateFactory.generateCertificate(new ByteArrayInputStream(content));
@@ -53,7 +53,7 @@ public class KeyStoreHandler {
         return pemLoadPrivateKeyPkcs1OrPkcs8Encoded(privateKeyPem);
     }
 
-    private byte[] readPemContent(String pem) throws IOException {
+    private static byte[] readPemContent(String pem) throws IOException {
         final byte[] content;
         try (PemReader pemReader = new PemReader(new StringReader(pem))) {
             final PemObject pemObject = pemReader.readPemObject();
