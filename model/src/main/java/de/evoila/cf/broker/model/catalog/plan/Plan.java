@@ -33,6 +33,8 @@ public class Plan {
     @JsonProperty("plan_updateable") // misspelling of attribute kept, do not change it
     private Boolean planUpdateable;
 
+    private Boolean bindable;
+
 	@JsonProperty("maintenance_info")
 	private MaintenanceInfo maintenanceInfo;
 
@@ -138,6 +140,14 @@ public class Plan {
     public void setPlanUpdateable(Boolean planUpdateable) {
         this.planUpdateable = planUpdateable;
     }
+
+	public Boolean getBindable() {
+		return bindable;
+	}
+
+	public void setBindable(Boolean bindable) {
+		this.bindable = bindable;
+	}
 
 	@Override
 	public boolean equals(Object o) {
