@@ -13,6 +13,7 @@ import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.DeploymentService;
 import de.evoila.cf.broker.util.EmptyRestResponse;
+import de.evoila.cf.broker.controller.utils.JobProgressUtils;
 import de.evoila.cf.broker.util.ServiceInstanceUtils;
 import de.evoila.cf.broker.util.UuidUtils;
 import org.slf4j.Logger;
@@ -45,16 +46,20 @@ public class ServiceInstanceController extends BaseController {
 
     private ServiceInstanceUtils serviceInstanceUtils;
 
+    private JobProgressUtils jobProgressUtils;
+
     public ServiceInstanceController(DeploymentService deploymentService,
                                      EndpointConfiguration endpointConfiguration,
                                      CatalogService catalogService,
                                      ServiceInstanceRepository serviceInstanceRepository,
-                                     ServiceInstanceUtils serviceInstanceUtils) {
+                                     ServiceInstanceUtils serviceInstanceUtils,
+                                     JobProgressUtils jobProgressUtils) {
         this.deploymentService = deploymentService;
         this.endpointConfiguration = endpointConfiguration;
         this.catalogService = catalogService;
         this.serviceInstanceRepository = serviceInstanceRepository;
         this.serviceInstanceUtils = serviceInstanceUtils;
+        this.jobProgressUtils = jobProgressUtils;
     }
 
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
@@ -216,7 +221,7 @@ public class ServiceInstanceController extends BaseController {
         else
             jobProgressResponse = deploymentService.getLastOperationByReferenceId(serviceInstanceId);
 
-        return new ResponseEntity<>(jobProgressResponse, HttpStatus.OK);
+        return jobProgressUtils.buildJobProgressResponseEntity(jobProgressResponse);
     }
 
     @ApiVersion({ApiVersions.API_214, ApiVersions.API_215})
