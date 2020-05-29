@@ -25,19 +25,6 @@ class UnbindTest extends BaseTest {
     @Mock
     private BaseServiceInstanceBindingResponse bindingResponse;
 
-    @Test
-    void acceptsIncompleteAndApi2_13() {
-        assertThrows(ServiceInstanceBindingBadRequestException.class,
-                     () -> controller.bindServiceInstance(HAPPY_INSTANCE_ID,
-                                                          HAPPY_BINDING_ID,
-                                                          "2.13",
-                                                          HAPPY_REQUEST_ID,
-                                                          HAPPY_ORIGINATING_ID,
-                                                          HAPPY_ACCEPTS_INCOMPLETE,
-                                                          request));
-    }
-
-
     @Nested
     class deleteServiceInstanceBindingThrows {
 
@@ -279,26 +266,5 @@ class UnbindTest extends BaseTest {
                                          HAPPY_ORIGINATING_ID);
             validateResponse();
         }
-
-        @Test
-        void acceptsIncompleteNull() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException {
-            final boolean async = false;
-            when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
-                                                             HAPPY_PLAN_ID,
-                                                             async))
-                    .thenReturn(bindingResponse);
-            when(bindingResponse.isAsync()).thenReturn(async);
-            response = controller.unbind(HAPPY_INSTANCE_ID,
-                                         HAPPY_BINDING_ID,
-                                         HAPPY_SERVICE_ID,
-                                         HAPPY_PLAN_ID,
-                                         null,
-                                         HAPPY_API_HEADER,
-                                         HAPPY_REQUEST_ID,
-                                         HAPPY_ORIGINATING_ID);
-            validateResponse();
-        }
-
     }
-
 }

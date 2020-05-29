@@ -85,16 +85,6 @@ class UpdateTest extends BaseTest {
         }
 
         @Test
-        void acceptsIncompleteNull() {
-            assertThrows(AsyncRequiredException.class,
-                         () -> controller.update(HAPPY_SERVICE_INSTANCE_ID,
-                                                 null,
-                                                 request,
-                                                 HAPPY_ORIGINATING_ID,
-                                                 HAPPY_REQUEST_ID));
-        }
-
-        @Test
         void getServiceDefinitionThrows() throws ServiceInstanceDoesNotExistException {
             when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
                     .thenThrow(new ServiceInstanceDoesNotExistException(HAPPY_SERVICE_INSTANCE_ID));
