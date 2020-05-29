@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.controller.core.ServiceInstanceBindingControllerTest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -21,8 +22,15 @@ class LastOperationTest extends BaseTest {
 
     private ResponseEntity<JobProgressResponse> response;
 
+
+
     @Nested
     class jobProgressResponse {
+
+        @BeforeEach
+        void setUp(){
+            when(jobProgressUtils.buildJobProgressResponseEntity(jobProgressResponse)).thenReturn(ResponseEntity.ok(jobProgressResponse));
+        }
 
         void validateResponse() {
             assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -31,8 +39,7 @@ class LastOperationTest extends BaseTest {
 
         @Test
         void withOperation() throws ServiceInstanceBindingDoesNotExistsException {
-            when(bindingService.getLastOperationById(HAPPY_BINDING_ID, HAPPY_OPERATION))
-                    .thenReturn(jobProgressResponse);
+            when(bindingService.getLastOperationById(HAPPY_BINDING_ID, HAPPY_OPERATION)).thenReturn(jobProgressResponse);
             response = controller.lastOperation(HAPPY_INSTANCE_ID,
                                                 HAPPY_BINDING_ID,
                                                 HAPPY_SERVICE_ID,
