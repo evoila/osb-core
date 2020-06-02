@@ -58,7 +58,7 @@ public class ServiceInstanceBindingController extends BaseController {
             @RequestHeader("X-Broker-API-Version") String apiHeader,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
-            @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "") Boolean acceptsIncomplete,
+            @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "false") Boolean acceptsIncomplete,
             @Valid @RequestBody ServiceInstanceBindingRequest request)
             throws ServiceInstanceBindingExistsException,
             ServiceBrokerException, ServiceDefinitionDoesNotExistException,
@@ -72,14 +72,6 @@ public class ServiceInstanceBindingController extends BaseController {
         // AppGuid may not be present and empty
         if (request.getAppGuid() != null && request.getAppGuid().isEmpty())
             return processEmptyErrorResponse(HttpStatus.BAD_REQUEST);
-
-        if (acceptsIncomplete == null) {
-            acceptsIncomplete = false;
-        }
-
-        if (acceptsIncomplete && apiHeader.equals("2.13")) {
-            throw new ServiceInstanceBindingBadRequestException(bindingId);
-        }
 
         BaseServiceInstanceBindingResponse serviceInstanceBindingResponse;
         try {
@@ -105,7 +97,7 @@ public class ServiceInstanceBindingController extends BaseController {
     @DeleteMapping(value = "/{instanceId}/service_bindings/{bindingId}")
     public ResponseEntity unbind(@PathVariable("instanceId") String instanceId,
                                          @PathVariable("bindingId") String bindingId, @RequestParam("service_id") String serviceId,
-                                         @RequestParam("plan_id") String planId, @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
+                                         @RequestParam("plan_id") String planId, @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "false") Boolean acceptsIncomplete,
                                          @RequestHeader("X-Broker-API-Version") String apiHeader,
                                          @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
                                          @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity
@@ -114,14 +106,6 @@ public class ServiceInstanceBindingController extends BaseController {
         log.debug("DELETE: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
                 + ", deleteServiceInstanceBinding(),  serviceInstance.id = " + instanceId + ", bindingId = " + bindingId
                 + ", serviceId = " + serviceId + ", planId = " + planId);
-
-        if (acceptsIncomplete == null) {
-            acceptsIncomplete = false;
-        }
-
-        if (acceptsIncomplete && apiHeader.equals("2.13")) {
-            throw new ServiceInstanceBindingBadRequestException(bindingId);
-        }
 
         BaseServiceInstanceBindingResponse baseServiceInstanceBindingResponse;
         try {

@@ -62,14 +62,14 @@ public class ServiceInstanceController extends BaseController {
     public ResponseEntity<ServiceInstanceOperationResponse> create(
             @PathVariable("serviceInstanceId")
             @Pattern(regexp = UuidUtils.UUID_REGEX, message = UuidUtils.NOT_A_UUID_MESSAGE) String serviceInstanceId,
-            @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
+            @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "false") Boolean acceptsIncomplete,
             @Valid @RequestBody ServiceInstanceRequest request,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity)
             throws ServiceDefinitionDoesNotExistException, ServiceInstanceExistsException, ServiceBrokerException,
             AsyncRequiredException, MaintenanceInfoVersionsDontMatchException, ServiceDefinitionPlanDoesNotExistException {
 
-        if (acceptsIncomplete == null || !acceptsIncomplete) {
+        if (!acceptsIncomplete) {
             throw new AsyncRequiredException();
         }
 
@@ -112,13 +112,12 @@ public class ServiceInstanceController extends BaseController {
     @PatchMapping(value = "/{serviceInstanceId}")
     public ResponseEntity update(
             @PathVariable("serviceInstanceId") String serviceInstanceId,
-            @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
+            @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "false") Boolean acceptsIncomplete,
             @RequestBody ServiceInstanceUpdateRequest request,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity
     ) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException,
             MaintenanceInfoVersionsDontMatchException, ServiceDefinitionPlanDoesNotExistException, ServiceInstanceNotFoundException, ConcurrencyErrorException {
-
 
         if (request.getServiceDefinitionId() == null) {
             return new ResponseEntity<>("Missing required fields: service_id", HttpStatus.BAD_REQUEST);
@@ -128,7 +127,7 @@ public class ServiceInstanceController extends BaseController {
         log.debug("PATCH: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
                 + ", updateServiceInstance(), serviceInstanceId = " + serviceInstanceId);
 
-        if (acceptsIncomplete == null || !acceptsIncomplete) {
+        if (!acceptsIncomplete) {
             throw new AsyncRequiredException();
         }
 
@@ -174,7 +173,7 @@ public class ServiceInstanceController extends BaseController {
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
             @PathVariable("serviceInstanceId") String serviceInstanceId,
-            @RequestParam(value = "accepts_incomplete", required = false) Boolean acceptsIncomplete,
+            @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "false") Boolean acceptsIncomplete,
             @RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId) throws ServiceBrokerException, AsyncRequiredException,
             ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException, ConcurrencyErrorException {
 
@@ -182,7 +181,7 @@ public class ServiceInstanceController extends BaseController {
                 + ", deleteServiceInstanceBinding(), serviceInstanceId = " + serviceInstanceId + ", serviceId = " + serviceId
                 + ", planId = " + planId);
 
-        if (acceptsIncomplete == null || !acceptsIncomplete) {
+        if (!acceptsIncomplete) {
             throw new AsyncRequiredException();
         }
 

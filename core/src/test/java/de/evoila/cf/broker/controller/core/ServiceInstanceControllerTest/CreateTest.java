@@ -42,16 +42,6 @@ class CreateTest extends BaseTest {
     }
 
     @Test
-    void acceptsIncompleteNull() {
-        assertThrows(AsyncRequiredException.class,
-                     () -> controller.create(HAPPY_SERVICE_INSTANCE_ID,
-                                             null,
-                                             request,
-                                             HAPPY_ORIGINATING_ID,
-                                             HAPPY_REQUEST_ID));
-    }
-
-    @Test
     void getServiceDefinitionThrows() throws ServiceDefinitionDoesNotExistException {
         ServiceDefinitionDoesNotExistException expectedEx = new ServiceDefinitionDoesNotExistException(HAPPY_SERVICE_DEFINITION_ID);
         when(request.getServiceDefinitionId())

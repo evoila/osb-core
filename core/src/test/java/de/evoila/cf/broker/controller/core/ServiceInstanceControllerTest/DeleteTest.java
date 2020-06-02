@@ -28,17 +28,6 @@ class DeleteTest extends BaseTest {
     }
 
     @Test
-    void acceptsIncompleteNull() {
-        assertThrows(AsyncRequiredException.class,
-                     () -> controller.delete(HAPPY_ORIGINATING_ID,
-                                             HAPPY_REQUEST_ID,
-                                             HAPPY_SERVICE_INSTANCE_ID,
-                                             null,
-                                             HAPPY_SERVICE_ID,
-                                             HAPPY_PLAN_ID));
-    }
-
-    @Test
     void deleteServiceInstanceThrows() throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceDefinitionDoesNotExistException {
         Exception[] exceptions = {
                 new ServiceBrokerException(),
