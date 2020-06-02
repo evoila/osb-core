@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.controller.core.ServiceInstanceBindingControllerTest;
 
+import de.evoila.cf.broker.controller.utils.JobProgressUtils;
 import de.evoila.cf.broker.util.ServiceBindingUtils;
 import de.evoila.cf.broker.util.ServiceInstanceUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,12 +44,14 @@ abstract class BaseTest {
     ServiceInstanceUtils serviceInstanceUtils;
     @Mock
     ServiceBindingUtils serviceBindingUtils;
+    @Mock
+    JobProgressUtils jobProgressUtils;
 
     ServiceInstanceBindingController controller;
 
     @BeforeEach
     void setUp() {
-        controller = new ServiceInstanceBindingController(bindingService, catalogService, serviceInstanceUtils, serviceBindingUtils);
+        controller = new ServiceInstanceBindingController(bindingService, catalogService, serviceInstanceUtils, serviceBindingUtils, jobProgressUtils);
     }
 
 }

@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.controller.core.ServiceInstanceControllerTest;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
@@ -18,58 +20,70 @@ class LastOperationTest extends BaseTest {
     @Mock
     JobProgressResponse jobProgressResponse;
 
-    @Test
-    void getLastOperationByIdThrows() throws ServiceInstanceDoesNotExistException {
-        ServiceInstanceDoesNotExistException expectedEx = new ServiceInstanceDoesNotExistException(HAPPY_SERVICE_INSTANCE_ID);
-        when(deploymentService.getLastOperationById(HAPPY_SERVICE_INSTANCE_ID, HAPPY_OPERATION))
-                .thenThrow(expectedEx);
-        ServiceInstanceDoesNotExistException ex = assertThrows(ServiceInstanceDoesNotExistException.class,
-                                                               () -> controller.lastOperation(HAPPY_REQUEST_ID,
-                                                                                              HAPPY_SERVICE_INSTANCE_ID,
-                                                                                              HAPPY_ORIGINATING_ID,
-                                                                                              HAPPY_OPERATION));
-        assertSame(expectedEx, ex);
+    @Nested
+    class exceptionThrown {
+
+        @Test
+        void getLastOperationByIdThrows() throws ServiceInstanceDoesNotExistException {
+            ServiceInstanceDoesNotExistException expectedEx = new ServiceInstanceDoesNotExistException(HAPPY_SERVICE_INSTANCE_ID);
+            when(deploymentService.getLastOperationById(HAPPY_SERVICE_INSTANCE_ID, HAPPY_OPERATION))
+                    .thenThrow(expectedEx);
+            ServiceInstanceDoesNotExistException ex = assertThrows(ServiceInstanceDoesNotExistException.class,
+                    () -> controller.lastOperation(HAPPY_REQUEST_ID,
+                            HAPPY_SERVICE_INSTANCE_ID,
+                            HAPPY_ORIGINATING_ID,
+                            HAPPY_OPERATION));
+            assertSame(expectedEx, ex);
+        }
+
+        @Test
+        void getLastOperationByReferenceIdThrows() throws ServiceInstanceDoesNotExistException {
+            ServiceInstanceDoesNotExistException expectedEx = new ServiceInstanceDoesNotExistException(HAPPY_SERVICE_INSTANCE_ID);
+            when(deploymentService.getLastOperationByReferenceId(HAPPY_SERVICE_INSTANCE_ID))
+                    .thenThrow(expectedEx);
+            ServiceInstanceDoesNotExistException ex = assertThrows(ServiceInstanceDoesNotExistException.class,
+                    () -> controller.lastOperation(HAPPY_REQUEST_ID,
+                            HAPPY_SERVICE_INSTANCE_ID,
+                            HAPPY_ORIGINATING_ID,
+                            null));
+            assertSame(expectedEx, ex);
+        }
+
     }
 
-    @Test
-    void getLastOperationByReferenceIdThrows() throws ServiceInstanceDoesNotExistException {
-        ServiceInstanceDoesNotExistException expectedEx = new ServiceInstanceDoesNotExistException(HAPPY_SERVICE_INSTANCE_ID);
-        when(deploymentService.getLastOperationByReferenceId(HAPPY_SERVICE_INSTANCE_ID))
-                .thenThrow(expectedEx);
-        ServiceInstanceDoesNotExistException ex = assertThrows(ServiceInstanceDoesNotExistException.class,
-                                                               () -> controller.lastOperation(HAPPY_REQUEST_ID,
-                                                                                              HAPPY_SERVICE_INSTANCE_ID,
-                                                                                              HAPPY_ORIGINATING_ID,
-                                                                                              null));
-        assertSame(expectedEx, ex);
+    @Nested
+    class jobProgressResponse {
+
+        @BeforeEach
+        void buildJobProgressResponseEntityReturns() {
+            when(jobProgressUtils.buildJobProgressResponseEntity(jobProgressResponse)).thenReturn(ResponseEntity.ok(jobProgressResponse));
+        }
+
+        private void validateResponse(ResponseEntity<JobProgressResponse> response) {
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertSame(jobProgressResponse, response.getBody());
+        }
+
+        @Test
+        void jobProgressResponseById() throws ServiceInstanceDoesNotExistException {
+            when(deploymentService.getLastOperationById(HAPPY_SERVICE_INSTANCE_ID, HAPPY_OPERATION))
+                    .thenReturn(jobProgressResponse);
+            ResponseEntity<JobProgressResponse> response = controller.lastOperation(HAPPY_REQUEST_ID,
+                    HAPPY_SERVICE_INSTANCE_ID,
+                    HAPPY_ORIGINATING_ID,
+                    HAPPY_OPERATION);
+            validateResponse(response);
+        }
+
+        @Test
+        void jobProgressResponseByReferenceId() throws ServiceInstanceDoesNotExistException {
+            when(deploymentService.getLastOperationByReferenceId(HAPPY_SERVICE_INSTANCE_ID))
+                    .thenReturn(jobProgressResponse);
+            ResponseEntity<JobProgressResponse> response = controller.lastOperation(HAPPY_REQUEST_ID,
+                    HAPPY_SERVICE_INSTANCE_ID,
+                    HAPPY_ORIGINATING_ID,
+                    null);
+            validateResponse(response);
+        }
     }
-
-    private void validateResponse(ResponseEntity<JobProgressResponse> response) {
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertSame(jobProgressResponse, response.getBody());
-    }
-
-    @Test
-    void jobProgressResponseById() throws ServiceInstanceDoesNotExistException {
-        when(deploymentService.getLastOperationById(HAPPY_SERVICE_INSTANCE_ID, HAPPY_OPERATION))
-                .thenReturn(jobProgressResponse);
-        ResponseEntity<JobProgressResponse> response = controller.lastOperation(HAPPY_REQUEST_ID,
-                                                                                HAPPY_SERVICE_INSTANCE_ID,
-                                                                                HAPPY_ORIGINATING_ID,
-                                                                                HAPPY_OPERATION);
-        validateResponse(response);
-    }
-
-
-    @Test
-    void jobProgressResponseByReferenceId() throws ServiceInstanceDoesNotExistException {
-        when(deploymentService.getLastOperationByReferenceId(HAPPY_SERVICE_INSTANCE_ID))
-                .thenReturn(jobProgressResponse);
-        ResponseEntity<JobProgressResponse> response = controller.lastOperation(HAPPY_REQUEST_ID,
-                                                                                HAPPY_SERVICE_INSTANCE_ID,
-                                                                                HAPPY_ORIGINATING_ID,
-                                                                                null);
-        validateResponse(response);
-    }
-
 }

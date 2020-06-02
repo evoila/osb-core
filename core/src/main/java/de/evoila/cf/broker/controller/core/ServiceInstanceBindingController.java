@@ -1,16 +1,14 @@
 package de.evoila.cf.broker.controller.core;
 
 import de.evoila.cf.broker.controller.BaseController;
+import de.evoila.cf.broker.controller.utils.JobProgressUtils;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.annotations.ApiVersion;
 import de.evoila.cf.broker.model.annotations.ResponseAdvice;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
-import de.evoila.cf.broker.util.ServiceBindingUtils;
-import de.evoila.cf.broker.util.ServiceInstanceUtils;
-import de.evoila.cf.broker.util.ParameterValidator;
-import de.evoila.cf.broker.util.UuidUtils;
+import de.evoila.cf.broker.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -38,13 +36,17 @@ public class ServiceInstanceBindingController extends BaseController {
 
     private ServiceInstanceUtils serviceInstanceUtils;
     private ServiceBindingUtils serviceBindingUtils;
+    private JobProgressUtils jobProgressUtils;
 
     public ServiceInstanceBindingController(BindingServiceImpl bindingService, CatalogService catalogService,
-                                            ServiceInstanceUtils serviceInstanceUtils, ServiceBindingUtils serviceBindingUtils) {
+                                            ServiceInstanceUtils serviceInstanceUtils,
+                                            ServiceBindingUtils serviceBindingUtils,
+                                            JobProgressUtils jobProgressUtils) {
         this.bindingService = bindingService;
         this.catalogService = catalogService;
         this.serviceInstanceUtils = serviceInstanceUtils;
         this.serviceBindingUtils = serviceBindingUtils;
+        this.jobProgressUtils = jobProgressUtils;
     }
 
     @ResponseAdvice
@@ -149,7 +151,7 @@ public class ServiceInstanceBindingController extends BaseController {
         else
             jobProgressResponse = bindingService.getLastOperationByReferenceId(bindingId);
 
-        return new ResponseEntity<>(jobProgressResponse, HttpStatus.OK);
+       return jobProgressUtils.buildJobProgressResponseEntity(jobProgressResponse);
     }
 
     @ApiVersion({ApiVersions.API_214, ApiVersions.API_215})

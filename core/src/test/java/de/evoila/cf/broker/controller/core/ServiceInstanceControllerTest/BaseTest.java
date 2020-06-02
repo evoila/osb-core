@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.controller.core.ServiceInstanceControllerTest;
 
+import de.evoila.cf.broker.controller.utils.JobProgressUtils;
 import de.evoila.cf.broker.util.ServiceInstanceUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,6 +57,9 @@ class BaseTest {
     @Mock
     ServiceInstanceUtils serviceInstanceUtils;
 
+    @Mock
+    JobProgressUtils jobProgressUtils;
+
     ServiceInstanceController controller;
 
     @BeforeEach
@@ -65,7 +69,8 @@ class BaseTest {
                 endpointConfiguration,
                 catalogService,
                 serviceInstanceRepository,
-                serviceInstanceUtils
+                serviceInstanceUtils,
+                jobProgressUtils
         );
     }
 
