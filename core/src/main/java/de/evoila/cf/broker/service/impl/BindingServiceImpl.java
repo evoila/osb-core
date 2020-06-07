@@ -61,13 +61,16 @@ public abstract class BindingServiceImpl implements BindingService {
 	public BaseServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
 			ServiceInstanceBindingRequest serviceInstanceBindingRequest, boolean async) throws ServiceInstanceBindingExistsException,
 			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException,
-			InvalidParametersException, AsyncRequiredException, ValidationException, PlatformException  {
+			InvalidParametersException, AsyncRequiredException, ValidationException, PlatformException, ServiceDefinitionPlanDoesNotExistException {
 
 		validateBindingNotExists(serviceInstanceBindingRequest, bindingId, instanceId);
 
 		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
 
-		Plan plan = serviceDefinitionRepository.getPlan(serviceInstanceBindingRequest.getPlanId());
+		Plan plan = serviceDefinitionRepository.getPlan(
+				serviceInstanceBindingRequest.getServiceDefinitionId(),
+				serviceInstanceBindingRequest.getPlanId()
+		);
 		if (serviceInstanceBindingRequest.getParameters() != null) {
 		    ParameterValidator.validateParameters(serviceInstanceBindingRequest, plan, false);
 		}
@@ -110,11 +113,11 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	@Override
-	public BaseServiceInstanceBindingResponse deleteServiceInstanceBinding(String bindingId, String planId, boolean async)
+	public BaseServiceInstanceBindingResponse deleteServiceInstanceBinding(String bindingId, String serviceDefinitionId, String planId, boolean async)
 			throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException,
-				   AsyncRequiredException, ServiceBrokerException {
+			AsyncRequiredException, ServiceBrokerException, ServiceDefinitionPlanDoesNotExistException {
 		ServiceInstance serviceInstance = getServiceInstanceByBindingId(bindingId);
-		Plan plan = serviceDefinitionRepository.getPlan(planId);
+		Plan plan = serviceDefinitionRepository.getPlan(serviceDefinitionId, planId);
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 		if (platformService == null) {
 			throw new ServiceBrokerException("No Platform configured for " + plan.getPlatform());

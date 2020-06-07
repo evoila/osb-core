@@ -83,7 +83,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     @Override
     public ServiceInstanceOperationResponse createServiceInstance(String serviceInstanceId, ServiceInstanceRequest request)
-            throws ServiceInstanceExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, ValidationException {
+            throws ServiceInstanceExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, ValidationException, ServiceDefinitionPlanDoesNotExistException {
 
         serviceDefinitionRepository.validateServiceId(request.getServiceDefinitionId());
         Optional<ServiceInstance> serviceInstanceOptional = serviceInstanceRepository.getServiceInstanceOptional(serviceInstanceId);
@@ -117,7 +117,7 @@ public class DeploymentServiceImpl implements DeploymentService {
             serviceInstanceOperationResponse.setDashboardUrl(dashboardUrl);
         }
 
-        Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
+        Plan plan = serviceDefinitionRepository.getPlan(request.getServiceDefinitionId(),request.getPlanId());
 
         if (request.getParameters() != null) {
             ParameterValidator.validateParameters(request, plan, false);
@@ -146,9 +146,9 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     @Override
     public ServiceInstanceOperationResponse updateServiceInstance(String serviceInstanceId, ServiceInstanceUpdateRequest request) throws ServiceBrokerException,
-            ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ValidationException {
+            ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException,ValidationException {
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
-        Plan plan = serviceDefinitionRepository.getPlan(request.getPlanId());
+        Plan plan = serviceDefinitionRepository.getPlan(request.getServiceDefinitionId(),request.getPlanId());
 
         if (request.getParameters() != null) {
             ParameterValidator.validateParameters(request, plan, true);
@@ -190,9 +190,9 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     @Override
     public ServiceInstanceOperationResponse deleteServiceInstance(String instanceId)
-            throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
+            throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
-        Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
+        Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getServiceDefinitionId(), serviceInstance.getPlanId());
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
         if (platformService == null) {
             throw new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
@@ -228,7 +228,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         try {
             serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
 
-            Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getPlanId());
+            Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getServiceDefinitionId(), serviceInstance.getPlanId());
 
             PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 

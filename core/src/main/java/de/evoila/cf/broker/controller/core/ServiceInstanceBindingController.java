@@ -64,7 +64,7 @@ public class ServiceInstanceBindingController extends BaseController {
             @Valid @RequestBody ServiceInstanceBindingRequest request)
             throws ServiceInstanceBindingExistsException,
             ServiceBrokerException, ServiceDefinitionDoesNotExistException,
-            InvalidParametersException, AsyncRequiredException, PlatformException, UnsupportedOperationException, ConcurrencyErrorException {
+            InvalidParametersException, AsyncRequiredException, PlatformException, UnsupportedOperationException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException {
 
         log.debug("PUT: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
                 + ", bindServiceInstance(), instanceId = " + instanceId + ", bindingId = " + bindingId);
@@ -103,7 +103,7 @@ public class ServiceInstanceBindingController extends BaseController {
                                          @RequestHeader("X-Broker-API-Version") String apiHeader,
                                          @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
                                          @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity
-    ) throws ServiceBrokerException, AsyncRequiredException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException {
+    ) throws ServiceBrokerException, AsyncRequiredException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
 
         log.debug("DELETE: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
                 + ", deleteServiceInstanceBinding(),  serviceInstance.id = " + instanceId + ", bindingId = " + bindingId
@@ -118,8 +118,8 @@ public class ServiceInstanceBindingController extends BaseController {
             }
 
             baseServiceInstanceBindingResponse = bindingService
-                    .deleteServiceInstanceBinding(bindingId, planId, acceptsIncomplete);
-        } catch (ServiceInstanceBindingDoesNotExistsException | ServiceDefinitionDoesNotExistException e) {
+                    .deleteServiceInstanceBinding(bindingId, serviceId, planId, acceptsIncomplete);
+        } catch (ServiceInstanceBindingDoesNotExistsException e) {
             return processEmptyErrorResponse(HttpStatus.GONE);
         }
 

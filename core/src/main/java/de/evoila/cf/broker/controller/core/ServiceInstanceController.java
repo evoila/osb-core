@@ -180,7 +180,7 @@ public class ServiceInstanceController extends BaseController {
             @PathVariable("serviceInstanceId") String serviceInstanceId,
             @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "false") Boolean acceptsIncomplete,
             @RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId) throws ServiceBrokerException, AsyncRequiredException,
-            ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException, ConcurrencyErrorException {
+            ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException {
 
         log.debug("DELETE: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
                 + ", deleteServiceInstanceBinding(), serviceInstanceId = " + serviceInstanceId + ", serviceId = " + serviceId
