@@ -1,14 +1,10 @@
 package de.evoila.cf.broker.service.impl.BindingServiceImplTest;
 
+import de.evoila.cf.broker.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import de.evoila.cf.broker.exception.AsyncRequiredException;
-import de.evoila.cf.broker.exception.PlatformException;
-import de.evoila.cf.broker.exception.ServiceBrokerException;
-import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceBindingDoesNotExistsException;
 import de.evoila.cf.broker.model.ServiceInstanceBindingOperationResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -101,6 +97,7 @@ class DeleteServiceInstanceBindingTest extends BaseTest {
                 .getServiceInstanceByBindingId(HAPPY_BINDING_ID);
         ServiceInstanceBindingDoesNotExistsException ex = assertThrows(ServiceInstanceBindingDoesNotExistsException.class,
                                                                        () -> service.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                                                                                  HAPPY_SERVICE_DEFINITION_ID,
                                                                                                                   HAPPY_PLAN_ID,
                                                                                                                   HAPPY_ASYNC));
         assertSame(expectedEx, ex);
@@ -117,12 +114,13 @@ class DeleteServiceInstanceBindingTest extends BaseTest {
         }
 
         @Test
-        void getPlanThrows() throws ServiceDefinitionDoesNotExistException {
+        void getPlanThrows() throws ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             ServiceDefinitionDoesNotExistException expectedEx = new ServiceDefinitionDoesNotExistException("Mock");
-            when(serviceDefinitionRepository.getPlan(HAPPY_PLAN_ID))
+            when(serviceDefinitionRepository.getPlan(HAPPY_SERVICE_DEFINITION_ID, HAPPY_PLAN_ID))
                     .thenThrow(expectedEx);
             ServiceDefinitionDoesNotExistException ex = assertThrows(ServiceDefinitionDoesNotExistException.class,
                                                                      () -> service.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                                                                                HAPPY_SERVICE_DEFINITION_ID,
                                                                                                                 HAPPY_PLAN_ID,
                                                                                                                 HAPPY_ASYNC));
             assertSame(expectedEx, ex);
@@ -132,8 +130,8 @@ class DeleteServiceInstanceBindingTest extends BaseTest {
         class getPlanDoesNotThrow {
 
             @BeforeEach
-            void setUp() throws ServiceDefinitionDoesNotExistException {
-                when(serviceDefinitionRepository.getPlan(HAPPY_PLAN_ID))
+            void setUp() throws ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
+                when(serviceDefinitionRepository.getPlan(HAPPY_SERVICE_DEFINITION_ID, HAPPY_PLAN_ID))
                         .thenReturn(plan);
                 when(plan.getPlatform())
                         .thenReturn(HAPPY_PLATFORM);
@@ -146,6 +144,7 @@ class DeleteServiceInstanceBindingTest extends BaseTest {
                 ServiceBrokerException expectedEx = new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
                 ServiceBrokerException ex = assertThrows(ServiceBrokerException.class,
                                                          () -> service.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                                                                    HAPPY_SERVICE_DEFINITION_ID,
                                                                                                     HAPPY_PLAN_ID,
                                                                                                     HAPPY_ASYNC));
                 assertEquals(expectedEx, ex);
@@ -187,16 +186,18 @@ class DeleteServiceInstanceBindingTest extends BaseTest {
                     }
 
                     @Test
-                    void asyncIsTrue() throws ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException {
+                    void asyncIsTrue() throws ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionPlanDoesNotExistException {
                         ServiceInstanceBindingOperationResponse response = (ServiceInstanceBindingOperationResponse) service.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                                                                                                                          HAPPY_SERVICE_DEFINITION_ID,
                                                                                                                                                           HAPPY_PLAN_ID,
                                                                                                                                                           HAPPY_ASYNC);
                         validateResponse(response);
                     }
 
                     @Test
-                    void asyncIsFalse() throws ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException {
+                    void asyncIsFalse() throws ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionPlanDoesNotExistException {
                         ServiceInstanceBindingOperationResponse response = (ServiceInstanceBindingOperationResponse) service.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                                                                                                                          HAPPY_SERVICE_DEFINITION_ID,
                                                                                                                                                           HAPPY_PLAN_ID,
                                                                                                                                                           false);
                         validateResponse(response);
@@ -217,15 +218,17 @@ class DeleteServiceInstanceBindingTest extends BaseTest {
                     void asyncIsFalse() {
                         assertThrows(AsyncRequiredException.class,
                                      () -> service.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                                                HAPPY_SERVICE_DEFINITION_ID,
                                                                                 HAPPY_PLAN_ID,
                                                                                 false));
                     }
 
                     @Test
-                    void asyncIsTrue() throws ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException {
+                    void asyncIsTrue() throws ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionPlanDoesNotExistException {
                         ServiceInstanceBindingOperationResponse expectedResponse = new ServiceInstanceBindingOperationResponse(HAPPY_OPERATION_ID,
                                                                                                                                true);
                         ServiceInstanceBindingOperationResponse response = (ServiceInstanceBindingOperationResponse) service.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                                                                                                                          HAPPY_SERVICE_DEFINITION_ID,
                                                                                                                                                           HAPPY_PLAN_ID,
                                                                                                                                                           HAPPY_ASYNC);
                         verify(asyncBindingService, times(1))

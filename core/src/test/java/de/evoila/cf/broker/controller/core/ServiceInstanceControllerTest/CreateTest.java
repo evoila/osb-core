@@ -210,7 +210,7 @@ class CreateTest extends BaseTest {
     }
 
     @Test
-    void createServiceInstanceThrows() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException {
+    void createServiceInstanceThrows() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException, ServiceDefinitionPlanDoesNotExistException {
         setupMocksForSuccessfulMaintenanceInfoCheck();
         Exception[] exceptions = {
                 new ServiceInstanceExistsException(HAPPY_SERVICE_INSTANCE_ID, HAPPY_SERVICE_DEFINITION_ID),
@@ -234,7 +234,7 @@ class CreateTest extends BaseTest {
     class serviceInstanceOperationResponse {
 
         @BeforeEach
-        void setUp() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException {
+        void setUp() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException, ServiceDefinitionPlanDoesNotExistException {
             setupMocksForSuccessfulMaintenanceInfoCheck();
             when(deploymentService.createServiceInstance(HAPPY_SERVICE_INSTANCE_ID, request))
                     .thenReturn(operationResponse);

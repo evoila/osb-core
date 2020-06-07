@@ -28,7 +28,7 @@ class DeleteTest extends BaseTest {
     }
 
     @Test
-    void deleteServiceInstanceThrows() throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceDefinitionDoesNotExistException {
+    void deleteServiceInstanceThrows() throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
         Exception[] exceptions = {
                 new ServiceBrokerException(),
                 new ServiceDefinitionDoesNotExistException(HAPPY_SERVICE_DEFINITION_ID),
@@ -50,7 +50,7 @@ class DeleteTest extends BaseTest {
 
     @Test
     @DisplayName("Should return StatusCode 200, if the response is not async.")
-    void serviceInstanceOperationResponseOk() throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ConcurrencyErrorException {
+    void serviceInstanceOperationResponseOk() throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException {
         when(deploymentService.deleteServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
                 .thenReturn(operationResponse);
         ResponseEntity<ServiceInstanceOperationResponse> response = controller.delete(HAPPY_ORIGINATING_ID,
@@ -65,7 +65,7 @@ class DeleteTest extends BaseTest {
 
     @Test
     @DisplayName("Should return StatusCode 202, if the response is async.")
-    void serviceInstanceOperationResponseAccepted() throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ConcurrencyErrorException {
+    void serviceInstanceOperationResponseAccepted() throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException {
         when(deploymentService.deleteServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
                 .thenReturn(operationResponse);
         when(operationResponse.isAsync()).thenReturn(true);

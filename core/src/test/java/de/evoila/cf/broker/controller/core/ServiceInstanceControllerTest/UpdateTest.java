@@ -289,7 +289,7 @@ class UpdateTest extends BaseTest {
                     class updateServiceInstanceThrows {
 
                         @Test
-                        void caught() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
+                        void caught() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
                             when(deploymentService.updateServiceInstance(HAPPY_SERVICE_INSTANCE_ID, request))
                                     .thenThrow(new ServiceInstanceDoesNotExistException(HAPPY_SERVICE_INSTANCE_ID));
                             assertThrows(ServiceInstanceNotFoundException.class,
@@ -301,7 +301,7 @@ class UpdateTest extends BaseTest {
                         }
 
                         @Test
-                        void notCaught() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
+                        void notCaught() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
                             Exception[] exceptions = {
                                     new ServiceBrokerException(),
                                     new ServiceDefinitionDoesNotExistException(HAPPY_SERVICE_DEFINITION_ID)
