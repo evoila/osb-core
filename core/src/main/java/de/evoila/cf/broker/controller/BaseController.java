@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.io.Serializable;
+
 /**
  * @author Johannes Hiemer, Marco Di Martino.
  **/
@@ -105,6 +107,11 @@ public abstract class BaseController {
     @ExceptionHandler(ServiceInstanceBindingDoesNotExistsException.class)
     public ResponseEntity handleException(ServiceInstanceBindingDoesNotExistsException ex) {
         return processErrorResponse(HttpStatus.GONE);
+    }
+
+    @ExceptionHandler(ServicePlanNotBindableException.class)
+    public ResponseEntity handleException(ServicePlanNotBindableException ex){
+        return processErrorResponse(ex.getMessage(), HttpStatus.METHOD_NOT_ALLOWED);
     }
 
 }

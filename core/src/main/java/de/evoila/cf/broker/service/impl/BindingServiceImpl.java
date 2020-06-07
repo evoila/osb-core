@@ -3,6 +3,7 @@ package de.evoila.cf.broker.service.impl;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.catalog.ServerAddress;
+import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
 import de.evoila.cf.broker.repository.*;
 import de.evoila.cf.broker.service.AsyncBindingService;
@@ -61,16 +62,21 @@ public abstract class BindingServiceImpl implements BindingService {
 	public BaseServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
 			ServiceInstanceBindingRequest serviceInstanceBindingRequest, boolean async) throws ServiceInstanceBindingExistsException,
 			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException,
-			InvalidParametersException, AsyncRequiredException, ValidationException, PlatformException, ServiceDefinitionPlanDoesNotExistException {
+			InvalidParametersException, AsyncRequiredException, ValidationException, PlatformException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
 
 		validateBindingNotExists(serviceInstanceBindingRequest, bindingId, instanceId);
 
 		ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
+		ServiceDefinition serviceDefinition =
+				serviceDefinitionRepository.getServiceDefinition(serviceInstance.getServiceDefinitionId());
 
 		Plan plan = serviceDefinitionRepository.getPlan(
 				serviceInstanceBindingRequest.getServiceDefinitionId(),
 				serviceInstanceBindingRequest.getPlanId()
 		);
+
+		isBindable(serviceDefinition, plan);
+
 		if (serviceInstanceBindingRequest.getParameters() != null) {
 		    ParameterValidator.validateParameters(serviceInstanceBindingRequest, plan, false);
 		}
@@ -341,5 +347,16 @@ public abstract class BindingServiceImpl implements BindingService {
 			return routeBindingRepository.findOne(bindingId).getRoute();
 		}
 		return null;
+	}
+
+	private void isBindable(ServiceDefinition serviceDefinition, Plan servicePlan) throws ServicePlanNotBindableException {
+		if (servicePlan.getBindable() != null) {
+			if (servicePlan.getBindable()){
+				return;
+			}
+		} else if (serviceDefinition.isBindable()) {
+			return;
+		}
+		throw new ServicePlanNotBindableException(serviceDefinition.getId(), servicePlan.getId());
 	}
 }

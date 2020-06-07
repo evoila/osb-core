@@ -11,7 +11,7 @@ public interface BindingService {
     BaseServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId, ServiceInstanceBindingRequest request, boolean async)
             throws ServiceInstanceBindingExistsException, ServiceBrokerException,
             ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceBrokerFeatureIsNotSupportedException,
-            InvalidParametersException, AsyncRequiredException, PlatformException, ServiceDefinitionPlanDoesNotExistException;
+            InvalidParametersException, AsyncRequiredException, PlatformException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException;
 
     ServiceInstanceBinding fetchServiceInstanceBinding(String bindingId, String instanceId) throws ServiceInstanceBindingNotFoundException;
 
