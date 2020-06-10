@@ -65,7 +65,7 @@ public class CustomServiceKeysController extends BaseController {
     ) throws ServiceInstanceDoesNotExistException,
             ServiceBrokerException, ServiceInstanceBindingExistsException, ServiceDefinitionDoesNotExistException,
             ServiceBrokerFeatureIsNotSupportedException, PlatformException,
-            InvalidParametersException, AsyncRequiredException, ServiceDefinitionPlanDoesNotExistException {
+            InvalidParametersException, AsyncRequiredException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
         ServiceInstance instance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
 
         if (instance == null) {

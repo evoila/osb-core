@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
- * @author Johannes Hiemer, Marco Di Martino.
+ * @author Johannes Hiemer, Marco Di Martino, Johannes Strauß.
  **/
 @Service
 public abstract class BindingServiceImpl implements BindingService {
@@ -350,13 +350,10 @@ public abstract class BindingServiceImpl implements BindingService {
 	}
 
 	private void isBindable(ServiceDefinition serviceDefinition, Plan servicePlan) throws ServicePlanNotBindableException {
-		if (servicePlan.getBindable() != null) {
-			if (servicePlan.getBindable()){
-				return;
-			}
-		} else if (serviceDefinition.isBindable()) {
-			return;
-		}
+    	if(servicePlan.getBindable().isEmpty()){
+			if (serviceDefinition.isBindable()) return;
+		} else if (serviceDefinition.isBindable()) return;
+
 		throw new ServicePlanNotBindableException(serviceDefinition.getId(), servicePlan.getId());
 	}
 }

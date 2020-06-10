@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import de.evoila.cf.broker.model.Platform;
 import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
@@ -14,6 +15,7 @@ import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
  * 
  * @author sgreenberg@gopivotal.com
  * @author Johannes Hiemer.
+ * @author Johannes Strauß
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Plan {
@@ -33,7 +35,12 @@ public class Plan {
     @JsonProperty("plan_updateable") // misspelling of attribute kept, do not change it
     private Boolean planUpdateable;
 
-    private Boolean bindable;
+    /*
+     * Bindable is an optional configuration and defaults to the plans service-definition bindable field, if it has not been set.
+     * Because Java Boolean defaults to 'false' when it's null, Optional wrapper is being used here to implement the field according
+     * to the osb-api.
+     */
+    private Optional<Boolean> bindable;
 
 	@JsonProperty("maintenance_info")
 	private MaintenanceInfo maintenanceInfo;
@@ -141,12 +148,12 @@ public class Plan {
         this.planUpdateable = planUpdateable;
     }
 
-	public Boolean getBindable() {
+	public Optional<Boolean> getBindable() {
 		return bindable;
 	}
 
 	public void setBindable(Boolean bindable) {
-		this.bindable = bindable;
+		this.bindable = Optional.of(bindable);
 	}
 
 	@Override
