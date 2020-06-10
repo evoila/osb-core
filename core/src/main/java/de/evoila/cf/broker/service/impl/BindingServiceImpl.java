@@ -352,7 +352,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	private void isBindable(ServiceDefinition serviceDefinition, Plan servicePlan) throws ServicePlanNotBindableException {
     	if(servicePlan.getBindable().isEmpty()){
 			if (serviceDefinition.isBindable()) return;
-		} else if (serviceDefinition.isBindable()) return;
+		} else if (servicePlan.getBindable().get()) return;
 
 		throw new ServicePlanNotBindableException(serviceDefinition.getId(), servicePlan.getId());
 	}
