@@ -150,7 +150,7 @@ class CustomServiceKeysControllerTest {
             }
 
             @Test
-            void withCreateServiceInstanceBindingThrowing() throws ServiceInstanceDoesNotExistException, ServiceBrokerFeatureIsNotSupportedException, AsyncRequiredException, ServiceInstanceBindingExistsException, ServiceBrokerException, PlatformException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ServiceDefinitionPlanDoesNotExistException {
+            void withCreateServiceInstanceBindingThrowing() throws ServiceInstanceDoesNotExistException, ServiceBrokerFeatureIsNotSupportedException, AsyncRequiredException, ServiceInstanceBindingExistsException, ServiceBrokerException, PlatformException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
                 Exception[] exceptions = {
                         new ServiceInstanceBindingExistsException("Mock", "Mock"),
                         new ServiceBrokerException("Mock"),
@@ -175,7 +175,7 @@ class CustomServiceKeysControllerTest {
         }
 
         @Test
-        void okResponse() throws ServiceInstanceDoesNotExistException, ServiceBrokerFeatureIsNotSupportedException, AsyncRequiredException, ServiceInstanceBindingExistsException, ServiceBrokerException, PlatformException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ServiceDefinitionPlanDoesNotExistException {
+        void okResponse() throws ServiceInstanceDoesNotExistException, ServiceBrokerFeatureIsNotSupportedException, AsyncRequiredException, ServiceInstanceBindingExistsException, ServiceBrokerException, PlatformException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
             when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID)).thenReturn(serviceInstance);
             when(serviceInstance.getServiceDefinitionId()).thenReturn(HAPPY_SERVICE_DEFINITION_ID);
             when(serviceInstance.getPlanId()).thenReturn(HAPPY_PLAN_ID);

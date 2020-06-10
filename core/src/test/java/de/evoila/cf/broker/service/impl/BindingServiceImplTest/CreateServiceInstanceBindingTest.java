@@ -9,6 +9,7 @@ import org.mockito.Mock;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import de.evoila.cf.broker.model.ServiceInstanceBinding;
 import de.evoila.cf.broker.model.ServiceInstanceBindingOperationResponse;
@@ -130,6 +131,7 @@ class CreateServiceInstanceBindingTest extends BaseTest {
 
             @BeforeEach
             void setUp() throws ServiceInstanceDoesNotExistException {
+                when(serviceInstance.getServiceDefinitionId()).thenReturn(HAPPY_SERVICE_DEFINITION_ID);
                 when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
                         .thenReturn(serviceInstance);
                 when(request.getPlanId())
@@ -165,8 +167,36 @@ class CreateServiceInstanceBindingTest extends BaseTest {
 
                 @BeforeEach
                 void setUp() throws ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
+                    when(serviceDefinitionRepository.getServiceDefinition(HAPPY_SERVICE_DEFINITION_ID))
+                            .thenReturn(serviceDefinition);
                     when(serviceDefinitionRepository.getPlan(HAPPY_SERVICE_DEFINITION_ID, HAPPY_PLAN_ID))
                             .thenReturn(plan);
+                }
+
+                @Test
+                void serviceIsNotBindablePlanNotSpecified(){
+                    when(serviceDefinition.isBindable()).thenReturn(false);
+                    isBindableThrows();
+                }
+
+                @Test
+                void serviceAndPlanIsNotBindable() {
+                    when(plan.getBindable()).thenReturn(Optional.of(Boolean.FALSE));
+                    isBindableThrows();
+                }
+
+                @Test
+                void serviceIsBindablePlanIsNot(){
+                    when(plan.getBindable()).thenReturn(Optional.of(Boolean.FALSE));
+                    isBindableThrows();
+                }
+
+                private void isBindableThrows(){
+                    assertThrows(ServicePlanNotBindableException.class,
+                            () -> service.createServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                            HAPPY_SERVICE_INSTANCE_ID,
+                                                            request,
+                                                            HAPPY_ASYNC));
                 }
 
                 @Test
@@ -180,6 +210,7 @@ class CreateServiceInstanceBindingTest extends BaseTest {
                             .thenReturn(schemaServiceCreate);
                     when(schemaServiceCreate.getParameters())
                             .thenReturn(jsonSchema);
+                    when(plan.getBindable()).thenReturn(Optional.of(Boolean.TRUE));
                     assertThrows(SchemaException.class,
                                  () -> service.createServiceInstanceBinding(HAPPY_BINDING_ID,
                                                                             HAPPY_SERVICE_INSTANCE_ID,
@@ -194,12 +225,14 @@ class CreateServiceInstanceBindingTest extends BaseTest {
                     void setUp() {
                         when(plan.getPlatform())
                                 .thenReturn(HAPPY_PLATFORM);
+                        when(serviceDefinition.isBindable()).thenReturn(true);
                     }
 
                     @Test
                     void getPlatformServiceReturnsNull() {
                         when(platformRepository.getPlatformService(HAPPY_PLATFORM))
                                 .thenReturn(null);
+
                         ServiceBrokerException expectedEx = new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
                         ServiceBrokerException ex = assertThrows(ServiceBrokerException.class,
                                                                  () -> service.createServiceInstanceBinding(HAPPY_BINDING_ID,
@@ -256,7 +289,7 @@ class CreateServiceInstanceBindingTest extends BaseTest {
                                 }
 
                                 @Test
-                                void syncCreateBindingDoesNotThrow() throws ServiceBrokerException, InvalidParametersException, PlatformException, ServiceInstanceBindingExistsException, AsyncRequiredException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
+                                void syncCreateBindingDoesNotThrow() throws ServiceBrokerException, InvalidParametersException, PlatformException, ServiceInstanceBindingExistsException, AsyncRequiredException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
                                     ServiceInstanceBindingResponse expectedResponse = new ServiceInstanceBindingResponse();
                                     doReturn(expectedResponse)
                                             .when(service)
@@ -300,7 +333,7 @@ class CreateServiceInstanceBindingTest extends BaseTest {
                                 }
 
                                 @Test
-                                void syncCreateBindingDoesNotThrow() throws ServiceBrokerException, InvalidParametersException, PlatformException, ServiceInstanceBindingExistsException, AsyncRequiredException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
+                                void syncCreateBindingDoesNotThrow() throws ServiceBrokerException, InvalidParametersException, PlatformException, ServiceInstanceBindingExistsException, AsyncRequiredException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
                                     ServiceInstanceBindingResponse expectedResponse = new ServiceInstanceBindingResponse();
                                     doReturn(expectedResponse)
                                             .when(service)
@@ -324,6 +357,7 @@ class CreateServiceInstanceBindingTest extends BaseTest {
 
                             @BeforeEach
                             void setUp() {
+                                when(serviceDefinition.isBindable()).thenReturn(true);
                                 when(platformService.isSyncPossibleOnBind())
                                         .thenReturn(false);
                             }
@@ -338,7 +372,7 @@ class CreateServiceInstanceBindingTest extends BaseTest {
                             }
 
                             @Test
-                            void asyncIsTrue() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ServiceDefinitionPlanDoesNotExistException {
+                            void asyncIsTrue() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
                                 ServiceInstanceBinding expectedBinding = new ServiceInstanceBinding(HAPPY_BINDING_ID,
                                                                                                     HAPPY_SERVICE_INSTANCE_ID,
                                                                                                     null);

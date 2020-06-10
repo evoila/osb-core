@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.service.impl.BindingServiceImplTest;
 
+import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -141,6 +142,8 @@ public class BaseTest {
     ServiceInstanceBindingRequest request;
     @Mock
     ServiceInstance serviceInstance;
+    @Mock
+    ServiceDefinition serviceDefinition;
     @Mock
     Plan plan;
     @Mock

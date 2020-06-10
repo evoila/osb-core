@@ -32,7 +32,7 @@ class BindServiceInstanceTest extends BaseTest {
     }
 
     @Test
-    void emptyAppGuid() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException {
+    void emptyAppGuid() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
         when(request.getAppGuid()).thenReturn("");
         ResponseEntity response = controller.bindServiceInstance(HAPPY_INSTANCE_ID,
                                                                  HAPPY_BINDING_ID,
@@ -50,7 +50,7 @@ class BindServiceInstanceTest extends BaseTest {
 
         @SuppressWarnings("unchecked")
         @Test
-        void caught() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException {
+        void caught() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
             ServiceInstanceDoesNotExistException expectedException = new ServiceInstanceDoesNotExistException("Test9");
             when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
                                                              HAPPY_INSTANCE_ID,
@@ -70,7 +70,7 @@ class BindServiceInstanceTest extends BaseTest {
         }
 
         @Test
-        void notCaught() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException {
+        void notCaught() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
             Exception[] exceptions = {
                     new ServiceInstanceBindingExistsException("Test1", "Test2"),
                     new ServiceInstanceBindingExistsException("Test3", "Test4", true, new ServiceInstanceBindingResponse()),
@@ -121,7 +121,7 @@ class BindServiceInstanceTest extends BaseTest {
         private ResponseEntity<BaseServiceInstanceBindingResponse> response;
 
         @BeforeEach
-        void setUp() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ServiceDefinitionPlanDoesNotExistException {
+        void setUp() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
             when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
                                                              HAPPY_INSTANCE_ID,
                                                              request,
@@ -136,7 +136,7 @@ class BindServiceInstanceTest extends BaseTest {
         }
 
         @Test
-        void validIdentityHeaders() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException {
+        void validIdentityHeaders() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
             response = controller.bindServiceInstance(HAPPY_INSTANCE_ID,
                                                       HAPPY_BINDING_ID,
                                                       HAPPY_API_HEADER,
@@ -161,7 +161,7 @@ class BindServiceInstanceTest extends BaseTest {
         }
 
         @Test
-        void acceptsIncompleteTrue() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException {
+        void acceptsIncompleteTrue() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
             when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
                                                              HAPPY_INSTANCE_ID,
                                                              request,
@@ -179,7 +179,7 @@ class BindServiceInstanceTest extends BaseTest {
         }
 
         @Test
-        void acceptsIncompleteFalse() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException {
+        void acceptsIncompleteFalse() throws AsyncRequiredException, PlatformException, ServiceInstanceBindingExistsException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
             final boolean async = false;
             when(bindingService.createServiceInstanceBinding(HAPPY_BINDING_ID,
                                                              HAPPY_INSTANCE_ID,
