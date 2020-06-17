@@ -1,6 +1,7 @@
 package de.evoila.cf.broker.service.impl.AsyncDeploymentServiceImplTest;
 
 import de.evoila.cf.broker.exception.ServiceBrokerException;
+import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import de.evoila.cf.broker.model.JobProgress;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,13 +12,13 @@ class AsyncUpdateInstanceTest extends BaseTest {
 
     private final static String JOB_PROGRESS_DESCRIPTION = "Updating service..";
 
-    private void whensForSyncUpdateInstanceThrowsException(Exception expectedException) throws ServiceBrokerException {
+    private void whensForSyncUpdateInstanceThrowsException(Exception expectedException) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException {
         mockSuccessfulStartJob(JobProgress.UPDATE);
         when(deploymentService.syncUpdateInstance(serviceInstance, parameters, plan, platformService))
                 .thenThrow(expectedException);
     }
 
-    private void whensForSyncUpdateInstanceSucceeds() throws ServiceBrokerException {
+    private void whensForSyncUpdateInstanceSucceeds() throws ServiceBrokerException, ServiceDefinitionDoesNotExistException {
         mockSuccessfulStartJob(JobProgress.UPDATE);
         when(deploymentService.syncUpdateInstance(serviceInstance, parameters, plan, platformService))
                 .thenReturn(serviceInstance);
@@ -40,14 +41,14 @@ class AsyncUpdateInstanceTest extends BaseTest {
 
     @Test
     @DisplayName("Should log exception, when syncUpdateInstance(...) throws ServiceBrokerException")
-    void syncUpdateInstanceThrowsServiceBrokerException() throws ServiceBrokerException {
+    void syncUpdateInstanceThrowsServiceBrokerException() throws ServiceBrokerException, ServiceDefinitionDoesNotExistException {
         whensForSyncUpdateInstanceThrowsException(new ServiceBrokerException("Test"));
         asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
 
     @Test
     @DisplayName("Should log exception, when syncUpdateInstance(...) throws RuntimeException")
-    void syncUpdateInstanceThrowsRuntimeException() throws ServiceBrokerException {
+    void syncUpdateInstanceThrowsRuntimeException() throws ServiceBrokerException, ServiceDefinitionDoesNotExistException {
         whensForSyncUpdateInstanceThrowsException(new RuntimeException("Test"));
 
         asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
@@ -55,21 +56,21 @@ class AsyncUpdateInstanceTest extends BaseTest {
 
 
     @Test
-    void syncUpdateInstanceThrowsExceptionFailJobReturnsObject() throws ServiceBrokerException {
+    void syncUpdateInstanceThrowsExceptionFailJobReturnsObject() throws ServiceBrokerException, ServiceDefinitionDoesNotExistException {
         whensForSyncUpdateInstanceThrowsException(new ServiceBrokerException("Test"));
 
         asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
 
     @Test
-    void syncUpdateInstanceSucceedsReturnsNull() throws ServiceBrokerException {
+    void syncUpdateInstanceSucceedsReturnsNull() throws ServiceBrokerException, ServiceDefinitionDoesNotExistException {
         whensForSyncUpdateInstanceSucceeds();
 
         asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);
     }
 
     @Test
-    void syncUpdateInstanceSucceedsReturnsObject() throws ServiceBrokerException {
+    void syncUpdateInstanceSucceedsReturnsObject() throws ServiceBrokerException, ServiceDefinitionDoesNotExistException {
         whensForSyncUpdateInstanceSucceeds();
 
         asyncDeploymentService.asyncUpdateInstance(deploymentService, serviceInstance, parameters, plan, platformService, JOB_PROGRESS_ID);

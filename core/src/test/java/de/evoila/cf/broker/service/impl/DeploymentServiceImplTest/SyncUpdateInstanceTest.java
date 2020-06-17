@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.service.impl.DeploymentServiceImplTest;
 
+import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -54,7 +55,7 @@ class SyncUpdateInstanceTest extends BaseTest {
         }
 
         @Test
-        void updateInstanceThrows() throws PlatformException {
+        void updateInstanceThrows() throws PlatformException, ServiceDefinitionDoesNotExistException {
             PlatformException platformEx = new PlatformException("Mock");
             when(platformService.updateInstance(serviceInstance,
                                                 plan,
@@ -74,7 +75,7 @@ class SyncUpdateInstanceTest extends BaseTest {
         class updateInstanceDoesNotThrow {
 
             @BeforeEach
-            void setUp() throws PlatformException {
+            void setUp() throws PlatformException, ServiceDefinitionDoesNotExistException {
                 when(platformService.updateInstance(serviceInstance,
                                                     plan,
                                                     requestParameters))
@@ -97,7 +98,7 @@ class SyncUpdateInstanceTest extends BaseTest {
             }
 
             @Test
-            void postUpdateInstanceDoesNotThrow() throws PlatformException, ServiceBrokerException {
+            void postUpdateInstanceDoesNotThrow() throws PlatformException, ServiceBrokerException, ServiceDefinitionDoesNotExistException {
                 when(platformService.postUpdateInstance(serviceInstance, plan))
                         .thenReturn(serviceInstance);
                 ServiceInstance result = service.syncUpdateInstance(serviceInstance,
