@@ -38,6 +38,9 @@ public class Plan {
 	@JsonProperty("maintenance_info")
 	private MaintenanceInfo maintenanceInfo;
 
+	@JsonProperty("maximum_polling_duration")
+	private Integer maximumPollingDuration;
+
 	public Plan() {}
 
 	/**
@@ -170,4 +173,11 @@ public class Plan {
 		return Objects.hash(id, name, description, metadata, free, schemas, planUpdateable, maintenanceInfo, platform);
 	}
 
+	public Integer getMaximumPollingDuration() {
+		return maximumPollingDuration;
+	}
+
+	public void setMaximumPollingDuration(Integer maximumPollingDuration) {
+		this.maximumPollingDuration = maximumPollingDuration;
+	}
 }
