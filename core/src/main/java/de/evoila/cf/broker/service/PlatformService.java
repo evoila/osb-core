@@ -118,7 +118,7 @@ public interface PlatformService {
      * @return
      * @throws PlatformException
      */
-	ServiceInstance updateInstance(ServiceInstance serviceInstance, Plan plan, Map<String, Object> customParameters) throws PlatformException;
+	ServiceInstance updateInstance(ServiceInstance serviceInstance, Plan plan, Map<String, Object> customParameters) throws PlatformException, ServiceDefinitionDoesNotExistException;
 
     /**
      * @param serviceInstance

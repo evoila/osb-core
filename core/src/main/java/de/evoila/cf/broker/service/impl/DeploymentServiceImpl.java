@@ -280,7 +280,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     }
 
     public ServiceInstance syncUpdateInstance(ServiceInstance serviceInstance, Map<String, Object> parameters,
-                                              Plan plan, PlatformService platformService) throws ServiceBrokerException {
+                                              Plan plan, PlatformService platformService) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException {
 
         // TODO: We need to decide which method we trigger when preCreateInstance fails
         try {
