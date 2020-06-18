@@ -111,7 +111,7 @@ public abstract class BaseController {
 
     @ExceptionHandler(ServicePlanNotBindableException.class)
     public ResponseEntity handleException(ServicePlanNotBindableException ex){
-        return processErrorResponse(ex.getMessage(), HttpStatus.METHOD_NOT_ALLOWED);
+        return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
 }
