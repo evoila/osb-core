@@ -103,7 +103,7 @@ class UpdateTest extends BaseTest {
                     .thenReturn(serviceInstance);
             when(serviceInstance.getPlanId())
                     .thenReturn(HAPPY_PLAN_ID);
-            when(serviceDefinition.specificPlanIsUpdatable(HAPPY_PLAN_ID))
+            when(serviceDefinition.isPlanUpdatable(HAPPY_PLAN_ID))
                     .thenThrow(expectedEx);
             ServiceDefinitionPlanDoesNotExistException ex = assertThrows(ServiceDefinitionPlanDoesNotExistException.class,
                                                                          () -> controller.update(HAPPY_SERVICE_INSTANCE_ID,
@@ -121,7 +121,7 @@ class UpdateTest extends BaseTest {
                     .thenReturn(serviceInstance);
             when(serviceInstance.getPlanId())
                     .thenReturn(HAPPY_PLAN_ID);
-            when(serviceDefinition.specificPlanIsUpdatable(HAPPY_PLAN_ID))
+            when(serviceDefinition.isPlanUpdatable(HAPPY_PLAN_ID))
                     .thenReturn(false);
             ServiceBrokerErrorResponse expectedResponse = new ServiceBrokerErrorResponse("NotUpdatable",
                                                                                          "An update on the requested service instance is not supported.");
@@ -148,7 +148,7 @@ class UpdateTest extends BaseTest {
                         .thenReturn(serviceInstance);
                 when(serviceInstance.getPlanId())
                         .thenReturn(HAPPY_PLAN_ID);
-                when(serviceDefinition.specificPlanIsUpdatable(HAPPY_PLAN_ID))
+                when(serviceDefinition.isPlanUpdatable(HAPPY_PLAN_ID))
                         .thenReturn(true);
             }
 
