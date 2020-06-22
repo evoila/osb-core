@@ -62,7 +62,7 @@ public abstract class BindingServiceImpl implements BindingService {
 	public BaseServiceInstanceBindingResponse createServiceInstanceBinding(String bindingId, String instanceId,
 			ServiceInstanceBindingRequest serviceInstanceBindingRequest, boolean async) throws ServiceInstanceBindingExistsException,
 			ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException,
-			InvalidParametersException, AsyncRequiredException, ValidationException, PlatformException, ServiceDefinitionPlanDoesNotExistException, ServicePlanNotBindableException {
+			InvalidParametersException, AsyncRequiredException, ValidationException, PlatformException, ServiceDefinitionPlanDoesNotExistException {
 
 		validateBindingNotExists(serviceInstanceBindingRequest, bindingId, instanceId);
 
@@ -74,8 +74,6 @@ public abstract class BindingServiceImpl implements BindingService {
 				serviceInstanceBindingRequest.getServiceDefinitionId(),
 				serviceInstanceBindingRequest.getPlanId()
 		);
-
-		isBindable(serviceDefinition, plan);
 
 		if (serviceInstanceBindingRequest.getParameters() != null) {
 		    ParameterValidator.validateParameters(serviceInstanceBindingRequest, plan, false);
@@ -347,13 +345,5 @@ public abstract class BindingServiceImpl implements BindingService {
 			return routeBindingRepository.findOne(bindingId).getRoute();
 		}
 		return null;
-	}
-
-	private void isBindable(ServiceDefinition serviceDefinition, Plan servicePlan) throws ServicePlanNotBindableException {
-    	if(servicePlan.getBindable().isEmpty()){
-			if (serviceDefinition.isBindable()) return;
-		} else if (servicePlan.getBindable().get()) return;
-
-		throw new ServicePlanNotBindableException(serviceDefinition.getId(), servicePlan.getId());
 	}
 }

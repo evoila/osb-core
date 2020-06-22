@@ -35,12 +35,7 @@ public class Plan {
     @JsonProperty("plan_updateable") // misspelling of attribute kept, do not change it
     private Boolean planUpdateable;
 
-    /*
-     * Bindable is an optional configuration and defaults to the plans service-definition bindable field, if it has not been set.
-     * Because Java Boolean defaults to 'false' when it's null, Optional wrapper is being used here to implement the field according
-     * to the osb-api.
-     */
-    private Optional<Boolean> bindable;
+    private Boolean bindable;
 
 	@JsonProperty("maintenance_info")
 	private MaintenanceInfo maintenanceInfo;
@@ -148,12 +143,12 @@ public class Plan {
         this.planUpdateable = planUpdateable;
     }
 
-	public Optional<Boolean> getBindable() {
+	public Boolean isBindable() {
 		return bindable;
 	}
 
-	public void setBindable(Boolean bindable) {
-		this.bindable = Optional.of(bindable);
+	public void setBindable(boolean bindable) {
+		this.bindable = bindable;
 	}
 
 	@Override

@@ -26,7 +26,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 
 /**
- * @author Johannes Hiemer, Christian Brinker, Marco Di Martino.
+ * @author Johannes Hiemer, Christian Brinker, Marco Di Martino, Johannes Strauß.
  **/
 @RestController
 @RequestMapping(value = "/v2/service_instances")
@@ -145,7 +145,7 @@ public class ServiceInstanceController extends BaseController {
                 throw new ConcurrencyErrorException("Service Instance");
             }
 
-            if (serviceDefinition.specificPlanIsUpdatable(serviceInstance.getPlanId())) {
+            if (serviceDefinition.isPlanUpdatable(serviceInstance.getPlanId())) {
                 if (!ServiceInstanceUtils.isEffectivelyUpdating(serviceInstance, request)) {
                     log.info("Update would have not effective changes.");
                     return processEmptyErrorResponse(HttpStatus.OK);

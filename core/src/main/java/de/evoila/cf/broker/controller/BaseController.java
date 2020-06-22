@@ -108,10 +108,4 @@ public abstract class BaseController {
     public ResponseEntity handleException(ServiceInstanceBindingDoesNotExistsException ex) {
         return processErrorResponse(HttpStatus.GONE);
     }
-
-    @ExceptionHandler(ServicePlanNotBindableException.class)
-    public ResponseEntity handleException(ServicePlanNotBindableException ex){
-        return processErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
 }
