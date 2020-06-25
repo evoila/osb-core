@@ -97,7 +97,7 @@ class UpdateTest extends BaseTest {
         }
 
         @Test
-        void specificPlanIsUpdatableThrows() throws ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
+        void isPlanIsUpdatableThrows() throws ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             ServiceDefinitionPlanDoesNotExistException expectedEx = new ServiceDefinitionPlanDoesNotExistException(HAPPY_SERVICE_DEFINITION_ID, HAPPY_PLAN_ID);
             when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
                     .thenReturn(serviceInstance);
@@ -116,7 +116,7 @@ class UpdateTest extends BaseTest {
 
         @SuppressWarnings("unchecked")
         @Test
-        void specificPlanIsUpdatableReturnsFalse() throws ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException, AsyncRequiredException, ServiceInstanceNotFoundException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, MaintenanceInfoVersionsDontMatchException, ConcurrencyErrorException {
+        void isPlanIsUpdatableReturnsFalse() throws ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException, AsyncRequiredException, ServiceInstanceNotFoundException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, MaintenanceInfoVersionsDontMatchException, ConcurrencyErrorException {
             when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
                     .thenReturn(serviceInstance);
             when(serviceInstance.getPlanId())
@@ -135,7 +135,7 @@ class UpdateTest extends BaseTest {
         }
 
         @Nested
-        class specificPlanIsUpdatableReturnsTrue {
+        class isPlanIsUpdatableReturnsTrue {
 
             @Mock
             Context context;
