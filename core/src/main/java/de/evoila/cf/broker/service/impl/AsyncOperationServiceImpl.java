@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AsyncOperationServiceImpl implements AsyncOperationService {
 
-    static Logger log = LoggerFactory.getLogger(AsyncDeploymentServiceImpl.class);
+    private static Logger log = LoggerFactory.getLogger(AsyncDeploymentServiceImpl.class);
 
     JobProgressService progressService;
 
@@ -26,8 +26,7 @@ public class AsyncOperationServiceImpl implements AsyncOperationService {
         try {
             return progressService.getProgressByReferenceId(referenceId);
         } catch (Exception e) {
-            log.error("Error during job progress retrieval", e);
-            return new JobProgress(JobProgress.UNKNOWN, JobProgress.UNKNOWN, JobProgress.UNKNOWN, "Error during job progress retrieval");
+            return logException("ReferenceId: " + referenceId, e);
         }
     }
 
@@ -36,9 +35,13 @@ public class AsyncOperationServiceImpl implements AsyncOperationService {
         try {
             return progressService.getProgressById(progressId);
         } catch (Exception e) {
-            log.error("Error during job progress retrieval", e);
-            return new JobProgress(JobProgress.UNKNOWN, JobProgress.UNKNOWN, JobProgress.UNKNOWN, "Error during job progress retrieval");
+            return logException("JobProgressId: " + progressId, e);
         }
+    }
+
+    private JobProgress logException(String id, Exception e) {
+        log.error("Error during job progress retrieval with " + id, e);
+        return new JobProgress(JobProgress.UNKNOWN, JobProgress.UNKNOWN, JobProgress.UNKNOWN, "Error during job progress retrieval");
     }
 
     void logException(String jobProgressId, String operation, Exception e){
