@@ -6,14 +6,8 @@ import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
-import de.evoila.cf.broker.repository.JobRepository;
-import de.evoila.cf.broker.repository.PlatformRepository;
-import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
-import de.evoila.cf.broker.repository.ServiceInstanceRepository;
-import de.evoila.cf.broker.service.AsyncDeploymentService;
-import de.evoila.cf.broker.service.CatalogService;
-import de.evoila.cf.broker.service.DeploymentService;
-import de.evoila.cf.broker.service.PlatformService;
+import de.evoila.cf.broker.repository.*;
+import de.evoila.cf.broker.service.*;
 import de.evoila.cf.broker.util.ParameterValidator;
 import de.evoila.cf.broker.util.ServiceInstanceUtils;
 import de.evoila.cf.security.utils.RandomString;
@@ -22,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,22 +34,30 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     private ServiceInstanceRepository serviceInstanceRepository;
 
+    private BindingRepository bindingRepository;
+
     private JobRepository jobRepository;
 
     private CatalogService catalogService;
 
     private AsyncDeploymentService asyncDeploymentService;
 
+    private BindingService bindingService;
+
     private RandomString randomString = new RandomString();
 
     public DeploymentServiceImpl(PlatformRepository platformRepository, ServiceDefinitionRepository serviceDefinitionRepository,
                                  ServiceInstanceRepository serviceInstanceRepository,
-                                 JobRepository jobRepository, AsyncDeploymentService asyncDeploymentService, CatalogService catalogService) {
+                                 JobRepository jobRepository, BindingRepository bindingRepository,
+                                 AsyncDeploymentService asyncDeploymentService,
+                                 BindingService bindingService,CatalogService catalogService) {
         this.platformRepository = platformRepository;
         this.serviceDefinitionRepository = serviceDefinitionRepository;
         this.serviceInstanceRepository = serviceInstanceRepository;
+        this.bindingRepository = bindingRepository;
         this.jobRepository = jobRepository;
         this.asyncDeploymentService = asyncDeploymentService;
+        this.bindingService = bindingService;
         this.catalogService = catalogService;
     }
 
@@ -194,9 +197,15 @@ public class DeploymentServiceImpl implements DeploymentService {
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(instanceId);
         Plan plan = serviceDefinitionRepository.getPlan(serviceInstance.getServiceDefinitionId(), serviceInstance.getPlanId());
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
+
         if (platformService == null) {
             throw new ServiceBrokerException("No Platform configured for " + plan.getPlatform());
         }
+
+        boolean isSyncPossible = platformService.isSyncPossibleOnDelete(serviceInstance);
+
+        List<ServiceInstanceBinding> bindings = bindingRepository.getBindingsForServiceInstance(instanceId);
+        bindings.forEach(serviceInstanceBinding -> deleteBindings(serviceInstanceBinding,serviceInstance, !isSyncPossible));
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
 
@@ -208,7 +217,7 @@ public class DeploymentServiceImpl implements DeploymentService {
             return serviceInstanceOperationResponse;
         }
 
-        if (platformService.isSyncPossibleOnDelete(serviceInstance)) {
+        if (isSyncPossible) {
             syncDeleteInstance(serviceInstance, plan, platformService);
         } else {
             String jobProgressId = randomString.nextString();
@@ -218,6 +227,15 @@ public class DeploymentServiceImpl implements DeploymentService {
         }
 
         return serviceInstanceOperationResponse;
+    }
+
+    private void deleteBindings(ServiceInstanceBinding serviceInstanceBinding, ServiceInstance serviceInstance, boolean async){
+        try {
+            bindingService.deleteServiceInstanceBinding(serviceInstanceBinding.getId(),
+                    serviceInstance.getPlanId(), async);
+        } catch (Exception e) {
+            log.error("Error while Deleting Binding ", e);
+        }
     }
 
     @Override

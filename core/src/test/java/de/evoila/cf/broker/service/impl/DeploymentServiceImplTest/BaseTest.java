@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.service.impl.DeploymentServiceImplTest;
 
+import de.evoila.cf.broker.repository.*;
+import de.evoila.cf.broker.service.BindingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -11,10 +13,6 @@ import de.evoila.cf.broker.model.Platform;
 import de.evoila.cf.broker.model.ServiceInstance;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
-import de.evoila.cf.broker.repository.JobRepository;
-import de.evoila.cf.broker.repository.PlatformRepository;
-import de.evoila.cf.broker.repository.ServiceDefinitionRepository;
-import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import de.evoila.cf.broker.service.AsyncDeploymentService;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.PlatformService;
@@ -42,12 +40,19 @@ class BaseTest {
     ServiceDefinitionRepository serviceDefinitionRepository;
     @Mock
     ServiceInstanceRepository serviceInstanceRepository;
+
+    @Mock
+    BindingRepository bindingRepository;
+
     @Mock
     JobRepository jobRepository;
     @Mock
     AsyncDeploymentService asyncDeploymentService;
     @Mock
     CatalogService catalogService;
+
+    @Mock
+    BindingService bindingService;
 
     @Mock
     ServiceInstance serviceInstance;
@@ -70,7 +75,9 @@ class BaseTest {
                                             serviceDefinitionRepository,
                                             serviceInstanceRepository,
                                             jobRepository,
+                                            bindingRepository,
                                             asyncDeploymentService,
+                                            bindingService,
                                             catalogService);
         try {
             FieldSetter.setField(service,
