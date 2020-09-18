@@ -29,17 +29,13 @@ class UnbindTest extends BaseTest {
     class deleteServiceInstanceBindingThrows {
 
         @Test
-        void caught() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException {
-            Exception[] exceptions = {
-                    new ServiceInstanceBindingDoesNotExistsException("Test1"),
-                    new ServiceDefinitionDoesNotExistException("Test2")
-            };
+        void caught() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                             HAPPY_SERVICE_ID,
                                                              HAPPY_PLAN_ID,
                                                              HAPPY_ACCEPTS_INCOMPLETE))
-                    .thenThrow(exceptions);
-            for (Exception ignored : exceptions) {
-                ResponseEntity response = controller.unbind(HAPPY_INSTANCE_ID,
+                    .thenThrow(new ServiceInstanceBindingDoesNotExistsException("Test1"));
+            ResponseEntity response = controller.unbind(HAPPY_INSTANCE_ID,
                                                             HAPPY_BINDING_ID,
                                                             HAPPY_SERVICE_ID,
                                                             HAPPY_PLAN_ID,
@@ -47,13 +43,12 @@ class UnbindTest extends BaseTest {
                                                             HAPPY_API_HEADER,
                                                             HAPPY_REQUEST_ID,
                                                             HAPPY_ORIGINATING_ID);
-                assertEquals(HttpStatus.GONE, response.getStatusCode());
-                assertEquals(EmptyRestResponse.BODY, response.getBody());
-            }
+            assertEquals(HttpStatus.GONE, response.getStatusCode());
+            assertEquals(EmptyRestResponse.BODY, response.getBody());
 
             when(serviceBindingUtils.isBlocked(HAPPY_BINDING_ID, JobProgress.UNBIND))
                     .thenThrow(new ServiceInstanceBindingDoesNotExistsException(""));
-            ResponseEntity response = controller.unbind(HAPPY_INSTANCE_ID,
+            response = controller.unbind(HAPPY_INSTANCE_ID,
                     HAPPY_BINDING_ID,
                     HAPPY_SERVICE_ID,
                     HAPPY_PLAN_ID,
@@ -67,9 +62,10 @@ class UnbindTest extends BaseTest {
 
 
             @Test
-            void asyncRequiredException() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException {
+            void asyncRequiredException() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceDefinitionPlanDoesNotExistException {
                 AsyncRequiredException exception = new AsyncRequiredException();
                 when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                        HAPPY_SERVICE_ID,
                         HAPPY_PLAN_ID,
                         HAPPY_ACCEPTS_INCOMPLETE))
                         .thenThrow(exception);
@@ -86,12 +82,13 @@ class UnbindTest extends BaseTest {
             }
 
         @Test
-        void notCaught() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException {
+        void notCaught() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceDefinitionPlanDoesNotExistException {
                     Exception[] exceptions = {
                             new AsyncRequiredException(),
                             new ServiceBrokerException()
                     };
                     when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                            HAPPY_SERVICE_ID,
                             HAPPY_PLAN_ID,
                             HAPPY_ACCEPTS_INCOMPLETE))
                             .thenThrow(exceptions);
@@ -175,8 +172,9 @@ class UnbindTest extends BaseTest {
         private ResponseEntity<BaseServiceInstanceBindingResponse> response;
 
         @BeforeEach
-        void setUp() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException {
+        void setUp() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceDefinitionPlanDoesNotExistException {
             when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                             HAPPY_SERVICE_ID,
                                                              HAPPY_PLAN_ID,
                                                              HAPPY_ACCEPTS_INCOMPLETE))
                     .thenReturn(bindingResponse);
@@ -189,7 +187,7 @@ class UnbindTest extends BaseTest {
         }
 
         @Test
-        void validIdentityHeaders() throws AsyncRequiredException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException {
+        void validIdentityHeaders() throws AsyncRequiredException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             response = controller.unbind(HAPPY_INSTANCE_ID,
                                          HAPPY_BINDING_ID,
                                          HAPPY_SERVICE_ID,
@@ -214,8 +212,9 @@ class UnbindTest extends BaseTest {
         }
 
         @Test
-        void deleteServiceInstanceBindingReturns_Null() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException {
+        void deleteServiceInstanceBindingReturns_Null() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                             HAPPY_SERVICE_ID,
                                                              HAPPY_PLAN_ID,
                                                              HAPPY_ACCEPTS_INCOMPLETE))
                     .thenReturn(null);
@@ -231,8 +230,9 @@ class UnbindTest extends BaseTest {
         }
 
         @Test
-        void acceptsIncompleteTrue() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException {
+        void acceptsIncompleteTrue() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                             HAPPY_SERVICE_ID,
                                                              HAPPY_PLAN_ID,
                                                              HAPPY_ACCEPTS_INCOMPLETE))
                     .thenReturn(bindingResponse);
@@ -249,9 +249,10 @@ class UnbindTest extends BaseTest {
         }
 
         @Test
-        void acceptsIncompleteFalse() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException {
+        void acceptsIncompleteFalse() throws ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             final boolean async = false;
             when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                                                             HAPPY_SERVICE_ID,
                                                              HAPPY_PLAN_ID,
                                                              async))
                     .thenReturn(bindingResponse);

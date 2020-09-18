@@ -14,16 +14,16 @@ public interface DeploymentService {
 	JobProgressResponse getLastOperationById(String referenceId, String jobProgressId) throws ServiceInstanceDoesNotExistException;
 
     ServiceInstanceOperationResponse createServiceInstance(String serviceInstanceId, ServiceInstanceRequest serviceInstanceRequest)
-            throws ServiceInstanceExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException;
+            throws ServiceInstanceExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException;
 
     ServiceInstanceOperationResponse updateServiceInstance(String serviceInstanceId, ServiceInstanceUpdateRequest serviceInstanceUpdateRequest)
-            throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException;
+            throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException;
 
 	ServiceInstanceOperationResponse updateServiceInstanceContext(String serviceInstanceId, ServiceInstanceUpdateRequest serviceInstanceUpdateRequest)
 			throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException;
 
 	ServiceInstanceOperationResponse deleteServiceInstance(String instanceId) throws ServiceBrokerException, ServiceDefinitionDoesNotExistException,
-            ServiceInstanceDoesNotExistException;
+			ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException;
 
 	ServiceInstance fetchServiceInstance(String instanceId) throws UnsupportedOperationException, ServiceBrokerException,
             ConcurrencyErrorException, ServiceInstanceNotFoundException;

@@ -97,13 +97,13 @@ class UpdateTest extends BaseTest {
         }
 
         @Test
-        void specificPlanIsUpdatableThrows() throws ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
+        void isPlanIsUpdatableThrows() throws ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             ServiceDefinitionPlanDoesNotExistException expectedEx = new ServiceDefinitionPlanDoesNotExistException(HAPPY_SERVICE_DEFINITION_ID, HAPPY_PLAN_ID);
             when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
                     .thenReturn(serviceInstance);
             when(serviceInstance.getPlanId())
                     .thenReturn(HAPPY_PLAN_ID);
-            when(serviceDefinition.specificPlanIsUpdatable(HAPPY_PLAN_ID))
+            when(serviceDefinition.isPlanUpdatable(HAPPY_PLAN_ID))
                     .thenThrow(expectedEx);
             ServiceDefinitionPlanDoesNotExistException ex = assertThrows(ServiceDefinitionPlanDoesNotExistException.class,
                                                                          () -> controller.update(HAPPY_SERVICE_INSTANCE_ID,
@@ -116,12 +116,12 @@ class UpdateTest extends BaseTest {
 
         @SuppressWarnings("unchecked")
         @Test
-        void specificPlanIsUpdatableReturnsFalse() throws ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException, AsyncRequiredException, ServiceInstanceNotFoundException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, MaintenanceInfoVersionsDontMatchException, ConcurrencyErrorException {
+        void isPlanIsUpdatableReturnsFalse() throws ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException, AsyncRequiredException, ServiceInstanceNotFoundException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, MaintenanceInfoVersionsDontMatchException, ConcurrencyErrorException {
             when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
                     .thenReturn(serviceInstance);
             when(serviceInstance.getPlanId())
                     .thenReturn(HAPPY_PLAN_ID);
-            when(serviceDefinition.specificPlanIsUpdatable(HAPPY_PLAN_ID))
+            when(serviceDefinition.isPlanUpdatable(HAPPY_PLAN_ID))
                     .thenReturn(false);
             ServiceBrokerErrorResponse expectedResponse = new ServiceBrokerErrorResponse("NotUpdatable",
                                                                                          "An update on the requested service instance is not supported.");
@@ -135,7 +135,7 @@ class UpdateTest extends BaseTest {
         }
 
         @Nested
-        class specificPlanIsUpdatableReturnsTrue {
+        class isPlanIsUpdatableReturnsTrue {
 
             @Mock
             Context context;
@@ -148,7 +148,7 @@ class UpdateTest extends BaseTest {
                         .thenReturn(serviceInstance);
                 when(serviceInstance.getPlanId())
                         .thenReturn(HAPPY_PLAN_ID);
-                when(serviceDefinition.specificPlanIsUpdatable(HAPPY_PLAN_ID))
+                when(serviceDefinition.isPlanUpdatable(HAPPY_PLAN_ID))
                         .thenReturn(true);
             }
 
@@ -289,7 +289,7 @@ class UpdateTest extends BaseTest {
                     class updateServiceInstanceThrows {
 
                         @Test
-                        void caught() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
+                        void caught() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
                             when(deploymentService.updateServiceInstance(HAPPY_SERVICE_INSTANCE_ID, request))
                                     .thenThrow(new ServiceInstanceDoesNotExistException(HAPPY_SERVICE_INSTANCE_ID));
                             assertThrows(ServiceInstanceNotFoundException.class,
@@ -301,7 +301,7 @@ class UpdateTest extends BaseTest {
                         }
 
                         @Test
-                        void notCaught() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
+                        void notCaught() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
                             Exception[] exceptions = {
                                     new ServiceBrokerException(),
                                     new ServiceDefinitionDoesNotExistException(HAPPY_SERVICE_DEFINITION_ID)

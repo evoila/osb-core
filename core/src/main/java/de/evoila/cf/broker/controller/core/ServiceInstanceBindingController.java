@@ -6,6 +6,7 @@ import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.annotations.ApiVersion;
 import de.evoila.cf.broker.model.annotations.ResponseAdvice;
+import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
 import de.evoila.cf.broker.util.*;
@@ -64,7 +65,7 @@ public class ServiceInstanceBindingController extends BaseController {
             @Valid @RequestBody ServiceInstanceBindingRequest request)
             throws ServiceInstanceBindingExistsException,
             ServiceBrokerException, ServiceDefinitionDoesNotExistException,
-            InvalidParametersException, AsyncRequiredException, PlatformException, UnsupportedOperationException, ConcurrencyErrorException {
+            InvalidParametersException, AsyncRequiredException, PlatformException, UnsupportedOperationException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException {
 
         log.debug("PUT: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
                 + ", bindServiceInstance(), instanceId = " + instanceId + ", bindingId = " + bindingId);
@@ -74,6 +75,13 @@ public class ServiceInstanceBindingController extends BaseController {
         // AppGuid may not be present and empty
         if (request.getAppGuid() != null && request.getAppGuid().isEmpty())
             return processEmptyErrorResponse(HttpStatus.BAD_REQUEST);
+
+        ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(request.getServiceDefinitionId());
+
+        if (!serviceDefinition.isPlanBindable(request.getPlanId())){
+            return new ResponseEntity<>("Service Definition: " + request.getServiceDefinitionId() + " with Plan: "
+                    + request.getPlanId() + " is not bindable.", HttpStatus.UNPROCESSABLE_ENTITY);
+        }
 
         BaseServiceInstanceBindingResponse serviceInstanceBindingResponse;
         try {
@@ -103,7 +111,7 @@ public class ServiceInstanceBindingController extends BaseController {
                                          @RequestHeader("X-Broker-API-Version") String apiHeader,
                                          @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
                                          @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity
-    ) throws ServiceBrokerException, AsyncRequiredException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException {
+    ) throws ServiceBrokerException, AsyncRequiredException, ConcurrencyErrorException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
 
         log.debug("DELETE: " + SERVICE_INSTANCE_BINDING_BASE_PATH + "/{bindingId}"
                 + ", deleteServiceInstanceBinding(),  serviceInstance.id = " + instanceId + ", bindingId = " + bindingId
@@ -118,8 +126,8 @@ public class ServiceInstanceBindingController extends BaseController {
             }
 
             baseServiceInstanceBindingResponse = bindingService
-                    .deleteServiceInstanceBinding(bindingId, planId, acceptsIncomplete);
-        } catch (ServiceInstanceBindingDoesNotExistsException | ServiceDefinitionDoesNotExistException e) {
+                    .deleteServiceInstanceBinding(bindingId, serviceId, planId, acceptsIncomplete);
+        } catch (ServiceInstanceBindingDoesNotExistsException e) {
             return processEmptyErrorResponse(HttpStatus.GONE);
         }
 

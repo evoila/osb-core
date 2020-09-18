@@ -71,7 +71,7 @@ public class CustomManageController extends BaseController {
             serviceInstanceRequest.setParameters(request);
 
             deploymentService.updateServiceInstance(serviceInstanceId, serviceInstanceRequest);
-        } catch (ServiceDefinitionDoesNotExistException e) {
+        } catch (ServiceDefinitionDoesNotExistException | ServiceDefinitionPlanDoesNotExistException e) {
             return new ResponseEntity<>(new ResponseMessage<>(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 

@@ -150,7 +150,7 @@ class CustomServiceKeysControllerTest {
             }
 
             @Test
-            void withCreateServiceInstanceBindingThrowing() throws ServiceInstanceDoesNotExistException, ServiceBrokerFeatureIsNotSupportedException, AsyncRequiredException, ServiceInstanceBindingExistsException, ServiceBrokerException, PlatformException, ServiceDefinitionDoesNotExistException, InvalidParametersException {
+            void withCreateServiceInstanceBindingThrowing() throws ServiceInstanceDoesNotExistException, ServiceBrokerFeatureIsNotSupportedException, AsyncRequiredException, ServiceInstanceBindingExistsException, ServiceBrokerException, PlatformException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ServiceDefinitionPlanDoesNotExistException {
                 Exception[] exceptions = {
                         new ServiceInstanceBindingExistsException("Mock", "Mock"),
                         new ServiceBrokerException("Mock"),
@@ -175,7 +175,7 @@ class CustomServiceKeysControllerTest {
         }
 
         @Test
-        void okResponse() throws ServiceInstanceDoesNotExistException, ServiceBrokerFeatureIsNotSupportedException, AsyncRequiredException, ServiceInstanceBindingExistsException, ServiceBrokerException, PlatformException, ServiceDefinitionDoesNotExistException, InvalidParametersException {
+        void okResponse() throws ServiceInstanceDoesNotExistException, ServiceBrokerFeatureIsNotSupportedException, AsyncRequiredException, ServiceInstanceBindingExistsException, ServiceBrokerException, PlatformException, ServiceDefinitionDoesNotExistException, InvalidParametersException, ServiceDefinitionPlanDoesNotExistException{
             when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID)).thenReturn(serviceInstance);
             when(serviceInstance.getServiceDefinitionId()).thenReturn(HAPPY_SERVICE_DEFINITION_ID);
             when(serviceInstance.getPlanId()).thenReturn(HAPPY_PLAN_ID);
@@ -218,7 +218,7 @@ class CustomServiceKeysControllerTest {
             }
 
             @Test
-            void withDeleteServiceInstanceBindingThrowing() throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException {
+            void withDeleteServiceInstanceBindingThrowing() throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, AsyncRequiredException, ServiceBrokerException, ServiceInstanceBindingDoesNotExistsException, ServiceDefinitionPlanDoesNotExistException {
                 Exception[] exceptions = {
                         new ServiceBrokerException(),
                         new ServiceInstanceBindingDoesNotExistsException("Mock"),
@@ -229,7 +229,9 @@ class CustomServiceKeysControllerTest {
                         .thenReturn(serviceInstance);
                 when(serviceInstance.getPlanId())
                         .thenReturn(HAPPY_PLAN_ID);
-                when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID,
+                when(serviceInstance.getServiceDefinitionId())
+                        .thenReturn(HAPPY_SERVICE_DEFINITION_ID);
+                when(bindingService.deleteServiceInstanceBinding(HAPPY_BINDING_ID, HAPPY_SERVICE_DEFINITION_ID,
                         HAPPY_PLAN_ID,
                         false))
                         .thenThrow(exceptions);
@@ -242,14 +244,15 @@ class CustomServiceKeysControllerTest {
         }
 
         @Test
-        void okResponse() throws ServiceInstanceDoesNotExistException, AsyncRequiredException, ServiceInstanceBindingDoesNotExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException {
+        void okResponse() throws ServiceInstanceDoesNotExistException, AsyncRequiredException, ServiceInstanceBindingDoesNotExistsException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
                     .thenReturn(serviceInstance);
             when(serviceInstance.getPlanId())
                     .thenReturn(HAPPY_PLAN_ID);
+            when(serviceInstance.getServiceDefinitionId()).thenReturn(HAPPY_SERVICE_DEFINITION_ID);
             ResponseEntity response = controller.delete(HAPPY_SERVICE_INSTANCE_ID, HAPPY_BINDING_ID);
             verify(bindingService, times(1))
-                    .deleteServiceInstanceBinding(HAPPY_BINDING_ID, HAPPY_PLAN_ID, false);
+                    .deleteServiceInstanceBinding(HAPPY_BINDING_ID, HAPPY_SERVICE_DEFINITION_ID, HAPPY_PLAN_ID, false);
             assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
             assertNull(response.getBody());
         }

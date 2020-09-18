@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import de.evoila.cf.broker.model.Platform;
 import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
@@ -14,6 +15,7 @@ import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
  * 
  * @author sgreenberg@gopivotal.com
  * @author Johannes Hiemer.
+ * @author Johannes Strauß
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Plan {
@@ -141,11 +143,11 @@ public class Plan {
         this.planUpdateable = planUpdateable;
     }
 
-	public Boolean getBindable() {
+	public Boolean isBindable() {
 		return bindable;
 	}
 
-	public void setBindable(Boolean bindable) {
+	public void setBindable(boolean bindable) {
 		this.bindable = bindable;
 	}
 

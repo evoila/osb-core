@@ -95,15 +95,30 @@ public class ServiceDefinition {
         return bindingsRetrievable;
     }
 
-    public boolean specificPlanIsUpdatable(String planId) throws ServiceDefinitionPlanDoesNotExistException {
-        Plan plan = plans.stream().filter(plan1 -> plan1.getId().equals(planId))
-                .findFirst().orElseThrow(() -> new ServiceDefinitionPlanDoesNotExistException(this.id, planId));
+    public boolean isPlanUpdatable(String planId) throws ServiceDefinitionPlanDoesNotExistException {
+        Plan plan = getPlan(planId);
 
         if (plan.isPlanUpdateable() == null) {
             return this.isUpdateable();
         } else {
             return plan.isPlanUpdateable();
         }
+    }
+
+    public boolean isPlanBindable(String planId) throws ServiceDefinitionPlanDoesNotExistException {
+        Plan plan = getPlan(planId);
+
+        if (plan.isBindable() == null) {
+            return this.isBindable();
+        } else {
+            return plan.isBindable();
+        }
+
+    }
+
+    public Plan getPlan(String planId) throws ServiceDefinitionPlanDoesNotExistException {
+        return getPlans().stream().filter(plan -> plan.getId().equals(planId))
+                .findFirst().orElseThrow(() -> new ServiceDefinitionPlanDoesNotExistException(this.id, planId));
     }
 
     public void setBindingsRetrievable(boolean bindingsRetrievable) {

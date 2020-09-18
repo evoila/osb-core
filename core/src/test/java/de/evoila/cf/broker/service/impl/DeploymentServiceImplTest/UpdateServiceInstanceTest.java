@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.service.impl.DeploymentServiceImplTest;
 
+import de.evoila.cf.broker.exception.*;
 import org.everit.json.schema.SchemaException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -8,10 +9,6 @@ import org.mockito.Mock;
 
 import java.util.Map;
 
-import de.evoila.cf.broker.exception.PlatformException;
-import de.evoila.cf.broker.exception.ServiceBrokerException;
-import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.ServiceInstanceOperationResponse;
 import de.evoila.cf.broker.model.ServiceInstanceUpdateRequest;
 import de.evoila.cf.broker.model.catalog.plan.SchemaServiceInstance;
@@ -52,16 +49,19 @@ class UpdateServiceInstanceTest extends BaseTest {
         void setUp() throws ServiceInstanceDoesNotExistException {
             when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
                     .thenReturn(serviceInstance);
+            when(request.getServiceDefinitionId())
+                    .thenReturn(HAPPY_SERVICE_DEFINITION_ID);
             when(request.getPlanId())
                     .thenReturn(HAPPY_PLAN_ID);
         }
 
         @Test
-        void getPlanThrows() throws ServiceDefinitionDoesNotExistException {
+        void getPlanThrows() throws ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             ServiceDefinitionDoesNotExistException expectedEx = new ServiceDefinitionDoesNotExistException(HAPPY_PLAN_ID);
-            when(serviceDefinitionRepository.getPlan(HAPPY_PLAN_ID))
+            when(serviceDefinitionRepository.getPlan(HAPPY_SERVICE_DEFINITION_ID, HAPPY_PLAN_ID))
                     .thenThrow(expectedEx);
-            ServiceDefinitionDoesNotExistException ex = assertThrows(ServiceDefinitionDoesNotExistException.class,
+            ServiceDefinitionDoesNotExistException ex =
+                    assertThrows(ServiceDefinitionDoesNotExistException.class,
                                                                      () -> service.updateServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
                                                                                                          request));
             assertSame(expectedEx, ex);
@@ -80,8 +80,8 @@ class UpdateServiceInstanceTest extends BaseTest {
             private JsonSchema jsonSchema;
 
             @BeforeEach
-            void setUp() throws ServiceDefinitionDoesNotExistException {
-                when(serviceDefinitionRepository.getPlan(HAPPY_PLAN_ID))
+            void setUp() throws ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
+                when(serviceDefinitionRepository.getPlan(HAPPY_SERVICE_DEFINITION_ID, HAPPY_PLAN_ID))
                         .thenReturn(plan);
             }
 
@@ -96,6 +96,7 @@ class UpdateServiceInstanceTest extends BaseTest {
                         .thenReturn(schemaServiceUpdate);
                 when(schemaServiceUpdate.getParameters())
                         .thenReturn(jsonSchema);
+                when(request.getServiceDefinitionId()).thenReturn(HAPPY_SERVICE_DEFINITION_ID);
                 assertThrows(SchemaException.class,
                              () -> service.updateServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
                                                                  request));
@@ -166,7 +167,7 @@ class UpdateServiceInstanceTest extends BaseTest {
                         }
 
                         @Test
-                        void syncUpdateInstanceDoesNotThrow() throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException {
+                        void syncUpdateInstanceDoesNotThrow() throws ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
                             // We have to save the parameters in a local variable, otherwise mockito
                             // is failing with an unfished stubbing error
                             Map<String, Object> requestParameters = request.getParameters();
@@ -189,7 +190,7 @@ class UpdateServiceInstanceTest extends BaseTest {
                     }
 
                     @Test
-                    void isSyncPossibleOnUpdateReturnsFalse() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
+                    void isSyncPossibleOnUpdateReturnsFalse() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
                         when(platformService.isSyncPossibleOnUpdate(serviceInstance, plan))
                                 .thenReturn(false);
                         when(randomString.nextString())

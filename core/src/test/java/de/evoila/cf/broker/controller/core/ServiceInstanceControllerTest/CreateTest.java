@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.controller.core.ServiceInstanceControllerTest;
 
+import de.evoila.cf.broker.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,12 +12,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 
-import de.evoila.cf.broker.exception.AsyncRequiredException;
-import de.evoila.cf.broker.exception.MaintenanceInfoVersionsDontMatchException;
-import de.evoila.cf.broker.exception.ServiceBrokerException;
-import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceDefinitionPlanDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceExistsException;
 import de.evoila.cf.broker.model.ServiceInstanceOperationResponse;
 import de.evoila.cf.broker.model.ServiceInstanceRequest;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
@@ -84,26 +79,6 @@ class CreateTest extends BaseTest {
                     .thenReturn(serviceDefinition);
         }
 
-        @Test
-        void serviceDefinitionPlanDoesNotExistException() {
-            ServiceDefinitionPlanDoesNotExistException expectedEx = new ServiceDefinitionPlanDoesNotExistException(HAPPY_SERVICE_DEFINITION_ID, HAPPY_PLAN_ID);
-            when(serviceDefinition.getPlans())
-                    .thenReturn(new ArrayList<>() {{
-                        add(plan);
-                    }});
-            when(request.getPlanId())
-                    .thenReturn(HAPPY_PLAN_ID);
-            when(plan.getId())
-                    .thenReturn(null);
-            ServiceDefinitionPlanDoesNotExistException ex = assertThrows(ServiceDefinitionPlanDoesNotExistException.class,
-                                                                         () -> controller.create(HAPPY_SERVICE_INSTANCE_ID,
-                                                                                                 HAPPY_ACCEPTS_INCOMPLETE,
-                                                                                                 request,
-                                                                                                 HAPPY_ORIGINATING_ID,
-                                                                                                 HAPPY_REQUEST_ID));
-            assertEquals(expectedEx, ex);
-        }
-
         @Nested
         class maintenanceInfoVersionsDontMatchException {
 
@@ -155,8 +130,8 @@ class CreateTest extends BaseTest {
                 assertEquals(expectedEx, ex);
             }
 
-        }
 
+        }
         @Test
         void serviceDefinitionDoesNotExistException() throws ServiceDefinitionDoesNotExistException {
             ServiceDefinitionDoesNotExistException expectedEx = new ServiceDefinitionDoesNotExistException(HAPPY_SERVICE_DEFINITION_ID);
@@ -184,8 +159,8 @@ class CreateTest extends BaseTest {
             assertSame(expectedEx, ex);
         }
 
-    }
 
+    }
     private void setupMocksForSuccessfulMaintenanceInfoCheck() throws ServiceDefinitionDoesNotExistException {
         when(request.getServiceDefinitionId())
                 .thenReturn(HAPPY_SERVICE_DEFINITION_ID);
@@ -210,7 +185,7 @@ class CreateTest extends BaseTest {
     }
 
     @Test
-    void createServiceInstanceThrows() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException {
+    void createServiceInstanceThrows() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException, ServiceDefinitionPlanDoesNotExistException {
         setupMocksForSuccessfulMaintenanceInfoCheck();
         Exception[] exceptions = {
                 new ServiceInstanceExistsException(HAPPY_SERVICE_INSTANCE_ID, HAPPY_SERVICE_DEFINITION_ID),
@@ -234,7 +209,7 @@ class CreateTest extends BaseTest {
     class serviceInstanceOperationResponse {
 
         @BeforeEach
-        void setUp() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException {
+        void setUp() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException, ServiceDefinitionPlanDoesNotExistException {
             setupMocksForSuccessfulMaintenanceInfoCheck();
             when(deploymentService.createServiceInstance(HAPPY_SERVICE_INSTANCE_ID, request))
                     .thenReturn(operationResponse);

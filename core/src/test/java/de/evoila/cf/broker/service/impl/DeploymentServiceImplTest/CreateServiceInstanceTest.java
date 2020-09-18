@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.service.impl.DeploymentServiceImplTest;
 
+import de.evoila.cf.broker.exception.ServiceDefinitionPlanDoesNotExistException;
 import org.everit.json.schema.SchemaException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -110,7 +111,7 @@ class CreateServiceInstanceTest extends BaseTest {
                     }
 
                     @Test
-                    void isInProgressReturnsTrue() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException {
+                    void isInProgressReturnsTrue() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException, ServiceDefinitionPlanDoesNotExistException {
                         when(jobProgress.isInProgress())
                                 .thenReturn(true);
                         when(jobProgress.getId())
@@ -258,9 +259,9 @@ class CreateServiceInstanceTest extends BaseTest {
                 }
 
                 @Test
-                void getPlanThrows() throws ServiceDefinitionDoesNotExistException {
+                void getPlanThrows() throws ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
                     ServiceDefinitionDoesNotExistException expectedEx = new ServiceDefinitionDoesNotExistException(HAPPY_PLAN_ID);
-                    when(serviceDefinitionRepository.getPlan(HAPPY_PLAN_ID))
+                    when(serviceDefinitionRepository.getPlan(HAPPY_SERVICE_DEFINITION_ID, HAPPY_PLAN_ID))
                             .thenThrow(expectedEx);
                     ServiceDefinitionDoesNotExistException ex = assertThrows(ServiceDefinitionDoesNotExistException.class,
                                                                              () -> service.createServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
@@ -281,8 +282,8 @@ class CreateServiceInstanceTest extends BaseTest {
                     private JsonSchema jsonSchema;
 
                     @BeforeEach
-                    void setUp() throws ServiceDefinitionDoesNotExistException {
-                        when(serviceDefinitionRepository.getPlan(HAPPY_PLAN_ID))
+                    void setUp() throws ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
+                        when(serviceDefinitionRepository.getPlan(HAPPY_SERVICE_DEFINITION_ID, HAPPY_PLAN_ID))
                                 .thenReturn(plan);
                     }
 
@@ -332,7 +333,7 @@ class CreateServiceInstanceTest extends BaseTest {
                             }
 
                             @Test
-                            void isSyncPossibleOnCreateReturnsTrue() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException {
+                            void isSyncPossibleOnCreateReturnsTrue() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException, ServiceDefinitionPlanDoesNotExistException {
                                 when(platformService.isSyncPossibleOnCreate(plan))
                                         .thenReturn(true);
                                 ServiceInstanceOperationResponse expectedResponse = new ServiceInstanceOperationResponse();
@@ -385,14 +386,14 @@ class CreateServiceInstanceTest extends BaseTest {
                                 }
 
                                 @Test
-                                void noDashboardUrlSet() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException {
+                                void noDashboardUrlSet() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException, ServiceDefinitionPlanDoesNotExistException {
                                     ServiceInstanceOperationResponse response = service.createServiceInstance(HAPPY_SERVICE_INSTANCE_ID,
                                                                                                               request);
                                     validateResponse(response);
                                 }
 
                                 @Test
-                                void dashboardUrlSet() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException {
+                                void dashboardUrlSet() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceExistsException, ServiceDefinitionPlanDoesNotExistException {
                                     when(serviceDefinition.getDashboard())
                                             .thenReturn(dashboard);
                                     when(dashboard.getUrl())

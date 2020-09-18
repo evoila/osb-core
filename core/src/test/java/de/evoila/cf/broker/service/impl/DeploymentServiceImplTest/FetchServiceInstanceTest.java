@@ -1,14 +1,10 @@
 package de.evoila.cf.broker.service.impl.DeploymentServiceImplTest;
 
+import de.evoila.cf.broker.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import de.evoila.cf.broker.exception.ConcurrencyErrorException;
-import de.evoila.cf.broker.exception.PlatformException;
-import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceNotFoundException;
 import de.evoila.cf.broker.model.JobProgress;
 import de.evoila.cf.broker.model.ServiceInstance;
 
@@ -43,11 +39,13 @@ class FetchServiceInstanceTest extends BaseTest {
                     .thenReturn(serviceInstance);
             when(serviceInstance.getPlanId())
                     .thenReturn(HAPPY_PLAN_ID);
+            when(serviceInstance.getServiceDefinitionId())
+                    .thenReturn(HAPPY_SERVICE_DEFINITION_ID);
         }
 
         @Test
-        void getPlanThrows() throws ServiceDefinitionDoesNotExistException {
-            when(serviceDefinitionRepository.getPlan(HAPPY_PLAN_ID))
+        void getPlanThrows() throws ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
+            when(serviceDefinitionRepository.getPlan(HAPPY_SERVICE_DEFINITION_ID, HAPPY_PLAN_ID))
                     .thenThrow(new ServiceDefinitionDoesNotExistException(HAPPY_PLAN_ID));
             ServiceInstanceNotFoundException ex = assertThrows(ServiceInstanceNotFoundException.class,
                                                                () -> service.fetchServiceInstance(HAPPY_SERVICE_INSTANCE_ID));
@@ -58,8 +56,8 @@ class FetchServiceInstanceTest extends BaseTest {
         class getPlanDoesNotThrow {
 
             @BeforeEach
-            void setUp() throws ServiceDefinitionDoesNotExistException {
-                when(serviceDefinitionRepository.getPlan(HAPPY_PLAN_ID))
+            void setUp() throws ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
+                when(serviceDefinitionRepository.getPlan(HAPPY_SERVICE_DEFINITION_ID, HAPPY_PLAN_ID))
                         .thenReturn(plan);
                 when(plan.getPlatform())
                         .thenReturn(HAPPY_PLATFORM);

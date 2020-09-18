@@ -1,5 +1,6 @@
 package de.evoila.cf.broker.controller.custom;
 
+import de.evoila.cf.broker.exception.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,11 +18,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import de.evoila.cf.broker.exception.ConcurrencyErrorException;
-import de.evoila.cf.broker.exception.ServiceBrokerException;
-import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
-import de.evoila.cf.broker.exception.ServiceInstanceNotFoundException;
 import de.evoila.cf.broker.model.JobProgressResponse;
 import de.evoila.cf.broker.model.ResponseMessage;
 import de.evoila.cf.broker.model.ServiceInstance;
@@ -152,7 +148,7 @@ class CustomManageControllerTest {
             }
 
             @Test
-            void withUpdateServiceInstanceThrowing() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
+            void withUpdateServiceInstanceThrowing() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
                 Exception[] exceptions = {
                         new ServiceBrokerException(),
                         new ServiceInstanceDoesNotExistException("Mock")
@@ -179,7 +175,7 @@ class CustomManageControllerTest {
 
         @SuppressWarnings("unchecked")
         @Test
-        void badRequestResponse() throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceBrokerException {
+        void badRequestResponse() throws ServiceInstanceDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceDefinitionPlanDoesNotExistException {
             ServiceDefinitionDoesNotExistException expectedEx = new ServiceDefinitionDoesNotExistException("Mock");
             ResponseMessage<String> expectedResponseMessage = new ResponseMessage<>(expectedEx.getMessage());
             when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
@@ -199,7 +195,7 @@ class CustomManageControllerTest {
 
         @SuppressWarnings("unchecked")
         @Test
-        void okResponse() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
+        void okResponse() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             when(serviceInstanceRepository.getServiceInstance(HAPPY_SERVICE_INSTANCE_ID))
                     .thenReturn(serviceInstance);
             when(serviceInstance.getServiceDefinitionId())
