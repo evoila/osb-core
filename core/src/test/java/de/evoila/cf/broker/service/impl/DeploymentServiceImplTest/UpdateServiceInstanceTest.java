@@ -147,7 +147,7 @@ class UpdateServiceInstanceTest extends BaseTest {
                         }
 
                         @Test
-                        void syncUpdateInstanceThrows() throws ServiceBrokerException {
+                        void syncUpdateInstanceThrows() throws ServiceBrokerException, ServiceDefinitionDoesNotExistException {
                             PlatformException platformEx = new PlatformException("Mock");
                             ServiceBrokerException expectedEx = new ServiceBrokerException("Mock", platformEx);
                             // We have to save the parameters in a local variable, otherwise mockito

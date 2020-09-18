@@ -51,6 +51,9 @@ public class ServiceDefinition {
     @JsonProperty("plan_updateable") // misspelling of attribute kept, do not change it
     private boolean updateable;
 
+    @JsonProperty("maximum_polling_duration")
+    private Integer maximumPollingDuration;
+
     @JsonSerialize
     @JsonProperty("allow_context_updates")
     private boolean allowContextUpdates;
@@ -255,4 +258,11 @@ public class ServiceDefinition {
         return Objects.hash(id, name, description, bindable, plans, tags, metadata, requires, dashboard, instancesRetrievable, bindingsRetrievable, dashboardClient, updateable, allowContextUpdates);
     }
 
+    public Integer getMaximumPollingDuration() {
+        return maximumPollingDuration;
+    }
+
+    public void setMaximumPollingDuration(Integer maximumPollingDuration) {
+        this.maximumPollingDuration = maximumPollingDuration;
+    }
 }
