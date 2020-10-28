@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
+import de.evoila.cf.broker.exception.ServiceDefinitionPlanDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.backup.BackupItem;
 import de.evoila.cf.broker.service.BackupCustomService;
@@ -51,10 +52,11 @@ class CustomBackupControllerTest {
     class exceptionThrown {
 
         @Test
-        void withGetItemsThrowing() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
+        void withGetItemsThrowing() throws ServiceDefinitionDoesNotExistException, ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             Exception[] exceptions = {
                     new ServiceInstanceDoesNotExistException("Mock"),
                     new ServiceDefinitionDoesNotExistException("Mock"),
+                    new ServiceDefinitionPlanDoesNotExistException("Mock","Mock"),
                     new ServiceBrokerException()
             };
             when(backupCustomService.getItems(HAPPY_SERVICE_INSTANCE_ID))
@@ -71,7 +73,7 @@ class CustomBackupControllerTest {
     @Nested
     class okResponse {
 
-        private void testForOkResponseWithBackupItems(Map<String, String> backupItems) throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
+        private void testForOkResponseWithBackupItems(Map<String, String> backupItems) throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             List<BackupItem> expectedBackupItems = backupItems.entrySet()
                                                               .stream()
                                                               .map(e -> new BackupItem(e.getKey(), e.getValue()))
@@ -84,12 +86,12 @@ class CustomBackupControllerTest {
         }
 
         @Test
-        void noItems() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException {
+        void noItems() throws ServiceDefinitionDoesNotExistException, ServiceBrokerException, ServiceInstanceDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             testForOkResponseWithBackupItems(Collections.emptyMap());
         }
 
         @Test
-        void severalItems() throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceDefinitionDoesNotExistException {
+        void severalItems() throws ServiceInstanceDoesNotExistException, ServiceBrokerException, ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException {
             testForOkResponseWithBackupItems(Map.of("Key1", "Value1",
                                                     "Key2", "Value2",
                                                     "Key3", "Value3"));

@@ -4,6 +4,7 @@ import de.evoila.cf.broker.bean.BackupConfiguration;
 import de.evoila.cf.broker.controller.BaseController;
 import de.evoila.cf.broker.exception.ServiceBrokerException;
 import de.evoila.cf.broker.exception.ServiceDefinitionDoesNotExistException;
+import de.evoila.cf.broker.exception.ServiceDefinitionPlanDoesNotExistException;
 import de.evoila.cf.broker.exception.ServiceInstanceDoesNotExistException;
 import de.evoila.cf.broker.model.backup.BackupItem;
 import de.evoila.cf.broker.service.BackupCustomService;
@@ -41,7 +42,7 @@ public class CustomBackupController extends BaseController {
 
     @GetMapping(value = "/{serviceInstanceId}/items")
     public ResponseEntity<Page<BackupItem>> items(
-            @PathVariable String serviceInstanceId, @PageableDefault(size = 10, sort = {"name"}, direction = Sort.Direction.DESC) Pageable pageable) throws ServiceDefinitionDoesNotExistException,
+            @PathVariable String serviceInstanceId, @PageableDefault(size = 10, sort = {"name"}, direction = Sort.Direction.DESC) Pageable pageable) throws ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException,
             ServiceBrokerException, ServiceInstanceDoesNotExistException {
         Map<String, String> responses = backupCustomService.getItems(serviceInstanceId);
 
