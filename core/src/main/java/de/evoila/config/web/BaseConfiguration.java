@@ -48,6 +48,6 @@ public class BaseConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(new ApiVersionInterceptor()).addPathPatterns("/**").excludePathPatterns("/resources/**");
         registry.addInterceptor(new OriginatingIdentityInterceptor()).addPathPatterns("/**").excludePathPatterns("/resources/**");
         registry.addInterceptor(new RequestIdentityInterceptor()).addPathPatterns("/**").excludePathPatterns("/resources/**");
-        registry.addInterceptor(new ServiceInstancePermissionInterceptor(cloudFoundryApplicationProperties)).addPathPatterns("/**").excludePathPatterns("/resources/**");
+        registry.addInterceptor(new ServiceInstancePermissionInterceptor(cloudFoundryApplicationProperties)).addPathPatterns("/custom/**").excludePathPatterns("/custom/v2/authentication/{serviceInstanceId}/confirm", "/custom/v2/authentication/{serviceInstanceId}", "/resources/**");
     }
 }
