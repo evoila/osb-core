@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
@@ -100,13 +102,17 @@ public class ServiceInstancePermissionInterceptor implements HandlerInterceptor 
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(cloudFoundryApplicationProperties.getCfApi()));
 
-        ResponseEntity<Map> response = restTemplate.exchange(uri, HttpMethod.GET, httpEntity, Map.class);
+        try{
+            ResponseEntity<Map> response = restTemplate.exchange(uri, HttpMethod.GET, httpEntity, Map.class);
+            if (response.getStatusCode().isError()) {
+                throw new AuthenticationServiceException("Failed to request permissions for " + serviceInstanceId + ".");
+            }
 
-        if (response.getStatusCode().isError()) {
-            throw new AuthenticationServiceException("Failed to request permissions for " + serviceInstanceId + ".");
+            return response;
+        } catch (HttpClientErrorException e ){
+            throw new AuthenticationServiceException("Failed to request permissions for " + serviceInstanceId + ". Service Instance was not found!");
         }
 
-        return response;
     }
 
     private HttpHeaders getHttpHeaders() {
