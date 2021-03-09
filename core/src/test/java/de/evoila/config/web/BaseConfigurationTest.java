@@ -42,7 +42,7 @@ class BaseConfigurationTest {
         void allMethodCallsVerified() {
             when(corsRegistry.addMapping("/**"))
                     .thenReturn(corsRegistration);
-            when(corsRegistration.allowedOrigins("*"))
+            when(corsRegistration.allowedOriginPatterns("*"))
                     .thenReturn(corsRegistration);
             when(corsRegistration.allowedHeaders("*"))
                     .thenReturn(corsRegistration);

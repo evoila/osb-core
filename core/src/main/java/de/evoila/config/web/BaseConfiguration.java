@@ -29,7 +29,7 @@ public class BaseConfiguration implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
 
         registry.addMapping("/**")
-                .allowedOrigins("*")
+                .allowedOriginPatterns("*")
                 .allowedHeaders("*")
                 .exposedHeaders("WWW-Authenticate",
                         "Access-Control-Allow-Origin",

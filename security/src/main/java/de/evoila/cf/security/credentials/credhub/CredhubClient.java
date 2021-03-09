@@ -10,7 +10,10 @@ import de.evoila.cf.security.credentials.CredentialStore;
 import de.evoila.cf.security.utils.RandomString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.env.Environment;
 import org.springframework.credhub.core.CredHubOperations;
 import org.springframework.credhub.support.CredentialDetails;
@@ -27,6 +30,7 @@ import org.springframework.credhub.support.user.UserParametersRequest;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletRequest;
 import java.util.Map;
 
 /**
@@ -34,6 +38,7 @@ import java.util.Map;
  */
 @Service
 @ConditionalOnBean(CredhubBean.class)
+@AutoConfigureAfter(SimpleClientHttpRequestFactory.class)
 public class CredhubClient implements CredentialStore {
 
     private static final Logger log = LoggerFactory.getLogger(CredhubClient.class);
@@ -43,7 +48,7 @@ public class CredhubClient implements CredentialStore {
     private CredHubOperations credHubOperations;
 
     private static String SERVICE_BROKER_PREFIX = "sb-";
-
+    
     public CredhubClient(
             /*
             This is here, to ensure the HttpClientFactory gets created BEFORE any rest calls are being fired, to ensure
@@ -59,7 +64,7 @@ public class CredhubClient implements CredentialStore {
             SERVICE_BROKER_PREFIX += "test-";
         }
 
-        log.trace("Credhub Version is: " + this.credHubOperations.info().version().getVersion());
+        //log.trace("Credhub Version is: " + this.credHubOperations.info().version().getVersion());
     }
 
     private SimpleCredentialName identifier(String instanceId, String valueName) {
