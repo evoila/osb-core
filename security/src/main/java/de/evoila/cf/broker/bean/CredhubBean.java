@@ -2,7 +2,10 @@ package de.evoila.cf.broker.bean;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.client.*;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 
 /**
  * @author Rene Schollmeyer, Johannes Hiemer.
@@ -31,4 +34,5 @@ public class CredhubBean {
     public void setBoshDirector(String boshDirector) {
         this.boshDirector = boshDirector;
     }
+
 }
