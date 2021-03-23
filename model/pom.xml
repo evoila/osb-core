@@ -39,11 +39,23 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-		    <groupId>com.github.java-json-tools</groupId>
-		    <artifactId>json-schema-validator</artifactId>
-		    <version>2.2.10</version>
-		    <scope>test</scope>
+			<groupId>com.github.java-json-tools</groupId>
+			<artifactId>json-schema-validator</artifactId>
+			<version>2.2.10</version>
+			<scope>test</scope>
 		</dependency>
-	</dependencies>
+        	<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+ 			<version>4.13.2</version>
+ 			<scope>test</scope>
+		</dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 </project>
