@@ -5,8 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
-import java.util.Optional;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import de.evoila.cf.broker.model.Platform;
 import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
 
@@ -18,6 +19,7 @@ import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
  * @author Johannes Strauß
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class Plan {
 
 	private String id;
