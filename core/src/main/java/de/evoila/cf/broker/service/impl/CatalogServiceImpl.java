@@ -10,6 +10,7 @@ import de.evoila.cf.broker.service.CatalogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +48,18 @@ public class CatalogServiceImpl implements CatalogService {
 			transformCatalog.forEach(e -> e.clean(catalog, environment, endpointConfiguration));
 		}
 		prepareCatalogIfTesting(catalog);
+	}
+
+	@Bean
+	public CatalogService catalogService() {
+		return this;
+	}
+
+	@Bean
+	public List<String> catalogServiceIds(){
+		return this.getCatalog().getServices().stream().map(serviceDefinition -> {
+			return serviceDefinition.getId().replace("-","");
+		}).collect(Collectors.toList());
 	}
 
 	@Override
