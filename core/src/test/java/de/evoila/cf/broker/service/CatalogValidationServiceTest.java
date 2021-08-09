@@ -10,10 +10,7 @@ import de.evoila.cf.broker.model.catalog.plan.Plan;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.assertFalse;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
@@ -277,6 +274,11 @@ public class CatalogValidationServiceTest {
 
             @Override
             public ServiceDefinition getServiceDefinition(String serviceId) {
+                return null;
+            }
+
+            @Override
+            public List<String> getServiceIdsWithoutHyphen() {
                 return null;
             }
         };
