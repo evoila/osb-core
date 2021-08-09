@@ -50,13 +50,8 @@ public class CatalogServiceImpl implements CatalogService {
 		prepareCatalogIfTesting(catalog);
 	}
 
-	@Bean
-	public CatalogService catalogService() {
-		return this;
-	}
-
-	@Bean
-	public List<String> catalogServiceIds(){
+	@Override
+	public List<String> getServiceIdsWithoutHyphen(){
 		return this.getCatalog().getServices().stream().map(serviceDefinition -> {
 			return serviceDefinition.getId().replace("-","");
 		}).collect(Collectors.toList());
