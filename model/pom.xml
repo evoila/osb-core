@@ -12,7 +12,7 @@
 		<groupId>de.evoila.cf.broker</groupId>
 		<artifactId>core-parent</artifactId>
 		<version>1.2.0</version>
-		<relativePath>../</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
     <properties>
