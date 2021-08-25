@@ -1,10 +1,13 @@
 package de.evoila.cf.broker.model.json.schema.utils;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatTypes;
 import de.evoila.cf.broker.model.json.schema.JsonSchema;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -69,4 +72,61 @@ public class JsonSchemaUtils {
         }
         return result;
     }
+
+
+    public static void defaults(JsonSchema jsonSchema, Map<String, Object> createdMap) throws Exception {
+        if (jsonSchema.getType() == null) {
+            throw new JSONException("JsonSchema Porperty must have a type");
+        }
+        switch (jsonSchema.getType()){
+                case ARRAY:
+                        for (Object item:((List)createdMap)) {
+                            if (item instanceof Map<?,?>){
+                                defaults(jsonSchema.getItems().get(0),(Map<String, Object>) item);
+                            }
+                        }
+                    break;
+                case OBJECT:
+                    for (Map.Entry<String, JsonSchema> entry : jsonSchema.getProperties().entrySet()) {
+
+                        JsonSchema schemaProperty = entry.getValue();
+                        Object defaults = schemaProperty.getDefault();
+                        String key = entry.getKey();
+                        if (schemaProperty.getType() == null) {
+                            throw new JSONException("JsonSchema Porperty must have a type");
+                        }
+                        switch (schemaProperty.getType()) {
+                            case ARRAY:
+                                if (createdMap.containsKey(key)) {
+                                    defaults(schemaProperty, (Map<String, Object>) createdMap.get(key));
+                                }
+                                break;
+                            case OBJECT:
+                                if (createdMap.containsKey(key)) {
+                                    defaults(schemaProperty, (Map<String, Object>) createdMap.get(key));
+                                } else {
+                                    Map<String, Object> tmpResult = new HashMap<String, Object>();
+                                    defaults(schemaProperty, tmpResult);
+                                    if (!tmpResult.isEmpty()) {
+                                        createdMap.put(key, tmpResult);
+                                    }
+                                }
+                                break;
+                            case NULL:
+                                throw new JSONException("JsonSchema Porperty must have a type");
+                            default:
+                                if (!createdMap.containsKey(key) && defaults != null) {
+                                    createdMap.put(key, defaults);
+                                }
+                                break;
+                        }
+                    }
+                    break;
+                case NULL:
+                    throw new JSONException("JsonSchema Porperty must have a type");
+                default:
+                    break;
+        }
+    }
+
 }

@@ -1,10 +1,13 @@
 package de.evoila.cf.broker.service.impl;
 
+import de.evoila.cf.broker.controller.utils.ParameterUtil;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.catalog.ServerAddress;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
+import de.evoila.cf.broker.model.json.schema.JsonSchema;
+import de.evoila.cf.broker.model.json.schema.utils.JsonSchemaUtils;
 import de.evoila.cf.broker.repository.*;
 import de.evoila.cf.broker.service.AsyncBindingService;
 import de.evoila.cf.broker.service.BindingService;
@@ -17,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -75,9 +79,23 @@ public abstract class BindingServiceImpl implements BindingService {
 				serviceInstanceBindingRequest.getPlanId()
 		);
 
-		if (serviceInstanceBindingRequest.getParameters() != null) {
-		    ParameterValidator.validateParameters(serviceInstanceBindingRequest, plan, false);
+
+		if (serviceInstanceBindingRequest.getParameters() == null) {
+			serviceInstanceBindingRequest.setParameters(new HashMap<String, Object>());
 		}
+
+
+
+		JsonSchema jsonSchema = ParameterUtil.resolve(() -> plan.getSchemas().getServiceBinding().getCreate().getParameters()).orElse(null);
+		if (jsonSchema != null){
+			try {
+				JsonSchemaUtils.defaults(jsonSchema, serviceInstance.getParameters());
+			} catch (Exception e) {
+				new ServiceBrokerException(e.getMessage());
+			}
+		}
+
+		ParameterValidator.validateParameters(serviceInstanceBindingRequest, plan, false);
 
 		PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 		if (platformService == null) {

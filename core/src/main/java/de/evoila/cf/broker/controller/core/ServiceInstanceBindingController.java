@@ -7,6 +7,7 @@ import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.annotations.ApiVersion;
 import de.evoila.cf.broker.model.annotations.ResponseAdvice;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
+import de.evoila.cf.broker.model.json.schema.utils.JsonSchemaUtils;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
 import de.evoila.cf.broker.util.*;
@@ -77,6 +78,7 @@ public class ServiceInstanceBindingController extends BaseController {
             return processEmptyErrorResponse(HttpStatus.BAD_REQUEST);
 
         ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(request.getServiceDefinitionId());
+
 
         if (!serviceDefinition.isPlanBindable(request.getPlanId())){
             return new ResponseEntity<>("Service Definition: " + request.getServiceDefinitionId() + " with Plan: "

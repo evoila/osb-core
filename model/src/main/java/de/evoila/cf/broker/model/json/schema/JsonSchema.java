@@ -144,8 +144,8 @@ public class JsonSchema {
     /**
      * This attribute is an object, which contains a possible default value;
      */
-    @JsonProperty(value = "default", required = false)
-    private Object defaultValue;
+    @JsonProperty("default")
+    private Object defaults;
 
     /**
      * This attribute is a string that provides a links related to description of the
@@ -414,12 +414,14 @@ public class JsonSchema {
         this.title = title;
     }
 
+    @JsonProperty
     public Object getDefault() {
-        return defaultValue;
+        return defaults;
     }
 
-    public void setDefault(Object defaultValue) {
-        this.defaultValue = defaultValue;
+    @JsonProperty
+    public void setDefault(Object defaults) {
+        this.defaults = defaults;
     }
 
     public LinkDescriptionObject[] getLinks() {
