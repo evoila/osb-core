@@ -14,6 +14,7 @@ import de.evoila.cf.broker.service.*;
 import de.evoila.cf.broker.util.ParameterValidator;
 import de.evoila.cf.broker.util.ServiceInstanceUtils;
 import de.evoila.cf.security.utils.RandomString;
+import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,7 +140,7 @@ public class DeploymentServiceImpl implements DeploymentService {
                 try {
                     JsonSchemaUtils.defaults(jsonSchema, request.getParameters());
                 } catch (Exception e) {
-                    throw new ServiceBrokerException(e.getMessage());
+                    throw new SchemaException(e.getMessage());
                 }
         }
 
@@ -184,7 +185,7 @@ public class DeploymentServiceImpl implements DeploymentService {
                 try {
                     JsonSchemaUtils.defaults(jsonSchema, request.getParameters());
                 } catch (Exception e) {
-                    throw  new ServiceBrokerException(e.getMessage());
+                    throw new SchemaException(e.getMessage());
                 }
             }
 
