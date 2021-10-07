@@ -3,6 +3,7 @@
   "name": "s",
   "description": "The minimal test plan",
   "metadata": {
+    "active": true,
     "instanceGroupConfig": [],
     "customParameters": {}
   },

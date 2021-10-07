@@ -3,6 +3,7 @@
   "name": "s",
   "description": "A complex test plan",
   "metadata": {
+    "active": true,
     "instanceGroupConfig": [],
     "customParameters": {}
   },
