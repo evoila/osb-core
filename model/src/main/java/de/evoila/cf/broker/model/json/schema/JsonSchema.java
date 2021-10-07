@@ -164,7 +164,7 @@ public class JsonSchema {
      (Section 5.15).
      */
     @JsonProperty(value = "enum", required = true)
-    protected Set<String> enums;
+    protected ArrayList<Object> enums;
 
     /**
      * This provides an enumeration of all possible values that are valid
@@ -430,11 +430,11 @@ public class JsonSchema {
         this.links = links;
     }
 
-    public Set<String> getEnums() {
+    public ArrayList<Object> getEnums() {
         return enums;
     }
 
-    public void setEnums(Set<String> enums) {
+    public void setEnums(ArrayList<Object> enums) {
         this.enums = enums;
     }
 
