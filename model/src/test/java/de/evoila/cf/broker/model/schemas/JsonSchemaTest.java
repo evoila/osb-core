@@ -1,10 +1,7 @@
 package de.evoila.cf.broker.model.schemas;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.*;
 import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
@@ -80,19 +77,19 @@ public class JsonSchemaTest {
     	log.info(r.toString().trim());
 	}
 	
-	//@Test
+	@Test
 	public void testPlan1JsonDeserialization() throws JSONException, IOException {
 		File file = new File(PATH_PLAN_VALID_1);		
 		assertTrue(testPlanFromJson(file, true));
 	}	
 	
-	//@Test
+	@Test
 	public void testPlan2JsonDeserialization() throws JSONException, IOException {
 		File file = new File(PATH_PLAN_VALID_2);		
 		assertTrue(testPlanFromJson(file, true));
 	}	
 	
-	//@Test
+	@Test
 	public void testPlan3JsonDeserialization() throws JSONException, IOException {
 		File file = new File(PATH_PLAN_VALID_3);		
 		assertTrue("Initial JSON and generated JSON should be equal but are not.", testPlanFromJson(file, true));
