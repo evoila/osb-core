@@ -182,10 +182,10 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         JsonSchema jsonSchema = ParameterUtil.resolve(() -> plan.getSchemas().getServiceInstance().getUpdate().getParameters()).orElse(null);
         if (jsonSchema != null) {
-                try {
+                try{
                     JsonSchemaUtils.defaults(jsonSchema, request.getParameters());
                 } catch (Exception e) {
-                    throw new SchemaException(e.getMessage());
+                    throw new SchemaException(e.getMessage(),e);
                 }
             }
 
