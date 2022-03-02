@@ -176,7 +176,7 @@ public class JsonSchema {
      (Section 5.15).
      */
     @JsonProperty(value = "oneOf", required = true)
-    protected Set<Object> oneOf;
+    protected Set<JsonSchema> oneOf;
 
     // ArraySchema Section
     /**
@@ -440,11 +440,11 @@ public class JsonSchema {
         this.enums = enums;
     }
 
-    public Set<Object> getOneOf() {
+    public Set<JsonSchema> getOneOf() {
         return oneOf;
     }
 
-    public void setOneOf(Set<Object> oneOf) {
+    public void setOneOf(Set<JsonSchema> oneOf) {
         this.oneOf = oneOf;
     }
 

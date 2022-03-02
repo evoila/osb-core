@@ -76,7 +76,7 @@ public class JsonSchemaUtils {
 
     public static void defaults(JsonSchema jsonSchema, Object createdMap) throws Exception {
         if (jsonSchema.getType() == null) {
-            throw new JSONException("JsonSchema Porperty must have a type");
+            throw new JSONException("JsonSchema Property with title (" + jsonSchema.getTitle() + ") must have a type");
         }
         switch (jsonSchema.getType()){
                 case ARRAY:
@@ -89,43 +89,49 @@ public class JsonSchemaUtils {
                     break;
                 case OBJECT:
                     Map<String, Object> mapEntry = (Map<String, Object>) createdMap;
-                    for (Map.Entry<String, JsonSchema> entry : jsonSchema.getProperties().entrySet()) {
-
-                        JsonSchema schemaProperty = entry.getValue();
-                        Object defaults = schemaProperty.getDefault();
-                        String key = entry.getKey();
-                        if (schemaProperty.getType() == null) {
-                            throw new JSONException("JsonSchema Porperty must have a type");
-                        }
-                        switch (schemaProperty.getType()) {
-                            case ARRAY:
-                                if (mapEntry.containsKey(key)) {
-                                    defaults(schemaProperty, mapEntry.get(key));
-                                }
-                                break;
-                            case OBJECT:
-                                if (mapEntry.containsKey(key)) {
-                                    defaults(schemaProperty, mapEntry.get(key));
-                                } else {
-                                    Map<String, Object> tmpResult = new HashMap<String, Object>();
-                                    defaults(schemaProperty, tmpResult);
-                                    if (!tmpResult.isEmpty()) {
-                                        mapEntry.put(key, tmpResult);
+                    if (jsonSchema.getProperties() != null){
+                        for (Map.Entry<String, JsonSchema> entry : jsonSchema.getProperties().entrySet()) {
+                            JsonSchema schemaProperty = entry.getValue();
+                            Object defaults = schemaProperty.getDefault();
+                            String key = entry.getKey();
+                            if (schemaProperty.getType() == null) {
+                                throw new JSONException("JsonSchema Property (" + key + ") must have a type" );
+                            }
+                            switch (schemaProperty.getType()) {
+                                case ARRAY:
+                                    if (mapEntry.containsKey(key)) {
+                                        defaults(schemaProperty, mapEntry.get(key));
                                     }
-                                }
-                                break;
-                            case NULL:
-                                throw new JSONException("JsonSchema Porperty must have a type");
-                            default:
-                                if (!mapEntry.containsKey(key) && defaults != null) {
-                                    mapEntry.put(key, defaults);
-                                }
-                                break;
+                                    break;
+                                case OBJECT:
+                                    if (mapEntry.containsKey(key)) {
+                                        defaults(schemaProperty, mapEntry.get(key));
+                                    } else {
+                                        Map<String, Object> tmpResult = new HashMap<String, Object>();
+                                        defaults(schemaProperty, tmpResult);
+                                        if (!tmpResult.isEmpty()) {
+                                            mapEntry.put(key, tmpResult);
+                                        }
+                                    }
+                                    break;
+                                case NULL:
+                                    throw new JSONException("JsonSchema Property (" + key+ ") must have a type");
+                                default:
+                                    if (!mapEntry.containsKey(key) && defaults != null) {
+                                        mapEntry.put(key, defaults);
+                                    }
+                                    break;
+                            }
                         }
+                    }
+                    else if (jsonSchema.getOneOf() != null){
+                        // TODO
+                    } else {
+                        throw new Exception("JsonSchema Property with title (" + jsonSchema.getTitle()+ ") of type object does not contain properties nor oneOf entries");
                     }
                     break;
                 case NULL:
-                    throw new JSONException("JsonSchema Porperty must have a type");
+                    throw new JSONException("JsonSchema Property with title (" + jsonSchema.getTitle() + ") must have a type");
                 default:
                     break;
         }
