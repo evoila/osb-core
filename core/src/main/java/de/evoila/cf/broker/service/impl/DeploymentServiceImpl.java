@@ -140,6 +140,7 @@ public class DeploymentServiceImpl implements DeploymentService {
                 try {
                     JsonSchemaUtils.defaults(jsonSchema, request.getParameters());
                 } catch (Exception e) {
+                    e.printStackTrace();
                     throw new SchemaException(e.getMessage());
                 }
         }
