@@ -270,6 +270,19 @@ public class CredhubClient implements CredentialStore {
     }
 
     @Override
+    public void deleteCredentials(ServiceInstance serviceInstance) {
+        this.deleteCredentials(serviceInstance.getId());
+    }
+
+    @Override
+    public void deleteCredentials(String instanceId) {
+        credHubOperations.credentials().findByPath(credhubBean.getBoshDirector() + "/" + SERVICE_BROKER_PREFIX + instanceId)
+                .stream().map(credentialSummary -> credentialSummary.getName()).forEach(name -> {
+                    credHubOperations.credentials().deleteByName(name);
+                });
+    }
+
+    @Override
     public CertificateCredential createCertificate(ServiceInstance serviceInstance, String valueName, CertificateParameters certificateParameters) {
         return this.createCertificate(serviceInstance.getId(), valueName, certificateParameters);
     }

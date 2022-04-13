@@ -13,6 +13,7 @@ import java.util.Map;
  */
 public interface CredentialStore {
 
+
     UsernamePasswordCredential createUser(ServiceInstance serviceInstance, String valueName);
 
     UsernamePasswordCredential createUser(String instanceId, String valueName);
@@ -56,6 +57,10 @@ public interface CredentialStore {
     void deleteCredentials(ServiceInstance serviceInstance, String valueName);
 
     void deleteCredentials(String instanceId, String valueName);
+
+    void deleteCredentials(ServiceInstance serviceInstance);
+
+    void deleteCredentials(String instanceId);
 
     CertificateCredential createCertificate(ServiceInstance serviceInstance, String valueName, CertificateParameters certificateParameters);
 
