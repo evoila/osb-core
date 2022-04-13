@@ -13,5 +13,7 @@ public interface CredentialRepository {
 
     void deleteById(String identifier);
 
+    void deleteByIdContains(String identifier);
+
     void delete(Credential credential);
 }

@@ -225,6 +225,16 @@ public class DatabaseCredentialsClient implements CredentialStore {
     }
 
     @Override
+    public void deleteCredentials(ServiceInstance serviceInstance) {
+        deleteCredentials(serviceInstance.getId());
+    }
+
+    @Override
+    public void deleteCredentials(String instanceId) {
+        credentialRepository.deleteByIdContains(SERVICE_BROKER_PREFIX + instanceId + "-");
+    }
+
+    @Override
     public CertificateCredential createCertificate(ServiceInstance serviceInstance, String valueName,
                                                    CertificateParameters certificateParameters) {
         return this.createCertificate(serviceInstance.getId(), valueName, certificateParameters);
