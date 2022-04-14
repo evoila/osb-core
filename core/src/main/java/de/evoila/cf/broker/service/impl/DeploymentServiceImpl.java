@@ -230,7 +230,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
 
-        if(plan.getMetadata().getBackup().isEnabled()) {
+        if(plan.getMetadata().getBackup() != null && plan.getMetadata().getBackup().isEnabled()) {
             deleteRelatedBackupData(serviceInstance.getId());
         }
 
