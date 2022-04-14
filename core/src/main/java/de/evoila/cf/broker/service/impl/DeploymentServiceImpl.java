@@ -21,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.lang.Nullable;
 
 import java.util.Base64;
 import java.util.List;
@@ -62,7 +63,7 @@ public class DeploymentServiceImpl implements DeploymentService {
             ServiceInstanceRepository serviceInstanceRepository, JobRepository jobRepository,
             BindingRepository bindingRepository, AsyncDeploymentService asyncDeploymentService,
             BindingService bindingService, CatalogService catalogService,
-            EndpointConfiguration endpointConfiguration, BackupConfiguration backupConfiguration) {
+            EndpointConfiguration endpointConfiguration, @Nullable BackupConfiguration backupConfiguration) {
         this.platformRepository = platformRepository;
         this.serviceDefinitionRepository = serviceDefinitionRepository;
         this.serviceInstanceRepository = serviceInstanceRepository;
@@ -230,7 +231,7 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
 
-        if(plan.getMetadata().getBackup() != null && plan.getMetadata().getBackup().isEnabled()) {
+        if(this.backupConfiguration != null && plan.getMetadata().getBackup() != null && plan.getMetadata().getBackup().isEnabled()) {
             deleteRelatedBackupData(serviceInstance.getId());
         }
 
