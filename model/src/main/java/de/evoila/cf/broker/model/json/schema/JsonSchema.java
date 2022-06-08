@@ -242,6 +242,9 @@ public class JsonSchema {
     @JsonProperty
     private Boolean exclusiveMinimum;
 
+    @JsonProperty
+    private Boolean additionalProperties;
+
     /**This attribute defines the maximum value of the instance property*/
     @JsonProperty
     private Double maximum = null;
@@ -380,6 +383,13 @@ public class JsonSchema {
 
     public void setDisallow(JsonSchema[] disallow) {
         this.disallow = disallow;
+    }
+
+    public Boolean getAdditionalProperties() {
+        return additionalProperties;
+    }
+    public void setAdditionalProperties(Boolean additionalProperties) {
+        this.additionalProperties = additionalProperties;
     }
 
     public Boolean getReadonly() {
@@ -661,6 +671,7 @@ public class JsonSchema {
                 Objects.equals(minLength, that.minLength) &&
                 Objects.equals(pattern, that.pattern) &&
                 Objects.equals(definitions, that.definitions) &&
+                Objects.equals(additionalProperties, that.additionalProperties) &&
                 format == that.format;
     }
 
@@ -670,7 +681,7 @@ public class JsonSchema {
                 oneOf, additionalItems, items, maxItems, minItems, uniqueItems, exclusiveMaximum,
                 exclusiveMinimum, maximum, minimum, multipleOf, divisibleBy, required, minProperties,
                 maxProperties, dependencies, patternProperties, properties, maxLength, minLength,
-                pattern, definitions, format);
+                pattern, definitions, format, additionalProperties);
         result = 31 * result + Arrays.hashCode(disallow);
         result = 31 * result + Arrays.hashCode(links);
         return result;
