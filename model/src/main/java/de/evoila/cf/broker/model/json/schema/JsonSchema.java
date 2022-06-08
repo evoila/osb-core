@@ -385,6 +385,7 @@ public class JsonSchema {
         this.disallow = disallow;
     }
 
+    /* Commenting out to see if this solves the problem of the osb not using default values
     public Boolean getAdditionalProperties() {
         return additionalProperties;
     }
@@ -392,6 +393,8 @@ public class JsonSchema {
     public void setAdditionalProperties(Boolean additionalProperties) {
         this.additionalProperties = additionalProperties;
     }
+
+     */
 
     public Boolean getReadonly() {
         return readonly;
@@ -670,7 +673,8 @@ public class JsonSchema {
                 Objects.equals(minLength, that.minLength) &&
                 Objects.equals(pattern, that.pattern) &&
                 Objects.equals(definitions, that.definitions) &&
-                Objects.equals(additionalProperties, that.additionalProperties) &&
+                //commented out temporarily to see if additionalProperties cause problems
+                //Objects.equals(additionalProperties, that.additionalProperties) &&
                 format == that.format;
     }
 
@@ -680,7 +684,7 @@ public class JsonSchema {
                 oneOf, additionalItems, items, maxItems, minItems, uniqueItems, exclusiveMaximum,
                 exclusiveMinimum, maximum, minimum, multipleOf, divisibleBy, required, minProperties,
                 maxProperties, dependencies, patternProperties, properties, maxLength, minLength,
-                pattern, definitions, format, additionalProperties);
+                pattern, definitions, format);
         result = 31 * result + Arrays.hashCode(disallow);
         result = 31 * result + Arrays.hashCode(links);
         return result;
