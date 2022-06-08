@@ -242,8 +242,11 @@ public class JsonSchema {
     @JsonProperty
     private Boolean exclusiveMinimum;
 
+    /* Commenting out to see if this solves the problem of the osb not using default values
     @JsonProperty
     private Boolean additionalProperties;
+
+     */
 
     /**This attribute defines the maximum value of the instance property*/
     @JsonProperty
