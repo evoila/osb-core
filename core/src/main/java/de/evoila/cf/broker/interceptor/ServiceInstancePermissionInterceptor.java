@@ -2,6 +2,8 @@ package de.evoila.cf.broker.interceptor;
 
 
 import de.evoila.cf.broker.bean.CloudFoundryApplicationProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,6 +34,7 @@ public class ServiceInstancePermissionInterceptor implements HandlerInterceptor 
     private static final String SUB = "sub";
     private static final String READ = "read";
     private static final String MANAGE = "manage";
+    Logger log = LoggerFactory.getLogger(ServiceInstancePermissionInterceptor.class);
 
     private final CloudFoundryApplicationProperties cloudFoundryApplicationProperties;
 
@@ -45,6 +48,9 @@ public class ServiceInstancePermissionInterceptor implements HandlerInterceptor 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) request.getUserPrincipal();
+        log.info("request: " + request);
+        log.info("request attribute names: " + request.getAttributeNames());
+        log.info("HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE: " + HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         Map<Object, Object> attributes = (Map<Object, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         String serviceInstanceId = (String) attributes.get("serviceInstanceId");
 
