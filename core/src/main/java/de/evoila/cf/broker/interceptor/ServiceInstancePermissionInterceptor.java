@@ -20,6 +20,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Enumeration;
 import java.util.Map;
 
 /**
@@ -50,6 +51,10 @@ public class ServiceInstancePermissionInterceptor implements HandlerInterceptor 
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) request.getUserPrincipal();
         log.info("request: " + request);
         log.info("request attribute names: " + request.getAttributeNames());
+        Enumeration names = request.getAttributeNames();
+        while (names.hasMoreElements()) {
+            log.info("request attribute names element: " + names.nextElement());
+        }
         log.info("HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE: " + HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         Map<Object, Object> attributes = (Map<Object, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         String serviceInstanceId = (String) attributes.get("serviceInstanceId");
