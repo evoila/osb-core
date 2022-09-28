@@ -83,8 +83,8 @@
 			<version>21.0</version>
 		</dependency>
         <dependency>
-            <groupId>com.github.everit-org.json-schema</groupId>
-            <artifactId>org.everit.json.schema</artifactId>
+            <groupId>com.github.erosb</groupId>
+            <artifactId>everit-json-schema</artifactId>
             <version>1.10.0</version>
         </dependency>
 		<dependency>
