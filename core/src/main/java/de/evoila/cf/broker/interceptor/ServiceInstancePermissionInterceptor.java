@@ -57,7 +57,6 @@ public class ServiceInstancePermissionInterceptor implements HandlerInterceptor 
         if (!cannAccessServiceInstance(serviceInstanceId)) {
             throw new AuthenticationServiceException("User is not authorised to access" + serviceInstanceId + ". Please contact your System Administrator.");
         }
-
         return true;
     }
 
