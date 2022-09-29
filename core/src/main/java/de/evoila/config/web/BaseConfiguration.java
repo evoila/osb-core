@@ -4,10 +4,7 @@
 package de.evoila.config.web;
 
 import de.evoila.cf.broker.bean.CloudFoundryApplicationProperties;
-import de.evoila.cf.broker.interceptor.ApiVersionInterceptor;
-import de.evoila.cf.broker.interceptor.OriginatingIdentityInterceptor;
-import de.evoila.cf.broker.interceptor.RequestIdentityInterceptor;
-import de.evoila.cf.broker.interceptor.ServiceInstancePermissionInterceptor;
+import de.evoila.cf.broker.interceptor.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -49,5 +46,6 @@ public class BaseConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(new OriginatingIdentityInterceptor()).addPathPatterns("/**").excludePathPatterns("/resources/**");
         registry.addInterceptor(new RequestIdentityInterceptor()).addPathPatterns("/**").excludePathPatterns("/resources/**");
         registry.addInterceptor(new ServiceInstancePermissionInterceptor(cloudFoundryApplicationProperties)).addPathPatterns("/custom/**").excludePathPatterns("/custom/v2/authentication/{serviceInstanceId}/confirm", "/custom/v2/authentication/{serviceInstanceId}", "/resources/**");
+        registry.addInterceptor(new LoggingInterceptor()).addPathPatterns("/**").excludePathPatterns("/resources/**");
     }
 }
