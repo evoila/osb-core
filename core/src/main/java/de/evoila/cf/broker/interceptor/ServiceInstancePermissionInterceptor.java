@@ -21,6 +21,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -50,13 +51,29 @@ public class ServiceInstancePermissionInterceptor implements HandlerInterceptor 
 
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) request.getUserPrincipal();
         log.info("request: " + request);
+        log.info("request auth: " + request.getAuthType());
+        log.info("request pathinfo: " + request.getPathInfo());
+        log.info("request query: " + request.getQueryString());
+        log.info("request.getRequestURL(): " + request.getRequestURL().toString());
+        log.info("request URI: " + request.getRequestURI());
+        Map<String,String[]> parameters = request.getParameterMap();
+        log.info("Parameters:");
+        for (String key: parameters.keySet()) {
+            log.info("key" + key + ": " + parameters.get(key));
+        }
         log.info("request attribute names: " + request.getAttributeNames());
-        Enumeration names = request.getAttributeNames();
-        while (names.hasMoreElements()) {
-            log.info("request attribute names element: " + names.nextElement());
+        Iterator iterator = request.getAttributeNames().asIterator();
+        while (iterator.hasNext()) {
+            Object o = iterator.next();
+            log.info(o.toString());
         }
         log.info("HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE: " + HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         Map<Object, Object> attributes = (Map<Object, Object>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        for (Object key : attributes.keySet()) {
+            log.info("Attribute " + key + ": " + attributes.get(key));
+        }
+
+
         String serviceInstanceId = (String) attributes.get("serviceInstanceId");
 
         if (!cannAccessServiceInstance(serviceInstanceId)) {
