@@ -686,5 +686,4 @@ public class JsonSchema {
         result = 31 * result + Arrays.hashCode(links);
         return result;
     }
-
 }

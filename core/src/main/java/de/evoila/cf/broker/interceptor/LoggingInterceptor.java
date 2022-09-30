@@ -2,7 +2,6 @@ package de.evoila.cf.broker.interceptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,7 +14,7 @@ import java.util.Enumeration;
  * @author sgreenberg@gopivotal.com
  *
  */
-public class LoggingInterceptor implements HandlerInterceptor {
+public class LoggingInterceptor extends HandlerInterceptorAdapter {
 
 	private final Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
 	 
@@ -23,7 +22,6 @@ public class LoggingInterceptor implements HandlerInterceptor {
 			HttpServletResponse response, Object handler) {
  
 		StringBuilder message = new StringBuilder();
-		message.append("LoggingInterceptor start\n\t ==========");
 		message.append(request.getMethod());
 		message.append(" ");
 		message.append(request.getRequestURL());
@@ -46,7 +44,6 @@ public class LoggingInterceptor implements HandlerInterceptor {
 			}
 			message.append("\n\t");
 		}
-		message.append("LoggingInterceptor end\n\t==========\n\t");
 		
 		logger.info(message.toString());
 		
