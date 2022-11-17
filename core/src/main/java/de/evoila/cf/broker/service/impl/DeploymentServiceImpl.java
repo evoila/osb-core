@@ -94,7 +94,7 @@ public class DeploymentServiceImpl implements DeploymentService {
     public ServiceInstanceOperationResponse createServiceInstance(String serviceInstanceId,
             ServiceInstanceRequest request) throws ServiceInstanceExistsException, ServiceBrokerException,
             ServiceDefinitionDoesNotExistException, ValidationException, ServiceDefinitionPlanDoesNotExistException {
-
+        log.debug("Inside createServiceInstance (DeploymentServiceImpl)");
         serviceDefinitionRepository.validateServiceId(request.getServiceDefinitionId());
         Optional<ServiceInstance> serviceInstanceOptional = serviceInstanceRepository
                 .getServiceInstanceOptional(serviceInstanceId);
@@ -160,6 +160,7 @@ public class DeploymentServiceImpl implements DeploymentService {
             serviceInstanceRepository.saveServiceInstance(serviceInstance);
 
             String jobProgressId = randomString.nextString();
+            log.debug("Inside createServiceInstance before asyncCreateInstance");
             asyncDeploymentService.asyncCreateInstance(this, serviceInstance, request.getParameters(), plan,
                     platformService, jobProgressId);
 
@@ -311,8 +312,8 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     public ServiceInstance syncCreateInstance(ServiceInstance serviceInstance, Map<String, Object> parameters,
             Plan plan, PlatformService platformService) throws ServiceBrokerException {
-
         // TODO: We need to decide which method we trigger when preCreateInstance fails
+        log.debug("Inside syncCreateInstance");
         try {
             serviceInstance = platformService.preCreateInstance(serviceInstance, plan);
         } catch (PlatformException e) {
