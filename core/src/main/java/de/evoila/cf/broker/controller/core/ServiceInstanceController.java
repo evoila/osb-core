@@ -87,7 +87,6 @@ public class ServiceInstanceController extends BaseController {
         }
 
         checkMaintenanceInfo(request);
-        log.debug("Create, before createServiceInstance");
         ServiceInstanceOperationResponse response = deploymentService.createServiceInstance(serviceInstanceId, request);
 
         log.debug("ServiceInstance Creation Started: " + serviceInstanceId);
