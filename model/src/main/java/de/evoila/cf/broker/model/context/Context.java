@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -132,7 +132,7 @@ public class Context {
      * Throws IllegalArgumentException to force jackson to fail when deserializing an invalid context object according to osb-api-spec, and if platform is empty or null.
      */
     public void validateContextObject() {
-        if (StringUtils.isEmpty(this.getPlatform())) {
+        if (ObjectUtils.isEmpty(this.getPlatform())) {
             throw new IllegalArgumentException("no value for Platform found!");
         }
 
@@ -177,7 +177,7 @@ public class Context {
     }
 
     private boolean fieldIsPresent(String value) {
-        return !StringUtils.isEmpty(value);
+        return !ObjectUtils.isEmpty(value);
     }
 
     @Override

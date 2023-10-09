@@ -22,8 +22,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * @author Johannes Hiemer, Christian Brinker, Marco Di Martino, Johannes Strauß.
@@ -65,7 +65,7 @@ public class ServiceInstanceController extends BaseController {
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @PutMapping(value = "/{serviceInstanceId}")
     public ResponseEntity<ServiceInstanceOperationResponse> create(
-            @PathVariable("serviceInstanceId")
+            @PathVariable
             @Pattern(regexp = UuidUtils.UUID_REGEX, message = UuidUtils.NOT_A_UUID_MESSAGE) String serviceInstanceId,
             @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "false") Boolean acceptsIncomplete,
             @Valid @RequestBody ServiceInstanceRequest request,
@@ -115,7 +115,7 @@ public class ServiceInstanceController extends BaseController {
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @PatchMapping(value = "/{serviceInstanceId}")
     public ResponseEntity update(
-            @PathVariable("serviceInstanceId") String serviceInstanceId,
+            @PathVariable String serviceInstanceId,
             @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "false") Boolean acceptsIncomplete,
             @RequestBody ServiceInstanceUpdateRequest request,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
@@ -176,7 +176,7 @@ public class ServiceInstanceController extends BaseController {
     public ResponseEntity<ServiceInstanceOperationResponse> delete(
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
-            @PathVariable("serviceInstanceId") String serviceInstanceId,
+            @PathVariable String serviceInstanceId,
             @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "false") Boolean acceptsIncomplete,
             @RequestParam("service_id") String serviceId, @RequestParam("plan_id") String planId) throws ServiceBrokerException, AsyncRequiredException,
             ServiceDefinitionDoesNotExistException, ServiceInstanceDoesNotExistException, ConcurrencyErrorException, ServiceDefinitionPlanDoesNotExistException {
@@ -208,9 +208,9 @@ public class ServiceInstanceController extends BaseController {
     @GetMapping(value = "/{serviceInstanceId}/last_operation")
     public ResponseEntity<JobProgressResponse> lastOperation(
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
-            @PathVariable("serviceInstanceId") String serviceInstanceId,
+            @PathVariable String serviceInstanceId,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
-            @RequestParam(value = "operation", required = false) String operation)
+            @RequestParam(required = false) String operation)
             throws ServiceInstanceDoesNotExistException {
 
         JobProgressResponse jobProgressResponse;
@@ -227,7 +227,7 @@ public class ServiceInstanceController extends BaseController {
     public ResponseEntity<ServiceInstanceResponse> get(
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
-            @PathVariable("serviceInstanceId") String serviceInstanceId) throws UnsupportedOperationException,
+            @PathVariable String serviceInstanceId) throws UnsupportedOperationException,
             ServiceBrokerException, ConcurrencyErrorException, ServiceInstanceNotFoundException, ServiceDefinitionDoesNotExistException {
 
         ServiceInstance serviceInstance = deploymentService.fetchServiceInstance(serviceInstanceId);

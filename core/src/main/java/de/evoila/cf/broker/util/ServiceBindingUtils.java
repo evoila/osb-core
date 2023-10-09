@@ -6,7 +6,7 @@ import de.evoila.cf.broker.model.ServiceInstanceBinding;
 import de.evoila.cf.broker.repository.BindingRepository;
 import de.evoila.cf.broker.repository.JobRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.NoSuchElementException;
 
@@ -34,7 +34,7 @@ public class ServiceBindingUtils {
      * @return false if service instance binding has no running operations or the action is equal to the running operation; true otherwise
      */
     public boolean isBlocked(ServiceInstanceBinding binding, String action) {
-        if (binding == null || StringUtils.isEmpty(action)) return false;
+        if (binding == null || ObjectUtils.isEmpty(action)) return false;
 
         JobProgress jobProgress;
         try {

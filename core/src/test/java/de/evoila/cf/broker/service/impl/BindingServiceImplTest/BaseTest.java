@@ -42,7 +42,7 @@ import de.evoila.cf.security.utils.RandomString;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
-public class BaseTest {
+class BaseTest {
 
     /**
      * Subclass for making protected methods visible to the tests to make testing the public methods easier.

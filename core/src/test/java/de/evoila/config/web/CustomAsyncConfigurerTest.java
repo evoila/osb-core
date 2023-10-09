@@ -32,9 +32,9 @@ class CustomAsyncConfigurerTest {
         assertNotNull(executor);
         assertThat(executor, instanceOf(ThreadPoolTaskExecutor.class));
         ThreadPoolTaskExecutor taskExecutor = (ThreadPoolTaskExecutor)executor;
-        assertEquals(taskExecutor.getCorePoolSize(), 15);
-        assertEquals(taskExecutor.getMaxPoolSize(), 30);
-        assertEquals(taskExecutor.getThreadNamePrefix(), "MyExecutor-");
+        assertEquals(15, taskExecutor.getCorePoolSize());
+        assertEquals(30, taskExecutor.getMaxPoolSize());
+        assertEquals("MyExecutor-", taskExecutor.getThreadNamePrefix());
         Field queueCapacityField = ReflectionUtils.findField(ThreadPoolTaskExecutor.class, "queueCapacity");
         ReflectionUtils.makeAccessible(queueCapacityField);
         assertEquals(15, ReflectionUtils.getField(queueCapacityField, taskExecutor) );

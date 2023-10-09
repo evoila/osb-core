@@ -5,15 +5,14 @@ import de.evoila.cf.broker.model.catalog.Catalog;
 import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import javax.annotation.PostConstruct;
+import org.springframework.util.ObjectUtils;
 
 @Service
 @ConditionalOnBean(CatalogService.class)
@@ -61,8 +60,10 @@ public class CatalogValidationService {
     public void validate() throws CatalogIsNotValidException {
         Catalog catalog = catalogService.getCatalog();
         if (!validateCatalog(catalog) && strict) {
-            throw new CatalogIsNotValidException("The catalog that was build on the given configuration is not valid. " +
-                    "Please see the logs of class 'CatalogValidationService' to identify flawed or missing fields.");
+            throw new CatalogIsNotValidException("""
+                    The catalog that was build on the given configuration is not valid. \
+                    Please see the logs of class 'CatalogValidationService' to identify flawed or missing fields.\
+                    """);
         }
     }
 
@@ -116,11 +117,11 @@ public class CatalogValidationService {
             log.info("Id of a service definition is not a valid guid (name = " + serviceDefinition.getName() + ")");
             return false;
         }
-        if (StringUtils.isEmpty(serviceDefinition.getName())) {
+        if (ObjectUtils.isEmpty(serviceDefinition.getName())) {
             log.info("Name of service definition " + serviceDefinition.getId() + " is null or empty.");
             return false;
         }
-        if (StringUtils.isEmpty(serviceDefinition.getDescription())) {
+        if (ObjectUtils.isEmpty(serviceDefinition.getDescription())) {
             log.info("Description of service definition " + serviceDefinition.getId() + " is null or empty.");
             return false;
         }
@@ -159,11 +160,11 @@ public class CatalogValidationService {
             log.info("Id of a plan of the service definition " + serviceDefinitionId + " is not a valid guid (name = " + plan.getName() + ")");
             return false;
         }
-        if (StringUtils.isEmpty(plan.getName())) {
+        if (ObjectUtils.isEmpty(plan.getName())) {
             log.info("Name of plan " + plan.getId() + " is null or empty.");
             return false;
         }
-        if (StringUtils.isEmpty(plan.getDescription())) {
+        if (ObjectUtils.isEmpty(plan.getDescription())) {
             log.info("Description of plan " + plan.getId() + " is null or empty.");
             return false;
         }
@@ -177,7 +178,7 @@ public class CatalogValidationService {
      * @return true if the given string qualifies for a GUID and false if it does not
      */
     private boolean validateGuid(String guid) {
-        return !StringUtils.isEmpty(guid) && guid.matches(GUID_REGEX);
+        return !ObjectUtils.isEmpty(guid) && guid.matches(GUID_REGEX);
     }
 
     /**
@@ -190,7 +191,7 @@ public class CatalogValidationService {
     private boolean validateMaintenanceInfo(String planId, MaintenanceInfo maintenanceInfo) {
         if (maintenanceInfo == null) return true;
 
-        if (StringUtils.isEmpty(maintenanceInfo.getVersion())) {
+        if (ObjectUtils.isEmpty(maintenanceInfo.getVersion())) {
             logVersionFieldDoesNotExist(planId);
             return false;
         }
@@ -234,7 +235,7 @@ public class CatalogValidationService {
      * @return true if given version String is Semantic Versioning 2
      */
     private boolean validateSemanticVersion2(String versionToCheck) {
-        return !StringUtils.isEmpty(versionToCheck) &&
+        return !ObjectUtils.isEmpty(versionToCheck) &&
                 versionToCheck.matches("^(0|[1-9]\\d*)" +
                         "\\.(0|[1-9]\\d*)" +
                         "\\.(0|[1-9]\\d*)" +

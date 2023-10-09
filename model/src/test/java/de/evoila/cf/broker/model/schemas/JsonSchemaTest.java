@@ -12,7 +12,7 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.skyscreamer.jsonassert.JSONCompareResult;
@@ -24,8 +24,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This Test class checks for simple equality between the given initial json and the generated one, 
@@ -59,24 +58,26 @@ public class JsonSchemaTest {
 	private static final String PATH_PLAN_5_INVALID = "." + File.separator + "src" + File.separator + "test"
 			+ File.separator + "resources" + File.separator + "testPlan5Invalid.json";
 
-		
-	@Test
-	public void testSchemaIsValid() throws IOException, JSONException, ProcessingException {
+
+    @Test
+    void testSchemaIsValid() throws IOException, JSONException, ProcessingException {
 		runSchemaTestWithFile(PATH_SCHEMA_VALID_1);
 	}
-	
-	@Test(expected = JsonParseException.class)
-	public void testSchema2IsInvalid() throws IOException {
-		runSchemaTestWithFile(PATH_SCHEMA_INVALID_1);
-	}
+
+    @Test
+    void testSchema2IsInvalid() throws IOException {
+        assertThrows(JsonParseException.class, () -> {
+            runSchemaTestWithFile(PATH_SCHEMA_INVALID_1);
+        });
+    }
 	
 	public void runSchemaTestWithFile(String path) throws IOException {
     	JsonNode schema = JsonLoader.fromPath(path);
     	JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
     	ProcessingReport r = factory.getSyntaxValidator().validateSchema(schema);
-    	assertTrue(r.toString(),r.isSuccess());
-    	assertFalse("The schema holds keywords that are unkown. This may cause the validator to skip invalid parts of the schema:\n" +r.toString(),
-    			r.toString().contains("warning: the following keywords are unknown and will be ignored:"));
+    	assertTrue(r.isSuccess(),r.toString());
+    	assertFalse(r.toString().contains("warning: the following keywords are unknown and will be ignored:"),
+    			"The schema holds keywords that are unkown. This may cause the validator to skip invalid parts of the schema:\n" +r.toString());
     	log.info(r.toString().trim());
 	}
 	
@@ -95,20 +96,22 @@ public class JsonSchemaTest {
 	//@Test
 	public void testPlan3JsonDeserialization() throws JSONException, IOException {
 		File file = new File(PATH_PLAN_VALID_3);		
-		assertTrue("Initial JSON and generated JSON should be equal but are not.", testPlanFromJson(file, true));
-	}	
-	
-	@Test
-	public void testPlan4JsonDeserializationFail() throws JSONException, IOException {
+		assertTrue(testPlanFromJson(file, true), "Initial JSON and generated JSON should be equal but are not.");
+	}
+
+    @Test
+    void testPlan4JsonDeserializationFail() throws JSONException, IOException {
 		File file = new File(PATH_PLAN_4_INVALID);		
-		assertFalse("Initial JSON and generated JSON should be unequal but are equal.", testPlanFromJson(file, false));
+		assertFalse(testPlanFromJson(file, false), "Initial JSON and generated JSON should be unequal but are equal.");
 	}
-	
-	@Test (expected = JsonMappingException.class)
-	public void testPlan5JsonDeserializationFail() throws JSONException, IOException {
-		File file = new File(PATH_PLAN_5_INVALID);		
-		assertFalse("Initial JSON and generated JSON should be unequal but are equal.", testPlanFromJson(file, false));
-	}
+
+    @Test
+    void testPlan5JsonDeserializationFail() throws JSONException, IOException {
+        assertThrows(JsonMappingException.class, () -> {
+            File file = new File(PATH_PLAN_5_INVALID);
+            assertFalse(testPlanFromJson(file, false), "Initial JSON and generated JSON should be unequal but are equal.");
+        });
+    }
 	
 	/*
 	 * This methods checks for equality of two json Strings!

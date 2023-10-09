@@ -30,7 +30,7 @@ class JobProgressUtilsTest {
     @Test
     void retryAfterIsZero() {
         ResponseEntity<JobProgressResponse> response = utils.buildJobProgressResponseEntity(jobProgressResponse);
-        assertEquals(response.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(response.getBody(), jobProgressResponse);
     }
 
@@ -38,7 +38,7 @@ class JobProgressUtilsTest {
     void RetryAfterIsLagerThanZero(){
         utils.setRetryAfter(HAPPY_RETRY_AFTER);
         ResponseEntity<JobProgressResponse> response = utils.buildJobProgressResponseEntity(jobProgressResponse);
-        assertEquals(response.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(Objects.requireNonNull(response.getHeaders().get("Retry-After")).get(0), Integer.toString(HAPPY_RETRY_AFTER));
         assertEquals(response.getBody(), jobProgressResponse);
     }

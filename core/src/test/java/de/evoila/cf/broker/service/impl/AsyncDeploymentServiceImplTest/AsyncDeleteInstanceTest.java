@@ -5,7 +5,8 @@ import de.evoila.cf.broker.model.JobProgress;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.doNothing;
 
 class AsyncDeleteInstanceTest extends BaseTest {
 

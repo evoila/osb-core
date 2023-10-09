@@ -9,7 +9,7 @@ import de.evoila.cf.broker.model.catalog.ServerAddress;
 import de.evoila.cf.broker.repository.JobRepository;
 import de.evoila.cf.broker.repository.ServiceInstanceRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -107,10 +107,10 @@ public class ServiceInstanceUtils {
             credentials.put(HOSTS, hosts);
         }
 
-        if (!StringUtils.isEmpty(username))
+        if (!ObjectUtils.isEmpty(username))
             credentials.put(USERNAME, username);
 
-        if (!StringUtils.isEmpty(password))
+        if (!ObjectUtils.isEmpty(password))
             credentials.put(PASSWORD, password);
 
         if (additionalConfigs != null) {
@@ -169,7 +169,7 @@ public class ServiceInstanceUtils {
      * @return true if provisioning would create an identical instance and false if it would not
      */
     public static boolean wouldCreateIdenticalInstance(String serviceInstanceId, ServiceInstanceRequest request, ServiceInstance serviceInstance) {
-        if (StringUtils.isEmpty(serviceInstanceId) || request == null || serviceInstance == null) return true;
+        if (ObjectUtils.isEmpty(serviceInstanceId) || request == null || serviceInstance == null) return true;
         if (request.getContext() == null ^ serviceInstance.getContext() == null) return false;
         if (request.getParameters() == null ^ serviceInstance.getParameters() == null) return false;
 
@@ -235,7 +235,7 @@ public class ServiceInstanceUtils {
      * @return false if service instance has no running operations or the action is equal to the running operation; true otherwise
      */
     public boolean isBlocked(ServiceInstance serviceInstance, String action) {
-        if (serviceInstance == null || StringUtils.isEmpty(action)) return false;
+        if (serviceInstance == null || ObjectUtils.isEmpty(action)) return false;
 
         JobProgress jobProgress = jobRepository.getJobProgressByReferenceId(serviceInstance.getId());
         if (jobProgress == null) return false;

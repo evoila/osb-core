@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-public class ValidateParametersServiceInstanceRequestPlanBooleanTest extends BaseTest {
+class ValidateParametersServiceInstanceRequestPlanBooleanTest extends BaseTest {
     @Mock
     private Plan mockedPlan;
 

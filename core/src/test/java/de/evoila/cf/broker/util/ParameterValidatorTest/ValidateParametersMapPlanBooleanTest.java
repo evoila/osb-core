@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-public class ValidateParametersMapPlanBooleanTest extends BaseTest {
+class ValidateParametersMapPlanBooleanTest extends BaseTest {
     @Mock
     private Plan mockedPlan;
     @Mock

@@ -1,6 +1,6 @@
 package de.evoila.cf.broker.exception;
 
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author Marco Di Martino
@@ -20,7 +20,7 @@ public class ServiceInstanceNotFoundException extends Exception {
 
     public ServiceInstanceNotFoundException(String serviceInstanceId) {
         super("Service Instance "
-                + (StringUtils.isEmpty(serviceInstanceId)? "" : serviceInstanceId + " ")
+                + (ObjectUtils.isEmpty(serviceInstanceId)? "" : serviceInstanceId + " ")
                 + "does not exists or an operation for this Instance is still in progress.");
     }
 

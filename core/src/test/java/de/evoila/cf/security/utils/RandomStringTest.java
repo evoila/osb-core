@@ -9,7 +9,8 @@ import org.mockito.stubbing.Answer;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,7 +35,7 @@ class RandomStringTest {
                 );
         RandomString randomString = new RandomString(104, mockRandom, false,true);
         String string = randomString.nextString();
-        assertEquals(string.length(), 104);
+        assertEquals(104, string.length());
         assertEquals("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz", string);
     }
 
@@ -54,7 +55,7 @@ class RandomStringTest {
                 );
         RandomString randomString = new RandomString(52, mockRandom, false,false);
         String string = randomString.nextString();
-        assertEquals(string.length(), 52);
+        assertEquals(52, string.length());
         assertEquals("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", string);
 
     }
@@ -75,7 +76,7 @@ class RandomStringTest {
                 );
         RandomString randomString = new RandomString(62, mockRandom, true,true);
         String string = randomString.nextString();
-        assertEquals(string.length(), 62);
+        assertEquals(62, string.length());
         assertEquals("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz0123456789", string);
 
     }
@@ -96,7 +97,7 @@ class RandomStringTest {
                 );
         RandomString randomString = new RandomString(62, mockRandom, true,false);
         String string = randomString.nextString();
-        assertEquals(string.length(), 62);
+        assertEquals(62, string.length());
         assertEquals("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", string);
 
     }

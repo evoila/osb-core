@@ -4,8 +4,8 @@
 package de.evoila.cf.broker.controller.utils;
 
 import de.evoila.cf.broker.model.catalog.Dashboard;
+import org.apache.hc.core5.net.URIBuilder;
 import de.evoila.cf.broker.model.DashboardClient;
-import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;

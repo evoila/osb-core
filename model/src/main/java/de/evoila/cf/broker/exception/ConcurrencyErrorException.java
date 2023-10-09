@@ -1,7 +1,7 @@
 package de.evoila.cf.broker.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author Marco Di Martino, Marius Berger
@@ -35,6 +35,6 @@ public class ConcurrencyErrorException extends ServiceBrokerErrorException {
 
     @Override
     public String getDescription() {
-        return "Another operation" + (StringUtils.isEmpty(objectName) ? "" : " for this " + objectName) + " is in progress.";
+        return "Another operation" + (ObjectUtils.isEmpty(objectName) ? "" : " for this " + objectName) + " is in progress.";
     }
 }

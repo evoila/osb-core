@@ -10,11 +10,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.authentication.configurers.provisioning.UserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AnonymousConfigurer;
-import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
-import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
-import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
-import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
+import org.springframework.security.config.annotation.web.configurers.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -31,6 +27,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @ExtendWith(MockitoExtension.class)
 class BasicAuthSecurityConfigurationTest {
@@ -121,9 +118,9 @@ class BasicAuthSecurityConfigurationTest {
         @Mock
         private HttpSecurity httpSecurity;
         @Mock
-        private ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry expressionInterceptUrlRegistry;
+        private AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry expressionInterceptUrlRegistry;
         @Mock
-        private ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl authorizedUrl;
+        private AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizedUrl authorizedUrl;
         @Mock
         private HttpBasicConfigurer<HttpSecurity> httpBasicConfigurer;
         @Mock
@@ -141,9 +138,9 @@ class BasicAuthSecurityConfigurationTest {
             @Test
             void withAuthorizeRequestsThrowing() throws Exception {
                 Exception expectedE = new Exception();
-                when(httpSecurity.antMatcher("/v2/**"))
+                when(httpSecurity.securityMatcher("/v2/**"))
                         .thenReturn(httpSecurity);
-                when(httpSecurity.authorizeRequests())
+                when(httpSecurity.authorizeHttpRequests())
                         .thenThrow(expectedE);
                 Exception e = assertThrows(Exception.class,
                                            () -> configuration.configure(httpSecurity));
@@ -155,25 +152,25 @@ class BasicAuthSecurityConfigurationTest {
         @Test
         void allMethodCallsVerified() throws Exception {
             // Mocks
-            when(httpSecurity.antMatcher("/v2/**"))
+            when(httpSecurity.securityMatcher("/v2/**"))
                     .thenReturn(httpSecurity);
-            when(httpSecurity.authorizeRequests())
+            when(httpSecurity.authorizeHttpRequests())
                     .thenReturn(expressionInterceptUrlRegistry);
-            when(expressionInterceptUrlRegistry.antMatchers("/v2/**"))
+            when(expressionInterceptUrlRegistry.requestMatchers("/v2/**"))
                     .thenReturn(authorizedUrl);
             when(authorizedUrl.authenticated())
                     .thenReturn(expressionInterceptUrlRegistry);
             when(expressionInterceptUrlRegistry.and())
                     .thenReturn(httpSecurity);
-            when(httpSecurity.httpBasic())
+            when(httpSecurity.httpBasic(withDefaults()))
                     .thenReturn(httpBasicConfigurer);
             when(httpBasicConfigurer.and())
                     .thenReturn(httpSecurity);
-            when(httpSecurity.anonymous())
+            when(httpSecurity.anonymous(withDefaults()))
                     .thenReturn(anonymousConfigurer);
             when(anonymousConfigurer.disable())
                     .thenReturn(httpSecurity);
-            when(httpSecurity.exceptionHandling())
+            when(httpSecurity.exceptionHandling(withDefaults()))
                     .thenReturn(exceptionHandlingConfigurer);
             doReturn(authenticationEntryPoint)
                     .when(configuration)
@@ -182,7 +179,7 @@ class BasicAuthSecurityConfigurationTest {
                     .thenReturn(exceptionHandlingConfigurer);
             when(exceptionHandlingConfigurer.and())
                     .thenReturn(httpSecurity);
-            when(httpSecurity.csrf())
+            when(httpSecurity.csrf(withDefaults()))
                     .thenReturn(csrfConfigurer);
             when(csrfConfigurer.disable())
                     .thenReturn(httpSecurity);

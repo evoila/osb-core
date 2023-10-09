@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import de.evoila.cf.broker.model.JobProgressResponse;
 import de.evoila.cf.broker.model.ResponseMessage;

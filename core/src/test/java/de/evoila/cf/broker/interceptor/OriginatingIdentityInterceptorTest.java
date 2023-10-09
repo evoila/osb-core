@@ -14,14 +14,14 @@ import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import java.lang.reflect.Method;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -114,7 +114,7 @@ class OriginatingIdentityInterceptorTest {
                     boolean result = interceptor.preHandle(request,
                                                            response,
                                                            handler);
-                    verifyZeroInteractions(response);
+                    verifyNoInteractions(response);
                     assertTrue(result);
                 }
 
@@ -125,7 +125,7 @@ class OriginatingIdentityInterceptorTest {
                     boolean result = interceptor.preHandle(request,
                                                            response,
                                                            handler);
-                    verifyZeroInteractions(response);
+                    verifyNoInteractions(response);
                     assertTrue(result);
                 }
 

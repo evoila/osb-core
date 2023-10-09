@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DeepMergeTest extends BaseTest {
     private Map<String, Object> sourceMap;  // initialized with Map.of, so it is immutable and we don't need an explicit check that it is not changed by the deepMerge method
