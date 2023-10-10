@@ -1,11 +1,13 @@
 package de.evoila.config.web;
 
+import de.evoila.cf.broker.bean.AuthenticationConfiguration;
 import de.evoila.cf.broker.bean.BaseAuthenticationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,20 +32,19 @@ public class BasicAuthSecurityConfiguration {
 
     @Bean
     InMemoryUserDetailsManager inMemoryAuthManager() throws Exception {
-        return new InMemoryUserDetailsManager(User.builder().username(authentication.getUsername()).build());
+        return new InMemoryUserDetailsManager(User.builder().username(authentication.getUsername()).password(authentication.getPassword()).build());
     }
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.securityMatcher("/v2/**")
-                .authorizeHttpRequests()
-                .requestMatchers("/v2/**").authenticated()
-                .and()
+                .authorizeHttpRequests((authz) -> authz
+                .requestMatchers("/v2/**").authenticated())
                 .httpBasic(withDefaults())
-                .anonymous(anonymous -> anonymous.disable())
+                .anonymous(AbstractHttpConfigurer::disable)
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(authenticationEntryPoint()))
-                .csrf(csrf -> csrf.disable());
+                .csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
 
