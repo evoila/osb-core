@@ -58,8 +58,8 @@ public class CredhubClient implements CredentialStore {
         if (EnvironmentUtils.isTestEnvironment(environment)) {
             SERVICE_BROKER_PREFIX += "test-";
         }
-
-        log.trace("Credhub Version is: " + this.credHubOperations.info().version().getVersion());
+        //TODO throws error on backup-manager start
+        //log.trace("Credhub Version is: " + this.credHubOperations.info().version().getVersion());
     }
 
     private SimpleCredentialName identifier(String instanceId, String valueName) {
