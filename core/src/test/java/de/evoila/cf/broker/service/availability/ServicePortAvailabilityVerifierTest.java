@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.exceptions.misusing.InvalidUseOfMatchersException;
-import org.mockito.internal.util.reflection.FieldSetter;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -48,14 +48,16 @@ class ServicePortAvailabilityVerifierTest {
     void setUp() {
         verifier = new ServicePortAvailabilityVerifier();
         try {
-            FieldSetter.setField(verifier,
-                    verifier.getClass().getDeclaredField("log"),
-                    log);
-            FieldSetter.setField(verifier,
-                    verifier.getClass().getDeclaredField("availabilityVerifier"),
-                    availabilityVerifier);
+            Field loggerField = verifier.getClass().getDeclaredField("log");
+            loggerField.setAccessible(true); // Make the field accessible
+            loggerField.set(verifier, log);
+            Field availabilityVerifierField = verifier.getClass().getDeclaredField("availabilityVerifier");
+            availabilityVerifierField.setAccessible(true); // Make the field accessible
+            availabilityVerifierField.set(verifier, availabilityVerifier);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException("Setting field failed", e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 

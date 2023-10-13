@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.internal.util.reflection.FieldSetter;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.ParameterizableViewController;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,9 +50,9 @@ class RequestIdentityInterceptorTest {
         interceptor = new RequestIdentityInterceptor();
         // Set a mocked logger to avoid cluttered logs
         try {
-            FieldSetter.setField(interceptor,
-                                 interceptor.getClass().getDeclaredField("log"),
-                                 log);
+            Field loggerField = interceptor.getClass().getDeclaredField("log");
+            loggerField.setAccessible(true); // Make the field accessible
+            loggerField.set(interceptor, log);
         } catch (Exception e) {
             throw new RuntimeException("Setting logger failed", e);
         }
