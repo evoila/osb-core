@@ -21,8 +21,8 @@ public class MapUtils {
                 Object value1 = map1.get(key);
                 if (value1 instanceof Map && value2 instanceof Map)
                     deepMerge((Map<String, Object>) value1, (Map<String, Object>) value2);
-                else if (value1 instanceof List && value2 instanceof List)
-                    map1.put(key, merge((List) value1, (List) value2));
+                else if (value1 instanceof List list && value2 instanceof List list2)
+                    map1.put(key, merge(list, list2));
                 else map1.put(key, value2);
             } else map1.put(key, value2);
         }

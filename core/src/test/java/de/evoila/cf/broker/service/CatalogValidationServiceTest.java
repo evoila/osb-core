@@ -7,18 +7,19 @@ import de.evoila.cf.broker.model.catalog.MaintenanceInfo;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.model.catalog.plan.Metadata;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.UUID;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
-public class CatalogValidationServiceTest {
+class CatalogValidationServiceTest {
 
     private Catalog catalog;
     private CatalogValidationService catalogValidationService;
@@ -28,8 +29,8 @@ public class CatalogValidationServiceTest {
      * Creates one service offering with three service plans.
      * The resulting test is supposed to be valid.
      */
-    @Before
-    public void initCatalog() {
+    @BeforeEach
+    void initCatalog() {
 
         Plan planA = getTestPlan(
                 UUID.randomUUID().toString(),
@@ -126,34 +127,34 @@ public class CatalogValidationServiceTest {
                         catalogValidationService.validateServicePlan(getServiceDefinition().getId(), plan));
             });
         } else {
-            assertFalse("Catalog should be invalid after changes to " + nameOfChangedObject + " but is not.",
-                    catalogValidationService.validateCatalog(catalog));
-            assertFalse("Service definition should be invalid after changes to " + nameOfChangedObject + " but is not.",
-                    catalogValidationService.validateServiceDefinition(getServiceDefinition()));
+            assertFalse(catalogValidationService.validateCatalog(catalog),
+                    "Catalog should be invalid after changes to " + nameOfChangedObject + " but is not.");
+            assertFalse(catalogValidationService.validateServiceDefinition(getServiceDefinition()),
+                    "Service definition should be invalid after changes to " + nameOfChangedObject + " but is not.");
 
             if (getServiceDefinition().getPlans() == null || getServiceDefinition().getPlans().isEmpty()) {
                 return;
             }
                 
             if (indexOfChangedPlan == 0) {
-                assertFalse("Plan A should be invalid after changes to " + nameOfChangedObject + " but is not.",
-                        catalogValidationService.validateServicePlan(getServiceDefinition().getId(), getPlan(0)));
+                assertFalse(catalogValidationService.validateServicePlan(getServiceDefinition().getId(), getPlan(0)),
+                        "Plan A should be invalid after changes to " + nameOfChangedObject + " but is not.");
             } else {
                 assertTrue("Plan A should still be valid after changes to " + nameOfChangedObject + " but is not.",
                         catalogValidationService.validateServicePlan(getServiceDefinition().getId(), getPlan(0)));
             }
 
             if (indexOfChangedPlan == 1) {
-                assertFalse("Plan B should be invalid after changes to " + nameOfChangedObject + " but is not.",
-                        catalogValidationService.validateServicePlan(getServiceDefinition().getId(), getPlan(1)));
+                assertFalse(catalogValidationService.validateServicePlan(getServiceDefinition().getId(), getPlan(1)),
+                        "Plan B should be invalid after changes to " + nameOfChangedObject + " but is not.");
             } else {
                 assertTrue("Plan B should still be valid after changes to " + nameOfChangedObject + " but is not.",
                         catalogValidationService.validateServicePlan(getServiceDefinition().getId(), getPlan(1)));
             }
 
             if (indexOfChangedPlan == 2) {
-                assertFalse("Plan C should be invalid after changes to " + nameOfChangedObject + " but is not.",
-                        catalogValidationService.validateServicePlan(getServiceDefinition().getId(), getPlan(2)));
+                assertFalse(catalogValidationService.validateServicePlan(getServiceDefinition().getId(), getPlan(2)),
+                        "Plan C should be invalid after changes to " + nameOfChangedObject + " but is not.");
             } else {
                 assertTrue("Plan C should still be valid after changes to " + nameOfChangedObject + " but is not.",
                         catalogValidationService.validateServicePlan(getServiceDefinition().getId(), getPlan(2)));
@@ -166,12 +167,12 @@ public class CatalogValidationServiceTest {
      * The catalog has to be created and initiated beforehand.
      */
     @Test
-    public void testValidDefault() {
+    void testValidDefault() {
         assertCatalogComponents(true, "", -1);
     }
 
     @Test
-    public void testInvalidPlans() {
+    void testInvalidPlans() {
         // Test non guid id
         Plan planInvalid = getPlan(0);
         planInvalid.setId("nonsense####");
@@ -210,7 +211,7 @@ public class CatalogValidationServiceTest {
     }
 
     @Test
-    public void testInvalidServiceDefinition() {
+    void testInvalidServiceDefinition() {
         // Test non guid id
         ServiceDefinition definitionInvalid = getServiceDefinition();
         definitionInvalid.setId("nonsense####");
@@ -254,36 +255,38 @@ public class CatalogValidationServiceTest {
     }
 
     @Test
-    public void testInvalidCatalog() {
+    void testInvalidCatalog() {
         // Test services equals null
         catalog.setServices(null);
-        assertFalse("Catalog has null for services list but passed validation.", catalogValidationService.validateCatalog(catalog));
+        assertFalse(catalogValidationService.validateCatalog(catalog), "Catalog has null for services list but passed validation.");
 
         // Test empty services list
         initCatalog();
         catalog.setServices(new LinkedList<>());
-        assertFalse("Catalog has no service definitions but passed validation.", catalogValidationService.validateCatalog(catalog));
+        assertFalse(catalogValidationService.validateCatalog(catalog), "Catalog has no service definitions but passed validation.");
     }
 
-    @Test(expected = CatalogIsNotValidException.class)
-    public void testValidationExceptionThrown() throws CatalogIsNotValidException {
-        CatalogService catalogService = new CatalogService() {
-            @Override
-            public Catalog getCatalog() {
-                Catalog catalog = new Catalog();
-                catalog.setServices(null);
-                return catalog;
-            }
+    @Test
+    void testValidationExceptionThrown() throws CatalogIsNotValidException {
+        assertThrows(CatalogIsNotValidException.class, () -> {
+            CatalogService catalogService = new CatalogService() {
+                @Override
+                public Catalog getCatalog() {
+                    Catalog catalog = new Catalog();
+                    catalog.setServices(null);
+                    return catalog;
+                }
 
-            @Override
-            public ServiceDefinition getServiceDefinition(String serviceId) {
-                return null;
-            }
-        };
-        catalogValidationService = new CatalogValidationService(catalogService);
-        catalogValidationService.setValidate(true);
-        catalogValidationService.setStrict(true);
+                @Override
+                public ServiceDefinition getServiceDefinition(String serviceId) {
+                    return null;
+                }
+            };
+            catalogValidationService = new CatalogValidationService(catalogService);
+            catalogValidationService.setValidate(true);
+            catalogValidationService.setStrict(true);
 
-        catalogValidationService.validate();
+            catalogValidationService.validate();
+        });
     }
 }

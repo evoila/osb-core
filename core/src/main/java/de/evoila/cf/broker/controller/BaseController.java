@@ -39,8 +39,8 @@ public abstract class BaseController {
         return new ResponseEntity<>(new ServiceBrokerErrorResponse(error, description), status);
     }
 
-    @ExceptionHandler({javax.validation.ValidationException.class})
-    public ResponseEntity handleException(javax.validation.ValidationException ex) {
+    @ExceptionHandler({jakarta.validation.ValidationException.class})
+    public ResponseEntity handleException(jakarta.validation.ValidationException ex) {
         return processErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

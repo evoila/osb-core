@@ -5,6 +5,7 @@ import de.evoila.cf.broker.model.catalog.Catalog;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 
 
+
 /**
  * Handles the catalog of services made available by this 
  * broker.

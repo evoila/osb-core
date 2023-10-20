@@ -6,10 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.FieldSetter;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +42,7 @@ import de.evoila.cf.security.utils.RandomString;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
-public class BaseTest {
+class BaseTest {
 
     /**
      * Subclass for making protected methods visible to the tests to make testing the public methods easier.
@@ -163,13 +163,13 @@ public class BaseTest {
     @BeforeEach
     void setUp() {
         try {
-            FieldSetter.setField(service,
-                                 service.getClass()         // TestBindingServiceImpl
-                                        .getSuperclass()    // BindingServiceImpl
-                                        .getDeclaredField("log"), //
-                                 log);
+            Field loggerField = service.getClass().getSuperclass().getDeclaredField("log");
+            loggerField.setAccessible(true); // Make the field accessible
+            loggerField.set(service, log);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException("Setting logger failed.", e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 

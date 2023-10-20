@@ -56,7 +56,7 @@ public class CustomManageController extends BaseController {
     }
 
     @PatchMapping(value = "/{serviceInstanceId}")
-    public ResponseEntity submit(@PathVariable("serviceInstanceId") String serviceInstanceId,
+    public ResponseEntity submit(@PathVariable String serviceInstanceId,
                                  @RequestBody Map<String, Object> request
     ) throws ServiceBrokerException,
             ServiceInstanceDoesNotExistException, ValidationException {
@@ -87,8 +87,8 @@ public class CustomManageController extends BaseController {
 
     @GetMapping(value = "/{serviceInstanceId}/last_operation")
     public ResponseEntity<JobProgressResponse> lastOperation(
-            @PathVariable("serviceInstanceId") String serviceInstanceId,
-            @RequestParam(value = "operation", required = false) String operation)
+            @PathVariable String serviceInstanceId,
+            @RequestParam(required = false) String operation)
             throws ServiceInstanceDoesNotExistException {
 
         JobProgressResponse jobProgressResponse;

@@ -144,8 +144,8 @@ public class JsonSchema {
     /**
      * This attribute is an object, which contains a possible default value;
      */
-    @JsonProperty(value = "default", required = false)
-    private Object defaultValue;
+    @JsonProperty("default")
+    private Object defaults;
 
     /**
      * This attribute is a string that provides a links related to description of the
@@ -176,7 +176,7 @@ public class JsonSchema {
      (Section 5.15).
      */
     @JsonProperty(value = "oneOf", required = true)
-    protected Set<Object> oneOf;
+    protected Set<JsonSchema> oneOf;
 
     // ArraySchema Section
     /**
@@ -242,12 +242,9 @@ public class JsonSchema {
     @JsonProperty
     private Boolean exclusiveMinimum;
 
-    /* Commenting out to see if this solves the problem of the osb not using default values
     @JsonProperty
     private Boolean additionalProperties;
-
-     */
-
+  
     /**This attribute defines the maximum value of the instance property*/
     @JsonProperty
     private Double maximum = null;
@@ -388,7 +385,6 @@ public class JsonSchema {
         this.disallow = disallow;
     }
 
-    /* Commenting out to see if this solves the problem of the osb not using default values
     public Boolean getAdditionalProperties() {
         return additionalProperties;
     }
@@ -396,8 +392,6 @@ public class JsonSchema {
     public void setAdditionalProperties(Boolean additionalProperties) {
         this.additionalProperties = additionalProperties;
     }
-
-     */
 
     public Boolean getReadonly() {
         return readonly;
@@ -431,12 +425,14 @@ public class JsonSchema {
         this.title = title;
     }
 
+    @JsonProperty
     public Object getDefault() {
-        return defaultValue;
+        return defaults;
     }
 
-    public void setDefault(Object defaultValue) {
-        this.defaultValue = defaultValue;
+    @JsonProperty
+    public void setDefault(Object defaults) {
+        this.defaults = defaults;
     }
 
     public LinkDescriptionObject[] getLinks() {
@@ -455,11 +451,11 @@ public class JsonSchema {
         this.enums = enums;
     }
 
-    public Set<Object> getOneOf() {
+    public Set<JsonSchema> getOneOf() {
         return oneOf;
     }
 
-    public void setOneOf(Set<Object> oneOf) {
+    public void setOneOf(Set<JsonSchema> oneOf) {
         this.oneOf = oneOf;
     }
 
@@ -676,8 +672,8 @@ public class JsonSchema {
                 Objects.equals(minLength, that.minLength) &&
                 Objects.equals(pattern, that.pattern) &&
                 Objects.equals(definitions, that.definitions) &&
-                //commented out temporarily to see if additionalProperties cause problems
-                //Objects.equals(additionalProperties, that.additionalProperties) &&
+                Objects.equals(additionalProperties, that.additionalProperties) &&
+
                 format == that.format;
     }
 
@@ -687,7 +683,7 @@ public class JsonSchema {
                 oneOf, additionalItems, items, maxItems, minItems, uniqueItems, exclusiveMaximum,
                 exclusiveMinimum, maximum, minimum, multipleOf, divisibleBy, required, minProperties,
                 maxProperties, dependencies, patternProperties, properties, maxLength, minLength,
-                pattern, definitions, format);
+                pattern, definitions, format, additionalProperties);
         result = 31 * result + Arrays.hashCode(disallow);
         result = 31 * result + Arrays.hashCode(links);
         return result;

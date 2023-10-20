@@ -2,8 +2,8 @@ package de.evoila.cf.security.openid;
 
 import de.evoila.cf.broker.model.DashboardClient;
 import de.evoila.cf.security.model.CompositeAccessToken;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.NameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -59,8 +59,7 @@ public class OpenIdAuthenticationUtils {
             token = template.exchange(oauthEndpoint + "/token",
                     HttpMethod.POST, new HttpEntity<>(form, headers), CompositeAccessToken.class);
         } catch (Exception ex) {
-            if (ex instanceof HttpClientErrorException) {
-                HttpClientErrorException castedEx = (HttpClientErrorException) ex;
+            if (ex instanceof HttpClientErrorException castedEx) {
                 log.debug("Getting or refreshing oauth token failed with code " +
                                 +castedEx.getRawStatusCode()
                                 + " "
@@ -82,9 +81,9 @@ public class OpenIdAuthenticationUtils {
 
     private static String getClientBasicAuthHeader(String clientId, String clientSecret) {
         try {
-            byte[] autbytes = Base64.encode(String.format("%s:%s", clientId, clientSecret).getBytes("UTF-8"));
+            byte[] autbytes = Base64.encode("%s:%s".formatted(clientId, clientSecret).getBytes("UTF-8"));
             String base64 = new String(autbytes);
-            return String.format("Basic %s", base64);
+            return "Basic %s".formatted(base64);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalArgumentException(e);
         }

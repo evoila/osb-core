@@ -2,7 +2,6 @@ package de.evoila.cf.broker.interceptor;
 
 
 import de.evoila.cf.broker.bean.CloudFoundryApplicationProperties;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,10 +16,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -123,7 +120,7 @@ public class ServiceInstancePermissionInterceptor implements HandlerInterceptor 
 
     private String getUserId() {
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        return jwtAuthenticationToken.getToken().containsClaim(USER_ID) ? jwtAuthenticationToken.getToken().getClaimAsString(USER_ID) : jwtAuthenticationToken.getToken().getClaim(SUB);
+        return jwtAuthenticationToken.getToken().hasClaim(USER_ID) ? jwtAuthenticationToken.getToken().getClaimAsString(USER_ID) : jwtAuthenticationToken.getToken().getClaim(SUB);
     }
 
     private String getUserToken() {

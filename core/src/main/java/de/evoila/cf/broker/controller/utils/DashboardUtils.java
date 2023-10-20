@@ -3,7 +3,7 @@
  */
 package de.evoila.cf.broker.controller.utils;
 
-import org.apache.http.util.TextUtils;
+import org.apache.hc.core5.util.TextUtils;
 
 import de.evoila.cf.broker.model.DashboardClient;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;

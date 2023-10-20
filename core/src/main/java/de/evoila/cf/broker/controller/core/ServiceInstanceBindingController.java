@@ -7,6 +7,7 @@ import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.annotations.ApiVersion;
 import de.evoila.cf.broker.model.annotations.ResponseAdvice;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
+import de.evoila.cf.broker.model.json.schema.utils.JsonSchemaUtils;
 import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.impl.BindingServiceImpl;
 import de.evoila.cf.broker.util.*;
@@ -17,8 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * @author Marco Di Martino, Johannes Hiemer
@@ -55,9 +56,9 @@ public class ServiceInstanceBindingController extends BaseController {
     @PutMapping(value = "/{instanceId}/service_bindings/{bindingId}")
     public ResponseEntity bindServiceInstance(
             @Pattern(regexp = UuidUtils.UUID_REGEX, message = UuidUtils.NOT_A_UUID_MESSAGE)
-            @PathVariable("instanceId") String instanceId,
+            @PathVariable String instanceId,
             @Pattern(regexp = UuidUtils.UUID_REGEX, message = UuidUtils.NOT_A_UUID_MESSAGE)
-            @PathVariable("bindingId") String bindingId,
+            @PathVariable String bindingId,
             @RequestHeader("X-Broker-API-Version") String apiHeader,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
@@ -77,6 +78,7 @@ public class ServiceInstanceBindingController extends BaseController {
             return processEmptyErrorResponse(HttpStatus.BAD_REQUEST);
 
         ServiceDefinition serviceDefinition = catalogService.getServiceDefinition(request.getServiceDefinitionId());
+
 
         if (!serviceDefinition.isPlanBindable(request.getPlanId())){
             return new ResponseEntity<>("Service Definition: " + request.getServiceDefinitionId() + " with Plan: "
@@ -105,8 +107,8 @@ public class ServiceInstanceBindingController extends BaseController {
 
     @ApiVersion({ApiVersions.API_213, ApiVersions.API_214, ApiVersions.API_215})
     @DeleteMapping(value = "/{instanceId}/service_bindings/{bindingId}")
-    public ResponseEntity unbind(@PathVariable("instanceId") String instanceId,
-                                         @PathVariable("bindingId") String bindingId, @RequestParam("service_id") String serviceId,
+    public ResponseEntity unbind(@PathVariable String instanceId,
+                                         @PathVariable String bindingId, @RequestParam("service_id") String serviceId,
                                          @RequestParam("plan_id") String planId, @RequestParam(value = "accepts_incomplete", required = false, defaultValue = "false") Boolean acceptsIncomplete,
                                          @RequestHeader("X-Broker-API-Version") String apiHeader,
                                          @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
@@ -144,13 +146,13 @@ public class ServiceInstanceBindingController extends BaseController {
     @ApiVersion({ApiVersions.API_214, ApiVersions.API_215})
     @GetMapping(value = "/{instanceId}/service_bindings/{bindingId}/last_operation")
     public ResponseEntity<JobProgressResponse> lastOperation(
-            @PathVariable("instanceId") String instanceId,
-            @PathVariable("bindingId") String bindingId,
+            @PathVariable String instanceId,
+            @PathVariable String bindingId,
             @RequestParam(value = "service_id", required = false) String serviceId,
             @RequestParam(value = "plan_id", required = false) String planId,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
-            @RequestHeader(value = "operation", required = false) String operation)
+            @RequestHeader(required = false) String operation)
             throws ServiceInstanceBindingDoesNotExistsException {
 
         JobProgressResponse jobProgressResponse;
@@ -165,8 +167,8 @@ public class ServiceInstanceBindingController extends BaseController {
     @ApiVersion({ApiVersions.API_214, ApiVersions.API_215})
     @GetMapping(value = "/{instanceId}/service_bindings/{bindingId}")
     public ResponseEntity fetch(
-            @PathVariable("instanceId") String instanceId,
-            @PathVariable("bindingId") String bindingId,
+            @PathVariable String instanceId,
+            @PathVariable String bindingId,
             @RequestHeader(value = "X-Broker-API-Originating-Identity", required = false) String originatingIdentity,
             @RequestHeader(value = "X-Broker-API-Request-Identity", required = false) String requestIdentity) throws
             ServiceInstanceBindingNotFoundException, ServiceBrokerException, ServiceDefinitionDoesNotExistException {

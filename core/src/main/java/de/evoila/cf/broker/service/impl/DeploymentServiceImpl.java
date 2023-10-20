@@ -4,15 +4,19 @@ package de.evoila.cf.broker.service.impl;
 import de.evoila.cf.broker.bean.BackupConfiguration;
 import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
+import de.evoila.cf.broker.controller.utils.ParameterUtil;
 import de.evoila.cf.broker.exception.*;
 import de.evoila.cf.broker.model.*;
 import de.evoila.cf.broker.model.catalog.ServiceDefinition;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
+import de.evoila.cf.broker.model.json.schema.JsonSchema;
+import de.evoila.cf.broker.model.json.schema.utils.JsonSchemaUtils;
 import de.evoila.cf.broker.repository.*;
 import de.evoila.cf.broker.service.*;
 import de.evoila.cf.broker.util.ParameterValidator;
 import de.evoila.cf.broker.util.ServiceInstanceUtils;
 import de.evoila.cf.security.utils.RandomString;
+import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.lang.Nullable;
 
-import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -104,7 +108,6 @@ public class DeploymentServiceImpl implements DeploymentService {
     public ServiceInstanceOperationResponse createServiceInstance(String serviceInstanceId,
             ServiceInstanceRequest request) throws ServiceInstanceExistsException, ServiceBrokerException,
             ServiceDefinitionDoesNotExistException, ValidationException, ServiceDefinitionPlanDoesNotExistException {
-
         serviceDefinitionRepository.validateServiceId(request.getServiceDefinitionId());
         Optional<ServiceInstance> serviceInstanceOptional = serviceInstanceRepository
                 .getServiceInstanceOptional(serviceInstanceId);
@@ -141,9 +144,23 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         Plan plan = serviceDefinitionRepository.getPlan(request.getServiceDefinitionId(), request.getPlanId());
 
-        if (request.getParameters() != null) {
-            ParameterValidator.validateParameters(request, plan, false);
+        if (request.getParameters() == null) {
+            request.setParameters(new HashMap<String, Object>());
         }
+
+        JsonSchema jsonSchema = ParameterUtil.resolve(() -> plan.getSchemas().getServiceInstance().getCreate().getParameters()).orElse(null);
+        if (jsonSchema != null) {
+                try {
+                    JsonSchemaUtils.defaults(jsonSchema, request.getParameters());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new SchemaException(e.getMessage());
+                }
+        }
+
+
+        ParameterValidator.validateParameters(request, plan, false);
+
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
         if (platformService == null) {
@@ -173,9 +190,21 @@ public class DeploymentServiceImpl implements DeploymentService {
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
         Plan plan = serviceDefinitionRepository.getPlan(request.getServiceDefinitionId(), request.getPlanId());
 
-        if (request.getParameters() != null) {
-            ParameterValidator.validateParameters(request, plan, true);
+        if (request.getParameters() == null) {
+            request.setParameters(new HashMap<String, Object>());
         }
+
+        JsonSchema jsonSchema = ParameterUtil.resolve(() -> plan.getSchemas().getServiceInstance().getUpdate().getParameters()).orElse(null);
+        if (jsonSchema != null) {
+                try{
+                    JsonSchemaUtils.defaults(jsonSchema, request.getParameters());
+                } catch (Exception e) {
+                    throw new SchemaException(e.getMessage(),e);
+                }
+            }
+
+            ParameterValidator.validateParameters(request, plan, true);
+
 
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
@@ -324,7 +353,6 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     public ServiceInstance syncCreateInstance(ServiceInstance serviceInstance, Map<String, Object> parameters,
             Plan plan, PlatformService platformService) throws ServiceBrokerException {
-
         // TODO: We need to decide which method we trigger when preCreateInstance fails
         try {
             serviceInstance = platformService.preCreateInstance(serviceInstance, plan);
@@ -406,4 +434,6 @@ public class DeploymentServiceImpl implements DeploymentService {
     public void updateInstanceInfo(ServiceInstance serviceInstance) {
         serviceInstanceRepository.updateServiceInstance(serviceInstance);
     }
+
+
 }

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class BaseTest {
+class BaseTest {
     Map<String, Object> destinationMap;
     Map<String, Object> originalDestinationMap; // immutable
 

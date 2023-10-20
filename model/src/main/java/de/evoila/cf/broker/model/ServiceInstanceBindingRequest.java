@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -84,7 +84,7 @@ public class ServiceInstanceBindingRequest {
 	 */
 	@Deprecated
 	public String getAppGuid() {
-		if (bindResource != null && !StringUtils.isEmpty(bindResource.getAppGuid())) {
+		if (bindResource != null && !ObjectUtils.isEmpty(bindResource.getAppGuid())) {
 			return bindResource.getAppGuid();
 		}
 		return appGuid;

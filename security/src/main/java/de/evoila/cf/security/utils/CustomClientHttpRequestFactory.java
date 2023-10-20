@@ -1,6 +1,6 @@
 package de.evoila.cf.security.utils;
 
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -14,14 +14,14 @@ public abstract class CustomClientHttpRequestFactory extends SimpleClientHttpReq
     //TODO: why overwrite this method?
     @Override
     protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
-        if (connection instanceof HttpsURLConnection) {
+        if (connection instanceof HttpsURLConnection lConnection) {
             try {
-                ((HttpsURLConnection) connection).setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
+                lConnection.setSSLSocketFactory(SSLContext.getDefault().getSocketFactory());
             } catch (NoSuchAlgorithmException ex) {
                 throw new IOException("Could not set Default SSL context", ex);
             }
 
-            ((HttpsURLConnection) connection).setHostnameVerifier(new NoopHostnameVerifier());
+            lConnection.setHostnameVerifier(new NoopHostnameVerifier());
         }
         super.prepareConnection(connection, httpMethod);
     }

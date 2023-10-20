@@ -7,7 +7,6 @@ import de.evoila.cf.broker.service.BindingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.internal.util.reflection.FieldSetter;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import de.evoila.cf.broker.model.JobProgress;
@@ -20,6 +19,8 @@ import de.evoila.cf.broker.service.CatalogService;
 import de.evoila.cf.broker.service.PlatformService;
 import de.evoila.cf.broker.service.impl.DeploymentServiceImpl;
 import de.evoila.cf.security.utils.RandomString;
+
+import java.lang.reflect.Field;
 
 @ExtendWith(MockitoExtension.class)
 class BaseTest {
@@ -90,11 +91,13 @@ class BaseTest {
                                             endpointConfiguration,
                                             backupConfiguration);
         try {
-            FieldSetter.setField(service,
-                                 service.getClass().getDeclaredField("randomString"),
-                                 randomString);
+            Field loggerField = service.getClass().getDeclaredField("randomString");
+            loggerField.setAccessible(true); // Make the field accessible
+            loggerField.set(service, randomString);
         } catch (NoSuchFieldException ex) {
             throw new RuntimeException("Mocking `randomString` failed.", ex);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 

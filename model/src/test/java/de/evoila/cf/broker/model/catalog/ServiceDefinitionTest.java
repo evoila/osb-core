@@ -2,50 +2,53 @@ package de.evoila.cf.broker.model.catalog;
 
 import de.evoila.cf.broker.exception.ServiceDefinitionPlanDoesNotExistException;
 import de.evoila.cf.broker.model.catalog.plan.Plan;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class ServiceDefinitionTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+class ServiceDefinitionTest {
 
     private static String HAPPY_PLAN_ID = "b2a46348-e0bb-4731-bc39-052033e47bc6";
     private ServiceDefinition serviceDefinition = new ServiceDefinition();
 
-    @Test(expected = ServiceDefinitionPlanDoesNotExistException.class)
-    public void getPlanThrows() throws ServiceDefinitionPlanDoesNotExistException {
-        serviceDefinition.isPlanBindable(HAPPY_PLAN_ID);
+    @Test
+    void getPlanThrows() throws ServiceDefinitionPlanDoesNotExistException {
+        assertThrows(ServiceDefinitionPlanDoesNotExistException.class, () -> {
+            serviceDefinition.isPlanBindable(HAPPY_PLAN_ID);
+        });
     }
 
     @Test
-    public void planIsBindable() throws ServiceDefinitionPlanDoesNotExistException {
+    void planIsBindable() throws ServiceDefinitionPlanDoesNotExistException {
         Plan plan = plan();
         plan.setBindable(true);
         serviceDefinition.setPlans(List.of(plan));
 
-        Assert.assertTrue("Should return true", serviceDefinition.isPlanBindable(HAPPY_PLAN_ID));
+        assertTrue(serviceDefinition.isPlanBindable(HAPPY_PLAN_ID), "Should return true");
     }
 
     @Test
-    public void serviceDefinitionIsBindable() throws ServiceDefinitionPlanDoesNotExistException {
+    void serviceDefinitionIsBindable() throws ServiceDefinitionPlanDoesNotExistException {
         Plan plan = plan();
         serviceDefinition.setBindable(true);
         serviceDefinition.setPlans(List.of(plan));
 
-        Assert.assertTrue("Should return true", serviceDefinition.isPlanBindable(HAPPY_PLAN_ID));
+        assertTrue(serviceDefinition.isPlanBindable(HAPPY_PLAN_ID), "Should return true");
     }
 
     @Test
-    public void isNotBindable() throws ServiceDefinitionPlanDoesNotExistException {
+    void isNotBindable() throws ServiceDefinitionPlanDoesNotExistException {
         Plan plan = plan();
         serviceDefinition.setPlans(List.of(plan));
 
-        Assert.assertFalse("Should be false", serviceDefinition.isPlanBindable(HAPPY_PLAN_ID));
+        assertFalse(serviceDefinition.isPlanBindable(HAPPY_PLAN_ID), "Should be false");
     }
 
 
     @Test
-    public void planIsUpdatable() throws ServiceDefinitionPlanDoesNotExistException {
+    void planIsUpdatable() throws ServiceDefinitionPlanDoesNotExistException {
         Plan plan = plan();
         plan.setPlanUpdateable(true);
         serviceDefinition.setPlans(List.of(plan));
@@ -54,7 +57,7 @@ public class ServiceDefinitionTest {
     }
 
     @Test
-    public void serviceDefinitionIsUpdatable() throws ServiceDefinitionPlanDoesNotExistException {
+    void serviceDefinitionIsUpdatable() throws ServiceDefinitionPlanDoesNotExistException {
         Plan plan = plan();
         serviceDefinition.setPlanUpdateable(true);
         serviceDefinition.setPlans(List.of(plan));
@@ -63,11 +66,11 @@ public class ServiceDefinitionTest {
     }
 
     @Test
-    public void isNotUpdatable() throws ServiceDefinitionPlanDoesNotExistException {
+    void isNotUpdatable() throws ServiceDefinitionPlanDoesNotExistException {
         Plan plan = plan();
         serviceDefinition.setPlans(List.of(plan));
 
-        Assert.assertFalse("Should be false", serviceDefinition.isPlanUpdatable(HAPPY_PLAN_ID));
+        assertFalse(serviceDefinition.isPlanUpdatable(HAPPY_PLAN_ID), "Should be false");
     }
 
     private Plan plan() {

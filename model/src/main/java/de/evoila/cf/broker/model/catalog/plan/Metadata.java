@@ -35,6 +35,8 @@ public class Metadata extends InstanceGroupConfig {
 
     private boolean active = true;
 
+    private boolean randomizeAzPlacement;
+
     public Metadata() {}
 
     public Metadata(int connections, int nodes, String vmType, String persistentDiskType, List<NetworkReference> networks,
@@ -126,6 +128,14 @@ public class Metadata extends InstanceGroupConfig {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isRandomizeAzPlacement() {
+        return randomizeAzPlacement;
+    }
+
+    public void setRandomizeAzPlacement(boolean randomizeAzPlacement) {
+        this.randomizeAzPlacement = randomizeAzPlacement;
     }
 
     @Override

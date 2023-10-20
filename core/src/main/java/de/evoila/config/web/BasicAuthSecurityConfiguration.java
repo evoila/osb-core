@@ -1,21 +1,26 @@
 package de.evoila.config.web;
 
+import de.evoila.cf.broker.bean.AuthenticationConfiguration;
 import de.evoila.cf.broker.bean.BaseAuthenticationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @Order(1)
-public class BasicAuthSecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class BasicAuthSecurityConfiguration {
 
     @Autowired
     private BaseAuthenticationConfiguration authentication;
@@ -25,27 +30,22 @@ public class BasicAuthSecurityConfiguration extends WebSecurityConfigurerAdapter
         return new BCryptPasswordEncoder();
     }
 
-    @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser(authentication.getUsername())
-                .password(passwordEncoder().encode(authentication.getPassword()))
-                .authorities("USER");
+    @Bean
+    InMemoryUserDetailsManager inMemoryAuthManager() throws Exception {
+        return new InMemoryUserDetailsManager(User.builder().username(authentication.getUsername()).password(authentication.getPassword()).build());
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.antMatcher("/v2/**")
-                .authorizeRequests()
-                .antMatchers("/v2/**").authenticated()
-                .and()
-                .httpBasic()
-                .and()
-                .anonymous().disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint())
-                .and()
-                .csrf().disable();
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.securityMatcher("/v2/**")
+                .authorizeHttpRequests((authz) -> authz
+                .requestMatchers("/v2/**").authenticated())
+                .httpBasic(withDefaults())
+                .anonymous(AbstractHttpConfigurer::disable)
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint(authenticationEntryPoint()))
+                .csrf(AbstractHttpConfigurer::disable);
+        return http.build();
     }
 
     @Bean (name = "basicAuthenticationEntryPoint")

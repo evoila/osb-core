@@ -33,12 +33,11 @@ public class BackupConfig {
         if (o == null || getClass() != o.getClass()) { return false; }
         BackupConfig that = (BackupConfig) o;
         return enabled == that.enabled &&
-               Objects.equals(instanceGroup, that.instanceGroup);
+                Objects.equals(instanceGroup, that.instanceGroup);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(instanceGroup, enabled);
     }
-
 }

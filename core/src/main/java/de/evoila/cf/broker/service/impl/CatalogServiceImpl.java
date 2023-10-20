@@ -49,6 +49,7 @@ public class CatalogServiceImpl implements CatalogService {
 		prepareCatalogIfTesting(catalog);
 	}
 
+
 	@Override
 	public Catalog getCatalog() {
 		return catalog;

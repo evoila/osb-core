@@ -1,13 +1,8 @@
 package de.evoila.cf.security.utils;
 
 import de.evoila.cf.security.keystore.KeyStoreHandler;
+import org.junit.jupiter.api.Test;
 
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.cert.*;
@@ -17,7 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CustomTrustManagerTest {
+class CustomTrustManagerTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -41,14 +36,14 @@ public class CustomTrustManagerTest {
     }
 
     @Test
-    public void getAcceptedIssuersReturnsArray() throws IOException, GeneralSecurityException {
+    void getAcceptedIssuersReturnsArray() throws IOException, GeneralSecurityException {
         CustomTrustManager customTrustManager = setUpCustomTrustManager(ca);
         X509Certificate[] result = customTrustManager.getAcceptedIssuers();
         assertTrue(result.length > 0);
     }
-    
+
     @Test
-    public void checkServerTrustedDoesNotThrowException() throws IOException, GeneralSecurityException {
+    void checkServerTrustedDoesNotThrowException() throws IOException, GeneralSecurityException {
         CustomTrustManager customTrustManager = setUpCustomTrustManager(ca);
         X509Certificate[] chain = new X509Certificate[]{
                 (X509Certificate) KeyStoreHandler.loadCertificate(serverCertificate),
@@ -57,7 +52,7 @@ public class CustomTrustManagerTest {
     }
 
     @Test
-    public void checkServerTrustedDoesThrowException() throws IOException, GeneralSecurityException {
+    void checkServerTrustedDoesThrowException() throws IOException, GeneralSecurityException {
         CustomTrustManager customTrustManager = setUpCustomTrustManager(null);
         X509Certificate[] chain = new X509Certificate[]{
                 (X509Certificate) KeyStoreHandler.loadCertificate(serverCertificate),
@@ -86,109 +81,49 @@ public class CustomTrustManagerTest {
         certificate.checkValidity();
     }
 
-    /**
-     * This server certificate is valid until September 8, 2031
-     */
-    private final static String serverCertificate = "-----BEGIN CERTIFICATE-----\n" +
-            "    MIIE1jCCAr6gAwIBAgIUehm+VCos+EcFyXHzXkJgci+RWbAwDQYJKoZIhvcNAQEL\n" +
-            "    BQAwajELMAkGA1UEBhMCREUxDjAMBgNVBAgMBU1haW56MQ8wDQYDVQQKDAZFdm9p\n" +
-            "    bGExHDAaBgNVBAsME09zYlRlc3RJbnRlcm1lZGlhdGUxHDAaBgNVBAMME09zYlRl\n" +
-            "    c3RJbnRlcm1lZGlhdGUwHhcNMjEwOTEwMTEzMzUyWhcNMzEwOTA4MTEzMzUyWjCB\n" +
-            "    jTElMCMGA1UEAxMcZXZvaWxhIHVuaXQgdGVzdCBjZXJ0aWZpY2F0ZTEXMBUGA1UE\n" +
-            "    CxMORGV2ZWxvcG1lbnQgQlUxCzAJBgNVBAYTAkRFMRgwFgYDVQQIEw9SaGVpbmxh\n" +
-            "    bmQtUGZhbHoxFDASBgNVBAoTC2V2b2lsYSBHbWJIMQ4wDAYDVQQHEwVNYWluejCC\n" +
-            "    ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAM2rQruvs/C9JEFS+ujS3DPo\n" +
-            "    weQFdsHkNvNxoTI+xKPahR58Cvjmb4U0nOq9Ulh77c8jFoFDojzjBR3eCxFaxZo2\n" +
-            "    8DECC+KLY1K2OMaKD8qh6xHWcJNnHmt1lYSU6NKOZXBQeoKfz0KIXS+Gt6+xrn0j\n" +
-            "    UYQyLaN3FG5iPcfSyUrwrjlp4exdr4dSTX3t/d14YtP0+5h9gdnudKRicQAEHulX\n" +
-            "    5xRxmAfybbiaUq7DWGvVCTTPuG6vz6spY/sjldlSqkHUhANAajZPWeN3nE2OfXJa\n" +
-            "    OqvDfXaNN3LLCRHcKaYnUbH0qZS/7+5Z0uXL7YBP571a8gddC2mo1x3aQTa4Xy0C\n" +
-            "    AwEAAaNQME4wHQYDVR0OBBYEFKmLp41Gqhc7Y+UqYzLqhmDtOC+tMB8GA1UdIwQY\n" +
-            "    MBaAFFGFm3+U8tWoeNEIghrPlIhL5j8mMAwGA1UdEwEB/wQCMAAwDQYJKoZIhvcN\n" +
-            "    AQELBQADggIBAMczlo+RqoXooxX1PaBAnM4MU2hcpENbu03tJe9p5JD8zOySIrGA\n" +
-            "    +Y+jtCoEccqSlW7LnPCLh6VZ5vdlj2Lhi6oX7GNI+b1MNk8wz9d8jgj4cLHiQwJv\n" +
-            "    YVXB0yfXnzsKQm4AQ1jUJBLqpNEG003hs58H1t74LYE+aYivniOVcDm+eAvgonk/\n" +
-            "    SB3NmqbdHZr+T1LOW0v6OElv6WuAresaXGfGKjEEvpAZrtO2EO9L82HETC6zOXmN\n" +
-            "    Pjh1S2tFUKFxisEuFmgWi59+oBWrXw3ge7OCsBW7unFrYsI2EHWsgbTBzdsCIWR2\n" +
-            "    t5tU5Q+YS2TDR4hiyGn3FVqjnBD3A1yt4ambeS3XU25TqyrgdWfMJS1F/nSzqZf8\n" +
-            "    um2AfYxpwrRhnxOzNg7qoTAVJiMhd8R6lTZdSkZWWEOKnksoAPxrBiZDa4D1OAFn\n" +
-            "    OClVWfw+Wy1F0y3nXoHwWTJq6wWOvRsv9A/Qx7nKjUxnDIngg4IHf8SDcV0moV7J\n" +
-            "    xomEfTRbhhvFt4u3clV+DoKHpa5qBJ/scVHChNRG6o4E9QlTCxuGHAK2et8BD4+B\n" +
-            "    onmA5xCwzPAlsx3hHmE1eMDkp6DQ6lp+VSAn5027ivGLy/VA5B3lEPpCVgCGkVBW\n" +
-            "    U9dDr1436A57fTYX1XC0VuDter9ZeqTRVpDe5V6qTuNsPBR0+VGTCfWF\n" +
-            "    -----END CERTIFICATE-----";
+    private final static String serverCertificate = """
+            -----BEGIN CERTIFICATE-----
+            MIIDPDCCAiSgAwIBAgIUU4SQUjV/4x5d0IZ6wGnAB3wXqG8wDQYJKoZIhvcNAQEL
+            BQAwGTEXMBUGA1UEAxMOZG5zLWFwaS10bHMtY2EwHhcNMjIwMzAxMTUxNTAwWhcN
+            MjMwMzAxMTUxNTAwWjAXMRUwEwYDVQQDEwxhcGkuYm9zaC1kbnMwggEiMA0GCSqG
+            SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDXh1v7y2qlc8q27uODhoujQ3ItderNDVwy
+            IPcosdkoUnKJZMeSdN3ER9u5dP1fpnkqTbA/a3ERciYFHlgRkqTdYpd8H/G3iwfE
+            9wetz5xVTlVQ/qw9aMUqvFFcyKOH3bWvT8x61xK3h9sLggDNE25hx4ICQruceN55
+            stDW+/x9fOrQgyjo0aPj31vCrVrJz/6EvGpTWKGIs5LYIPrLdXzT1MY+YCnHvf4l
+            PgqtmIC5LznjDMKN8kX41dcX3/S6fWa7gIoZc5eoxw7riUFLEoqq0Pvqn7MnnCLg
+            dnV+3mmaRwFPrihVUHzyRZnzo+czehaKgZUJUY/JCUXXScm8uDztAgMBAAGjfjB8
+            MB0GA1UdDgQWBBR9VTG35qYmmDnsrgfHnqdKk3TcajAXBgNVHREEEDAOggxhcGku
+            Ym9zaC1kbnMwEwYDVR0lBAwwCgYIKwYBBQUHAwIwHwYDVR0jBBgwFoAUZXJOM4bb
+            AA1NFIh0/sJJTjin4mgwDAYDVR0TAQH/BAIwADANBgkqhkiG9w0BAQsFAAOCAQEA
+            X6UMvmpYYWwHzJIgoN9glVsRx6CKnAKD2eiFPwuHLICV2D3QYoJvsBGZOz/GRb4V
+            JHg3dljfjjZFFDuwd3uSJWSgq3Bi2UdnbvKhbgxYO1PDA1wrbfWP0EQMZBjHQShl
+            CjdWiN6cT4vGyhA0DtMjXwWnZyZn9FxJEjhhOtGz8hGuT9LpzUb43yrOmoM6+REY
+            NrbwVVUrvY1wUiyothgzkgV1YJMGQwZLURL+FZZjjEc/k5R6Y+Srf2kv3JLUO5xp
+            m+GG0jhafEteNcQfPW6q+fqQy6JqxQ1TJFbzpWfLNj49H0kUxjWxJ+3IDb/dAQ/r
+            PNFjSgcpN2bCfTToqpZ9dw==
+            -----END CERTIFICATE-----\
+            """;
 
-    /**
-     * This intermediate certificate is valid until June 30, 2026
-     */
-    private final static String intermediateCertificate = "-----BEGIN CERTIFICATE-----\n" +
-            "MIIFqjCCA5KgAwIBAgICEAAwDQYJKoZIhvcNAQELBQAwXjELMAkGA1UEBhMCREUx\n" +
-            "DjAMBgNVBAgMBU1haW56MQ8wDQYDVQQKDAZFdm9pbGExFjAUBgNVBAsMDU9zYlRl\n" +
-            "c3RSb290Q2ExFjAUBgNVBAMMDU9zYlRlc3RSb290Q2EwHhcNMjEwNzAxMTUwNzM5\n" +
-            "WhcNMjYwNjMwMTUwNzM5WjBqMQswCQYDVQQGEwJERTEOMAwGA1UECAwFTWFpbnox\n" +
-            "DzANBgNVBAoMBkV2b2lsYTEcMBoGA1UECwwTT3NiVGVzdEludGVybWVkaWF0ZTEc\n" +
-            "MBoGA1UEAwwTT3NiVGVzdEludGVybWVkaWF0ZTCCAiIwDQYJKoZIhvcNAQEBBQAD\n" +
-            "ggIPADCCAgoCggIBANfpkOc6zQlOE6MtBtdZoyMou3zP7QmfThMlCtUA8BVwanqb\n" +
-            "GJwD6CpDvwQIyQQz7FfBYOegTsHpsqgMBuMrnAIpFXxnqQITpw05zbUmMoiCHhCw\n" +
-            "z81tUDh3c1XQY0hXpxoDlde7aMIzxmMGGL+r8hBsTUTqMNEedLb+UXPM0hDt9W0n\n" +
-            "W2j2XHznMSWJeKZaRdwLMHGY/mE4mqZ47r41jpK4+Gu/rBr8ztEc5jIW4XrbovBM\n" +
-            "SL5WBX8v+YTyCO0pMjC4c7745oEp57aNXkdPsxAKpYQwuZlyjRAdGIShw3eX2t9r\n" +
-            "i4SOFKUi/j2WF5aX662o23rqPNFO2y7LSbWjbxpN5GrISi4LGzlXovR4FqpcKAmC\n" +
-            "qywfHrhEZABsniLjX4BPcErQcV61cwPsJ2H/iaPC+0PNP+QRPm7OLY/SaP3LKrOI\n" +
-            "+VNaJ/+yPQE5ct1vrMmpIwTSt/g29d5Py1ZwoRXR/SFzYfpd9m5YtijuHlIGqmqE\n" +
-            "Har1lEyMNONdSfGhyrY3bd9jzhBBLUxYG3+GYo4qqsYlqgXmgpXfpvCbNmHVFGDQ\n" +
-            "irNdXzXuY9Mjk8XrIBQ1t9FV2p7EStigiLdID4p9XnokTKatpsFgZ11wv/iAaADo\n" +
-            "3IDQEA+hJDkAJj0Tfy+vuZxA3X/cUwFG31LBOZreBZeuJVuYxdpFudpKoyHBAgMB\n" +
-            "AAGjZjBkMB0GA1UdDgQWBBRRhZt/lPLVqHjRCIIaz5SIS+Y/JjAfBgNVHSMEGDAW\n" +
-            "gBRiXv2L+N9c1rrPeEmipoTKolD8hzASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1Ud\n" +
-            "DwEB/wQEAwIBhjANBgkqhkiG9w0BAQsFAAOCAgEAcxdxPXTXL/PKSFGADK+09iYE\n" +
-            "i1lOJTj8Bascvz5KL3CRbZ5eJYcFuR8jqpyF30F9utiUcBTDfCMCGnNb/Ys7PEki\n" +
-            "Fy1NwyWXj30xI/I6NTxSsnygtRe77OuiBSLGrUFuzZ61RWE0MCY407N9kBHz3sxA\n" +
-            "ZSOsPRUZ5bI9hdrfHBcYX67N6PXBrYSTO9GdvTfe6ZiDJ6LtMIn1CaSBlIvvxpJY\n" +
-            "PLW81LTGLCg0wReGwkD51ttoGnOzWOHUesbIAi9uGxVwCm+KGqFcmvuF6PtPxWHp\n" +
-            "r0PLzZ0HLCBDdB8mB+9XQvEPXpwSuwlktNjejGk4oxTrkUJyYsn15Khkq3gYHLoH\n" +
-            "rq4483y98Z4ICu6bfJUTi3rlsw9bfzuMthgYkNFFO+aTlcU36RKEFJqssO5yaRBm\n" +
-            "HnMdq1L4yGusFQSXeaMNHmcixFqJ3OZwL40OrDpB1XtxyEH5kcggE5e2E0Lpm9A+\n" +
-            "lfxf2pv+wdKkMw3ug0ke4Mh24M50SQTlDmi7+T9qiyRSeGwOo529MQsi7qFxuDyh\n" +
-            "TqfnK2TzVbTmriorDCUSDEQju+0nGqAtbxolFDbbXLC24UZE64mayEw9nA3T7fhE\n" +
-            "paNCIJRQ1zy1f5Ax8ZJa+QHgSUzqlt5aZLlBwghlPhKFvlUuMRgeH1nQGOzQKAAl\n" +
-            "zuSw9wzECa66pQxHcMo=\n" +
-            "-----END CERTIFICATE-----";
+    private final static String ca = """
+            -----BEGIN CERTIFICATE-----
+            MIIDEzCCAfugAwIBAgIURRkZmhg/gJ0TpoxQfbutR9nWg0YwDQYJKoZIhvcNAQEL
+            BQAwGTEXMBUGA1UEAxMOZG5zLWFwaS10bHMtY2EwHhcNMjIwMzAxMTUxNDU5WhcN
+            MzIwMjI3MTUxNDU5WjAZMRcwFQYDVQQDEw5kbnMtYXBpLXRscy1jYTCCASIwDQYJ
+            KoZIhvcNAQEBBQADggEPADCCAQoCggEBANVuMSZT5zlJcOUYBjsi9dsbXVqLi8zj
+            CQMba6aNwecu+pqsveyZwjv9ddgbjDmlb0FxzFqaBKPQDbiqWqLY9Y3kHuNupAyC
+            cQ3cVbTbFGxeCLeQWFHNQnO2vdgGhFEIRfcKuHgm8iAH3lj27rQq4ffwpENAWPiV
+            EpwdYhHOhuVBoUfF40B1c79bI3ELxWTBqlvOjQRWgSJ8mryfSOok6pbCd16WxHFa
+            6iyp0E3V89KrfkHmoE0IB3O5sFZOQLzKFnYMoTFtpBoDiiILPKcCMOeaS7oPmaee
+            gEAzGffEZPro900Afam9PtQJGysR9YlIByCV5qWrDaUYd/pkRNw0LZkCAwEAAaNT
+            MFEwHQYDVR0OBBYEFGVyTjOG2wANTRSIdP7CSU44p+JoMB8GA1UdIwQYMBaAFGVy
+            TjOG2wANTRSIdP7CSU44p+JoMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQEL
+            BQADggEBAJkqTQsJOfdL2UZ34IbHvExqkz5H1yMCGCmqQzCGpl9LtlQGpd3zZVPA
+            qDpHiM2j3oQHcDUCQHuNF5V+hxjzv5UNe6K+Mm+WCUQzsLHDNiSHOu+OHwn42kjJ
+            JntuvHY5HbrbOvpMTAQL9CvDIlIN7BkdEcm8WTq9rqhlBQx7ExKWjL+PkW1At2N6
+            HaFxOjAHjVcmiVYVO+qVPgN6UpY2SHVxBrDGrUr5NOJnyICp5uJjIO+qUzWl7SZY
+            BvLCMhL/BzPXLY1rjIzR3cVAU30B99pQcb46iYJN8P9HkhOV+xUf6WZRQQnTYiaK
+            UHrVBiuj+dGtooKgrKAS+RNAFWQimhw=
+            -----END CERTIFICATE-----\
+            """;
 
-    /**
-     * This ca certificate is valid until June 26, 2041
-     */
-    private final static String ca = "-----BEGIN CERTIFICATE-----\n" +
-            "MIIFojCCA4qgAwIBAgIJAIeqWPtJ8KdrMA0GCSqGSIb3DQEBCwUAMF4xCzAJBgNV\n" +
-            "BAYTAkRFMQ4wDAYDVQQIDAVNYWluejEPMA0GA1UECgwGRXZvaWxhMRYwFAYDVQQL\n" +
-            "DA1Pc2JUZXN0Um9vdENhMRYwFAYDVQQDDA1Pc2JUZXN0Um9vdENhMB4XDTIxMDcw\n" +
-            "MTEyNDE1NloXDTQxMDYyNjEyNDE1NlowXjELMAkGA1UEBhMCREUxDjAMBgNVBAgM\n" +
-            "BU1haW56MQ8wDQYDVQQKDAZFdm9pbGExFjAUBgNVBAsMDU9zYlRlc3RSb290Q2Ex\n" +
-            "FjAUBgNVBAMMDU9zYlRlc3RSb290Q2EwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAw\n" +
-            "ggIKAoICAQC7I9pDwfwtV7RmdFU8ZYOXY6xPi1Ejjr6F+z4OIQ2f76GIPKV/61hM\n" +
-            "SVBb0TI9rsT1QNCSUa4HK/6zdIRjJ2ndEkFA7tZDR75m6NrK5Xbq7p85dJMyvh+C\n" +
-            "ieoY8sSgTO1HLpGUcQdidQ/kRzc0Fz5CNuT6aGbqSCDb46YcOOz6OQYfwx3DpF7U\n" +
-            "o4CR4Bcb8WsWdbf9aVRpHhxVPi/EEx7lZZI/xRzH3OIWLTzNPoRda1EH9k8Xa9Yr\n" +
-            "v/IdA+wxIsIqQbVuLbiDxKtqH79WTFAzH5n9ikvWx5FU3AV/SgS1lrFedjGWv5uA\n" +
-            "R6exb3uoyAeuw3dnH9MkQ9kgWWJyXGvh3It+s0YQyTFAG9aQwTrzY0FAAeAfYvDM\n" +
-            "mNW+4n+RPAbKq+Ydo2hVadhT3Sof9ICJM60UzvLfvLMaWtt91W6Nqt8Jte+cLRUa\n" +
-            "whSE9Rbqbuqn8dZcxlhUVuQqcM0lkaJ40imsB1Eq3wRxjmRQ+2avYaKIOTY8Qz6B\n" +
-            "k5Sl+72BhD9J177oh/res0Cbq1x9FlGyFNDg7ucPRq4dSYbpD/TyceZ/qLtyOyS0\n" +
-            "fTxU+U+PI0qliVeZPZ5/gHgYDoob2zh5BAAcBHtMHdbA9bjxyeNYBu/K3h/NKNSe\n" +
-            "nq+LongxGP0FbO10b73yYcEG+GhlHslnaKUK9P8Lkrp1Ani5cUq3XQIDAQABo2Mw\n" +
-            "YTAdBgNVHQ4EFgQUYl79i/jfXNa6z3hJoqaEyqJQ/IcwHwYDVR0jBBgwFoAUYl79\n" +
-            "i/jfXNa6z3hJoqaEyqJQ/IcwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMC\n" +
-            "AYYwDQYJKoZIhvcNAQELBQADggIBABTP+UyYJArgFZ7z2yPWPLMWAP3VWVJs0JSV\n" +
-            "/A0d4FJQJ1pYE+XQzi+enNv3eMJdzcpKs+xF4R9ZqOkV5h6M+Xcl/CJZoY6B6mqR\n" +
-            "sGJP7B0PT915YQDx9uGR5PZcOeU0QMh+Il1ZpZK2uc3rJDsaWbIk5yM8qPUg1hHu\n" +
-            "xoalEOO23owiz0sAH/ilic+2EXD8GFpJus/kJfqskAM+TPiNLVIvSW/NuRpi7ra1\n" +
-            "al2mfNHeDkz/wK7Ij4AaKr2ApHekGatLx08r8MSN79hNX8xa3FvmczF2lhaNJ4Qt\n" +
-            "wrtIATABKMMEOqCAQ0053EMIyCI8qZvcVsfbLCx0dLDz5jm7WvmweNJwJ0YAaR4l\n" +
-            "NGfzzgL8xja6RlPWKdty9R6SliEehyWEIGETQl67yH9krhzePqiplxwHPMic9Hxs\n" +
-            "XSD8dxBpTI3qh72sLQ0baYL2yNvDJ8s51kNg9Z5eeO2PM1kRyktev0CNbcN8HsO2\n" +
-            "hbB5jf8u/BOQpawYXZZBq0bFQBdcvCPR1P9AOEPKettpCrL6bI8Fl2nvKVRfe04g\n" +
-            "TU7d85ZKb/LefcDkdzL0OjDF+TA3YOaSsdpzrsHOaTtqhjvBl1UCOvfKO8VsHtit\n" +
-            "TcL5YjjSbq4bB8/0+hyQwiEFHSJtVV+l77C+lqEAZCBYdZWyapyRew/vB0Cj57Ax\n" +
-            "KfVBvDgm\n" +
-            "-----END CERTIFICATE-----";
 }

@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.evoila.cf.broker.model.json.schema.JsonSchema;
 import de.evoila.cf.broker.util.ParameterValidator;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.internal.util.reflection.FieldSetter;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -98,11 +98,13 @@ public class BaseTest {
     void replaceObjectMapperWithSpy() {
         mockedObjectMapper = spy(new ObjectMapper());
         try {
-            FieldSetter.setField(ParameterValidator.class,
-                    ParameterValidator.class.getDeclaredField("objectMapper"),
-                    mockedObjectMapper);
+            Field loggerField = ParameterValidator.class.getDeclaredField("objectMapper");
+            loggerField.setAccessible(true); // Make the field accessible
+            loggerField.set(ParameterValidator.class, mockedObjectMapper);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException("Setting field failed", e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 }
