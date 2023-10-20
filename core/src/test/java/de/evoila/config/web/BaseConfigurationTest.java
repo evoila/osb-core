@@ -1,5 +1,6 @@
 package de.evoila.config.web;
 
+import de.evoila.cf.broker.interceptor.ServiceInstancePermissionInterceptor;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,15 +79,23 @@ class BaseConfigurationTest {
                     .thenReturn(interceptorRegistration);
             when(interceptorRegistration.addPathPatterns("/**"))
                     .thenReturn(interceptorRegistration);
+            when(interceptorRegistration.addPathPatterns("/custom/**"))
+                    .thenReturn(interceptorRegistration);
             when(interceptorRegistration.excludePathPatterns("/resources/**"))
+                    .thenReturn(interceptorRegistration);
+            when(interceptorRegistration.excludePathPatterns("/custom/v2/authentication/{serviceInstanceId}/confirm", "/custom/v2/authentication/{serviceInstanceId}", "/resources/**"))
                     .thenReturn(interceptorRegistration);
             configuration.addInterceptors(interceptorRegistry);
             verify(interceptorRegistration, times(3))
                     .addPathPatterns("/**");
             verify(interceptorRegistration, times(3))
                     .excludePathPatterns("/resources/**");
+            verify(interceptorRegistration, times(1))
+                    .addPathPatterns("/custom/**");
+            verify(interceptorRegistration, times(1))
+                    .excludePathPatterns("/custom/v2/authentication/{serviceInstanceId}/confirm", "/custom/v2/authentication/{serviceInstanceId}", "/resources/**");
             ArgumentCaptor<HandlerInterceptor> interceptorCaptor = ArgumentCaptor.forClass(HandlerInterceptor.class);
-            verify(interceptorRegistry, times(3))
+            verify(interceptorRegistry, times(4))
                     .addInterceptor(interceptorCaptor.capture());
             verifyNoMoreInteractions(interceptorRegistry,
                                      interceptorRegistration);
@@ -94,6 +103,7 @@ class BaseConfigurationTest {
             assertSame(ApiVersionInterceptor.class, capturedValues.get(0).getClass());
             assertSame(OriginatingIdentityInterceptor.class, capturedValues.get(1).getClass());
             assertSame(RequestIdentityInterceptor.class, capturedValues.get(2).getClass());
+            assertSame(ServiceInstancePermissionInterceptor.class, capturedValues.get(3).getClass());
         }
 
     }

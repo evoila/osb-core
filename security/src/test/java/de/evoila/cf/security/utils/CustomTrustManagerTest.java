@@ -3,11 +3,9 @@ package de.evoila.cf.security.utils;
 import de.evoila.cf.security.keystore.KeyStoreHandler;
 import org.junit.jupiter.api.Test;
 
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
+import java.security.cert.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -16,14 +14,25 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CustomTrustManagerTest {
 
-    private CustomTrustManager setUpCustomTrustManager(String ca) throws GeneralSecurityException, IOException {
-        Collection<Certificate> certificates;
-        if (ca != null) {
-            certificates = List.of(KeyStoreHandler.loadCertificate(ca));
-        } else {
-            certificates = Collections.emptyList();
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        try {
+            checkCertificateValidity(ca);
+        } catch (CertificateExpiredException e) {
+            fail("The CA certificate is expired. Please update the certificate in this test class!");
         }
-        return new CustomTrustManager(certificates);
+
+        try {
+            checkCertificateValidity(serverCertificate);
+        } catch (CertificateExpiredException e) {
+            fail("The server certificate is expired. Please update the certificate in this test class!");
+        }
+
+        try {
+            checkCertificateValidity(intermediateCertificate);
+        } catch (CertificateExpiredException e) {
+            fail("The intermediate certificate is expired. Please update the certificate in this test class!");
+        }
     }
 
     @Test
@@ -36,17 +45,41 @@ class CustomTrustManagerTest {
     @Test
     void checkServerTrustedDoesNotThrowException() throws IOException, GeneralSecurityException {
         CustomTrustManager customTrustManager = setUpCustomTrustManager(ca);
-        X509Certificate[] chain = new X509Certificate[]{(X509Certificate) KeyStoreHandler.loadCertificate(serverCertificate)};
+        X509Certificate[] chain = new X509Certificate[]{
+                (X509Certificate) KeyStoreHandler.loadCertificate(serverCertificate),
+                (X509Certificate) KeyStoreHandler.loadCertificate(intermediateCertificate)};
         assertDoesNotThrow(() -> customTrustManager.checkServerTrusted(chain, "ECDHE_RSA"));
     }
 
     @Test
     void checkServerTrustedDoesThrowException() throws IOException, GeneralSecurityException {
         CustomTrustManager customTrustManager = setUpCustomTrustManager(null);
-        X509Certificate[] chain = new X509Certificate[]{(X509Certificate) KeyStoreHandler.loadCertificate(serverCertificate)};
+        X509Certificate[] chain = new X509Certificate[]{
+                (X509Certificate) KeyStoreHandler.loadCertificate(serverCertificate),
+                (X509Certificate) KeyStoreHandler.loadCertificate(intermediateCertificate)};
         assertThrows(GeneralSecurityException.class, () -> customTrustManager.checkServerTrusted(chain, "ECDHE_RSA"));
     }
 
+    private CustomTrustManager setUpCustomTrustManager(String ca) throws GeneralSecurityException, IOException {
+        Collection<Certificate> certificates;
+        if (ca != null) {
+            certificates = List.of(KeyStoreHandler.loadCertificate(ca));
+        } else {
+            certificates = Collections.emptyList();
+        }
+        return new CustomTrustManager(certificates);
+    }
+
+    private static void checkCertificateValidity(String serverCertificate) throws CertificateException {
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        ByteArrayInputStream bytes = new ByteArrayInputStream(serverCertificate.getBytes());
+        X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(bytes);
+        checkCertificateValidity(certificate);
+    }
+
+    private static void checkCertificateValidity(X509Certificate certificate) throws CertificateNotYetValidException, CertificateExpiredException {
+        certificate.checkValidity();
+    }
 
     private final static String serverCertificate = """
             -----BEGIN CERTIFICATE-----
@@ -92,4 +125,5 @@ class CustomTrustManagerTest {
             UHrVBiuj+dGtooKgrKAS+RNAFWQimhw=
             -----END CERTIFICATE-----\
             """;
+
 }

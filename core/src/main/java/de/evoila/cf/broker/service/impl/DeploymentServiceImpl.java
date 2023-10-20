@@ -1,6 +1,8 @@
 
 package de.evoila.cf.broker.service.impl;
 
+import de.evoila.cf.broker.bean.BackupConfiguration;
+import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.broker.controller.utils.DashboardUtils;
 import de.evoila.cf.broker.controller.utils.ParameterUtil;
 import de.evoila.cf.broker.exception.*;
@@ -18,7 +20,12 @@ import org.everit.json.schema.SchemaException;
 import org.everit.json.schema.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.lang.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -51,11 +58,16 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     private RandomString randomString = new RandomString();
 
+    private EndpointConfiguration endpointConfiguration;
+
+    private BackupConfiguration backupConfiguration;
+
     public DeploymentServiceImpl(PlatformRepository platformRepository,
             ServiceDefinitionRepository serviceDefinitionRepository,
             ServiceInstanceRepository serviceInstanceRepository, JobRepository jobRepository,
             BindingRepository bindingRepository, AsyncDeploymentService asyncDeploymentService,
-            BindingService bindingService, CatalogService catalogService) {
+            BindingService bindingService, CatalogService catalogService,
+            EndpointConfiguration endpointConfiguration, @Nullable BackupConfiguration backupConfiguration) {
         this.platformRepository = platformRepository;
         this.serviceDefinitionRepository = serviceDefinitionRepository;
         this.serviceInstanceRepository = serviceInstanceRepository;
@@ -64,6 +76,8 @@ public class DeploymentServiceImpl implements DeploymentService {
         this.asyncDeploymentService = asyncDeploymentService;
         this.bindingService = bindingService;
         this.catalogService = catalogService;
+        this.endpointConfiguration = endpointConfiguration;
+        this.backupConfiguration = backupConfiguration;
     }
 
     @Override
@@ -246,6 +260,10 @@ public class DeploymentServiceImpl implements DeploymentService {
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
 
+        if(this.backupConfiguration != null && plan.getMetadata().getBackup() != null && plan.getMetadata().getBackup().isEnabled()) {
+            deleteRelatedBackupData(serviceInstance.getId());
+        }
+
         // Will cause a NPE, if there is no JobProgress object. To fix this, the
         // JobRepository has to be touched.
         JobProgress jobProgress = jobRepository.getJobProgressByReferenceId(instanceId);
@@ -275,6 +293,31 @@ public class DeploymentServiceImpl implements DeploymentService {
         } catch (Exception e) {
             log.error("Error while Deleting Binding ", e);
         }
+    }
+
+    private void deleteRelatedBackupData(String serviceInstanceId) {
+        //Not sure if this is good practice just taking the first element?
+        String backupManagerUrl = endpointConfiguration.getCustom().get(0).getUrl();
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Authorization", "Basic " + encodeCredentials(backupConfiguration.getUsername(),
+                backupConfiguration.getPassword()));
+        HttpEntity entity = new HttpEntity(httpHeaders);
+
+        //Delete related backupJobs
+        restTemplate.exchange(backupManagerUrl + "/backupJobs/byInstance/" + serviceInstanceId,
+                HttpMethod.DELETE, entity, String.class);
+        //Delete related backupPlans
+        restTemplate.exchange(backupManagerUrl + "/backupPlans/byInstance/" + serviceInstanceId,
+                HttpMethod.DELETE, entity, String.class);
+        //Delete related destinations
+        restTemplate.exchange(backupManagerUrl + "/fileDestinations/byInstance/" + serviceInstanceId,
+                HttpMethod.DELETE, entity, String.class);
+    }
+
+    private String encodeCredentials(String username, String password) {
+        return Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
     }
 
     @Override

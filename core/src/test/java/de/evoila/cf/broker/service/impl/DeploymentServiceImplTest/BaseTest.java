@@ -1,5 +1,7 @@
 package de.evoila.cf.broker.service.impl.DeploymentServiceImplTest;
 
+import de.evoila.cf.broker.bean.BackupConfiguration;
+import de.evoila.cf.broker.bean.EndpointConfiguration;
 import de.evoila.cf.broker.repository.*;
 import de.evoila.cf.broker.service.BindingService;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +36,12 @@ class BaseTest {
     static final String     HAPPY_ORGANIZATION_GUID     = "13f603e5-570a-4dfe-93c2-7ac6dd114924";
     static final String     HAPPY_SPACE_GUID            = "a4ea7a0f-d6a8-451e-a4a7-829094d46a6e";
     static final Platform   HAPPY_PLATFORM              = Platform.EXISTING_SERVICE;
+
+    @Mock
+    EndpointConfiguration endpointConfiguration;
+
+    @Mock
+    BackupConfiguration backupConfiguration;
 
     @Mock
     PlatformRepository platformRepository;
@@ -79,7 +87,9 @@ class BaseTest {
                                             bindingRepository,
                                             asyncDeploymentService,
                                             bindingService,
-                                            catalogService);
+                                            catalogService,
+                                            endpointConfiguration,
+                                            backupConfiguration);
         try {
             Field loggerField = service.getClass().getDeclaredField("randomString");
             loggerField.setAccessible(true); // Make the field accessible

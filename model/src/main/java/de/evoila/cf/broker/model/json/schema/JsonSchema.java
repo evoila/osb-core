@@ -244,7 +244,7 @@ public class JsonSchema {
 
     @JsonProperty
     private Boolean additionalProperties;
-
+  
     /**This attribute defines the maximum value of the instance property*/
     @JsonProperty
     private Double maximum = null;
@@ -388,6 +388,7 @@ public class JsonSchema {
     public Boolean getAdditionalProperties() {
         return additionalProperties;
     }
+
     public void setAdditionalProperties(Boolean additionalProperties) {
         this.additionalProperties = additionalProperties;
     }
@@ -672,6 +673,7 @@ public class JsonSchema {
                 Objects.equals(pattern, that.pattern) &&
                 Objects.equals(definitions, that.definitions) &&
                 Objects.equals(additionalProperties, that.additionalProperties) &&
+
                 format == that.format;
     }
 
