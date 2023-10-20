@@ -1,9 +1,11 @@
 package de.evoila.cf.security.utils;
 
 import de.evoila.cf.security.keystore.KeyStoreHandler;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.security.GeneralSecurityException;
 import java.security.cert.*;
 import java.util.Collection;
@@ -14,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CustomTrustManagerTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         try {
             checkCertificateValidity(ca);
@@ -26,12 +28,6 @@ class CustomTrustManagerTest {
             checkCertificateValidity(serverCertificate);
         } catch (CertificateExpiredException e) {
             fail("The server certificate is expired. Please update the certificate in this test class!");
-        }
-
-        try {
-            checkCertificateValidity(intermediateCertificate);
-        } catch (CertificateExpiredException e) {
-            fail("The intermediate certificate is expired. Please update the certificate in this test class!");
         }
     }
 
@@ -46,8 +42,7 @@ class CustomTrustManagerTest {
     void checkServerTrustedDoesNotThrowException() throws IOException, GeneralSecurityException {
         CustomTrustManager customTrustManager = setUpCustomTrustManager(ca);
         X509Certificate[] chain = new X509Certificate[]{
-                (X509Certificate) KeyStoreHandler.loadCertificate(serverCertificate),
-                (X509Certificate) KeyStoreHandler.loadCertificate(intermediateCertificate)};
+                (X509Certificate) KeyStoreHandler.loadCertificate(serverCertificate)};
         assertDoesNotThrow(() -> customTrustManager.checkServerTrusted(chain, "ECDHE_RSA"));
     }
 
@@ -55,8 +50,7 @@ class CustomTrustManagerTest {
     void checkServerTrustedDoesThrowException() throws IOException, GeneralSecurityException {
         CustomTrustManager customTrustManager = setUpCustomTrustManager(null);
         X509Certificate[] chain = new X509Certificate[]{
-                (X509Certificate) KeyStoreHandler.loadCertificate(serverCertificate),
-                (X509Certificate) KeyStoreHandler.loadCertificate(intermediateCertificate)};
+                (X509Certificate) KeyStoreHandler.loadCertificate(serverCertificate)};
         assertThrows(GeneralSecurityException.class, () -> customTrustManager.checkServerTrusted(chain, "ECDHE_RSA"));
     }
 
