@@ -31,8 +31,12 @@ public class BasicAuthSecurityConfiguration {
     }
 
     @Bean
-    InMemoryUserDetailsManager inMemoryAuthManager() throws Exception {
-        return new InMemoryUserDetailsManager(User.builder().username(authentication.getUsername()).password(authentication.getPassword()).build());
+    InMemoryUserDetailsManager inMemoryAuthManager(PasswordEncoder passwordEncoder) throws Exception {
+        return new InMemoryUserDetailsManager(User
+                .builder()
+                .username(authentication.getUsername())
+                .password(passwordEncoder.encode(authentication.getPassword()))
+                .build());
     }
 
     @Bean
