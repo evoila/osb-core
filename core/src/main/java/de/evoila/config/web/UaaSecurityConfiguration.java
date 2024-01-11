@@ -27,7 +27,7 @@ public class UaaSecurityConfiguration {
 
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain uaaFilterChain(HttpSecurity http) throws Exception {
         http.securityMatchers(matchers -> matchers
                 .requestMatchers("/custom/**"))
                 .cors(withDefaults())
