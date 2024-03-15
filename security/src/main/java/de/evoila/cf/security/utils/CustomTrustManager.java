@@ -104,7 +104,7 @@ public class CustomTrustManager implements X509TrustManager {
         }
 
         if (defaultException != null) {
-            throw new CertificateException("Default and custom truststore do not trust the certificate ", defaultException);
+            throw new CertificateException("Default truststore can not trust the certificate and custom trust manager is null.", defaultException);
         }
 
         //This should never happen, as a default truststore should always be present.
