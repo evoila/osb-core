@@ -2,6 +2,7 @@ package de.evoila.cf.security.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.client.ResourceAccessException;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -87,6 +88,8 @@ public class CustomTrustManager implements X509TrustManager {
                 return;
             } catch (CertificateException ex) {
                 defaultCertificateException = ex;
+            } catch (ResourceAccessException ex) {
+                defaultCertificateException = new CertificateException(ex);
             }
         }
 
@@ -94,9 +97,9 @@ public class CustomTrustManager implements X509TrustManager {
             try {
                 customTrustManager.checkServerTrusted(chain, authType);
                 return;
-            } catch (CertificateException e) {
+            } catch (CertificateException | ResourceAccessException e) {
                 log.trace("Custom trust manager did not know the certificate ", e);
-                throw new CertificateException("Default and custom truststore trust the certificate ", e);
+                throw new CertificateException("Default and custom truststore do not trust the certificate ", e);
             }
         }
 
