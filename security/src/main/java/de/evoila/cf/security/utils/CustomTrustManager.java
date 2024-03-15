@@ -56,6 +56,7 @@ public class CustomTrustManager implements X509TrustManager {
                 defaultTrustManager.checkClientTrusted(chain, authType);
                 return;
             } catch (CertificateException e) {
+                // TODO: Similar to checkServerTrusted, add catch of more exceptions
                 log.trace("Default trust manager did not know the certificate ", e);
                 defaultCertificateException = e;
             }
@@ -81,15 +82,14 @@ public class CustomTrustManager implements X509TrustManager {
 
     @Override
     public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        CertificateException defaultCertificateException = null;
+        Exception defaultException = null;
         if (defaultTrustManager != null) {
             try {
                 defaultTrustManager.checkServerTrusted(chain, authType);
                 return;
-            } catch (CertificateException ex) {
-                defaultCertificateException = ex;
-            } catch (ResourceAccessException ex) {
-                defaultCertificateException = new CertificateException(ex);
+            } catch (Exception ex) {
+                log.trace("Default trust manager did not know the certificate ", ex);
+                defaultException = ex;
             }
         }
 
@@ -97,14 +97,14 @@ public class CustomTrustManager implements X509TrustManager {
             try {
                 customTrustManager.checkServerTrusted(chain, authType);
                 return;
-            } catch (CertificateException | ResourceAccessException e) {
+            } catch (Exception e) {
                 log.trace("Custom trust manager did not know the certificate ", e);
                 throw new CertificateException("Default and custom truststore do not trust the certificate ", e);
             }
         }
 
-        if (defaultCertificateException != null) {
-            throw defaultCertificateException;
+        if (defaultException != null) {
+            throw new CertificateException("Default and custom truststore do not trust the certificate ", defaultException);
         }
 
         //This should never happen, as a default truststore should always be present.
