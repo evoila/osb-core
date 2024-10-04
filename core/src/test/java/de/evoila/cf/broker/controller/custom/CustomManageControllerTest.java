@@ -203,11 +203,11 @@ class CustomManageControllerTest {
             when(serviceInstance.getPlanId())
                     .thenReturn(HAPPY_PLAN_ID);
             HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
-            when(httpServletRequest.getAttribute("javax.servlet.include.context_path"))
+            when(httpServletRequest.getAttribute("jakarta.servlet.include.context_path"))
                     .thenReturn("CONTEXT");
-            when(httpServletRequest.getAttribute("javax.servlet.include.request_uri"))
+            when(httpServletRequest.getAttribute("jakarta.servlet.include.request_uri"))
                     .thenReturn("URI");
-            when(httpServletRequest.getAttribute("javax.servlet.include.servlet_path"))
+            when(httpServletRequest.getAttribute("jakarta.servlet.include.servlet_path"))
                     .thenReturn("SERVLET");
             ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(httpServletRequest);
             RequestContextHolder.setRequestAttributes(servletRequestAttributes);
