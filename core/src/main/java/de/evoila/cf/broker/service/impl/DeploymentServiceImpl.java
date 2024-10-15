@@ -302,15 +302,19 @@ public class DeploymentServiceImpl implements DeploymentService {
                 backupConfiguration.getPassword()));
         HttpEntity entity = new HttpEntity(httpHeaders);
 
-        //Delete related backupJobs
-        restTemplate.exchange(backupManagerUrl + "/backupJobs/byInstance/" + serviceInstanceId,
-                HttpMethod.DELETE, entity, String.class);
-        //Delete related backupPlans
-        restTemplate.exchange(backupManagerUrl + "/backupPlans/byInstance/" + serviceInstanceId,
-                HttpMethod.DELETE, entity, String.class);
-        //Delete related destinations
-        restTemplate.exchange(backupManagerUrl + "/fileDestinations/byInstance/" + serviceInstanceId,
-                HttpMethod.DELETE, entity, String.class);
+        try {
+            //Delete related backupJobs
+            restTemplate.exchange(backupManagerUrl + "/backupJobs/byInstance/" + serviceInstanceId,
+                    HttpMethod.DELETE, entity, String.class);
+            //Delete related backupPlans
+            restTemplate.exchange(backupManagerUrl + "/backupPlans/byInstance/" + serviceInstanceId,
+                    HttpMethod.DELETE, entity, String.class);
+            //Delete related destinations
+            restTemplate.exchange(backupManagerUrl + "/fileDestinations/byInstance/" + serviceInstanceId,
+                    HttpMethod.DELETE, entity, String.class);
+        }catch (Exception ex){
+            log.error("Exception during deleteRelatedBackupData: {}", ex.getMessage());
+        }
     }
 
     private String encodeCredentials(String username, String password) {
