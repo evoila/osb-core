@@ -83,31 +83,32 @@ public class ServiceInstance implements BaseEntity<String> {
 
 	public ServiceInstance(String id, String serviceDefinitionId, String planId, String organizationGuid,
 			String spaceGuid, Map<String, Object> parameters, String dashboardUrl) {
-		initialize(id, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
+		initialize(id, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters, false);
 		setDashboardUrl(dashboardUrl);
 	}
 
 	private void initialize(String id, String serviceDefinitionId, String planId, String organizationGuid,
-			String spaceGuid, Map<String, Object> parameters) {
+							String spaceGuid, Map<String, Object> parameters, boolean allowContextUpdates) {
 		setId(id);
 		setServiceDefinitionId(serviceDefinitionId);
 		setPlanId(planId);
 		setOrganizationGuid(organizationGuid);
 		setSpaceGuid(spaceGuid);
+		setAllowContextUpdates(allowContextUpdates);
 		if (parameters != null)
 			setParameters(parameters);
 	}
 
 	public ServiceInstance(String serviceInstanceId, String serviceDefinitionId, String planId, String organizationGuid,
 			String spaceGuid, Map<String, Object> parameters, String dashboardUrl, String internalId) {
-		initialize(serviceInstanceId, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
+		initialize(serviceInstanceId, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters, false);
 		setInternalId(internalId);
 		setDashboardUrl(dashboardUrl);
 	}
 
 	public ServiceInstance(ServiceInstance serviceInstance, String dashboardUrl, String internalId) {
 		initialize(serviceInstance.id, serviceInstance.serviceDefinitionId, serviceInstance.planId,
-				serviceInstance.organizationGuid, serviceInstance.spaceGuid, serviceInstance.parameters);
+				serviceInstance.organizationGuid, serviceInstance.spaceGuid, serviceInstance.parameters, false);
 		this.setHosts(serviceInstance.getHosts());
 		setInternalId(internalId);
 		setDashboardUrl(dashboardUrl);
@@ -116,7 +117,7 @@ public class ServiceInstance implements BaseEntity<String> {
 	public ServiceInstance(ServiceInstance serviceInstance, String dashboardUrl, String internalId,
 			List<ServerAddress> hosts) {
 		initialize(serviceInstance.id, serviceInstance.serviceDefinitionId, serviceInstance.planId,
-				serviceInstance.organizationGuid, serviceInstance.spaceGuid, serviceInstance.parameters);
+				serviceInstance.organizationGuid, serviceInstance.spaceGuid, serviceInstance.parameters, false);
 		setInternalId(internalId);
 		setDashboardUrl(dashboardUrl);
 		setHosts(hosts);
@@ -124,14 +125,14 @@ public class ServiceInstance implements BaseEntity<String> {
 
 	public ServiceInstance(String serviceInstanceId, String serviceDefinitionId, String planId, String organizationGuid,
 			String spaceGuid, Map<String, Object> parameters, Context context) {
-		initialize(serviceInstanceId, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters);
+		initialize(serviceInstanceId, serviceDefinitionId, planId, organizationGuid, spaceGuid, parameters, false);
 		if(context != null)
 			setContext(context);
 	}
 
     public ServiceInstance(ServiceInstance serviceInstance, String internalId) {
         initialize(serviceInstance.id, serviceInstance.serviceDefinitionId, serviceInstance.planId,
-                serviceInstance.organizationGuid, serviceInstance.spaceGuid, serviceInstance.parameters);
+                serviceInstance.organizationGuid, serviceInstance.spaceGuid, serviceInstance.parameters, serviceInstance.isAllowContextUpdates());
         setInternalId(internalId);
     }
 

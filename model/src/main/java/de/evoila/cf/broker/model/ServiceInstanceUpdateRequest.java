@@ -36,7 +36,7 @@ public class ServiceInstanceUpdateRequest extends BaseServiceInstanceRequest {
     }
 
     public Boolean isContextUpdate() {
-	    return (parameters == null || parameters.isEmpty()) && (context != null);
+	    return (parameters == null && planId == null || planId == null && parameters.isEmpty()) && (context != null);
     }
 
     @Override
