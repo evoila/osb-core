@@ -126,7 +126,10 @@ public class ServiceInstanceController extends BaseController {
         if (request.getServiceDefinitionId() == null) {
             return new ResponseEntity<>("Missing required fields: service_id", HttpStatus.BAD_REQUEST);
         }
-        checkMaintenanceInfo(request);
+
+        if (request.getPlanId() != null) {
+            checkMaintenanceInfo(request);
+        }
 
         log.debug("PATCH: " + SERVICE_INSTANCE_BASE_PATH + "/{instanceId}"
                 + ", updateServiceInstance(), serviceInstanceId = " + serviceInstanceId);
