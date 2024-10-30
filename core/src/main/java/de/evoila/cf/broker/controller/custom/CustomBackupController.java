@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  **/
 @RestController
 @RequestMapping(value = "/custom/v2/manage/backup")
-@ConditionalOnBean(BackupConfiguration.class)
+@ConditionalOnBean(BackupCustomService.class)
 public class CustomBackupController extends BaseController {
 
     private BackupCustomService backupCustomService;
