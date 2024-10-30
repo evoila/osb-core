@@ -185,12 +185,16 @@ public class DeploymentServiceImpl implements DeploymentService {
             ServiceInstanceUpdateRequest request) throws ServiceBrokerException, ServiceInstanceDoesNotExistException,
             ServiceDefinitionDoesNotExistException, ServiceDefinitionPlanDoesNotExistException, ValidationException {
         ServiceInstance serviceInstance = serviceInstanceRepository.getServiceInstance(serviceInstanceId);
-        Plan plan = serviceDefinitionRepository.getPlan(request.getServiceDefinitionId(), request.getPlanId());
+        Plan plan;
+        if (request.getPlanId() != null) {
+            plan = serviceDefinitionRepository.getPlan(request.getServiceDefinitionId(), request.getPlanId());
+        } else {
+            plan = serviceDefinitionRepository.getPlan(serviceInstance.getServiceDefinitionId(), serviceInstance.getPlanId());
+        }
 
         if (request.getParameters() == null) {
             request.setParameters(new HashMap<String, Object>());
         }
-
         JsonSchema jsonSchema = ParameterUtil.resolve(() -> plan.getSchemas().getServiceInstance().getUpdate().getParameters()).orElse(null);
         if (jsonSchema != null) {
                 try{
@@ -201,8 +205,6 @@ public class DeploymentServiceImpl implements DeploymentService {
             }
 
             ParameterValidator.validateParameters(request, plan, true);
-
-
         PlatformService platformService = platformRepository.getPlatformService(plan.getPlatform());
 
         if (platformService == null) {
@@ -210,6 +212,7 @@ public class DeploymentServiceImpl implements DeploymentService {
         }
 
         ServiceInstanceOperationResponse serviceInstanceOperationResponse = new ServiceInstanceOperationResponse();
+        //actual update
         if (platformService.isSyncPossibleOnUpdate(serviceInstance, plan)) {
             syncUpdateInstance(serviceInstance, request.getParameters(), plan, platformService);
         } else {
