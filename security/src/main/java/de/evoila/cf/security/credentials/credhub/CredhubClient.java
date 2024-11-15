@@ -324,8 +324,8 @@ public class CredhubClient implements CredentialStore {
         CredentialDetails<org.springframework.credhub.support.certificate.CertificateCredential> certificate = credHubOperations.credentials()
                 .getByName(this.identifier(instanceId, valueName), org.springframework.credhub.support.certificate.CertificateCredential.class);
 
-        return new CertificateCredential(certificate.getValue().getCertificateAuthority(),
-                certificate.getValue().getCertificate(),
+        return new CertificateCredential(certificate.getValue().getCertificate(),
+                certificate.getValue().getCertificateAuthority(),
                 certificate.getValue().getPrivateKey());
     }
 
